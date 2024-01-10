@@ -50,13 +50,9 @@ public class AgentMover : MonoBehaviour
     {
         _behaviorArgs.CurrentVelocity = rigidBody.velocity;
         SteeringOutput steeringOutput = steeringBehavior.GetSteering(_behaviorArgs);
-        SteeringOutput steeringOutputClamped = ClampSteeringOutput(steeringOutput);
-        Vector2 newVelocity = GetNewVelocity(steeringOutputClamped, Time.fixedDeltaTime);
-        // rigidBody.velocity = newVelocity.magnitude < stopSpeed? Vector2.zero : newVelocity;
-        rigidBody.velocity = newVelocity;
+        rigidBody.velocity = steeringOutput.Linear;
         currentSpeed = rigidBody.velocity.magnitude;
         Debug.Log(currentSpeed);
-        // rigidBody.rotation += GetNewRotation(Time.fixedTime);
     }
 
     /// <summary>
