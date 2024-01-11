@@ -133,15 +133,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 805878432534679699, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
       propertyPath: m_Color.g
-      value: 0.018442066
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 805878432534679699, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
       propertyPath: m_Color.r
-      value: 0.98039216
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2027878817541019284, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
+      propertyPath: stopSpeed
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 2027878817541019284, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
       propertyPath: maximumSpeed
-      value: 2
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 2027878817541019284, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
       propertyPath: steeringBehavior
@@ -157,11 +161,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8382297402706859929, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 6.46
+      value: -3.37
       objectReference: {fileID: 0}
     - target: {fileID: 8382297402706859929, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.95
+      value: 0.36
       objectReference: {fileID: 0}
     - target: {fileID: 8382297402706859929, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
       propertyPath: m_LocalPosition.z
@@ -345,6 +349,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 805878432534679699, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
+      propertyPath: m_Color.g
+      value: 0.06575368
+      objectReference: {fileID: 0}
+    - target: {fileID: 805878432534679699, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2027878817541019284, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
       propertyPath: stopSpeed
       value: 0.1
@@ -363,6 +375,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2027878817541019284, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
       propertyPath: maximumDeceleration
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3252367746477992068, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
+      propertyPath: agentColor.g
+      value: 0.06575368
+      objectReference: {fileID: 0}
+    - target: {fileID: 3252367746477992068, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
+      propertyPath: agentColor.r
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6704505390198798578, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
@@ -940,5 +960,5 @@ SceneRoots:
   - {fileID: 519420032}
   - {fileID: 283550404}
   - {fileID: 415000272}
-  - {fileID: 241666227}
   - {fileID: 129316321}
+  - {fileID: 241666227}
