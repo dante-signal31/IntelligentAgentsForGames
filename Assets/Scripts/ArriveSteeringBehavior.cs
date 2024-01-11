@@ -46,8 +46,7 @@ public class ArriveSteeringBehavior : SteeringBehavior
         }
         
         Vector2 newVelocity = toTarget.normalized * newSpeed;
-        Vector2 newLinearAcceleration = newVelocity - currentVelocity;
         
-        return new SteeringOutput(newLinearAcceleration, 0);
+        return new SteeringOutput(newVelocity, 0);
     }
 }

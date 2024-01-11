@@ -8,7 +8,7 @@ public class SeekSteeringBehavior : SteeringBehavior
     [Header("CONFIGURATION:")]
     public GameObject target;
     [Tooltip("Distance at which we give our goal as reached and we stop our agent.")]
-    [SerializeField] private float arrivalDistance;
+    public float arrivalDistance;
     
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
