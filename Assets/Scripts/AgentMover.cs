@@ -18,7 +18,7 @@ public class AgentMover : MonoBehaviour
     [SerializeField] private float maximumSpeed;
     [Tooltip("Speed at which we consider agent should stop.")]
     [SerializeField] private float stopSpeed;
-    [Tooltip("Movement rotation will not surpass this maximum rotational speed.")]
+    [Tooltip("Movement rotation will not surpass this maximum rotational speed (degress).")]
     [SerializeField] private float maximumRotationalSpeed;
     [Tooltip("Maximum acceleration for this agent.")]
     [SerializeField] private float maximumAcceleration;

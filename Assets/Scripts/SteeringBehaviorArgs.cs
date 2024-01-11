@@ -50,6 +50,11 @@ public class SteeringBehaviorArgs
     /// </summary>
     public Vector2 Position => CurrentAgent.transform.position;
 
+    /// <summary>
+    /// This GameObject rotation (Z axis por a 2D game).
+    /// </summary>
+    public float Orientation => CurrentAgent.transform.rotation.eulerAngles.z;
+
     public SteeringBehaviorArgs(GameObject currentAgent, Vector2 currentVelocity,
         float maximumSpeed, float stopSpeed, float maximumRotationalSpeed, float maximumAcceleration,
         float maximumDeceleration, float deltaTime)

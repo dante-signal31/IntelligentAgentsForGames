@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 /// <summary>
 /// Monobehaviour to offer a Seek steering behaviour.
@@ -15,7 +14,7 @@ public class ArriveSteeringBehavior : SteeringBehavior
     [SerializeField] private float arrivingRadius;
     [Tooltip("Deceleration curve.")] 
     [SerializeField] private AnimationCurve decelerationCurve;
-    [Tooltip("At this distance from target agent will be at full speed.")]
+    [Tooltip("At this distance from start point will be at full speed.")]
     [SerializeField] private float accelerationRadius;
     [Tooltip("Acceleration curve.")] 
     [SerializeField] private AnimationCurve accelerationCurve;
