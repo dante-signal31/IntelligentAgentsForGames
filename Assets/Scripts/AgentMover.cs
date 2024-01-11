@@ -53,6 +53,7 @@ public class AgentMover : MonoBehaviour
         _behaviorArgs.DeltaTime = Time.fixedDeltaTime;
         SteeringOutput steeringOutput = steeringBehavior.GetSteering(_behaviorArgs);
         rigidBody.velocity = steeringOutput.Linear;
+        transform.up = rigidBody.velocity;
         currentSpeed = rigidBody.velocity.magnitude;
         Debug.Log(currentSpeed);
     }
