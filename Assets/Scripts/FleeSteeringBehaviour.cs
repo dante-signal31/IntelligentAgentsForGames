@@ -13,23 +13,37 @@ public class FleeSteeringBehavior : SteeringBehavior
     [FormerlySerializedAs("target")] [Header("CONFIGURATION:")]
     public GameObject threath;
     [Tooltip("Minimum distance to threath before fleeing.")]
-    [SerializeField] private float PanicDistance;
+    public float PanicDistance;
 
+    private GameObject _currentThreath;
+    private Vector2 _threathPosition;
+    
     private void Start()
     {
         seekSteeringBehaviour.target = threath;
     }
+    
+    /// <summary>
+    /// Load target data.
+    /// </summary>
+    private void UpdateThreathData()
+    {
+        _currentThreath = threath;
+        _threathPosition = _currentThreath.transform.position;
+        seekSteeringBehaviour.target = _currentThreath;
+    }
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
+        UpdateThreathData();
         if (Vector2.Distance(
                 args.CurrentAgent.transform.position,
-                threath.transform.position) > PanicDistance)
+                _threathPosition) > PanicDistance)
         { // Out of panic distance, so we stop accelerating.
             return new SteeringOutput();
         }
         else
-        { // Threath inside panic distance, so run. 
+        { // Threath inside panic distance, so run in the opposite direction seek would advise.. 
             SteeringOutput approachSteeringOutput = seekSteeringBehaviour.GetSteering(args);
             SteeringOutput fleeSteeringOutput = new SteeringOutput(
                 approachSteeringOutput.Linear * -1,

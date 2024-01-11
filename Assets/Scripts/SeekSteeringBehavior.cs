@@ -10,6 +10,9 @@ public class SeekSteeringBehavior : SteeringBehavior
     [Tooltip("Distance at which we give our goal as reached and we stop our agent.")]
     public float arrivalDistance;
     
+    private GameObject _currentThreath;
+    private Vector2 _threathPosition;
+    
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
         Vector2 targetPosition = target.transform.position;

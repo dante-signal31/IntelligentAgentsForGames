@@ -34,9 +34,9 @@ public class PursuitSteeringBehavior : SteeringBehavior
     {
         _cosAheadSemiConeRadians = Mathf.Cos(aheadSemiConeRadians);
         _cosComingToUsSemiConeRadians = Mathf.Cos(comingToUsSemiConeRadians);
-        seekSteeringBehaviour.target = positionMarker;
         seekSteeringBehaviour.arrivalDistance = arrivalDistance;
         _positionMarker = Instantiate(positionMarker, Vector2.zero, Quaternion.identity);
+        seekSteeringBehaviour.target = _positionMarker;
     }
 
     /// <summary>
@@ -67,6 +67,9 @@ public class PursuitSteeringBehavior : SteeringBehavior
         }
         else
         { // Target is not ahead so we must predict where it will be.
+            //The look-ahead time is proportional to the distance between the evader
+            //and the pursuer; and is inversely proportional to the sum of the
+            //agents' velocities
             float lookAheadTime = toTarget.magnitude / (maximumSpeed + _targetRigidBody.velocity.magnitude);
             _positionMarker.transform.position = _targetPosition + _targetRigidBody.velocity * lookAheadTime;
             seekSteeringBehaviour.target = _positionMarker;
