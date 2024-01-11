@@ -39,6 +39,11 @@ public class SteeringBehaviorArgs
     /// Maximum deceleration for this steering.
     /// </summary>
     public float MaximumDeceleration { get; private set; }
+    
+    /// <summary>
+    /// Delta time since last steering behavior update.
+    /// </summary>
+    public float DeltaTime { get; set; }
 
     /// <summary>
     /// This GameObject position.
@@ -47,7 +52,7 @@ public class SteeringBehaviorArgs
 
     public SteeringBehaviorArgs(GameObject currentAgent, Vector2 currentVelocity,
         float maximumSpeed, float stopSpeed, float maximumRotationalSpeed, float maximumAcceleration,
-        float maximumDeceleration)
+        float maximumDeceleration, float deltaTime)
     {
         CurrentVelocity = currentVelocity;
         MaximumSpeed = maximumSpeed;
@@ -56,5 +61,6 @@ public class SteeringBehaviorArgs
         CurrentAgent = currentAgent;
         MaximumAcceleration = maximumAcceleration;
         MaximumDeceleration = maximumDeceleration;
+        DeltaTime = deltaTime;
     }
 }

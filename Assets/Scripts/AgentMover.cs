@@ -38,7 +38,8 @@ public class AgentMover : MonoBehaviour
             stopSpeed,
             maximumRotationalSpeed,
             maximumAcceleration,
-            maximumDeceleration);
+            maximumDeceleration,
+            0);
     }
 
     private void Awake()
@@ -49,6 +50,7 @@ public class AgentMover : MonoBehaviour
     private void FixedUpdate()
     {
         _behaviorArgs.CurrentVelocity = rigidBody.velocity;
+        _behaviorArgs.DeltaTime = Time.fixedDeltaTime;
         SteeringOutput steeringOutput = steeringBehavior.GetSteering(_behaviorArgs);
         rigidBody.velocity = steeringOutput.Linear;
         currentSpeed = rigidBody.velocity.magnitude;
