@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.Serialization;
 
 /// <summary>
 /// Monobehaviour to offer an Align steering behaviour.
@@ -9,7 +8,6 @@ public class AlignSteeringBehavior : SteeringBehavior
     [Header("CONFIGURATION:")]
     [Tooltip("Target to align with.")]
     public GameObject target;
-    [FormerlySerializedAs("brakingRadius")]
     [Tooltip("Rotation to start to slow down (degress).")]
     [SerializeField] private float decelerationRadius;
     [Tooltip("At this rotation from target angle will full stop (degress).")]
