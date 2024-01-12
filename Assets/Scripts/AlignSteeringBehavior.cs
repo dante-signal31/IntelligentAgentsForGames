@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// Monobehaviour to offer an Align steering behaviour.
@@ -8,8 +9,9 @@ public class AlignSteeringBehavior : SteeringBehavior
     [Header("CONFIGURATION:")]
     [Tooltip("Target to align with.")]
     public GameObject target;
+    [FormerlySerializedAs("brakingRadius")]
     [Tooltip("Rotation to start to slow down (degress).")]
-    [SerializeField] private float brakingRadius;
+    [SerializeField] private float decelerationRadius;
     [Tooltip("At this rotation from target angle will full stop (degress).")]
     [SerializeField] private float arrivingRadius;
     [Tooltip("Deceleration curve.")] 
@@ -42,13 +44,22 @@ public class AlignSteeringBehavior : SteeringBehavior
         float maximumRotationalSpeed = args.MaximumRotationalSpeed;
         
         
-        float toTargetOrientation = Mathf.DeltaAngle(currentOrientation, _targetOrientation);
+        float toTargetRotation = Mathf.DeltaAngle(currentOrientation, _targetOrientation);
+        float toTargetRotationAbs = Mathf.Abs(toTargetRotation);
+        int rotationSide = (toTargetRotation < 0) ? -1 : 1;
 
         float newRotationalSpeed = 0.0f;
+
+        if (_idle && toTargetRotationAbs < arrivingRadius)
+        {
+            return new SteeringOutput(Vector2.zero, 0);
+        }
+        else if (_idle && _rotationFromStart > 0)
+        {
+            _rotationFromStart = 0;
+        }
         
-        if (_idle && _rotationFromStart > 0) _rotationFromStart = 0;
-        
-        if (toTargetOrientation >= arrivingRadius && _rotationFromStart < accelerationRadius)
+        if (toTargetRotationAbs >= arrivingRadius && Mathf.Abs(_rotationFromStart) < accelerationRadius)
         { // Acceleration phase.
             if (_idle)
             {
@@ -56,20 +67,20 @@ public class AlignSteeringBehavior : SteeringBehavior
                 _idle = false;
             }
             _rotationFromStart = Mathf.DeltaAngle(currentOrientation, _startOrientation);
-            newRotationalSpeed = maximumRotationalSpeed * accelerationCurve.Evaluate(_rotationFromStart / accelerationRadius);
+            newRotationalSpeed = maximumRotationalSpeed * accelerationCurve.Evaluate(Mathf.Abs(_rotationFromStart) / accelerationRadius) * rotationSide;
         }
-        else if (toTargetOrientation < brakingRadius && toTargetOrientation >= arrivingRadius)
+        else if (toTargetRotationAbs < decelerationRadius && toTargetRotationAbs >= arrivingRadius)
         { // Deceleration phase.
-            newRotationalSpeed = maximumRotationalSpeed * decelerationCurve.Evaluate(toTargetOrientation / brakingRadius);
+            newRotationalSpeed = maximumRotationalSpeed * decelerationCurve.Evaluate(toTargetRotationAbs / decelerationRadius) * rotationSide;
         }
-        else if (toTargetOrientation < arrivingRadius)
+        else if (toTargetRotationAbs < arrivingRadius)
         { // Stop phase.
             newRotationalSpeed = 0;
             _idle = true;
         }
         else
         { // Cruise speed phase.
-            newRotationalSpeed = maximumRotationalSpeed;
+            newRotationalSpeed = maximumRotationalSpeed * rotationSide;
         }
         
         return new SteeringOutput(Vector2.zero, newRotationalSpeed);

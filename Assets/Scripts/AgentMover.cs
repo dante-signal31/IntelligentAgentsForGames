@@ -1,6 +1,7 @@
 using System.Numerics;
 using UnityEngine;
 using Vector2 = UnityEngine.Vector2;
+using Vector3 = UnityEngine.Vector3;
 
 /// <summary>
 /// This scripts moves its prefab following steering behaviours components.
@@ -53,7 +54,16 @@ public class AgentMover : MonoBehaviour
         _behaviorArgs.DeltaTime = Time.fixedDeltaTime;
         SteeringOutput steeringOutput = steeringBehavior.GetSteering(_behaviorArgs);
         rigidBody.velocity = steeringOutput.Linear;
-        transform.up = rigidBody.velocity;
+        if (steeringOutput.Angular == 0 && rigidBody.velocity != Vector2.zero)
+        {
+            transform.up = rigidBody.velocity;
+        }
+        else
+        {
+            transform.eulerAngles = new Vector3(transform.eulerAngles.x, 
+                transform.eulerAngles.y, 
+                transform.eulerAngles.z + steeringOutput.Angular);
+        }
         currentSpeed = rigidBody.velocity.magnitude;
         Debug.Log(currentSpeed);
     }
