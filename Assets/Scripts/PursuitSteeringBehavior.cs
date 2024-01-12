@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 /// <summary>
 /// Monobehaviour to offer a Pursuit steering behaviour.
@@ -13,6 +14,8 @@ public class PursuitSteeringBehavior : SteeringBehavior
     public GameObject targetAgent;
     [Tooltip("Prefab used to mark next position to reach by pursuer.")]
     [SerializeField] private GameObject positionMarker;
+    [Tooltip("Make visible position marker.")] 
+    [SerializeField] private bool positionMarkerVisible = true;
     [Tooltip("Distance at which we give our goal as reached and we stop our agent.")]
     [SerializeField] private float arrivalDistance;
     [Tooltip("Radians from forward vector inside which we consider an object is ahead.")]
@@ -36,7 +39,13 @@ public class PursuitSteeringBehavior : SteeringBehavior
         _cosComingToUsSemiConeRadians = Mathf.Cos(comingToUsSemiConeRadians);
         seekSteeringBehaviour.arrivalDistance = arrivalDistance;
         _positionMarker = Instantiate(positionMarker, Vector2.zero, Quaternion.identity);
+        _positionMarker.GetComponentInChildren<SpriteRenderer>().enabled = positionMarkerVisible;
         seekSteeringBehaviour.target = _positionMarker;
+    }
+
+    private void OnDestroy()
+    {
+        Destroy(_positionMarker);
     }
 
     /// <summary>

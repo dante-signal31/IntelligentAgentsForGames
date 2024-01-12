@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 /// <summary>
 /// Monobehaviour to offer a velocity match steering behaviour.
@@ -14,11 +13,11 @@ public class VelocityMatchingSteeringBehavior : SteeringBehavior
 
     private GameObject _currentTarget;
     private Vector2 _targetVelocity;
-    private Rigidbody2D _rigidBody;
+    private Rigidbody2D _targetRigidBody;
 
     private void Awake()
     {
-        _rigidBody = target.GetComponentInChildren<Rigidbody2D>();
+        _targetRigidBody = target.GetComponentInChildren<Rigidbody2D>();
     }
 
     /// <summary>
@@ -28,10 +27,10 @@ public class VelocityMatchingSteeringBehavior : SteeringBehavior
     {
         if (_currentTarget != target)
         {
-            _rigidBody = target.GetComponentInChildren<Rigidbody2D>();
+            _targetRigidBody = target.GetComponentInChildren<Rigidbody2D>();
             _currentTarget = target;
         }
-        _targetVelocity = _rigidBody.velocity;
+        _targetVelocity = _targetRigidBody.velocity;
     }
     
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
