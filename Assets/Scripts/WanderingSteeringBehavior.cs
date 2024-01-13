@@ -21,7 +21,7 @@ public class WanderingSteeringBehavior : SteeringBehavior
     [SerializeField] private float wanderRadius;
     [Tooltip("This is the distance the wander ircle is projected in front of the agent. KEEP IT OVER wanderRadius!")]
     [SerializeField] private float wanderDistance;
-    [Tooltip("Maximum amount of random displacement that can be added to the target each second.")]
+    [Tooltip("Maximum amount of random displacement that can be added to the target each second. KEEP IT OVER wanderRadius.")]
     [SerializeField] private float wanderJitter;
     
     private GameObject _marker;
