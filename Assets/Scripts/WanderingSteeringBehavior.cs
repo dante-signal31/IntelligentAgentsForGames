@@ -17,17 +17,17 @@ public class WanderingSteeringBehavior : SteeringBehavior
     [SerializeField] private bool positionMarkerVisible = true;
     [Tooltip("Distance at which we give our goal as reached and we stop our agent.")]
     [SerializeField] private float arrivalDistance;
-    [Tooltip("This is the radius of the constraining circle.")] 
+    [Tooltip("This is the radius of the constraining circle. KEEP IT UNDER wanderDistance!")] 
     [SerializeField] private float wanderRadius;
-    [Tooltip("This is the distance the wander ircle is projected in front of the agent.")]
+    [Tooltip("This is the distance the wander ircle is projected in front of the agent. KEEP IT OVER wanderRadius!")]
     [SerializeField] private float wanderDistance;
     [Tooltip("Maximum amount of random displacement that can be added to the target each second.")]
     [SerializeField] private float wanderJitter;
     
     private GameObject _marker;
-    private Vector2 _markerPosition;
-    private Vector2 _wanderPosition;
-    private Vector2 _wanderRelativePosition;
+    // private Vector2 _markerPosition;
+    // private Vector2 _wanderPosition;
+    private Vector2 _wanderLocalPosition;
 
     private void Awake()
     {
@@ -36,7 +36,7 @@ public class WanderingSteeringBehavior : SteeringBehavior
         seekSteeringBehaviour.arrivalDistance = arrivalDistance;
         
         // WanderPosition is a point constrained to the edge of a circle of radius wanderRadius.
-        _wanderPosition = GetRandomCircunferencePoint(transform.position, 
+        _wanderLocalPosition = GetRandomCircunferencePoint(Vector2.zero, 
             wanderRadius);
     }
     
@@ -58,23 +58,18 @@ public class WanderingSteeringBehavior : SteeringBehavior
     
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        // Place again wanderPosition over circle around agent.
-        _wanderPosition = args.Position + _wanderRelativePosition;
-        
         // Add random displacement over an area of a circle or radius wanderJitter.
-        _wanderPosition += Random.insideUnitCircle * wanderJitter;
+        _wanderLocalPosition += Random.insideUnitCircle * wanderJitter;
         
         // Reproject this new vector back onto a unit circle.
-        _wanderPosition = _wanderPosition.normalized * wanderRadius;
+        _wanderLocalPosition = _wanderLocalPosition.normalized * wanderRadius;
         
-        // Move the marker into a position WanderDist in front of the agent.
-        Vector2 targetLocal = _wanderPosition + new Vector2(wanderDistance, 0);
+        // Create a targetLocal into a position WanderDist distance in front of the agent.
+        // Remember Y local axis is our forward axis.
+        Vector2 targetLocal = _wanderLocalPosition + new Vector2(0, wanderDistance);
         
-        _marker.transform.position = targetLocal;
-
-        // Keep relative position to place again wander position over de circle around
-        // the agent after it moves.
-        _wanderRelativePosition = _wanderPosition - args.Position;
+        // Place targetLocal as relative to agent.
+        _marker.transform.position = args.CurrentAgent.transform.TransformPoint(targetLocal);
         
         return seekSteeringBehaviour.GetSteering(args);
     }
