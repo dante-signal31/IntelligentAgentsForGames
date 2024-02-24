@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// Monobehaviour to offer a Pursuit steering behaviour.
@@ -20,9 +21,28 @@ public class PursuitSteeringBehavior : SteeringBehavior
     [Tooltip("Radians from forward vector inside which we consider an object is ahead.")]
     [Range(0, Mathf.PI/2)]
     [SerializeField] private float aheadSemiConeRadians;
-    [Tooltip("Radians from forward vector inside which we consider an object is going.")]
+    [FormerlySerializedAs("comingToUUsSemiConeRadians")]
+    [Tooltip("Radians from forward vector inside which we consider an object is going toward us.")]
     [Range(Mathf.PI/2, Mathf.PI)]
     [SerializeField] private float comingToUsSemiConeRadians;
+
+    /// <summary>
+    /// Radians from forward vector inside which we consider an object is ahead.
+    /// </summary>
+    public float AheadSemiConeRadians
+    {
+        get => aheadSemiConeRadians;
+        set => aheadSemiConeRadians = Mathf.Clamp(value, 0, Mathf.PI / 2);
+    }
+
+    /// <summary>
+    /// Radians from forward vector inside which we consider an object is going toward us.
+    /// </summary>
+    public float ComingToUsSemiConeRadians
+    {
+        get => comingToUsSemiConeRadians;
+        set => comingToUsSemiConeRadians = Mathf.Clamp(value, Mathf.PI / 2, Mathf.PI);
+    }
 
     private Rigidbody2D _targetRigidBody;
     private Vector2 _targetPosition;
