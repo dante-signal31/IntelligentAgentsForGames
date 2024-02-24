@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEditor;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 /// <summary>
@@ -7,6 +9,8 @@ using UnityEngine.Serialization;
 [RequireComponent(typeof(FleeSteeringBehavior))]
 public class EvadeSteeringBehavior : SteeringBehavior
 {
+    private const float MinimumPanicDistance = 0.3f;
+    
     [FormerlySerializedAs("seekSteeringBehaviour")]
     [Header("WIRING:")] 
     [SerializeField] private FleeSteeringBehavior fleeSteeringBehaviour;
@@ -16,8 +20,10 @@ public class EvadeSteeringBehavior : SteeringBehavior
     [Tooltip("Prefab used to mark next position to reach by pursuer.")]
     [SerializeField] private GameObject positionMarker;
     [Tooltip("Minimum distance to threath before fleeing.")]
-    [SerializeField] private float PanicDistance;
-
+    [Min(MinimumPanicDistance)]
+    [SerializeField] private float panicDistance = 1.0f;
+    // public float panicDistance = 1.0f;
+    
     private Rigidbody2D _threathRigidBody;
     private Vector2 _threathPosition;
     private GameObject _currentThreath;
@@ -26,10 +32,19 @@ public class EvadeSteeringBehavior : SteeringBehavior
     private float _cosComingToUsSemiConeRadians;
     private GameObject _positionMarker;
 
+    public float PanicDistance
+    {
+        get => panicDistance;
+        set
+        {
+            panicDistance = Mathf.Max(MinimumPanicDistance, value);
+        }
+    }
+    
     private void Start()
     {
         fleeSteeringBehaviour.threath = positionMarker;
-        fleeSteeringBehaviour.PanicDistance = PanicDistance;
+        fleeSteeringBehaviour.PanicDistance = panicDistance;
         _positionMarker = Instantiate(positionMarker, Vector2.zero, Quaternion.identity);
     }
 

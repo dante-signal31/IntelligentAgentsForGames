@@ -119,4 +119,4 @@ MonoBehaviour:
   fleeSteeringBehaviour: {fileID: 4610528816202031183}
   threathAgent: {fileID: 0}
   positionMarker: {fileID: 0}
-  PanicDistance: 0
+  PanicDistance: 1
