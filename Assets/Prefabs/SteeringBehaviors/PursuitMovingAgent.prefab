@@ -103,5 +103,5 @@ MonoBehaviour:
   positionMarker: {fileID: 0}
   positionMarkerVisible: 1
   arrivalDistance: 0.1
-  aheadSemiConeRadians: 0.19200192
+  aheadSemiConeRadians: 0.27561972
   comingToUsSemiConeRadians: 2.8631608

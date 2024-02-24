@@ -24,10 +24,14 @@ public class DrawPursuitCones : Editor
         Vector3 pursuerPosition = pursuer.transform.position;
         float aheadSemiConeDegrees = Mathf.Rad2Deg * pursuer.AheadSemiConeRadians;
         Vector3 forward = pursuer.transform.up;
-        Vector3 rotatedVector = pursuerPosition + Quaternion.Euler(0, 0, aheadSemiConeDegrees) * forward;
-        Vector3 aheadSemiConePosition = Handles.PositionHandle(rotatedVector,
+        // Rotate in local space.
+        // I don't know why rotated vector is only 0.5 length so I have to multiply by two to get a 1 unit length vector.
+        Vector3 rotatedVector = Quaternion.AngleAxis(aheadSemiConeDegrees, Vector3.forward) * Vector3.up * 2;
+        // Handle is placed in world space so rotated vector must be taken back to world space.
+        Vector3 aheadSemiConePosition = Handles.PositionHandle(pursuer.transform.TransformPoint(rotatedVector), 
             Quaternion.identity);
-        pursuer.AheadSemiConeRadians = Mathf.Deg2Rad * Vector2.Angle(forward, 
+        // Again, we rotate in local space, so aheadSemiConePosition is taken back to local space.
+        pursuer.AheadSemiConeRadians = Mathf.Deg2Rad * Vector2.Angle(Vector3.up, 
             pursuer.transform.InverseTransformPoint(aheadSemiConePosition));
         Handles.DrawSolidArc(pursuerPosition, Vector3.forward, 
             forward, aheadSemiConeDegrees, 1);
@@ -41,10 +45,10 @@ public class DrawPursuitCones : Editor
         Vector3 pursuerPosition = pursuer.transform.position;
         float comingToUsConeDegrees = Mathf.Rad2Deg * pursuer.ComingToUsSemiConeRadians;
         Vector3 forward = pursuer.transform.up;
-        Vector3 rotatedVector = pursuerPosition + Quaternion.Euler(0, 0, comingToUsConeDegrees) * forward;
-        Vector3 comingToUsSemiConePosition = Handles.PositionHandle(rotatedVector,
+        Vector3 rotatedVector = Quaternion.AngleAxis(comingToUsConeDegrees, Vector3.forward) * Vector3.up * 2;
+        Vector3 comingToUsSemiConePosition = Handles.PositionHandle(pursuer.transform.TransformPoint(rotatedVector),
             Quaternion.identity);
-        pursuer.ComingToUsSemiConeRadians = Mathf.Deg2Rad * Vector2.Angle(forward, 
+        pursuer.ComingToUsSemiConeRadians = Mathf.Deg2Rad * Vector2.Angle(Vector3.up, 
             pursuer.transform.InverseTransformPoint(comingToUsSemiConePosition));
         Handles.DrawSolidArc(pursuerPosition, Vector3.forward, 
             -forward, (180 - comingToUsConeDegrees), 1);
