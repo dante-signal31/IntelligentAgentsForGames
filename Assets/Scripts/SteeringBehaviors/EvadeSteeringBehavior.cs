@@ -22,7 +22,6 @@ public class EvadeSteeringBehavior : SteeringBehavior
     [Tooltip("Minimum distance to threath before fleeing.")]
     [Min(MinimumPanicDistance)]
     [SerializeField] private float panicDistance;
-    // public float panicDistance = 1.0f;
     
     private Rigidbody2D _threathRigidBody;
     private Vector2 _threathPosition;

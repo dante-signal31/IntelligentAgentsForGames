@@ -65,10 +65,4 @@ public class FleeSteeringBehavior : SteeringBehavior
             return fleeSteeringOutput;
         }
     }
-
-    // private void OnDrawGizmosSelected()
-    // {
-    //     Gizmos.color = Color.red;
-    //     Gizmos.DrawWireSphere(transform.position, PanicDistance);
-    // }
 }
