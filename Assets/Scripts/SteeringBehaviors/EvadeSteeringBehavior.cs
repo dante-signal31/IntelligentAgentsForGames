@@ -38,13 +38,14 @@ public class EvadeSteeringBehavior : SteeringBehavior
         set
         {
             panicDistance = Mathf.Max(MinimumPanicDistance, value);
+            fleeSteeringBehaviour.panicDistance = panicDistance;
         }
     }
     
     private void Start()
     {
         fleeSteeringBehaviour.threath = positionMarker;
-        fleeSteeringBehaviour.PanicDistance = panicDistance;
+        fleeSteeringBehaviour.panicDistance = panicDistance;
         _positionMarker = Instantiate(positionMarker, Vector2.zero, Quaternion.identity);
     }
 
