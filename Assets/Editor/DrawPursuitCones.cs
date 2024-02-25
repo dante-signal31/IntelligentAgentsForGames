@@ -20,7 +20,7 @@ public class DrawPursuitCones : Editor
 
     private static void drawAheadCone(PursuitSteeringBehavior pursuer)
     {
-        Handles.color =Color.blue;
+        Handles.color = new Color(0f, 0f, 1f, 0.1f);
         Vector3 pursuerPosition = pursuer.transform.position;
         float aheadSemiConeDegrees = Mathf.Rad2Deg * pursuer.AheadSemiConeRadians;
         Vector3 forward = pursuer.transform.up;
@@ -41,7 +41,7 @@ public class DrawPursuitCones : Editor
     
     private static void drawComingToUsCone(PursuitSteeringBehavior pursuer)
     {
-        Handles.color =Color.yellow;
+        Handles.color = new Color(1, 0.92f, 0.016f, 0.3f);
         Vector3 pursuerPosition = pursuer.transform.position;
         float comingToUsConeDegrees = Mathf.Rad2Deg * pursuer.ComingToUsSemiConeRadians;
         Vector3 forward = pursuer.transform.up;
