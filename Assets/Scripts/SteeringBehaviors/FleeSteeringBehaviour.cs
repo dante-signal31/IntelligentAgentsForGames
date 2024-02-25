@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 /// <summary>
@@ -15,7 +16,8 @@ public class FleeSteeringBehavior : SteeringBehavior
     [Header("CONFIGURATION:")]
     public GameObject threath;
     [Tooltip("Minimum distance to threath before fleeing.")]
-    public float panicDistance;
+    [Min(MinimumPanicDistance)]
+    [SerializeField] private float panicDistance;
 
     private GameObject _currentThreath;
     private Vector2 _threathPosition;
@@ -63,4 +65,10 @@ public class FleeSteeringBehavior : SteeringBehavior
             return fleeSteeringOutput;
         }
     }
+
+    // private void OnDrawGizmosSelected()
+    // {
+    //     Gizmos.color = Color.red;
+    //     Gizmos.DrawWireSphere(transform.position, PanicDistance);
+    // }
 }

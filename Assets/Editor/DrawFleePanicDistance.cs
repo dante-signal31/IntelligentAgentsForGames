@@ -12,11 +12,12 @@ namespace Editor
         
             EditorGUI.BeginChangeCheck();
             Handles.color =Color.red;
-            evade.PanicDistance =
+            float newPanicDistance =
                 Handles.RadiusHandle(Quaternion.identity, evade.transform.position, evade.PanicDistance);
             if (EditorGUI.EndChangeCheck())
             {
                 Undo.RecordObject(evade, "Changed panic distance.");
+                evade.PanicDistance = newPanicDistance;
             }
         }
     }

@@ -21,7 +21,7 @@ public class EvadeSteeringBehavior : SteeringBehavior
     [SerializeField] private GameObject positionMarker;
     [Tooltip("Minimum distance to threath before fleeing.")]
     [Min(MinimumPanicDistance)]
-    [SerializeField] private float panicDistance = 1.0f;
+    [SerializeField] private float panicDistance;
     // public float panicDistance = 1.0f;
     
     private Rigidbody2D _threathRigidBody;
@@ -38,14 +38,14 @@ public class EvadeSteeringBehavior : SteeringBehavior
         set
         {
             panicDistance = Mathf.Max(MinimumPanicDistance, value);
-            fleeSteeringBehaviour.panicDistance = panicDistance;
+            fleeSteeringBehaviour.PanicDistance = panicDistance;
         }
     }
     
     private void Start()
     {
         fleeSteeringBehaviour.threath = positionMarker;
-        fleeSteeringBehaviour.panicDistance = panicDistance;
+        fleeSteeringBehaviour.PanicDistance = panicDistance;
         _positionMarker = Instantiate(positionMarker, Vector2.zero, Quaternion.identity);
     }
 

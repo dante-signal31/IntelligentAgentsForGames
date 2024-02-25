@@ -100,4 +100,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   seekSteeringBehaviour: {fileID: 8010282070666378429}
   threath: {fileID: 0}
-  PanicDistance: 0
+  panicDistance: 0

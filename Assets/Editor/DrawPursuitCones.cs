@@ -8,18 +8,20 @@ namespace Editor
     {
         private void OnSceneGUI()
         {
-            PursuitSteeringBehavior pursuer = (PursuitSteeringBehavior)target;
+            var pursuer = (PursuitSteeringBehavior)target;
         
             EditorGUI.BeginChangeCheck();
-            drawAheadCone(pursuer);
-            drawComingToUsCone(pursuer);
+            float newAheadSemiConeRadians = DrawAheadCone(pursuer);
+            float newComingToUsSemiConeRadians = DrawComingToUsCone(pursuer);
             if (EditorGUI.EndChangeCheck())
             {
                 Undo.RecordObject(pursuer, "Changed ahead semicone degrees.");
+                pursuer.AheadSemiConeRadians = newAheadSemiConeRadians;
+                pursuer.ComingToUsSemiConeRadians = newComingToUsSemiConeRadians;
             }
         }
 
-        private static void drawAheadCone(PursuitSteeringBehavior pursuer)
+        private static float DrawAheadCone(PursuitSteeringBehavior pursuer)
         {
             Handles.color = new Color(0f, 0f, 1f, 0.1f);
             Vector3 pursuerPosition = pursuer.transform.position;
@@ -31,16 +33,17 @@ namespace Editor
             // Handle is placed in world space so rotated vector must be taken back to world space.
             Vector3 aheadSemiConePosition = Handles.PositionHandle(pursuer.transform.TransformPoint(rotatedVector), 
                 Quaternion.identity);
-            // Again, we rotate in local space, so aheadSemiConePosition is taken back to local space.
-            pursuer.AheadSemiConeRadians = Mathf.Deg2Rad * Vector2.Angle(Vector3.up, 
-                pursuer.transform.InverseTransformPoint(aheadSemiConePosition));
             Handles.DrawSolidArc(pursuerPosition, Vector3.forward, 
                 forward, aheadSemiConeDegrees, 1);
             Handles.DrawSolidArc(pursuerPosition, Vector3.forward,
                 forward, -1 * aheadSemiConeDegrees, 1);
+            // Again, we rotate in local space, so aheadSemiConePosition is taken back to local space.
+            float newAheadSemiConeRadians =  Mathf.Deg2Rad * Vector2.Angle(Vector3.up, 
+                pursuer.transform.InverseTransformPoint(aheadSemiConePosition));
+            return newAheadSemiConeRadians;
         }
     
-        private static void drawComingToUsCone(PursuitSteeringBehavior pursuer)
+        private static float DrawComingToUsCone(PursuitSteeringBehavior pursuer)
         {
             Handles.color = new Color(1, 0.92f, 0.016f, 0.3f);
             Vector3 pursuerPosition = pursuer.transform.position;
@@ -49,12 +52,13 @@ namespace Editor
             Vector3 rotatedVector = Quaternion.AngleAxis(comingToUsConeDegrees, Vector3.forward) * Vector3.up * 2;
             Vector3 comingToUsSemiConePosition = Handles.PositionHandle(pursuer.transform.TransformPoint(rotatedVector),
                 Quaternion.identity);
-            pursuer.ComingToUsSemiConeRadians = Mathf.Deg2Rad * Vector2.Angle(Vector3.up, 
-                pursuer.transform.InverseTransformPoint(comingToUsSemiConePosition));
             Handles.DrawSolidArc(pursuerPosition, Vector3.forward, 
                 -forward, (180 - comingToUsConeDegrees), 1);
             Handles.DrawSolidArc(pursuerPosition, Vector3.forward, 
                 -forward, -1 * (180 - comingToUsConeDegrees), 1);
+            float newComingToUsSemiConeRadians = Mathf.Deg2Rad * Vector2.Angle(Vector3.up, 
+                pursuer.transform.InverseTransformPoint(comingToUsSemiConePosition));
+            return newComingToUsSemiConeRadians;
         }
     }
 }
