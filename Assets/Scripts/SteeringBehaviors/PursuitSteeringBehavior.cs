@@ -124,7 +124,7 @@ public class PursuitSteeringBehavior : SteeringBehavior
 
     private void OnDrawGizmos()
     {
-        if (predictedPositionMarkerVisible)
+        if (predictedPositionMarkerVisible && _predictedPositionMarker != null)
         {
             Gizmos.color = _agentColor;
             Gizmos.DrawLine(transform.position, _predictedPositionMarker.transform.position);
