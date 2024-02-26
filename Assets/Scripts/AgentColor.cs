@@ -9,6 +9,8 @@ public class AgentColor : MonoBehaviour
     [Header("CONFIGURATION:")] 
     [Tooltip("Color for this agent.")] 
     [SerializeField] private Color agentColor;
+
+    public Color Color => agentColor;
     
     // Start is called before the first frame update
     void Start()

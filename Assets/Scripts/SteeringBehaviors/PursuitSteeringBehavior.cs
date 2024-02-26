@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 /// <summary>
@@ -12,19 +13,20 @@ public class PursuitSteeringBehavior : SteeringBehavior
     
     [Header("CONFIGURATION:")]
     public GameObject targetAgent;
-    [Tooltip("Prefab used to mark next position to reach by pursuer.")]
-    [SerializeField] private GameObject positionMarker;
-    [Tooltip("Make visible position marker.")] 
-    [SerializeField] private bool positionMarkerVisible = true;
+
     [Tooltip("Distance at which we give our goal as reached and we stop our agent.")]
     [SerializeField] private float arrivalDistance;
     [Tooltip("Radians from forward vector inside which we consider an object is ahead.")]
     [Range(0, Mathf.PI/2)]
     [SerializeField] private float aheadSemiConeRadians;
-    [FormerlySerializedAs("comingToUUsSemiConeRadians")]
     [Tooltip("Radians from forward vector inside which we consider an object is going toward us.")]
     [Range(Mathf.PI/2, Mathf.PI)]
     [SerializeField] private float comingToUsSemiConeRadians;
+    
+    [FormerlySerializedAs("positionMarkerVisible")]
+    [Header("DEBUG:")]
+    [Tooltip("Make visible position marker.")] 
+    [SerializeField] private bool predictedPositionMarkerVisible = true;
 
     /// <summary>
     /// Radians from forward vector inside which we consider an object is ahead.
@@ -50,21 +52,24 @@ public class PursuitSteeringBehavior : SteeringBehavior
 
     private float _cosAheadSemiConeRadians;
     private float _cosComingToUsSemiConeRadians;
-    private GameObject _positionMarker;
+    private GameObject _predictedPositionMarker;
+    private Color _agentColor;
+    private Color _targetColor;
 
     private void Start()
     {
         _cosAheadSemiConeRadians = Mathf.Cos(aheadSemiConeRadians);
         _cosComingToUsSemiConeRadians = Mathf.Cos(comingToUsSemiConeRadians);
         seekSteeringBehaviour.arrivalDistance = arrivalDistance;
-        _positionMarker = Instantiate(positionMarker, Vector2.zero, Quaternion.identity);
-        _positionMarker.GetComponentInChildren<SpriteRenderer>().enabled = positionMarkerVisible;
-        seekSteeringBehaviour.target = _positionMarker;
+        _predictedPositionMarker = new GameObject();
+        seekSteeringBehaviour.target = targetAgent;
+        _agentColor = GetComponent<AgentColor>().Color;
+        _targetColor = targetAgent.GetComponent<AgentColor>().Color;
     }
 
     private void OnDestroy()
     {
-        Destroy(_positionMarker);
+        Destroy(_predictedPositionMarker);
     }
 
     /// <summary>
@@ -99,8 +104,8 @@ public class PursuitSteeringBehavior : SteeringBehavior
             //and the pursuer; and is inversely proportional to the sum of the
             //agents' velocities
             float lookAheadTime = toTarget.magnitude / (maximumSpeed + _targetRigidBody.velocity.magnitude);
-            _positionMarker.transform.position = _targetPosition + _targetRigidBody.velocity * lookAheadTime;
-            seekSteeringBehaviour.target = _positionMarker;
+            _predictedPositionMarker.transform.position = _targetPosition + _targetRigidBody.velocity * lookAheadTime;
+            seekSteeringBehaviour.target = _predictedPositionMarker;
             return seekSteeringBehaviour.GetSteering(args);
         }
     }
@@ -115,5 +120,17 @@ public class PursuitSteeringBehavior : SteeringBehavior
         bool targetComingToUs = Vector2.Dot(currentVelocity, _targetRigidBody.velocity) < _cosComingToUsSemiConeRadians;
 
         return targetInFrontOfUs && targetComingToUs;
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (predictedPositionMarkerVisible)
+        {
+            Gizmos.color = _agentColor;
+            Gizmos.DrawLine(transform.position, _predictedPositionMarker.transform.position);
+            Gizmos.DrawWireSphere(_predictedPositionMarker.transform.position, 0.3f);
+            Gizmos.color = _targetColor;
+            Gizmos.DrawLine(targetAgent.transform.position, _predictedPositionMarker.transform.position);
+        }
     }
 }
