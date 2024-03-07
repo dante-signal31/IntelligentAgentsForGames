@@ -16,12 +16,15 @@ public class PursuitSteeringBehavior : SteeringBehavior
 
     [Tooltip("Distance at which we give our goal as reached and we stop our agent.")]
     [SerializeField] private float arrivalDistance;
+    [FormerlySerializedAs("aheadSemiConeDegress")]
+    [FormerlySerializedAs("aheadSemiConeRadians")]
     [Tooltip("Radians from forward vector inside which we consider an object is ahead.")]
-    [Range(0, Mathf.PI/2)]
-    [SerializeField] private float aheadSemiConeRadians;
+    [Range(0, 90)]
+    [SerializeField] private float aheadSemiConeDegrees;
+    [FormerlySerializedAs("comingToUsSemiConeRadians")]
     [Tooltip("Radians from forward vector inside which we consider an object is going toward us.")]
-    [Range(Mathf.PI/2, Mathf.PI)]
-    [SerializeField] private float comingToUsSemiConeRadians;
+    [Range(0, 90)]
+    [SerializeField] private float comingToUsSemiConeDegrees;
     
     [FormerlySerializedAs("positionMarkerVisible")]
     [Header("DEBUG:")]
@@ -31,19 +34,19 @@ public class PursuitSteeringBehavior : SteeringBehavior
     /// <summary>
     /// Radians from forward vector inside which we consider an object is ahead.
     /// </summary>
-    public float AheadSemiConeRadians
+    public float AheadSemiConeDegrees
     {
-        get => aheadSemiConeRadians;
-        set => aheadSemiConeRadians = Mathf.Clamp(value, 0, Mathf.PI / 2);
+        get => aheadSemiConeDegrees;
+        set => aheadSemiConeDegrees = Mathf.Clamp(value, 0, 90);
     }
 
     /// <summary>
     /// Radians from forward vector inside which we consider an object is going toward us.
     /// </summary>
-    public float ComingToUsSemiConeRadians
+    public float ComingToUsSemiConeDegrees
     {
-        get => comingToUsSemiConeRadians;
-        set => comingToUsSemiConeRadians = Mathf.Clamp(value, Mathf.PI / 2, Mathf.PI);
+        get => comingToUsSemiConeDegrees;
+        set => comingToUsSemiConeDegrees = Mathf.Clamp(value, 0, 90);
     }
 
     private Rigidbody2D _targetRigidBody;
@@ -58,8 +61,8 @@ public class PursuitSteeringBehavior : SteeringBehavior
 
     private void Start()
     {
-        _cosAheadSemiConeRadians = Mathf.Cos(aheadSemiConeRadians);
-        _cosComingToUsSemiConeRadians = Mathf.Cos(comingToUsSemiConeRadians);
+        _cosAheadSemiConeRadians = Mathf.Cos(aheadSemiConeDegrees * Mathf.Deg2Rad);
+        _cosComingToUsSemiConeRadians = Mathf.Cos(comingToUsSemiConeDegrees * Mathf.Deg2Rad);
         seekSteeringBehaviour.arrivalDistance = arrivalDistance;
         _predictedPositionMarker = new GameObject();
         seekSteeringBehaviour.target = targetAgent;
