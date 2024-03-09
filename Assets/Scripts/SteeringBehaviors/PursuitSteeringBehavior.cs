@@ -16,17 +16,13 @@ public class PursuitSteeringBehavior : SteeringBehavior
 
     [Tooltip("Distance at which we give our goal as reached and we stop our agent.")]
     [SerializeField] private float arrivalDistance;
-    [FormerlySerializedAs("aheadSemiConeDegress")]
-    [FormerlySerializedAs("aheadSemiConeRadians")]
     [Tooltip("Radians from forward vector inside which we consider an object is ahead.")]
     [Range(0, 90)]
     [SerializeField] private float aheadSemiConeDegrees;
-    [FormerlySerializedAs("comingToUsSemiConeRadians")]
     [Tooltip("Radians from forward vector inside which we consider an object is going toward us.")]
     [Range(0, 90)]
     [SerializeField] private float comingToUsSemiConeDegrees;
     
-    [FormerlySerializedAs("positionMarkerVisible")]
     [Header("DEBUG:")]
     [Tooltip("Make visible position marker.")] 
     [SerializeField] private bool predictedPositionMarkerVisible = true;
