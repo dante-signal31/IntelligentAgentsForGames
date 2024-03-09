@@ -6,6 +6,17 @@ namespace Editor.Tools
     public static class InteractiveRanges
     {
         /// <summary>
+        /// Show a circular range handle.
+        /// </summary>
+        /// <param name="position">Center for the circular handle.</param>
+        /// <param name="range">Radius for the circular range handle.</param>
+        /// <returns>New range got from handle.</returns>
+        public static float CircularRange(Vector3 position, float range)
+        {
+            return Handles.RadiusHandle(Quaternion.identity, position, range);
+        }
+        
+        /// <summary>
         /// Show a range cone with handle to set its angular width and its range.
         /// </summary>
         /// <param name="parentTransform">Transform of the GameObject this cone is attached to.</param>

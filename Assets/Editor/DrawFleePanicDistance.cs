@@ -1,5 +1,6 @@
 ﻿using UnityEditor;
 using UnityEngine;
+using Editor.Tools;
 
 namespace Editor
 {
@@ -13,12 +14,14 @@ namespace Editor
             EditorGUI.BeginChangeCheck();
             Handles.color =Color.red;
             float newPanicDistance =
-                Handles.RadiusHandle(Quaternion.identity, evade.transform.position, evade.PanicDistance);
+                InteractiveRanges.CircularRange(evade.transform.position, evade.PanicDistance);
             if (EditorGUI.EndChangeCheck())
             {
                 Undo.RecordObject(evade, "Changed panic distance.");
                 evade.PanicDistance = newPanicDistance;
             }
         }
+
+
     }
 }
