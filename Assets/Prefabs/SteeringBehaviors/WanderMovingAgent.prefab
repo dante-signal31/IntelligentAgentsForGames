@@ -99,9 +99,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   seekSteeringBehaviour: {fileID: 623674406017337766}
-  marker: {fileID: 5020279398051697321, guid: 7039a0f10eac5e4449a3edf7e5f9edc7, type: 3}
-  positionMarkerVisible: 1
   arrivalDistance: 0.1
-  wanderRadius: 1
-  wanderDistance: 2
-  wanderJitter: 0.5
+  wanderRadius: 3
+  wanderDistance: 6
+  wanderJitter: 4
+  wanderRecalculationTime: 1
+  predictedPositionMarkerVisible: 1

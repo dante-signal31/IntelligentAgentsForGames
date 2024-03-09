@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
 
 /// <summary>
@@ -11,10 +13,6 @@ public class WanderingSteeringBehavior : SteeringBehavior
     [SerializeField] private SeekSteeringBehavior seekSteeringBehaviour; 
     
     [Header("CONFIGURATION:")]
-    [Tooltip("Prefab used to mark next position to reach.")]
-    [SerializeField] private GameObject marker;
-    [Tooltip("Make visible position marker.")] 
-    [SerializeField] private bool positionMarkerVisible = true;
     [Tooltip("Distance at which we give our goal as reached and we stop our agent.")]
     [SerializeField] private float arrivalDistance;
     [Tooltip("This is the radius of the constraining circle. KEEP IT UNDER wanderDistance!")] 
@@ -23,15 +21,23 @@ public class WanderingSteeringBehavior : SteeringBehavior
     [SerializeField] private float wanderDistance;
     [Tooltip("Maximum amount of random displacement that can be added to the target each second. KEEP IT OVER wanderRadius.")]
     [SerializeField] private float wanderJitter;
+    [Tooltip("Time in seconds to recalculate the wander position.")]
+    [SerializeField] private float wanderRecalculationTime;
+    
+    [Header("DEBUG:")]
+    [Tooltip("Make visible position marker.")] 
+    [SerializeField] private bool predictedPositionMarkerVisible = true;
     
     private GameObject _marker;
-    // private Vector2 _markerPosition;
-    // private Vector2 _wanderPosition;
     private Vector2 _wanderLocalPosition;
+
+    private SteeringBehaviorArgs _currentSteeringBehaviorArgs;
+
+    private Color _agentColor;
 
     private void Awake()
     {
-        _marker = Instantiate(marker, Vector2.zero, Quaternion.identity);
+        _marker = new GameObject();
         seekSteeringBehaviour.target = _marker;
         seekSteeringBehaviour.arrivalDistance = arrivalDistance;
         
@@ -39,7 +45,14 @@ public class WanderingSteeringBehavior : SteeringBehavior
         _wanderLocalPosition = GetRandomCircunferencePoint(Vector2.zero, 
             wanderRadius);
     }
-    
+
+    private void Start()
+    {
+        _agentColor = GetComponent<AgentColor>().Color;
+
+        InvokeRepeating(nameof(WanderPositionUpdate), 0f, wanderRecalculationTime);
+    }
+
     private void OnDestroy()
     {
         Destroy(_marker);
@@ -58,6 +71,18 @@ public class WanderingSteeringBehavior : SteeringBehavior
     
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
+        _currentSteeringBehaviorArgs = args;
+
+        return seekSteeringBehaviour.GetSteering(args);
+    }
+
+    /// <summary>
+    /// Update the wander position based on the given steering behavior arguments.
+    /// </summary>
+    /// <param name="args">Steering behavior arguments</param>
+    private void WanderPositionUpdate()
+    {
+        SteeringBehaviorArgs args = _currentSteeringBehaviorArgs;
         // Add random displacement over an area of a circle or radius wanderJitter.
         _wanderLocalPosition += Random.insideUnitCircle * wanderJitter;
         
@@ -70,8 +95,18 @@ public class WanderingSteeringBehavior : SteeringBehavior
         
         // Place targetLocal as relative to agent.
         _marker.transform.position = args.CurrentAgent.transform.TransformPoint(targetLocal);
-        
-        return seekSteeringBehaviour.GetSteering(args);
+    }
+
+
+    private void OnDrawGizmos()
+    {
+        if (predictedPositionMarkerVisible && _marker != null)
+        {
+            Vector3 _markerPosition = _marker.transform.position;
+            Gizmos.color = _agentColor;
+            Gizmos.DrawWireSphere(_markerPosition, 0.2f);
+            Gizmos.DrawLine(_markerPosition, transform.position);
+        }
     }
     
 }
