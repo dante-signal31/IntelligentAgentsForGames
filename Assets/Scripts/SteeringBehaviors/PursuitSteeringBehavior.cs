@@ -12,9 +12,10 @@ public class PursuitSteeringBehavior : SteeringBehavior
     [SerializeField] private SeekSteeringBehavior seekSteeringBehaviour; 
     
     [Header("CONFIGURATION:")]
-    public GameObject targetAgent;
-
+    [Tooltip("Agent to pursue to.")]
+    [SerializeField] private GameObject targetAgent;
     [Tooltip("Distance at which we give our goal as reached and we stop our agent.")]
+    [Min(0)]
     [SerializeField] private float arrivalDistance;
     [Tooltip("Radians from forward vector inside which we consider an object is ahead.")]
     [Range(0, 90)]
@@ -26,6 +27,24 @@ public class PursuitSteeringBehavior : SteeringBehavior
     [Header("DEBUG:")]
     [Tooltip("Make visible position marker.")] 
     [SerializeField] private bool predictedPositionMarkerVisible = true;
+
+    /// <summary>
+    /// Agent pursued.
+    /// </summary>
+    public GameObject TargetAgent=> targetAgent;
+
+    /// <summary>
+    /// Distance at which we give our goal as reached and we stop our agent.
+    /// </summary>
+    public float ArrivalDistance
+    {
+        get => arrivalDistance;
+        set
+        {
+            arrivalDistance = Mathf.Max(0, value);
+            seekSteeringBehaviour.arrivalDistance = arrivalDistance;
+        }
+    }
 
     /// <summary>
     /// Radians from forward vector inside which we consider an object is ahead.
@@ -98,10 +117,10 @@ public class PursuitSteeringBehavior : SteeringBehavior
             return seekSteeringBehaviour.GetSteering(args);
         }
         else
-        { // Target is not ahead so we must predict where it will be.
-            //The look-ahead time is proportional to the distance between the evader
-            //and the pursuer; and is inversely proportional to the sum of the
-            //agents' velocities
+        {   // Target is not ahead so we must predict where it will be.
+            // The look-ahead time is proportional to the distance between the evader
+            // and the pursuer; and is inversely proportional to the sum of the
+            // agents' velocities
             float lookAheadTime = toTarget.magnitude / (maximumSpeed + _targetRigidBody.velocity.magnitude);
             _predictedPositionMarker.transform.position = _targetPosition + _targetRigidBody.velocity * lookAheadTime;
             seekSteeringBehaviour.target = _predictedPositionMarker;

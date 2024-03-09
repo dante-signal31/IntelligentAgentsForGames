@@ -16,12 +16,15 @@ public class EvadeSteeringBehavior : SteeringBehavior
     [SerializeField] private FleeSteeringBehavior fleeSteeringBehaviour;
     
     [Header("CONFIGURATION:")]
+    [Tooltip("Agent to run from.")]
     public GameObject threathAgent;
-    [Tooltip("Prefab used to mark next position to reach by pursuer.")]
-    [SerializeField] private GameObject positionMarker;
     [Tooltip("Minimum distance to threath before fleeing.")]
     [Min(MinimumPanicDistance)]
     [SerializeField] private float panicDistance;
+    
+    [Header("DEBUG:")]
+    [Tooltip("Make visible position marker.")] 
+    [SerializeField] private bool predictedPositionMarkerVisible = true;
     
     private Rigidbody2D _threathRigidBody;
     private Vector2 _threathPosition;
@@ -29,7 +32,10 @@ public class EvadeSteeringBehavior : SteeringBehavior
 
     private float _cosAheadSemiConeRadians;
     private float _cosComingToUsSemiConeRadians;
-    private GameObject _positionMarker;
+    private GameObject _predictedPositionMarker;
+    
+    private Color _agentColor;
+    private Color _targetColor;
 
     public float PanicDistance
     {
@@ -43,9 +49,11 @@ public class EvadeSteeringBehavior : SteeringBehavior
     
     private void Start()
     {
-        fleeSteeringBehaviour.threath = positionMarker;
+        fleeSteeringBehaviour.threath = threathAgent;
         fleeSteeringBehaviour.PanicDistance = panicDistance;
-        _positionMarker = Instantiate(positionMarker, Vector2.zero, Quaternion.identity);
+        _predictedPositionMarker = new GameObject();
+        _agentColor = GetComponent<AgentColor>().Color;
+        _targetColor = threathAgent.GetComponent<AgentColor>().Color;
     }
 
     /// <summary>
@@ -73,9 +81,20 @@ public class EvadeSteeringBehavior : SteeringBehavior
         //and the pursuer; and is inversely proportional to the sum of the
         //agents' velocities
         float lookAheadTime = toThreath.magnitude / (maximumSpeed + _threathRigidBody.velocity.magnitude);
-        _positionMarker.transform.position = _threathPosition + _threathRigidBody.velocity * lookAheadTime;
-        fleeSteeringBehaviour.threath = _positionMarker;
+        _predictedPositionMarker.transform.position = _threathPosition + _threathRigidBody.velocity * lookAheadTime;
+        fleeSteeringBehaviour.threath = _predictedPositionMarker;
         return fleeSteeringBehaviour.GetSteering(args);
-
+    }
+    
+    private void OnDrawGizmos()
+    {
+        if (predictedPositionMarkerVisible && _predictedPositionMarker != null)
+        {
+            Gizmos.color = _agentColor;
+            Gizmos.DrawLine(transform.position, _predictedPositionMarker.transform.position);
+            Gizmos.DrawWireSphere(_predictedPositionMarker.transform.position, 0.3f);
+            Gizmos.color = _targetColor;
+            Gizmos.DrawLine(threathAgent.transform.position, _predictedPositionMarker.transform.position);
+        }
     }
 }
