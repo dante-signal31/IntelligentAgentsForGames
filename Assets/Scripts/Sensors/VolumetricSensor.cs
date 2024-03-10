@@ -2,6 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
+/// <summary>
+/// This script emits events when objects are detected by the sensor. 
+/// </summary>
 public class VolumetricSensor : MonoBehaviour
 {
     [Header("WIRING:")] 
