@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -5,6 +6,7 @@ using UnityEngine.Events;
 /// <summary>
 /// This script emits events when objects are detected by the sensor. 
 /// </summary>
+[ExecuteAlways]
 public class VolumetricSensor : MonoBehaviour
 {
     [Header("WIRING:")] 
@@ -14,10 +16,13 @@ public class VolumetricSensor : MonoBehaviour
     [Header("CONFIGURATION:")] 
     [Tooltip("Subscribers for detection events.")] 
     [SerializeField] private UnityEvent<GameObject> objectEnteredDetectionArea;
+    [Tooltip("Subscribers to object staying in volumetric area.")]
+    [SerializeField] private UnityEvent<GameObject> objectStayDetectionArea;
     [Tooltip("Subscribers to object leaving volumetric area.")] 
     [SerializeField] private UnityEvent<GameObject> objectLeftDetectionArea;
-
+ 
     private HashSet<GameObject> _objectsDetected;
+    private HashSet<ContactPoint2D> _contactPoints;
 
     /// <summary>
     /// Set of GameObjects under sensor range.
@@ -28,6 +33,17 @@ public class VolumetricSensor : MonoBehaviour
     /// If sensor has any detected object under its range.
     /// </summary>
     public bool anyObjectDetected => ObjectsDetected.Count > 0;
+    
+    /// <summary>
+    /// This sensor collider. Useful to find approximate contact points.
+    /// </summary>
+    public Collider2D SensorCollider => volumetricCollider;
+    
+    private void Awake()
+    {
+        _objectsDetected = new HashSet<GameObject>();
+        _contactPoints = new HashSet<ContactPoint2D>();
+    }
     
     private void AddDetectedObject(GameObject obj)
     {
@@ -46,6 +62,7 @@ public class VolumetricSensor : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        Debug.Log("Trigger entered: " + other.name);
         GameObject detectedGameObject = GetGameObject(other);
         AddDetectedObject(detectedGameObject);
         if (objectEnteredDetectionArea != null) objectEnteredDetectionArea.Invoke(detectedGameObject);
@@ -58,9 +75,9 @@ public class VolumetricSensor : MonoBehaviour
         if (objectLeftDetectionArea != null) objectLeftDetectionArea.Invoke(detectedGameObject);
     }
 
-    // Start is called before the first frame update
-    void Awake()
+    private void OnTriggerStay2D(Collider2D other)
     {
-        _objectsDetected = new HashSet<GameObject>();
+        GameObject detectedGameObject = GetGameObject(other);
+        if (objectStayDetectionArea != null) objectStayDetectionArea.Invoke(detectedGameObject);
     }
 }

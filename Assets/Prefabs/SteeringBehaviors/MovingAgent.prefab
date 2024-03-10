@@ -338,7 +338,6 @@ MonoBehaviour:
   maximumRotationalSpeed: 0
   maximumAcceleration: 0
   maximumDeceleration: 0
-  currentSpeed: 0
 --- !u!1001 &1827033148479119055
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -353,7 +352,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1338589801130659108, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
       propertyPath: m_Offset.y
-      value: 1
+      value: 5.5
       objectReference: {fileID: 0}
     - target: {fileID: 3552668615500273946, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
       propertyPath: range

@@ -25,8 +25,16 @@ public class AgentMover : MonoBehaviour
     [SerializeField] private float maximumAcceleration;
     [Tooltip("Maximum deceleration for this agent.")]
     [SerializeField] private float maximumDeceleration;
-
-    public float currentSpeed;
+    
+    /// <summary>
+    /// This agent current speed
+    /// </summary>
+    public float CurrentSpeed { get; private set;}
+    
+    /// <summary>
+    /// This agent maximum speed.
+    /// </summary>
+    public float MaximumSpeed => maximumSpeed;
     
     private SteeringBehaviorArgs _behaviorArgs;
 
@@ -64,8 +72,8 @@ public class AgentMover : MonoBehaviour
                 transform.eulerAngles.y, 
                 transform.eulerAngles.z + steeringOutput.Angular);
         }
-        currentSpeed = rigidBody.velocity.magnitude;
-        Debug.Log(currentSpeed);
+        CurrentSpeed = rigidBody.velocity.magnitude;
+        // Debug.Log(CurrentSpeed);
     }
 
     /// <summary>
