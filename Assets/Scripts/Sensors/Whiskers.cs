@@ -313,9 +313,7 @@ public class Whiskers : MonoBehaviour
         if (transform == null) return rayEnds;
         
         float totalPlacementAngle = semiConeDegrees * 2;
-        Debug.Log("Total placement angle: " + totalPlacementAngle);
         float placementAngleInterval = totalPlacementAngle / (SensorAmount - 1);
-        Debug.Log("Placement angle interval: " + placementAngleInterval);
         Vector3 currentPosition = transform.position;
         
         // Remember: local forward is UP direction in local space.
@@ -324,14 +322,11 @@ public class Whiskers : MonoBehaviour
         for (int i = 0; i < SensorAmount; i++)
         {
             float currentAngle = semiConeDegrees - (placementAngleInterval * i);
-            Debug.Log("Current angle: " + currentAngle);
             Vector3 placementVector = Quaternion.AngleAxis(currentAngle, Vector3.forward) * forwardSensorPlacement;
             Vector3 placementVectorEnd = placementVector.normalized * range;
             
             Vector3 sensorStart = currentPosition + transform.TransformDirection(placementVector);
             Vector3 sensorEnd = currentPosition + transform.TransformDirection(placementVectorEnd);
-            Debug.Log("Sensor start: " + sensorStart);
-            Debug.Log("Sensor end: " + sensorEnd);   
             
             RayEnds newRayEnds = new RayEnds();
             newRayEnds.start = sensorStart;
