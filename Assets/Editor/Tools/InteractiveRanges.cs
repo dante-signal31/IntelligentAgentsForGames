@@ -102,8 +102,9 @@ namespace Editor.Tools
             Vector3 localLateralLineVector = parentTransform.InverseTransformDirection(lateralLineVector);
             Vector3 rotatedLateralLineVector = Quaternion.AngleAxis(-2 * semiConeDegrees, coneNormal) * localLateralLineVector;
             Vector3 rotatedLateralLineVectorNormalized = rotatedLateralLineVector.normalized;
-            Handles.DrawLine(rotatedLateralLineVectorNormalized * minimumRange, 
-                rotatedLateralLineVectorNormalized * range);
+            Vector3 globalRotatedLateralLineVectorNormalized = parentTransform.TransformDirection(rotatedLateralLineVectorNormalized);
+            Handles.DrawLine(position + globalRotatedLateralLineVectorNormalized * minimumRange, 
+                position + globalRotatedLateralLineVectorNormalized * range);
             // Again, we rotate in local space, so aheadSemiConePosition is taken back to local space.
             float newSemiConeDegrees =  Vector2.Angle(localConeForward, 
                 parentTransform.InverseTransformPoint(newHandlePosition));
