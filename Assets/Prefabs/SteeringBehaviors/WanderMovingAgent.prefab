@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 849294268029506539, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
       propertyPath: m_Offset.y
-      value: 6
+      value: 14
       objectReference: {fileID: 0}
     - target: {fileID: 2027878817541019284, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
       propertyPath: steeringBehavior

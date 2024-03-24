@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 
 /// <summary>
-/// This script emits events when objects are detected by the sensor. 
+/// This script emits events when objects are detected by the volumetric sensor. 
 /// </summary>
 [ExecuteAlways]
 public class VolumetricSensor : MonoBehaviour

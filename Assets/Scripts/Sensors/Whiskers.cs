@@ -104,6 +104,9 @@ public class Whiskers : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// Struct to represent ray ends for every sensor in prefab local space.
+    /// </summary>
     [Serializable]
     public struct RayEnds
     {
@@ -139,22 +142,8 @@ public class Whiskers : MonoBehaviour
         get => sensorResolution;
         set
         {
-            sensorResolution = value; 
-#if UNITY_EDITOR
-            if (PrefabStageUtility.GetCurrentPrefabStage() != null)
-            {
-                // Script is executing in prefab mode
-                PopulateRayEnds();
-            }
-            else
-            {
-                // Script is executing in edit mode (but not necessarily prefab mode)
-                // OR script is executing in Play mode
-                SetupSensors();
-            }
-#else
-        SetupSensors();
-#endif
+            sensorResolution = value;
+            _onValidationUpdatePending = true;
         }
     }
 
@@ -167,7 +156,7 @@ public class Whiskers : MonoBehaviour
         set
         {
             semiConeDegrees = value;
-            UpdateSensorPlacement();
+            _onValidationUpdatePending = true;
         }
     }
 
@@ -180,7 +169,7 @@ public class Whiskers : MonoBehaviour
         set
         {
             range = value;
-            UpdateSensorPlacement();
+            _onValidationUpdatePending = true;
         }
     }
 
@@ -193,7 +182,7 @@ public class Whiskers : MonoBehaviour
         set
         {
             minimumRange = value;
-            UpdateSensorPlacement();
+            _onValidationUpdatePending = true;
         }
     }
 
@@ -217,9 +206,9 @@ public class Whiskers : MonoBehaviour
         }
         else
         {
-            // Script is executing in edit mode (but not necessarily prefab mode)
+            // Script is executing in edit mode (but not in prefab mode, so in scene mode)
             // OR script is executing in Play mode
-            SetupSensors();
+            UpdateSensorPlacement();
             UpdateGizmosConfiguration();
         }
 #else
@@ -233,13 +222,12 @@ public class Whiskers : MonoBehaviour
     /// </summary>
     private void LateUpdate()
     {
-#if UNITY_EDITOR
         if (_onValidationUpdatePending)
         {
-            PopulateRayEnds();
+            UpdateSensorPlacement();
+            UpdateGizmosConfiguration();
             _onValidationUpdatePending = false;
         }
-#endif
     }
 
     /// <summary>
@@ -272,7 +260,7 @@ public class Whiskers : MonoBehaviour
     /// </summary>
     private void PlaceSensors()
     {
-        List<RayEnds> rayEnds = GetRayEnds();
+        List<RayEnds> rayEnds = _rayEnds;
 
         int i = 0;
         foreach (RayEnds rayEnd in rayEnds)
@@ -299,13 +287,19 @@ public class Whiskers : MonoBehaviour
         {
             // Script is executing in edit mode (but not necessarily prefab mode)
             // OR script is executing in Play mode
-            PlaceSensors();
+            PopulateRayEnds();
+            SetupSensors();
         }
 #else
-        PlaceSensors();
+        PopulateRayEnds();
+        SetupSensors();
 #endif
     }
     
+    /// <summary>
+    /// Calculate global position for sensor ends and store them to be serialized along the prefab.
+    /// </summary>
+    /// <returns>New list for sensor ends global positions.</returns>
     private List<RayEnds> GetRayEnds()
     {
         List<RayEnds> rayEnds = new List<RayEnds>();
@@ -337,6 +331,9 @@ public class Whiskers : MonoBehaviour
         return rayEnds;
     }
 
+    /// <summary>
+    /// Update gizmos configuration of every sensor in the list.
+    /// </summary>
     private void UpdateGizmosConfiguration()
     {
         foreach (RaySensor raySensor in _sensors)
@@ -356,12 +353,16 @@ public class Whiskers : MonoBehaviour
 #if UNITY_EDITOR
     private void OnValidate()
     {
+        // Remember: You cannot create objects from OnValidate(). So just mark the update as pending
+        // and create those objects from LateUpdate().
         _onValidationUpdatePending = true;
     }
     
     private void OnDrawGizmos()
     {
-        if (showGizmos &&_rayEnds != null)
+        // Draw gizmos only if in prefab mode. If in scene or play mode the gizmos
+        // I'm interested in are those drawn from the sensors.
+        if (showGizmos && _rayEnds != null && PrefabStageUtility.GetCurrentPrefabStage() != null)
         {
             Gizmos.color = gizmoColor;
             foreach (RayEnds rayEnds in _rayEnds)
