@@ -263,7 +263,7 @@ public class Whiskers : MonoBehaviour
     /// </summary>
     private void ClearStraggledSensors()
     {
-        var childSensors = GetComponentsInChildren<RaySensor>();
+        RaySensor[] childSensors = GetComponentsInChildren<RaySensor>();
         foreach (RaySensor raySensor in childSensors)
         {
 #if UNITY_EDITOR
