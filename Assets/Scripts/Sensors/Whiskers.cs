@@ -244,7 +244,8 @@ public class Whiskers : MonoBehaviour
     /// </summary>
     private void PopulateSensors()
     {
-        if (_sensors != null) _sensors.Clear();
+        _sensors?.Clear();
+        ClearStraggledSensors();
         List<RaySensor> raySensors = new List<RaySensor>();
         for (int i = 0; i < SensorAmount; i++)
         {
@@ -252,6 +253,25 @@ public class Whiskers : MonoBehaviour
             raySensors.Add(sensorInstance.GetComponent<RaySensor>());
         }
         _sensors = new RaySensorList(raySensors);
+    }
+
+    /// <summary>
+    /// <p>Destroy any child rays sensor that may be left behind after clearing the sensor list.</p>
+    /// <br/>
+    /// <p>When domain reloading the child sensor objects are not destroyed although
+    /// list is cleared. So I need to search and destroy for child sensors manually.</p>
+    /// </summary>
+    private void ClearStraggledSensors()
+    {
+        var childSensors = GetComponentsInChildren<RaySensor>();
+        foreach (RaySensor raySensor in childSensors)
+        {
+#if UNITY_EDITOR
+            if (raySensor != null) DestroyImmediate(raySensor.gameObject);
+#else
+            if (raySensor != null) Destroy(raySensor.gameObject);
+#endif
+        }
     }
     
 
@@ -308,7 +328,6 @@ public class Whiskers : MonoBehaviour
         
         float totalPlacementAngle = semiConeDegrees * 2;
         float placementAngleInterval = totalPlacementAngle / (SensorAmount - 1);
-        // Vector3 currentPosition = transform.position;
         
         // Remember: local forward is UP direction in local space.
         Vector3 forwardSensorPlacement = Vector3.up * minimumRange;
@@ -318,9 +337,6 @@ public class Whiskers : MonoBehaviour
             float currentAngle = semiConeDegrees - (placementAngleInterval * i);
             Vector3 placementVector = Quaternion.AngleAxis(currentAngle, Vector3.forward) * forwardSensorPlacement;
             Vector3 placementVectorEnd = placementVector.normalized * range;
-            
-            // Vector3 sensorStart = currentPosition + transform.TransformDirection(placementVector);
-            // Vector3 sensorEnd = currentPosition + transform.TransformDirection(placementVectorEnd);
             
             Vector3 sensorStart = placementVector;
             Vector3 sensorEnd = placementVectorEnd;
