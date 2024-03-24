@@ -265,8 +265,8 @@ public class Whiskers : MonoBehaviour
         int i = 0;
         foreach (RayEnds rayEnd in rayEnds)
         {
-            _sensors.GetSensorFromLeft(i).SetRayOrigin(rayEnd.start);
-            _sensors.GetSensorFromLeft(i).SetRayTarget(rayEnd.end);
+            _sensors.GetSensorFromLeft(i).SetRayOrigin(transform.TransformPoint(rayEnd.start));
+            _sensors.GetSensorFromLeft(i).SetRayTarget(transform.TransformPoint(rayEnd.end));
             i++;
         }
     }
@@ -297,9 +297,9 @@ public class Whiskers : MonoBehaviour
     }
     
     /// <summary>
-    /// Calculate global position for sensor ends and store them to be serialized along the prefab.
+    /// Calculate local positions for sensor ends and store them to be serialized along the prefab.
     /// </summary>
-    /// <returns>New list for sensor ends global positions.</returns>
+    /// <returns>New list for sensor ends local positions.</returns>
     private List<RayEnds> GetRayEnds()
     {
         List<RayEnds> rayEnds = new List<RayEnds>();
@@ -308,7 +308,7 @@ public class Whiskers : MonoBehaviour
         
         float totalPlacementAngle = semiConeDegrees * 2;
         float placementAngleInterval = totalPlacementAngle / (SensorAmount - 1);
-        Vector3 currentPosition = transform.position;
+        // Vector3 currentPosition = transform.position;
         
         // Remember: local forward is UP direction in local space.
         Vector3 forwardSensorPlacement = Vector3.up * minimumRange;
@@ -319,8 +319,11 @@ public class Whiskers : MonoBehaviour
             Vector3 placementVector = Quaternion.AngleAxis(currentAngle, Vector3.forward) * forwardSensorPlacement;
             Vector3 placementVectorEnd = placementVector.normalized * range;
             
-            Vector3 sensorStart = currentPosition + transform.TransformDirection(placementVector);
-            Vector3 sensorEnd = currentPosition + transform.TransformDirection(placementVectorEnd);
+            // Vector3 sensorStart = currentPosition + transform.TransformDirection(placementVector);
+            // Vector3 sensorEnd = currentPosition + transform.TransformDirection(placementVectorEnd);
+            
+            Vector3 sensorStart = placementVector;
+            Vector3 sensorEnd = placementVectorEnd;
             
             RayEnds newRayEnds = new RayEnds();
             newRayEnds.start = sensorStart;
