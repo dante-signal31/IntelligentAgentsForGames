@@ -127,7 +127,18 @@ public class Whiskers : MonoBehaviour
     [SerializeField] private float range = 1.0f;
     [Tooltip("Minimum range for these rays. Useful to make rays start not at the agent's center.")]
     [SerializeField] private float minimumRange = 0.2f;
-    
+    [Tooltip("Range proportion for whiskers at left side. 0.0 = leftmost sensor, 1.0 = center sensor.")]
+    [SerializeField] private AnimationCurve leftRangeSemiCone = AnimationCurve.EaseInOut(
+        0.0f, 
+        0.2f, 
+        1.0f, 
+        1.0f);
+    [Tooltip("Range proportion for whiskers at right side. 0.0 = center sensor, 1.0 = rightmost sensor.")]
+    [SerializeField] private AnimationCurve rightRangeSemiCone = AnimationCurve.EaseInOut(
+        0.0f,
+        1.0f,
+        1.0f,
+        0.2f);
     [Header("DEBUG")]
     [Tooltip("Whether to show gizmos for sensors.")]
     [SerializeField] private bool showGizmos = true;
@@ -336,7 +347,9 @@ public class Whiskers : MonoBehaviour
         {
             float currentAngle = semiConeDegrees - (placementAngleInterval * i);
             Vector3 placementVector = Quaternion.AngleAxis(currentAngle, Vector3.forward) * forwardSensorPlacement;
-            Vector3 placementVectorEnd = placementVector.normalized * range;
+            // Vector3 placementVectorEnd = placementVector.normalized * range;
+            Vector3 placementVectorEnd = placementVector.normalized * 
+                                         (minimumRange + GetSensorLength(i));
             
             Vector3 sensorStart = placementVector;
             Vector3 sensorEnd = placementVectorEnd;
@@ -346,15 +359,66 @@ public class Whiskers : MonoBehaviour
             newRayEnds.end = sensorEnd;
             rayEnds.Add(newRayEnds);
         }
-
         return rayEnds;
     }
+
+    /// <summary>
+    /// Calculates and returns the length of a sensor based on the sensor index provided.
+    ///
+    /// It uses index to use the proper proportion curve for left and right side.
+    /// </summary>
+    /// <param name="sensorIndex">Index of this sensor</param>
+    /// <returns>This sensor length from minimum range.</returns>
+    private float GetSensorLength(int sensorIndex)
+    {
+        int middleSensorIndex = SensorAmount / 2;
+        Debug.Log($"Middle sensor index: {middleSensorIndex}");
+        
+        if (sensorIndex < middleSensorIndex)
+        {
+            return GetLeftSensorLength(sensorIndex, middleSensorIndex);
+        }
+        return GetRightSensorLength(sensorIndex, middleSensorIndex);
+    }
+
+    /// <summary>
+    /// Calculate the length of the left sensor based on the sensor index using left range semi cone
+    /// curve.
+    /// </summary>
+    /// <param name="sensorIndex">Index of this sensor.</param>
+    /// <param name="middleSensorIndex">Middle sensor index.</param>
+    /// <returns>This sensor length from minimum range.</returns>
+    private float GetLeftSensorLength(int sensorIndex, int middleSensorIndex)
+    {
+        float curvePoint = Mathf.InverseLerp(0, middleSensorIndex, sensorIndex);
+        float curvePointRange = leftRangeSemiCone.Evaluate(curvePoint) * (range-minimumRange);
+        Debug.Log($"Point index: {sensorIndex}, curve point: {curvePoint}, range: {curvePointRange}");
+        return curvePointRange;
+    }
+    
+    /// <summary>
+    /// Calculate the length of the right sensor based on the sensor index using right range semi cone
+    /// curve.
+    /// </summary>
+    /// <param name="sensorIndex">Index of this sensor.</param>
+    /// <param name="middleSensorIndex">Middle sensor index.</param>
+    /// <returns>This sensor length from minimum range.</returns>
+    private float GetRightSensorLength(int sensorIndex, int middleSensorIndex)
+    {
+        float curvePoint = Mathf.InverseLerp( middleSensorIndex, SensorAmount-1, sensorIndex);
+        float curvePointRange = rightRangeSemiCone.Evaluate(curvePoint) * (range-minimumRange);
+        Debug.Log($"Point index: {sensorIndex}, curve point: {curvePoint}, range: {curvePointRange}");
+        return curvePointRange;
+    }
+    
+
 
     /// <summary>
     /// Update gizmos configuration of every sensor in the list.
     /// </summary>
     private void UpdateGizmosConfiguration()
     {
+        if (_sensors == null) return;
         foreach (RaySensor raySensor in _sensors)
         {
             raySensor.ShowGizmos = showGizmos;
