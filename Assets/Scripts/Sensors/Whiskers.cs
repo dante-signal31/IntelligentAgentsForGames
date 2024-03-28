@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 #if UNITY_EDITOR
@@ -202,6 +203,47 @@ public class Whiskers : MonoBehaviour
     /// </summary>
     public int SensorAmount => (sensorResolution * 2) + 3;
     
+    /// <summary>
+    /// Whether this sensor detects any collider.
+    /// </summary>
+    public bool IsAnyColliderDetected => _sensors.Any(sensor => sensor.IsColliderDetected);
+    
+    /// <summary>
+    /// Set of detected colliders.
+    /// </summary>
+    public HashSet<Collider2D> DetectedColliders
+    {
+        get
+        {
+            var detectedColliders = new HashSet<Collider2D>();
+            foreach (RaySensor sensor in _sensors)
+            {
+                if (sensor.IsColliderDetected) detectedColliders.Add(sensor.DetectedCollider);
+            }
+            return detectedColliders;
+        } 
+    }
+
+    /// <summary>
+    /// List of detected hits.
+    ///
+    /// It's got as a list of tuples of (hit, detecting sensor index).
+    /// </summary>
+    public List<(RaycastHit2D, int)> DetectedHits
+    {
+        get
+        {
+            var detectedHits = new List<(RaycastHit2D, int)>();
+            int sensorIndex = 0;
+            foreach (RaySensor sensor in _sensors)
+            {
+                if (sensor.IsColliderDetected) detectedHits.Add((sensor.DetectedHit, sensorIndex));
+                sensorIndex++;
+            }
+            return detectedHits;
+        }
+    }
+    
     private RaySensorList _sensors;
     public List<RayEnds> _rayEnds;
 
@@ -361,7 +403,7 @@ public class Whiskers : MonoBehaviour
         }
         return rayEnds;
     }
-
+    
     /// <summary>
     /// Calculates and returns the length of a sensor based on the sensor index provided.
     ///
@@ -369,7 +411,7 @@ public class Whiskers : MonoBehaviour
     /// </summary>
     /// <param name="sensorIndex">Index of this sensor</param>
     /// <returns>This sensor length from minimum range.</returns>
-    private float GetSensorLength(int sensorIndex)
+    public float GetSensorLength(int sensorIndex)
     {
         int middleSensorIndex = SensorAmount / 2;
         Debug.Log($"Middle sensor index: {middleSensorIndex}");

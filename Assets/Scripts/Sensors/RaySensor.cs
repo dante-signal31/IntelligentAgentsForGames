@@ -23,7 +23,7 @@ public class RaySensor : MonoBehaviour
     [Tooltip("Layers to be detected by this sensor.")] 
     [SerializeField] private LayerMask layerMask;
     [Tooltip("Event to trigger when a collider is detected by this sensor.")]    
-    [SerializeField] private UnityEvent<Collider2D> colliderDetected;
+    [SerializeField] private UnityEvent<RaySensor> colliderDetected;
     [Tooltip("Event to trigger when no collider is detected by this sensor.")]
     [SerializeField] private UnityEvent noColliderDetected;
     
@@ -53,15 +53,15 @@ public class RaySensor : MonoBehaviour
         {
             if (_detectedCollider != value)
             {
+                _detectedCollider = value;
                 if (value == null && noColliderDetected != null)
                 {
                     noColliderDetected.Invoke();
                 } 
                 else if (value != null && colliderDetected != null)
                 {
-                    colliderDetected.Invoke(value);
+                    colliderDetected.Invoke(this);
                 }
-                _detectedCollider = value;
             }
         }
     }
@@ -101,8 +101,8 @@ public class RaySensor : MonoBehaviour
             GetRayDirection(), 
             _rayDistance, 
             layerMask);
-        DetectedCollider = hit.collider;
         DetectedHit = hit;
+        DetectedCollider = hit.collider;
     }
     
     /// <summary>
