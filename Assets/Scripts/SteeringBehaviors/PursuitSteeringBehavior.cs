@@ -1,6 +1,4 @@
-﻿using System;
-using UnityEngine;
-using UnityEngine.Serialization;
+﻿using UnityEngine;
 
 /// <summary>
 /// Monobehaviour to offer a Pursuit steering behaviour.
@@ -139,7 +137,8 @@ public class PursuitSteeringBehavior : SteeringBehavior
 
         return targetInFrontOfUs && targetComingToUs;
     }
-
+    
+#if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         if (predictedPositionMarkerVisible && _predictedPositionMarker != null)
@@ -151,4 +150,5 @@ public class PursuitSteeringBehavior : SteeringBehavior
             Gizmos.DrawLine(targetAgent.transform.position, _predictedPositionMarker.transform.position);
         }
     }
+#endif
 }

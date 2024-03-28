@@ -97,7 +97,7 @@ public class WanderingSteeringBehavior : SteeringBehavior
         _marker.transform.position = args.CurrentAgent.transform.TransformPoint(targetLocal);
     }
 
-
+#if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         if (predictedPositionMarkerVisible && _marker != null)
@@ -108,5 +108,5 @@ public class WanderingSteeringBehavior : SteeringBehavior
             Gizmos.DrawLine(_markerPosition, transform.position);
         }
     }
-    
+#endif    
 }
