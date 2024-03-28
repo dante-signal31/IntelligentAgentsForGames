@@ -8,7 +8,15 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
     [Header("WIRING:")]
     [Tooltip("Sensor to detect walls and obstacles.")]
     [SerializeField] private Whiskers whiskers;
+    
+    [Header("DEBUG:")]
+    [Tooltip("Show closest hit marker and avoid velocity vector.")]
+    [SerializeField] private bool markersVisible = false;
+    [Tooltip("Color fot this object markers.")]
+    [SerializeField] private Color markerColor = Color.red;
 
+    private RaycastHit2D _closestHit;
+    private Vector2 _avoidVector; 
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
@@ -20,8 +28,8 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
 
             float overShootFactor = GetOverShootFactor(sensorIndexClosestDetectedHit, closestDistance);
 
-            Vector2 avoidVector = closestHit.normal * (args.MaximumSpeed * overShootFactor);
-            return new SteeringOutput(avoidVector, 0);
+            _avoidVector = closestHit.normal * (args.MaximumSpeed * overShootFactor);
+            return new SteeringOutput(_avoidVector, 0);
         }
         else
         {
@@ -55,7 +63,7 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
     {
         
         float closestDistance = float.MaxValue;
-        RaycastHit2D closestHit = new RaycastHit2D();
+        _closestHit = new RaycastHit2D();
         int sensorIndexClosestDetectedHit = 0;
 
         Vector2 currentAgentPosition = args.CurrentAgent.transform.position;
@@ -67,11 +75,23 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
             if (hitDistance < closestDistance)
             {
                 closestDistance = hitDistance;
-                closestHit = hit;
+                _closestHit = hit;
                 sensorIndexClosestDetectedHit = sensorIndex;
             }
         }
 
-        return (closestDistance, closestHit, sensorIndexClosestDetectedHit);
+        return (closestDistance, _closestHit, sensorIndexClosestDetectedHit);
     }
+    
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+        if (markersVisible && whiskers.IsAnyColliderDetected)
+        {
+            Gizmos.color = markerColor;
+            Gizmos.DrawWireSphere(_closestHit.point, 0.2f);
+            Gizmos.DrawLine(_closestHit.point, _closestHit.point + _avoidVector);
+        }
+    }
+#endif
 }
