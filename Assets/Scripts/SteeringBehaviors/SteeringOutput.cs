@@ -6,6 +6,11 @@
 public class SteeringOutput
 {
     /// <summary>
+    /// Zero steering output.
+    /// </summary>
+    public static SteeringOutput Zero = new SteeringOutput();
+    
+    /// <summary>
     /// Linear acceleration vector.
     /// </summary>
     public Vector2 Linear { get; }
@@ -41,5 +46,25 @@ public class SteeringOutput
     public static SteeringOutput operator *(SteeringOutput a, float b)
     {
         return new SteeringOutput(a.Linear * b, a.Angular * b);
+    }
+    
+    /// <summary>
+    /// Equality comparison with another object.
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    public override bool Equals(object other)
+    {
+        if (other is SteeringOutput output)
+        {
+            return Linear.Equals(output.Linear) && Mathf.Approximately(Angular, output.Angular);
+        }
+
+        return false;
+    }
+
+    public override int GetHashCode()
+    {
+        return Linear.GetHashCode() ^ Angular.GetHashCode();
     }
 }
