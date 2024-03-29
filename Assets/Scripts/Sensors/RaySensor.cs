@@ -22,8 +22,9 @@ public class RaySensor : MonoBehaviour
     [Header("CONFIGURATION:")] 
     [Tooltip("Layers to be detected by this sensor.")] 
     [SerializeField] private LayerMask layerMask;
+    [Space]
     [Tooltip("Event to trigger when a collider is detected by this sensor.")]    
-    [SerializeField] private UnityEvent<RaySensor> colliderDetected;
+    [SerializeField] private UnityEvent<Collider2D> colliderDetected;
     [Tooltip("Event to trigger when no collider is detected by this sensor.")]
     [SerializeField] private UnityEvent noColliderDetected;
     
@@ -42,6 +43,15 @@ public class RaySensor : MonoBehaviour
     public bool IsColliderDetected => DetectedCollider != null;
 
     private Collider2D _detectedCollider;
+    
+    /// <summary>
+    /// This ray sensor layer mask.
+    /// </summary>
+    public LayerMask SensorLayerMask
+    {
+        get => layerMask;
+        set => layerMask = value;
+    }
 
     /// <summary>
     /// Collider currently detected by sensor.
@@ -60,7 +70,7 @@ public class RaySensor : MonoBehaviour
                 } 
                 else if (value != null && colliderDetected != null)
                 {
-                    colliderDetected.Invoke(this);
+                    colliderDetected.Invoke(value);
                 }
             }
         }
@@ -85,6 +95,42 @@ public class RaySensor : MonoBehaviour
         _rayDistance = GetRayDistance();
     }
 
+    /// <summary>
+    /// Bind a listener to the colliderDetected event.
+    /// </summary>
+    /// <param name="action">Method to bind.</param>
+    public void SubscribeToColliderDetected(UnityAction<Collider2D> action)
+    {
+        colliderDetected.AddListener(action);
+    }
+    
+    /// <summary>
+    /// Unbind a listener from the colliderDetected event.
+    /// </summary>
+    /// <param name="action">Method to unbind.</param>
+    public void UnsubscribeFromColliderDetected(UnityAction<Collider2D> action)
+    {
+        colliderDetected.RemoveListener(action);
+    }
+
+    /// <summary>
+    /// Bind a listener to the noColliderDetected event.
+    /// </summary>
+    /// <param name="action">Method to bind.</param>
+    public void SubscribeToNoColliderDetected(UnityAction action)
+    {
+        noColliderDetected.AddListener(action);
+    }
+    
+    /// <summary>
+    /// Unbind a listener from the noColliderDetected event.
+    /// </summary>
+    /// <param name="action">Method to unbind.</param>
+    public void UnsubscribeFromNoColliderDetected(UnityAction action)
+    {
+        noColliderDetected.RemoveListener(action);
+    }
+    
     private Vector3 GetRayDirection()
     {
         return (endPoint.position - startPoint.position).normalized;
@@ -112,8 +158,9 @@ public class RaySensor : MonoBehaviour
     public void SetRayTarget(Vector3 target)
     {
         endPoint.position = target;
+        UpdateRayVectorData();
     }
-    
+
     /// <summary>
     /// Set the ray origin, using the provided position in 3D space.
     /// </summary>
@@ -121,16 +168,26 @@ public class RaySensor : MonoBehaviour
     public void SetRayOrigin(Vector3 origin)
     {
         startPoint.position = origin;
+        UpdateRayVectorData();
     }
     
     /// <summary>
-    /// Set this ray sensor layer mask.
+    /// Update the ray distance and direction data based on the current ray origin and target.
     /// </summary>
-    /// <param name="layerMask">Layermask for this sensor.</param>
-    public void SetLayerMask(LayerMask layerMask)
+    private void UpdateRayVectorData()
     {
-        this.layerMask = layerMask;
+        _rayDistance = GetRayDistance();
+        _rayDirection = GetRayDirection();
     }
+    
+    // /// <summary>
+    // /// Set this ray sensor layer mask.
+    // /// </summary>
+    // /// <param name="layerMask">Layermask for this sensor.</param>
+    // public void SetLayerMask(LayerMask layerMask)
+    // {
+    //     this.layerMask = layerMask;
+    // }
     
 #if UNITY_EDITOR
     private void OnDrawGizmos()

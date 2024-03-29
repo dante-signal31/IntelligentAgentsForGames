@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -118,6 +118,8 @@ public class Whiskers : MonoBehaviour
     [Header("CONFIGURATION:")]
     [Tooltip("Ray sensor to instance.")]
     [SerializeField] private GameObject sensor;
+    [Tooltip("Layers to be detected by this sensor.")] 
+    [SerializeField] private LayerMask layerMask;
     [Tooltip("Number of rays for this sensor: (sensorResolution * 2) + 3")]
     [Range(0.0f, 10.0f)]
     [SerializeField] private int sensorResolution = 1;
@@ -140,12 +142,33 @@ public class Whiskers : MonoBehaviour
         1.0f,
         1.0f,
         0.2f);
+    [Space]
+    [Tooltip("Event to trigger when a collider is detected by this sensor.")]    
+    [SerializeField] private UnityEvent<Collider2D> colliderDetected;
+    [Tooltip("Event to trigger when no collider is detected by this sensor.")]
+    [SerializeField] private UnityEvent noColliderDetected;
     [Header("DEBUG")]
     [Tooltip("Whether to show gizmos for sensors.")]
     [SerializeField] private bool showGizmos = true;
     [Tooltip("Color for this scripts gizmos.")]
     [SerializeField] private Color gizmoColor = Color.yellow;
 
+    /// <summary>
+    /// This sensor layer mask.
+    /// </summary>
+    public LayerMask SensorsLayerMask
+    {
+        get => layerMask;
+        set
+        {
+            layerMask = value;
+            foreach (RaySensor raySensor in _sensors)
+            {
+                raySensor.SensorLayerMask = value;
+            }
+        }
+    }
+    
     /// <summary>
     /// Number of rays for this sensor: (sensorResolution * 2) + 3
     /// </summary>
@@ -202,11 +225,22 @@ public class Whiskers : MonoBehaviour
     /// Number of rays for this sensor with given resolution.
     /// </summary>
     public int SensorAmount => (sensorResolution * 2) + 3;
-    
+
     /// <summary>
     /// Whether this sensor detects any collider.
     /// </summary>
-    public bool IsAnyColliderDetected => _sensors.Any(sensor => sensor.IsColliderDetected);
+    public bool IsAnyColliderDetected
+    {
+        get
+        {
+            if (_sensors == null) return false;
+            foreach (RaySensor sensor in _sensors)
+            {
+                if (sensor.IsColliderDetected) return true;
+            }
+            return false;
+        }
+    }
     
     /// <summary>
     /// Set of detected colliders.
@@ -261,13 +295,28 @@ public class Whiskers : MonoBehaviour
         {
             // Script is executing in edit mode (but not in prefab mode, so in scene mode)
             // OR script is executing in Play mode
-            UpdateSensorPlacement();
+            UpdateSensorsPlacement();
+            SubscribeToSensorsEvents();
             UpdateGizmosConfiguration();
         }
 #else
-        SetupSensors();
+        UpdateSensorPlacement();
+        SubscribeToSensorsEvents();
         UpdateGizmosConfiguration();
 #endif
+    }
+
+    private void OnEnable()
+    {
+        // OnEnable runs before Start, so first time OnEnable is called, sensors are not
+        // initialized. That's why I call to SubscribeToSensorsEvents in Start. Nevertheless
+        // I call it here too just in case object is disabled and then enabled again.
+        SubscribeToSensorsEvents();
+    }
+
+    private void OnDestroy()
+    {
+        UnsubscribeFromSensorsEvents();
     }
     
     /// <summary>
@@ -277,10 +326,65 @@ public class Whiskers : MonoBehaviour
     {
         if (_onValidationUpdatePending)
         {
-            UpdateSensorPlacement();
+            UpdateSensorsPlacement();
+            SubscribeToSensorsEvents();
             UpdateGizmosConfiguration();
             _onValidationUpdatePending = false;
         }
+    }
+    
+    /// <summary>
+    /// Bind a listener to the colliderDetected event.
+    /// </summary>
+    /// <param name="action">Method to bind.</param>
+    public void SubscribeToColliderDetected(UnityAction<Collider2D> action)
+    {
+        colliderDetected.AddListener(action);
+    }
+    
+    /// <summary>
+    /// Unbind a listener from the colliderDetected event.
+    /// </summary>
+    /// <param name="action">Method to unbind.</param>
+    public void UnsubscribeFromColliderDetected(UnityAction<Collider2D> action)
+    {
+        colliderDetected.RemoveListener(action);
+    }
+    
+    /// <summary>
+    /// Bind a listener to the noColliderDetected event.
+    /// </summary>
+    /// <param name="action">Method to bind.</param>
+    public void SubscribeToNoColliderDetected(UnityAction action)
+    {
+        noColliderDetected.AddListener(action);
+    }
+    
+    /// <summary>
+    /// Unbind a listener from the noColliderDetected event.
+    /// </summary>
+    /// <param name="action">Method to unbind.</param>
+    public void UnsubscribeFromNoColliderDetected(UnityAction action)
+    {
+        noColliderDetected.RemoveListener(action);
+    }
+
+    /// <summary>
+    /// Called when a collider is detected.
+    /// </summary>
+    /// <param name="collider">Collided detected by sensor.</param>
+    public void OnColliderDetected(Collider2D collider)
+    {
+        Debug.Log($"[Whiskers] OnColliderDetected: {collider.name}");
+        if (colliderDetected != null) colliderDetected.Invoke(collider);
+    }
+    
+    /// <summary>
+    /// Called when no collider is detected.
+    /// </summary>
+    public void OnColliderNoLongerDetected()
+    {
+        if (DetectedColliders.Count == 0) noColliderDetected.Invoke();
     }
 
     /// <summary>
@@ -290,6 +394,7 @@ public class Whiskers : MonoBehaviour
     {
         PopulateSensors();
         PlaceSensors();
+        SetSensorsLayerMask();
     }
 
     /// <summary>
@@ -306,6 +411,40 @@ public class Whiskers : MonoBehaviour
             raySensors.Add(sensorInstance.GetComponent<RaySensor>());
         }
         _sensors = new RaySensorList(raySensors);
+    }
+
+    /// <summary>
+    /// Subscribe to sensors events.
+    /// </summary>
+    private void SubscribeToSensorsEvents()
+    {
+        if (_sensors == null) return;
+        foreach (RaySensor raySensor in _sensors)
+        {
+            raySensor.SubscribeToColliderDetected(OnColliderDetected);
+            raySensor.SubscribeToNoColliderDetected(OnColliderNoLongerDetected);
+        }
+    }
+
+    /// <summary>
+    /// Unsubscribe from sensors events.
+    /// </summary>
+    private void UnsubscribeFromSensorsEvents()
+    {
+        if (_sensors == null) return;
+        foreach (RaySensor raySensor in _sensors)
+        {
+            raySensor.UnsubscribeFromColliderDetected(OnColliderDetected);
+            raySensor.UnsubscribeFromNoColliderDetected(OnColliderNoLongerDetected);
+        }
+    }
+
+    /// <summary>
+    /// Set layer mask for sensors.
+    /// </summary>
+    private void SetSensorsLayerMask()
+    {
+        SensorsLayerMask = layerMask;
     }
 
     /// <summary>
@@ -348,7 +487,7 @@ public class Whiskers : MonoBehaviour
     /// If in prefab mode then recalculate sensor ends positions. If in scene or play mode
     /// then it recalculates sensor ends positions and instantiate sensors in those positions.
     /// </summary>
-    private void UpdateSensorPlacement()
+    private void UpdateSensorsPlacement()
     {
 #if UNITY_EDITOR
         if (PrefabStageUtility.GetCurrentPrefabStage() != null)
@@ -414,8 +553,6 @@ public class Whiskers : MonoBehaviour
     public float GetSensorLength(int sensorIndex)
     {
         int middleSensorIndex = SensorAmount / 2;
-        Debug.Log($"Middle sensor index: {middleSensorIndex}");
-        
         if (sensorIndex < middleSensorIndex)
         {
             return GetLeftSensorLength(sensorIndex, middleSensorIndex);
@@ -434,7 +571,6 @@ public class Whiskers : MonoBehaviour
     {
         float curvePoint = Mathf.InverseLerp(0, middleSensorIndex, sensorIndex);
         float curvePointRange = leftRangeSemiCone.Evaluate(curvePoint) * (range-minimumRange);
-        Debug.Log($"Point index: {sensorIndex}, curve point: {curvePoint}, range: {curvePointRange}");
         return curvePointRange;
     }
     
@@ -449,12 +585,9 @@ public class Whiskers : MonoBehaviour
     {
         float curvePoint = Mathf.InverseLerp( middleSensorIndex, SensorAmount-1, sensorIndex);
         float curvePointRange = rightRangeSemiCone.Evaluate(curvePoint) * (range-minimumRange);
-        Debug.Log($"Point index: {sensorIndex}, curve point: {curvePoint}, range: {curvePointRange}");
         return curvePointRange;
     }
     
-
-
     /// <summary>
     /// Update gizmos configuration of every sensor in the list.
     /// </summary>

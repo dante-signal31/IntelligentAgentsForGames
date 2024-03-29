@@ -20,4 +20,26 @@ public class SteeringOutput
         Linear = linear;
         Angular = angular;
     }
+    
+    /// <summary>
+    /// Operator for adding two SteeringOutput objects.
+    /// </summary>
+    /// <param name="a">One steering output.</param>
+    /// <param name="b">Another steering output.</param>
+    /// <returns>Resulting steering output.</returns>
+    public static SteeringOutput operator +(SteeringOutput a, SteeringOutput b)
+    {
+        return new SteeringOutput(a.Linear + b.Linear, a.Angular + b.Angular);
+    }
+    
+    /// <summary>
+    /// Operator for multiplying a SteeringOutput object and a float.
+    /// </summary>
+    /// <param name="a">One steering output.</param>
+    /// <param name="b">A float to multiply.</param>
+    /// <returns>Resulting steering output.</returns>
+    public static SteeringOutput operator *(SteeringOutput a, float b)
+    {
+        return new SteeringOutput(a.Linear * b, a.Angular * b);
+    }
 }

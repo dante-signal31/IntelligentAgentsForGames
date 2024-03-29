@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 /// <summary>
 /// Steering behavior to avoid walls ans obstacles.
@@ -8,25 +9,80 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
     [Header("WIRING:")]
     [Tooltip("Sensor to detect walls and obstacles.")]
     [SerializeField] private Whiskers whiskers;
+    [Tooltip("Layers to avoid.")] 
+    [SerializeField] private LayerMask layerMask;
     
     [Header("DEBUG:")]
-    [Tooltip("Show closest hit marker and avoid velocity vector.")]
+    [Tooltip("Show closest hit marker and evasion velocity vector.")]
     [SerializeField] private bool markersVisible = false;
     [Tooltip("Color fot this object markers.")]
     [SerializeField] private Color markerColor = Color.red;
 
     private RaycastHit2D _closestHit;
-    private Vector2 _avoidVector; 
+    private Vector2 _avoidVector;
+    private bool _obstacleDetected;
+
+    /// <summary>
+    /// Layers to avoid.
+    /// </summary>
+    public LayerMask AvoidLayerMask
+    {
+        get => layerMask;
+        set
+        {
+            layerMask = value;
+            whiskers.SensorsLayerMask = value;
+        }
+    }
+
+    private void Start()
+    {
+        AvoidLayerMask = layerMask;
+    }
+
+    private void OnEnable()
+    {
+        // OnEnable runs before Start, so first time OnEnable is called, sensors are not
+        // initialized. That's why I call to SubscribeToSensorsEvents in Start. Nevertheless
+        // I call it here too just in case object is disabled and then enabled again.
+        whiskers.SubscribeToColliderDetected(OnColliderDetected);
+        whiskers.SubscribeToNoColliderDetected(OnNoColliderDetected);
+    }
+
+    private void OnDisable()
+    {
+        whiskers.UnsubscribeFromColliderDetected(OnColliderDetected);
+        whiskers.UnsubscribeFromNoColliderDetected(OnNoColliderDetected);
+    }
+
+    /// <summary>
+    /// Method to bind to whisker's ColliderDetected event.
+    /// </summary>
+    /// <param name="_"></param>
+    private void OnColliderDetected(Collider2D _)
+    {
+        _obstacleDetected = true;
+    }
+
+    /// <summary>
+    /// Method to bind to whisker's NoColliderDetected event.
+    /// </summary>
+    private void OnNoColliderDetected()
+    {
+        _obstacleDetected = false;
+    }
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        if (whiskers.IsAnyColliderDetected)
+        if (_obstacleDetected)
         {
             var (closestDistance, 
                 closestHit, 
                 sensorIndexClosestDetectedHit) = GetClosestHitData(args);
-
-            float overShootFactor = GetOverShootFactor(sensorIndexClosestDetectedHit, closestDistance);
+            _closestHit = closestHit;
+            
+            float overShootFactor = GetOverShootFactor(sensorIndexClosestDetectedHit, 
+                closestDistance);
 
             _avoidVector = closestHit.normal * (args.MaximumSpeed * overShootFactor);
             return new SteeringOutput(_avoidVector, 0);
@@ -63,7 +119,7 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
     {
         
         float closestDistance = float.MaxValue;
-        _closestHit = new RaycastHit2D();
+        RaycastHit2D closestHit = new RaycastHit2D();
         int sensorIndexClosestDetectedHit = 0;
 
         Vector2 currentAgentPosition = args.CurrentAgent.transform.position;
@@ -75,21 +131,21 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
             if (hitDistance < closestDistance)
             {
                 closestDistance = hitDistance;
-                _closestHit = hit;
+                closestHit = hit;
                 sensorIndexClosestDetectedHit = sensorIndex;
             }
         }
 
-        return (closestDistance, _closestHit, sensorIndexClosestDetectedHit);
+        return (closestDistance, closestHit, sensorIndexClosestDetectedHit);
     }
     
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
-        if (markersVisible && whiskers.IsAnyColliderDetected)
+        if (markersVisible && _obstacleDetected)
         {
             Gizmos.color = markerColor;
-            Gizmos.DrawWireSphere(_closestHit.point, 0.2f);
+            Gizmos.DrawWireSphere(_closestHit.point, 0.1f);
             Gizmos.DrawLine(_closestHit.point, _closestHit.point + _avoidVector);
         }
     }
