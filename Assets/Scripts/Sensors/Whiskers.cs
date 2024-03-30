@@ -375,7 +375,6 @@ public class Whiskers : MonoBehaviour
     /// <param name="collider">Collided detected by sensor.</param>
     public void OnColliderDetected(Collider2D collider)
     {
-        Debug.Log($"[Whiskers] OnColliderDetected: {collider.name}");
         if (colliderDetected != null) colliderDetected.Invoke(collider);
     }
     
