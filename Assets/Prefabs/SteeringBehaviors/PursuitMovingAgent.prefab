@@ -105,6 +105,6 @@ MonoBehaviour:
   seekSteeringBehaviour: {fileID: 1454815751659104529}
   targetAgent: {fileID: 0}
   arrivalDistance: 0.1
-  aheadSemiConeDegrees: 26.574986
-  comingToUsSemiConeDegrees: 24.225864
+  aheadSemiConeDegrees: 28.474184
+  comingToUsSemiConeDegrees: 26.200506
   predictedPositionMarkerVisible: 1
