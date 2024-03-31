@@ -11,9 +11,6 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
     [SerializeField] private Whiskers whiskers;
     [Tooltip("Layers to avoid.")] 
     [SerializeField] private LayerMask layerMask;
-    [Tooltip("Time in seconds to run away from obstacle before trying to approach target again.")]
-    [SerializeField] private float evasionTime = 2.0f;
-    
     
     [Header("DEBUG:")]
     [Tooltip("Show closest hit marker and evasion velocity vector.")]
@@ -66,29 +63,6 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
         _runningAwayFromObstacle = false;
     }
 
-    private void FixedUpdate()
-    {
-        UpdateRunningAwayTimer();
-    }
-
-    /// <summary>
-    /// Increment running away timer or call EndRunningAway if timer is over.
-    /// </summary>
-    private void UpdateRunningAwayTimer()
-    {
-        if (_runningAwayFromObstacle)
-        {
-            if (_runningAwayElapsedTime < evasionTime)
-            {
-                _runningAwayElapsedTime += Time.deltaTime;
-            }
-            else
-            {
-                EndRunningAway();
-            }
-        }
-    }
-
     private void OnEnable()
     {
         // OnEnable runs before Start, so first time OnEnable is called, sensors are not
@@ -135,11 +109,6 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
 
             _avoidVector = closestHit.normal * (args.MaximumSpeed * overShootFactor);
             StartRunningAwayTimer();
-            return new SteeringOutput(_avoidVector, 0);
-        }
-        else if (_runningAwayFromObstacle)
-        {
-            _avoidVector = _avoidVector.normalized * (1 - _runningAwayElapsedTime / evasionTime);
             return new SteeringOutput(_avoidVector, 0);
         }
         else
