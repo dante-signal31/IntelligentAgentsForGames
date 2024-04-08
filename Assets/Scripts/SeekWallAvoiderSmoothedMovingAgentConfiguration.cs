@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// Configuration for SeekWallAvoiderSmoothedMovingAgent.
@@ -10,8 +11,9 @@ using UnityEngine;
 /// </summary>
 public class SeekWallAvoiderSmoothedMovingAgentConfiguration : MonoBehaviour
 {
+    [FormerlySerializedAs("pursuitSteeringBehavior")]
     [Header("WIRING")] 
-    [SerializeField] private PursuitSteeringBehavior pursuitSteeringBehavior;
+    // [SerializeField] private SeekSteeringBehavior mainSeekSteeringBehavior;
     [SerializeField] private SeekSteeringBehavior seekSteeringBehavior;
     [SerializeField] private WallAvoidanceSteeringBehavior wallAvoidanceSteeringBehavior;
 
@@ -32,6 +34,6 @@ public class SeekWallAvoiderSmoothedMovingAgentConfiguration : MonoBehaviour
         seekSteeringBehavior.target = target;
         seekSteeringBehavior.arrivalDistance = arrivalDistance;
         wallAvoidanceSteeringBehavior.AvoidLayerMask = layersToAvoid;
-        pursuitSteeringBehavior.ArrivalDistance = easyness;
+        // mainSeekSteeringBehavior.ArrivalDistance = easyness;
     }
 }
