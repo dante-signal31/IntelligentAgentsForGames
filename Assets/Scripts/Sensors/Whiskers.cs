@@ -624,7 +624,7 @@ public class Whiskers : MonoBehaviour
             Gizmos.color = gizmoColor;
             foreach (RayEnds rayEnds in _rayEnds)
             {
-                Gizmos.DrawLine(rayEnds.start, rayEnds.end);
+                Gizmos.DrawLine(transform.TransformPoint(rayEnds.start), transform.TransformPoint(rayEnds.end));
             }
         }
     }
