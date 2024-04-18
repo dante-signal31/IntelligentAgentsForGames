@@ -125,7 +125,7 @@ MonoBehaviour:
   layerMask:
     serializedVersion: 2
     m_Bits: 64
-  markersVisible: 1
+  markersVisible: 0
   markerColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!1 &7538472519440863414 stripped
 GameObject:
@@ -206,7 +206,7 @@ MonoBehaviour:
   noColliderDetected:
     m_PersistentCalls:
       m_Calls: []
-  showGizmos: 1
+  showGizmos: 0
   gizmoColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   _rayEnds:
   - start: {x: -0.49111015, y: -0.1992736, z: 0}

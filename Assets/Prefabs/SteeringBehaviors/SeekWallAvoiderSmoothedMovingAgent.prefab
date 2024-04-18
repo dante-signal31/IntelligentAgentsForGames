@@ -46,7 +46,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da950d1799714465b160b3feacce8a0a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pursuitSteeringBehavior: {fileID: 0}
   seekSteeringBehavior: {fileID: 2798900393182026878}
   wallAvoidanceSteeringBehavior: {fileID: 8201137948445260142}
   target: {fileID: 0}

@@ -3,12 +3,18 @@
 /// <summary>
 /// Monobehaviour to offer a Seek steering behaviour.
 /// </summary>
-public class SeekSteeringBehavior : SteeringBehavior
+public class SeekSteeringBehavior : SteeringBehavior, ITargeter
 {
     [Header("CONFIGURATION:")]
     public GameObject target;
     [Tooltip("Distance at which we give our goal as reached and we stop our agent.")]
     public float arrivalDistance;
+
+    public GameObject Target
+    {
+        get=> target; 
+        set=> target = value;
+    }
     
     private GameObject _currentThreath;
     private Vector2 _threathPosition;
