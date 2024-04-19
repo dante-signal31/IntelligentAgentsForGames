@@ -46,6 +46,7 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
     /// Start timer for running away from obstacle.
     ///
     /// While timer is on the object will run away from obstacle, so will keep its evasion vector.
+    /// This is useful to avoid jittering whan avoiding small obstacles. 
     /// </summary>
     private void StartRunningAwayTimer()
     {
@@ -107,7 +108,20 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
             float overShootFactor = GetOverShootFactor(sensorIndexClosestDetectedHit, 
                 closestDistance);
 
-            _avoidVector = closestHit.normal * (args.MaximumSpeed * overShootFactor);
+            if (whiskers.IsCenterSensor(sensorIndexClosestDetectedHit))
+            {
+                // Buckland uses this approach for every sensor, but I only use it for center sensor
+                // to only brake when obstacle is just in front of us.
+                _avoidVector = closestHit.normal * (args.MaximumSpeed * overShootFactor);
+            }
+            else
+            {
+                // For every other sensor than front one I only project normal vector as a lateral push.
+                // This way I make agent rotate without braking when obstacle is not in front of it.
+                float lateralPush = Vector3.Dot(closestHit.normal, transform.right);
+                _avoidVector = transform.right * lateralPush * args.MaximumSpeed * overShootFactor;
+            }
+            
             StartRunningAwayTimer();
             return new SteeringOutput(_avoidVector, 0);
         }
@@ -118,7 +132,7 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
     }
 
     /// <summary>
-    /// 
+    /// Get how far this ray has penetrated the object surface.
     /// </summary>
     /// <param name="sensorIndexClosestDetectedHit"></param>
     /// <param name="closestDistance"></param>

@@ -1,21 +1,31 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// Smooths an agent movement making its current steering behavior (usually a simple one)
-/// follow another object (usually a complex one). This way agents movement avoid usual
+/// Obstacle avoider agents can show jittering rotation behavior when evading obstacles. Although
+/// overall path is correct visually, it is not smooth. To fix that you can use the Ushier Method.
+///
+/// If you have seen a Victorian film or series you already know the Ushier Method. When a guest
+/// arrives to a noble house (e.g. Downton Abbey), he is ushered by a servant through halls and
+/// alleys to where the house master is. The servant acts as a guide and the guest just follows him.
+/// The guide can doubt and jitter while selecting a path, but the guest can walk steadily because
+/// only needs to follow the overall path of the servant. Make the servant invisible and you'll
+/// only see a guest walking surely through the house.
+/// 
+/// So, this scripts smooths an agent movement making its current steering behavior (usually a simple
+/// one) follow another object (usually a complex one). This way agents movement avoid usual
 /// jittering in complex behaviors.
 /// </summary>
 public class SmoothByFollowing : MonoBehaviour, ITargeter
 {
     [Header("WIRING:")]
-    [Tooltip("Current steering behaviour of this agent.")]
+    [Tooltip("Current steering behaviour of this agent (the guest).")]
     [SerializeField] private SteeringBehavior steeringBehavior;
-    [Tooltip("Instatiator of the object to follow.")]
+    [Tooltip("Instantiator of the object to follow (the Ushier).")]
     [SerializeField] private Instantiator instantiator;
     [Header("CONFIGURATION:")]
-    [Tooltip("Name of the object to follow.")]
+    [Tooltip("Name of the object to follow (the Ushier name).")]
     [SerializeField] private string followedObjectName;
-    [Tooltip("Target for the followed object.")] 
+    [Tooltip("Target for the followed object (the house master).")] 
     [SerializeField] private GameObject target;
 
     public GameObject Target

@@ -543,6 +543,13 @@ public class Whiskers : MonoBehaviour
     }
     
     /// <summary>
+    /// Whether this index is the one of the center sensor.
+    /// </summary>
+    /// <param name="index">Sensor index</param>
+    /// <returns>True if center sensor has this index.</returns>
+    public bool IsCenterSensor(int index)=> index == SensorAmount / 2;
+    
+    /// <summary>
     /// Calculates and returns the length of a sensor based on the sensor index provided.
     ///
     /// It uses index to use the proper proportion curve for left and right side.
