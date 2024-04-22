@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using PropertyAttribute;
+using UnityEngine;
 
 /// <summary>
 /// Obstacle avoider agents can show jittering rotation behavior when evading obstacles. Although
@@ -14,11 +15,16 @@
 /// So, this scripts smooths an agent movement making its current steering behavior (usually a simple
 /// one) follow another object (usually a complex one). This way agents movement avoid usual
 /// jittering in complex behaviors.
+///
+/// The key point here is that the following object should not reach the ushier or it will suffer
+/// the same jittering behavior. Instead of that it it reaches Ushier it must let it go forward
+/// before following again.
 /// </summary>
 public class SmoothByFollowing : MonoBehaviour, ITargeter
 {
     [Header("WIRING:")]
     [Tooltip("Current steering behaviour of this agent (the guest).")]
+    [HelpBar("The steering behavior you set here should comply with ITargeter interface.", MessageTypes.MessageType.Info)]
     [SerializeField] private SteeringBehavior steeringBehavior;
     [Tooltip("Instantiator of the object to follow (the Ushier).")]
     [SerializeField] private Instantiator instantiator;
