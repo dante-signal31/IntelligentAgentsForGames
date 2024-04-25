@@ -104,22 +104,21 @@ public class PursuitSteeringBehavior : SteeringBehavior
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
         UpdateTargetData();
-        Vector2 currentPosition = args.Position;
-        float maximumSpeed = args.MaximumSpeed;
-
-        Vector2 toTarget = _targetPosition - currentPosition;
         
         if (TargetIsComingToUs(args))
-        { // Target ahead so just go straight to it.
+        {   // Target is coming to us so just go straight to it.
             _predictedPositionMarker.transform.position = targetAgent.transform.position;
             seekSteeringBehaviour.target = _predictedPositionMarker;
             return seekSteeringBehaviour.GetSteering(args);
         }
         else
-        {   // Target is not ahead so we must predict where it will be.
+        {   // Target is not coming to us so we must predict where it will be.
             // The look-ahead time is proportional to the distance between the evader
-            // and the pursuer; and is inversely proportional to the sum of the
-            // agents' velocities
+            // and the pursuer and is inversely proportional to the sum of the
+            // agents velocities.
+            Vector2 currentPosition = args.Position;
+            float maximumSpeed = args.MaximumSpeed;
+            Vector2 toTarget = _targetPosition - currentPosition;
             float lookAheadTime = toTarget.magnitude / (maximumSpeed + _targetRigidBody.velocity.magnitude);
             _predictedPositionMarker.transform.position = _targetPosition + _targetRigidBody.velocity * lookAheadTime;
             seekSteeringBehaviour.target = _predictedPositionMarker;
