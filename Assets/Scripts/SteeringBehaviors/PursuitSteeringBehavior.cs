@@ -117,9 +117,10 @@ public class PursuitSteeringBehavior : SteeringBehavior
             // and the pursuer and is inversely proportional to the sum of the
             // agents velocities.
             Vector2 currentPosition = args.Position;
-            float maximumSpeed = args.MaximumSpeed;
-            Vector2 toTarget = _targetPosition - currentPosition;
-            float lookAheadTime = toTarget.magnitude / (maximumSpeed + _targetRigidBody.velocity.magnitude);
+            float currentSpeed = args.CurrentVelocity.magnitude;
+            float targetSpeed = _targetRigidBody.velocity.magnitude;
+            float distanceToTarget = (_targetPosition - currentPosition).magnitude;
+            float lookAheadTime = distanceToTarget / (currentSpeed + targetSpeed);
             _predictedPositionMarker.transform.position = _targetPosition + _targetRigidBody.velocity * lookAheadTime;
             seekSteeringBehaviour.target = _predictedPositionMarker;
             return seekSteeringBehaviour.GetSteering(args);
