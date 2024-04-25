@@ -121,8 +121,11 @@ public class PursuitSteeringBehavior : SteeringBehavior
             float targetSpeed = _targetRigidBody.velocity.magnitude;
             float distanceToTarget = (_targetPosition - currentPosition).magnitude;
             float lookAheadTime = distanceToTarget / (currentSpeed + targetSpeed);
-            _predictedPositionMarker.transform.position = _targetPosition + _targetRigidBody.velocity * lookAheadTime;
-            seekSteeringBehaviour.target = _predictedPositionMarker;
+            if (!float.IsInfinity(lookAheadTime))
+            {
+                _predictedPositionMarker.transform.position = (Vector3) _targetPosition + (Vector3) (_targetRigidBody.velocity * lookAheadTime);
+                seekSteeringBehaviour.target = _predictedPositionMarker;
+            }
             return seekSteeringBehaviour.GetSteering(args);
         }
     }
