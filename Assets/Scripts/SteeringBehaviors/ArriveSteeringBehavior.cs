@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// Monobehaviour to offer a Seek steering behaviour.
+/// Component to offer a Seek-like steering behaviour in which agent accelerates at the startup
+/// and brakes gradually at deceleration.
 /// </summary>
 public class ArriveSteeringBehavior : SteeringBehavior
 {

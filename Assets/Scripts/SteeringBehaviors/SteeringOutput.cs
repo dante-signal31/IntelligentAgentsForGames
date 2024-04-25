@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// Accelerations to move agent.
+/// Velocities to move agent.
 /// </summary>
 public class SteeringOutput
 {

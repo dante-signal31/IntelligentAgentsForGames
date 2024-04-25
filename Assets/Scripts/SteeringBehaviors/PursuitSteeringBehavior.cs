@@ -15,10 +15,10 @@ public class PursuitSteeringBehavior : SteeringBehavior
     [Tooltip("Distance at which we give our goal as reached and we stop our agent.")]
     [Min(0)]
     [SerializeField] private float arrivalDistance;
-    [Tooltip("Radians from forward vector inside which we consider an object is ahead.")]
+    [Tooltip("Degrees from forward vector inside which we consider an object is ahead.")]
     [Range(0, 90)]
     [SerializeField] private float aheadSemiConeDegrees;
-    [Tooltip("Radians from forward vector inside which we consider an object is going toward us.")]
+    [Tooltip("Degrees from forward vector inside which we consider an object is going toward us.")]
     [Range(0, 90)]
     [SerializeField] private float comingToUsSemiConeDegrees;
     
@@ -111,7 +111,8 @@ public class PursuitSteeringBehavior : SteeringBehavior
         
         if (TargetIsComingToUs(args))
         { // Target ahead so just go straight to it.
-            seekSteeringBehaviour.target = targetAgent;
+            _predictedPositionMarker.transform.position = targetAgent.transform.position;
+            seekSteeringBehaviour.target = _predictedPositionMarker;
             return seekSteeringBehaviour.GetSteering(args);
         }
         else
@@ -132,9 +133,9 @@ public class PursuitSteeringBehavior : SteeringBehavior
         Vector2 currentVelocity = args.CurrentVelocity;
         
         Vector2 toTarget = _targetPosition - currentPosition;
-        bool targetInFrontOfUs = Vector2.Dot(currentVelocity, toTarget) < _cosAheadSemiConeRadians;
-        bool targetComingToUs = Vector2.Dot(currentVelocity, _targetRigidBody.velocity) < _cosComingToUsSemiConeRadians;
-
+        bool targetInFrontOfUs = Vector2.Dot(currentVelocity.normalized, toTarget.normalized) > _cosAheadSemiConeRadians;
+        bool targetComingToUs = Vector2.Dot(currentVelocity.normalized, _targetRigidBody.velocity.normalized) < (-1 * _cosComingToUsSemiConeRadians);
+        
         return targetInFrontOfUs && targetComingToUs;
     }
     
