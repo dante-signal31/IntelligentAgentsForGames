@@ -38,8 +38,8 @@ public class WanderingSteeringBehavior : SteeringBehavior
     private void Awake()
     {
         _marker = new GameObject();
-        seekSteeringBehaviour.target = _marker;
-        seekSteeringBehaviour.arrivalDistance = arrivalDistance;
+        seekSteeringBehaviour.Target = _marker;
+        seekSteeringBehaviour.ArrivalDistance = arrivalDistance;
         
         // WanderPosition is a point constrained to the edge of a circle of radius wanderRadius.
         _wanderLocalPosition = GetRandomCircunferencePoint(Vector2.zero, 

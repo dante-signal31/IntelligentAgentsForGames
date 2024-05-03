@@ -31,8 +31,8 @@ public class SeekWallAvoiderSmoothedMovingAgentConfiguration : MonoBehaviour
 
     private void Start()
     {
-        seekSteeringBehavior.target = target;
-        seekSteeringBehavior.arrivalDistance = arrivalDistance;
+        seekSteeringBehavior.Target = target;
+        seekSteeringBehavior.ArrivalDistance = arrivalDistance;
         wallAvoidanceSteeringBehavior.AvoidLayerMask = layersToAvoid;
         // mainSeekSteeringBehavior.ArrivalDistance = easyness;
     }

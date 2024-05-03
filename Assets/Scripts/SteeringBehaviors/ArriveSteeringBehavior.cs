@@ -4,11 +4,11 @@
 /// Component to offer a Seek-like steering behaviour in which agent accelerates at the startup
 /// and brakes gradually at deceleration.
 /// </summary>
-public class ArriveSteeringBehavior : SteeringBehavior
+public class ArriveSteeringBehavior : SteeringBehavior, ITargeter
 {
     [Header("CONFIGURATION:")]
     [Tooltip("Point to arrive to.")]
-    public GameObject target;
+    [SerializeField] private GameObject target;
     [Tooltip("Radius to start to slow down.")]
     [SerializeField] private float brakingRadius;
     [Tooltip("At this distance from target agent will full stop.")]
@@ -69,5 +69,11 @@ public class ArriveSteeringBehavior : SteeringBehavior
         Vector2 newVelocity = toTarget.normalized * newSpeed;
         
         return new SteeringOutput(newVelocity, 0);
+    }
+
+    public GameObject Target
+    {
+        get => target; 
+        set => target = value;
     }
 }

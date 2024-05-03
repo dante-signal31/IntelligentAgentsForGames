@@ -13,7 +13,7 @@ public class SteeringBehaviorArgs
     /// <summary>
     /// Maximum linear speed for this steering.
     /// </summary>
-    public float MaximumSpeed { get; private set; }
+    public float MaximumSpeed { get; set; }
     
     /// <summary>
     /// Minimum linear speed under which agent is considered stopped.

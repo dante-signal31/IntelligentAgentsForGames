@@ -6,9 +6,9 @@
 public class SeekSteeringBehavior : SteeringBehavior, ITargeter
 {
     [Header("CONFIGURATION:")]
-    public GameObject target;
+    private GameObject target;
     [Tooltip("Distance at which we give our goal as reached and we stop our agent.")]
-    public float arrivalDistance;
+    private float arrivalDistance;
 
     public GameObject Target
     {
@@ -16,11 +16,19 @@ public class SeekSteeringBehavior : SteeringBehavior, ITargeter
         set=> target = value;
     }
     
+    public float ArrivalDistance
+    {
+        get=> arrivalDistance; 
+        set=> arrivalDistance = value;
+    }
+    
     private GameObject _currentThreath;
     private Vector2 _threathPosition;
     
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
+        if (target == null) return new SteeringOutput(Vector2.zero, 0);
+        
         Vector2 targetPosition = target.transform.position;
         Vector2 currentPosition = args.CurrentAgent.transform.position;
         float maximumSpeed = args.MaximumSpeed;

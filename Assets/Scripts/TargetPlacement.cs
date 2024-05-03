@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -14,6 +11,24 @@ public class TargetPlacement : MonoBehaviour
     [SerializeField] private Transform targetTransform;
     
     private Camera _mainCamera;
+
+    /// <summary>
+    /// This target current position.
+    /// </summary>
+    public Vector3 TargetPosition
+    {
+        get => targetTransform.position;
+        set => targetTransform.position = value;
+    }
+
+    /// <summary>
+    /// Enable or disable this target.
+    /// </summary>
+    public bool Enabled
+    {
+        get => gameObject.activeSelf;
+        set => gameObject.SetActive(value);
+    }
     
     public void OnPointAndClick(InputAction.CallbackContext context)
     {

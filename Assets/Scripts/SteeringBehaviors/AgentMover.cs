@@ -34,8 +34,12 @@ public class AgentMover : MonoBehaviour
     /// <summary>
     /// This agent maximum speed.
     /// </summary>
-    public float MaximumSpeed => maximumSpeed;
-    
+    public float MaximumSpeed
+    {
+        get { return maximumSpeed; }
+        set { maximumSpeed = value; }
+    }
+
     private SteeringBehaviorArgs _behaviorArgs;
 
     private SteeringBehaviorArgs GetSteeringBehaviorArgs()
@@ -58,6 +62,7 @@ public class AgentMover : MonoBehaviour
 
     private void FixedUpdate()
     {
+        _behaviorArgs.MaximumSpeed = MaximumSpeed;
         _behaviorArgs.CurrentVelocity = rigidBody.velocity;
         _behaviorArgs.DeltaTime = Time.fixedDeltaTime;
         SteeringOutput steeringOutput = steeringBehavior.GetSteering(_behaviorArgs);

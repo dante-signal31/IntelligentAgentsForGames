@@ -40,7 +40,7 @@ public class PursuitSteeringBehavior : SteeringBehavior
         set
         {
             arrivalDistance = Mathf.Max(0, value);
-            seekSteeringBehaviour.arrivalDistance = arrivalDistance;
+            seekSteeringBehaviour.ArrivalDistance = arrivalDistance;
         }
     }
 
@@ -76,9 +76,9 @@ public class PursuitSteeringBehavior : SteeringBehavior
     {
         _cosAheadSemiConeRadians = Mathf.Cos(aheadSemiConeDegrees * Mathf.Deg2Rad);
         _cosComingToUsSemiConeRadians = Mathf.Cos(comingToUsSemiConeDegrees * Mathf.Deg2Rad);
-        seekSteeringBehaviour.arrivalDistance = arrivalDistance;
+        seekSteeringBehaviour.ArrivalDistance = arrivalDistance;
         _predictedPositionMarker = new GameObject();
-        seekSteeringBehaviour.target = targetAgent;
+        seekSteeringBehaviour.Target = targetAgent;
         _agentColor = GetComponent<AgentColor>().Color;
         _targetColor = targetAgent.GetComponent<AgentColor>().Color;
     }
@@ -108,7 +108,7 @@ public class PursuitSteeringBehavior : SteeringBehavior
         if (TargetIsComingToUs(args))
         {   // Target is coming to us so just go straight to it.
             _predictedPositionMarker.transform.position = targetAgent.transform.position;
-            seekSteeringBehaviour.target = _predictedPositionMarker;
+            seekSteeringBehaviour.Target = _predictedPositionMarker;
             return seekSteeringBehaviour.GetSteering(args);
         }
         else
@@ -125,7 +125,7 @@ public class PursuitSteeringBehavior : SteeringBehavior
             if (!float.IsInfinity(lookAheadTime))
             {
                 _predictedPositionMarker.transform.position = (Vector3) _targetPosition + (targetVelocity * lookAheadTime);
-                seekSteeringBehaviour.target = _predictedPositionMarker;
+                seekSteeringBehaviour.Target = _predictedPositionMarker;
             }
             return seekSteeringBehaviour.GetSteering(args);
         }

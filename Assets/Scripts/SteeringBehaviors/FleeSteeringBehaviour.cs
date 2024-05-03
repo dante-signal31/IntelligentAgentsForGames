@@ -33,7 +33,7 @@ public class FleeSteeringBehavior : SteeringBehavior
     
     private void Start()
     {
-        seekSteeringBehaviour.target = threath;
+        seekSteeringBehaviour.Target = threath;
     }
     
     /// <summary>
@@ -43,7 +43,7 @@ public class FleeSteeringBehavior : SteeringBehavior
     {
         _currentThreath = threath;
         _threathPosition = _currentThreath.transform.position;
-        seekSteeringBehaviour.target = _currentThreath;
+        seekSteeringBehaviour.Target = _currentThreath;
     }
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
