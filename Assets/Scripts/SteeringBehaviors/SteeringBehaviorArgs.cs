@@ -51,7 +51,8 @@ public class SteeringBehaviorArgs
     public Vector2 Position => CurrentAgent.transform.position;
 
     /// <summary>
-    /// This GameObject rotation (Z axis por a 2D game).
+    /// This GameObject rotation (using Z as rotation axis because this is a
+    /// 2D game).
     /// </summary>
     public float Orientation => CurrentAgent.transform.rotation.eulerAngles.z;
 

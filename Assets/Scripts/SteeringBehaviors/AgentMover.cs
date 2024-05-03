@@ -4,7 +4,8 @@ using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
 /// <summary>
-/// This scripts moves its prefab following steering behaviours components.
+/// This componenet moves its gameobject using the velocity vector calculated
+/// by an steering behavior component.
 /// </summary>
 public class AgentMover : MonoBehaviour
 {
@@ -39,6 +40,12 @@ public class AgentMover : MonoBehaviour
         get { return maximumSpeed; }
         set { maximumSpeed = value; }
     }
+    
+    /// <summary>
+    /// This GameObject rotation in degrees(using Z as rotation axis because
+    /// this is a2D game).
+    /// </summary>
+    public float Orientation => transform.rotation.eulerAngles.z;
 
     private SteeringBehaviorArgs _behaviorArgs;
 

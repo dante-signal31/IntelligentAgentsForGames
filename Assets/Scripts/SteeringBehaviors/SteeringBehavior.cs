@@ -1,5 +1,11 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Basic template for a steering behavior.
+///
+/// It could be an interface, but Unity does not allow to use interfaces in
+/// inspector fields.
+/// </summary>
 public abstract class SteeringBehavior: MonoBehaviour
 {
     /// <summary>

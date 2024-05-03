@@ -27,7 +27,7 @@ public class FaceMatchingSteeringBehavior : SteeringBehavior
         _targetPosition = target.transform.position;
         _marker = Instantiate(orientationMarker, Vector2.zero, Quaternion.identity);
         _marker.GetComponentInChildren<SpriteRenderer>().enabled = orientationMarkerVisible;
-        alignSteeringBehavior.target = _marker;
+        alignSteeringBehavior.Target = _marker;
     }
 
     private void OnDestroy()

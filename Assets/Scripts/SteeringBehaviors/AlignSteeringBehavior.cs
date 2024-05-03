@@ -7,7 +7,7 @@ public class AlignSteeringBehavior : SteeringBehavior
 {
     [Header("CONFIGURATION:")]
     [Tooltip("Target to align with.")]
-    public GameObject target;
+    [SerializeField] private GameObject target;
     [Tooltip("Rotation to start to slow down (degress).")]
     [SerializeField] private float decelerationRadius;
     [Tooltip("At this rotation from target angle will full stop (degress).")]
@@ -26,6 +26,12 @@ public class AlignSteeringBehavior : SteeringBehavior
     private GameObject _currentTarget;
     private float _targetOrientation;
 
+    public GameObject Target
+    {
+        get { return _currentTarget; }
+        set { _currentTarget = value; }
+    }
+
     /// <summary>
     /// Load target data.
     /// </summary>
@@ -37,6 +43,8 @@ public class AlignSteeringBehavior : SteeringBehavior
     
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
+        if (target == null) return new SteeringOutput(Vector2.zero, 0);
+        
         UpdateTargetData();
         float currentOrientation = args.Orientation;
         float maximumRotationalSpeed = args.MaximumRotationalSpeed;
