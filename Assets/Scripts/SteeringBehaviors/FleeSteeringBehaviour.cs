@@ -21,6 +21,12 @@ public class FleeSteeringBehavior : SteeringBehavior
 
     private GameObject _currentThreath;
     private Vector2 _threathPosition;
+
+    public GameObject Threath
+    {
+        get => threath;
+        set => threath = value;
+    }
     
     public float PanicDistance
     {

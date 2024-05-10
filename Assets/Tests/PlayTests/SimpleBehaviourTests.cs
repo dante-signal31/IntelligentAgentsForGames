@@ -10,11 +10,11 @@ namespace Tests.PlayTests
     public class SimpleBehaviourTests
     {
         private string _currentScene = "ClearCourtyard";
-        private string _seekPrefabPath = "Assets/Prefabs/SteeringBehaviors/SeekMovingAgent.prefab";
 
         private Transform _seekStartPosition;
         private Transform _alignStartPosition;
         private Transform _faceStartPosition;
+        private Transform _fleeStartPosition;
         private Transform _targetPosition;
         private Transform _targetPosition2;
         private Transform _targetPosition3;
@@ -24,6 +24,7 @@ namespace Tests.PlayTests
         private GameObject _seekGameObject;
         private GameObject _alignGameObject;
         private GameObject _faceGameObject;
+        private GameObject _fleeGameObject;
     
         [UnitySetUp]
         public IEnumerator SetUp()
@@ -49,6 +50,8 @@ namespace Tests.PlayTests
                 _alignStartPosition = GameObject.Find("AlignStartPosition").transform;
             if (_faceStartPosition == null) 
                 _faceStartPosition = GameObject.Find("FaceStartPosition").transform;
+            if (_fleeStartPosition == null) 
+                _fleeStartPosition = GameObject.Find("FleeStartPosition").transform;
             
             if (_seekGameObject == null)
             {
@@ -64,6 +67,11 @@ namespace Tests.PlayTests
             {
                 _faceGameObject = GameObject.Find("FaceMovingAgent");
                 _faceGameObject.SetActive(false);
+            }
+            if (_fleeGameObject == null)
+            {
+                _fleeGameObject = GameObject.Find("FleeMovingAgent");
+                _fleeGameObject.SetActive(false);
             }
         }
         
@@ -94,6 +102,44 @@ namespace Tests.PlayTests
             
             // Cleanup.
             _seekGameObject.SetActive(false);
+            _target.Enabled = false;
+        }
+        
+        /// <summary>
+        /// Test that FleeBehavior males game object go away from its threath.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator FleeBehaviourTest()
+        {
+            // Test setup.
+            _fleeGameObject.transform.position = _fleeStartPosition.position;
+            var fleeSteeringBehavior = _fleeGameObject.GetComponent<FleeSteeringBehavior>();
+            fleeSteeringBehavior.Threath = _target.gameObject;
+            fleeSteeringBehavior.PanicDistance = 5.0f;
+            var agentMover = _fleeGameObject.GetComponent<AgentMover>();
+            agentMover.MaximumSpeed = 10.0f;
+            _target.Enabled = true;
+            _target.TargetPosition = _targetPosition.position;
+            _fleeGameObject.SetActive(true);
+            
+            // Give time for the seeker to get to the target.
+            int testsSamples = 5;
+            for (int i = 0; i < testsSamples; i++)
+            {
+                // Place target in a random position inside the flee range.
+                _target.TargetPosition = _fleeGameObject.transform.position +
+                                         (Vector3)(Random.insideUnitCircle *
+                                         fleeSteeringBehavior.PanicDistance);
+                // Let the fleer go away from the target.
+                yield return new WaitForSeconds(1.0f);
+                // Assert fleer is now farther from the target than before.
+                Assert.True(Vector3.Distance(_targetPosition.position, 
+                                _fleeGameObject.transform.position) > 
+                           fleeSteeringBehavior.PanicDistance);
+            }
+            
+            // Cleanup.
+            _fleeGameObject.SetActive(false);
             _target.Enabled = false;
         }
         

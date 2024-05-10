@@ -158,5 +158,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   alignSteeringBehavior: {fileID: 5918340287660111832}
   target: {fileID: 0}
-  orientationMarker: {fileID: 5020279398051697321, guid: 7039a0f10eac5e4449a3edf7e5f9edc7, type: 3}
-  orientationMarkerVisible: 1
