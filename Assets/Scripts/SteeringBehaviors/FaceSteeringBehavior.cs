@@ -14,10 +14,6 @@ public class FaceMatchingSteeringBehavior : SteeringBehavior, ITargeter
     [Header("CONFIGURATION:")]
     [Tooltip("Target to face to.")]
     [SerializeField] private GameObject target;
-    [Tooltip("Prefab used to give orientation to underlying Align behavior.")]
-    [SerializeField] private GameObject orientationMarker;
-    [Tooltip("Make visible position marker.")] 
-    [SerializeField] private bool orientationMarkerVisible = true;
 
     /// <summary>
     /// Target to look to.
@@ -34,8 +30,7 @@ public class FaceMatchingSteeringBehavior : SteeringBehavior, ITargeter
     private void Awake()
     {
         _targetPosition = target.transform.position;
-        _marker = Instantiate(orientationMarker, Vector2.zero, Quaternion.identity);
-        _marker.GetComponentInChildren<SpriteRenderer>().enabled = orientationMarkerVisible;
+        _marker = new GameObject("MarkerForAlignSteeringBehavior");
         alignSteeringBehavior.Target = _marker;
     }
 
