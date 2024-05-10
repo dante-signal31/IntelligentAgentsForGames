@@ -32,6 +32,8 @@ public class AlignSteeringBehavior : SteeringBehavior
         set { _currentTarget = value; }
     }
 
+    public float ArrivingMargin => arrivingRadius;
+
     /// <summary>
     /// Load target data.
     /// </summary>
