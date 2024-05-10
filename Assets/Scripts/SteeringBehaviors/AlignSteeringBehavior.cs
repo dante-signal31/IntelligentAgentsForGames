@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// Monobehaviour to offer an Align steering behaviour.
@@ -11,7 +12,7 @@ public class AlignSteeringBehavior : SteeringBehavior
     [Tooltip("Rotation to start to slow down (degress).")]
     [SerializeField] private float decelerationRadius;
     [Tooltip("At this rotation from target angle will full stop (degress).")]
-    [SerializeField] private float arrivingRadius;
+    [SerializeField] private float arrivingMargin;
     [Tooltip("Deceleration curve.")] 
     [SerializeField] private AnimationCurve decelerationCurve;
     [Tooltip("At this rotation start angle will be at full speed (degress).")]
@@ -22,24 +23,22 @@ public class AlignSteeringBehavior : SteeringBehavior
     private float _startOrientation;
     private float _rotationFromStart;
     private bool _idle = true;
-
-    private GameObject _currentTarget;
+    
     private float _targetOrientation;
 
     public GameObject Target
     {
-        get { return _currentTarget; }
-        set { _currentTarget = value; }
+        get { return target; }
+        set { target = value; }
     }
 
-    public float ArrivingMargin => arrivingRadius;
+    public float ArrivingMargin => arrivingMargin;
 
     /// <summary>
     /// Load target data.
     /// </summary>
     private void UpdateTargetData()
     {
-        _currentTarget = target;
         _targetOrientation = target.transform.rotation.eulerAngles.z;
     }
     
@@ -58,7 +57,7 @@ public class AlignSteeringBehavior : SteeringBehavior
 
         float newRotationalSpeed = 0.0f;
 
-        if (_idle && toTargetRotationAbs < arrivingRadius)
+        if (_idle && toTargetRotationAbs < arrivingMargin)
         {
             return new SteeringOutput(Vector2.zero, 0);
         }
@@ -67,7 +66,7 @@ public class AlignSteeringBehavior : SteeringBehavior
             _rotationFromStart = 0;
         }
         
-        if (toTargetRotationAbs >= arrivingRadius && Mathf.Abs(_rotationFromStart) < accelerationRadius)
+        if (toTargetRotationAbs >= arrivingMargin && Mathf.Abs(_rotationFromStart) < accelerationRadius)
         { // Acceleration phase.
             if (_idle)
             {
@@ -77,11 +76,11 @@ public class AlignSteeringBehavior : SteeringBehavior
             _rotationFromStart = Mathf.DeltaAngle(currentOrientation, _startOrientation);
             newRotationalSpeed = maximumRotationalSpeed * accelerationCurve.Evaluate(Mathf.Abs(_rotationFromStart) / accelerationRadius) * rotationSide;
         }
-        else if (toTargetRotationAbs < decelerationRadius && toTargetRotationAbs >= arrivingRadius)
+        else if (toTargetRotationAbs < decelerationRadius && toTargetRotationAbs >= arrivingMargin)
         { // Deceleration phase.
             newRotationalSpeed = maximumRotationalSpeed * decelerationCurve.Evaluate(toTargetRotationAbs / decelerationRadius) * rotationSide;
         }
-        else if (toTargetRotationAbs < arrivingRadius)
+        else if (toTargetRotationAbs < arrivingMargin)
         { // Stop phase.
             newRotationalSpeed = 0;
             _idle = true;
