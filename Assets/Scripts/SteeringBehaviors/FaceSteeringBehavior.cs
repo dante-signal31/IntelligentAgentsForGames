@@ -6,18 +6,27 @@ using UnityEngine.Serialization;
 /// Monobehaviour to offer a face to a target steering behaviour.
 /// </summary>
 [RequireComponent(typeof(AlignSteeringBehavior))]
-public class FaceMatchingSteeringBehavior : SteeringBehavior
+public class FaceMatchingSteeringBehavior : SteeringBehavior, ITargeter
 {
     [Header("WIRING:")] 
     [SerializeField] private AlignSteeringBehavior alignSteeringBehavior;
     
     [Header("CONFIGURATION:")]
     [Tooltip("Target to face to.")]
-    public GameObject target;
+    [SerializeField] private GameObject target;
     [Tooltip("Prefab used to give orientation to underlying Align behavior.")]
     [SerializeField] private GameObject orientationMarker;
     [Tooltip("Make visible position marker.")] 
     [SerializeField] private bool orientationMarkerVisible = true;
+
+    /// <summary>
+    /// Target to look to.
+    /// </summary>
+    public GameObject Target
+    {
+        get => target;
+        set => target = value;
+    }
     
     private Vector2 _targetPosition;
     private GameObject _marker;
