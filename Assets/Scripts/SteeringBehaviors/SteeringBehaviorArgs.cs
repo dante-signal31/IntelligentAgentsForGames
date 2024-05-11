@@ -33,7 +33,7 @@ public class SteeringBehaviorArgs
     /// <summary>
     /// Maximum acceleration for this steering.
     /// </summary>
-    public float MaximumAcceleration { get; private set; }
+    public float MaximumAcceleration { get; set; }
     
     /// <summary>
     /// Maximum deceleration for this steering.

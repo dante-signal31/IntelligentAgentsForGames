@@ -33,12 +33,35 @@ public class AgentMover : MonoBehaviour
     public float CurrentSpeed { get; private set;}
     
     /// <summary>
+    /// This agent current velocity.
+    /// </summary>
+    public Vector2 Velocity => rigidBody.velocity;
+    
+    /// <summary>
     /// This agent maximum speed.
     /// </summary>
     public float MaximumSpeed
     {
         get { return maximumSpeed; }
         set { maximumSpeed = value; }
+    }
+
+    /// <summary>
+    /// Speed at which we consider agent should stop.
+    /// </summary>
+    public float StopSpeed
+    {
+        get => stopSpeed;
+        set => stopSpeed = value;
+    }
+    
+    /// <summary>
+    /// Maximum acceleration for this agent.
+    /// </summary>
+    public float MaximumAcceleration
+    {
+        get { return maximumAcceleration; }
+        set { maximumAcceleration = value; }
     }
     
     /// <summary>
@@ -71,6 +94,7 @@ public class AgentMover : MonoBehaviour
     {
         _behaviorArgs.MaximumSpeed = MaximumSpeed;
         _behaviorArgs.CurrentVelocity = rigidBody.velocity;
+        _behaviorArgs.MaximumAcceleration = MaximumAcceleration;
         _behaviorArgs.DeltaTime = Time.fixedDeltaTime;
         SteeringOutput steeringOutput = steeringBehavior.GetSteering(_behaviorArgs);
         rigidBody.velocity = steeringOutput.Linear;

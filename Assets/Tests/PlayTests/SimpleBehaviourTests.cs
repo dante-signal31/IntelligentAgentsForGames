@@ -31,6 +31,7 @@ namespace Tests.PlayTests
         private GameObject _arriveGameObject;
         private GameObject _pursuitGameObject;
         private GameObject _evadeGameObject;
+        private GameObject _velocityMatchingGameObject;
     
         [UnitySetUp]
         public IEnumerator SetUp()
@@ -99,6 +100,11 @@ namespace Tests.PlayTests
             {
                 _evadeGameObject = GameObject.Find("EvadeMovingAgent");
                 _evadeGameObject.SetActive(false);
+            }
+            if (_velocityMatchingGameObject == null)
+            {
+                _velocityMatchingGameObject = GameObject.Find("VelocityMatchingMovingAgent");
+                _velocityMatchingGameObject.SetActive(false);
             }
         }
         
@@ -401,6 +407,50 @@ namespace Tests.PlayTests
             _seekGameObject.SetActive(false);
             _evadeGameObject.SetActive(false);
             _target.Enabled = false;
+        }
+        
+        /// <summary>
+        /// Test that VelocityMatchingBehavior can can copy its target's velocity.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator VelocityMatchingBehaviourTest()
+        {
+            // Test setup.
+            _velocityMatchingGameObject.transform.position = _pursuitTargetStartPosition.position;
+            var velocityMatchingSteeringBehavior = _velocityMatchingGameObject.GetComponent<VelocityMatchingSteeringBehavior>();
+            var velocityMatchingAgentMover = _velocityMatchingGameObject.GetComponent<AgentMover>();
+            _arriveGameObject.transform.position = _alignStartPosition.position;
+            var arriveSteeringBehavior = _arriveGameObject.GetComponent<ArriveSteeringBehavior>();
+            var arriveAgentMover = _arriveGameObject.GetComponent<AgentMover>();
+            velocityMatchingAgentMover.MaximumSpeed = 2.0f;
+            velocityMatchingAgentMover.MaximumAcceleration = 4.0f;
+            velocityMatchingAgentMover.StopSpeed = 0.1f;
+            arriveAgentMover.MaximumSpeed = 2.0f;
+            velocityMatchingSteeringBehavior.Target = _arriveGameObject;
+            arriveSteeringBehavior.Target = _targetPosition.gameObject;
+            _velocityMatchingGameObject.SetActive(true);
+            _arriveGameObject.SetActive(true);
+            
+            // Give time for the VelocityMatcher to try to reach its target
+            // cruise Velocity and assert its velocity has matched the one
+            // of its target.
+            yield return new WaitUntil(() =>
+                Mathf.Approximately(
+                    arriveAgentMover.CurrentSpeed, 
+                    arriveAgentMover.MaximumSpeed));
+            yield return new WaitForSeconds(velocityMatchingSteeringBehavior.TimeToMatch);
+            Assert.True(velocityMatchingAgentMover.Velocity == arriveAgentMover.Velocity);
+            
+            // Wait until arriver brakes and asserts that the VelocityMatcher
+            // has braked to.
+            yield return new WaitUntil(() => 
+                Mathf.Approximately(arriveAgentMover.CurrentSpeed, 0));
+            yield return new WaitForSeconds(velocityMatchingSteeringBehavior.TimeToMatch);
+            Assert.True(velocityMatchingAgentMover.Velocity == arriveAgentMover.Velocity);
+
+            // Cleanup.
+            _velocityMatchingGameObject.SetActive(false);
+            _arriveGameObject.SetActive(false);
         }
     }
 }
