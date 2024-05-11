@@ -14,7 +14,7 @@ public class FleeSteeringBehavior : SteeringBehavior
     [SerializeField] private SeekSteeringBehavior seekSteeringBehaviour; 
     
     [Header("CONFIGURATION:")]
-    public GameObject threath;
+    [SerializeField] private GameObject threath;
     [Tooltip("Minimum distance to threath before fleeing.")]
     [Min(MinimumPanicDistance)]
     [SerializeField] private float panicDistance;

@@ -17,7 +17,7 @@ public class EvadeSteeringBehavior : SteeringBehavior
     
     [Header("CONFIGURATION:")]
     [Tooltip("Agent to run from.")]
-    public GameObject threathAgent;
+    [SerializeField] private GameObject threathAgent;
     [Tooltip("Minimum distance to threath before fleeing.")]
     [Min(MinimumPanicDistance)]
     [SerializeField] private float panicDistance;
@@ -37,6 +37,12 @@ public class EvadeSteeringBehavior : SteeringBehavior
     private Color _agentColor;
     private Color _targetColor;
 
+    public GameObject Threath
+    {
+        get => threathAgent;
+        set => threathAgent = value;
+    }
+    
     public float PanicDistance
     {
         get => panicDistance;
@@ -49,7 +55,7 @@ public class EvadeSteeringBehavior : SteeringBehavior
     
     private void Start()
     {
-        fleeSteeringBehaviour.threath = threathAgent;
+        fleeSteeringBehaviour.Threath = threathAgent;
         fleeSteeringBehaviour.PanicDistance = panicDistance;
         _predictedPositionMarker = new GameObject();
         _agentColor = GetComponent<AgentColor>().Color;
@@ -82,7 +88,7 @@ public class EvadeSteeringBehavior : SteeringBehavior
         //agents' velocities
         float lookAheadTime = toThreath.magnitude / (maximumSpeed + _threathRigidBody.velocity.magnitude);
         _predictedPositionMarker.transform.position = _threathPosition + _threathRigidBody.velocity * lookAheadTime;
-        fleeSteeringBehaviour.threath = _predictedPositionMarker;
+        fleeSteeringBehaviour.Threath = _predictedPositionMarker;
         return fleeSteeringBehaviour.GetSteering(args);
     }
     

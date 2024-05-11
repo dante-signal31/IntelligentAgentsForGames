@@ -30,6 +30,7 @@ namespace Tests.PlayTests
         private GameObject _fleeGameObject;
         private GameObject _arriveGameObject;
         private GameObject _pursuitGameObject;
+        private GameObject _evadeGameObject;
     
         [UnitySetUp]
         public IEnumerator SetUp()
@@ -93,6 +94,11 @@ namespace Tests.PlayTests
             {
                 _pursuitGameObject = GameObject.Find("PursuitMovingAgent");
                 _pursuitGameObject.SetActive(false);
+            }
+            if (_evadeGameObject == null)
+            {
+                _evadeGameObject = GameObject.Find("EvadeMovingAgent");
+                _evadeGameObject.SetActive(false);
             }
         }
         
@@ -351,7 +357,7 @@ namespace Tests.PlayTests
             yield return new WaitForSeconds(3.0f);
             
             // Assert the target was reached.
-            // We test for a distance ecual to the radius of both agents, plus
+            // We test for a distance equal to the radius of both agents, plus
             // a 0.1 of tolerance. That should be the distance of centers when
             // both agents are touching.
             Assert.True(Vector3.Distance(_seekGameObject.transform.position, 
@@ -360,6 +366,40 @@ namespace Tests.PlayTests
             // Cleanup.
             _seekGameObject.SetActive(false);
             _pursuitGameObject.SetActive(false);
+            _target.Enabled = false;
+        }
+        
+        /// <summary>
+        /// Test that EvadeBehavior can can keep away its agent from its chaser.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator EvadeBehaviourTest()
+        {
+            // Test setup.
+            _evadeGameObject.transform.position = _fleeStartPosition.position;
+            var evadeSteeringBehavior = _evadeGameObject.GetComponent<EvadeSteeringBehavior>();
+            var evadeAgentMover = _evadeGameObject.GetComponent<AgentMover>();
+            _seekGameObject.transform.position = _seekStartPosition.position;
+            var seekSteeringBehavior = _seekGameObject.GetComponent<SeekSteeringBehavior>();
+            var seekAgentMover = _seekGameObject.GetComponent<AgentMover>();
+            seekAgentMover.MaximumSpeed = 2.0f;
+            evadeAgentMover.MaximumSpeed = 2.0f;
+            seekSteeringBehavior.Target = _evadeGameObject;
+            evadeSteeringBehavior.Threath = _seekGameObject;
+            evadeSteeringBehavior.PanicDistance = 3.0f;
+            _evadeGameObject.SetActive(true);
+            _seekGameObject.SetActive(true);
+            
+            // Give time for the chaser to try to reach evader.
+            yield return new WaitForSeconds(4.0f);
+            
+            // Assert the evader was not reached.
+            Assert.True(Vector3.Distance(_seekGameObject.transform.position, 
+                _evadeGameObject.transform.position) >= (2.0f));
+            
+            // Cleanup.
+            _seekGameObject.SetActive(false);
+            _evadeGameObject.SetActive(false);
             _target.Enabled = false;
         }
     }
