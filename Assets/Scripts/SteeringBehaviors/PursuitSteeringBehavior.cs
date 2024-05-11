@@ -1,17 +1,19 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// Monobehaviour to offer a Pursuit steering behaviour.
 /// </summary>
 [RequireComponent(typeof(SeekSteeringBehavior))]
-public class PursuitSteeringBehavior : SteeringBehavior
+public class PursuitSteeringBehavior : SteeringBehavior, ITargeter
 {
     [Header("WIRING:")] 
     [SerializeField] private SeekSteeringBehavior seekSteeringBehaviour; 
     
+    [FormerlySerializedAs("targetAgent")]
     [Header("CONFIGURATION:")]
     [Tooltip("Agent to pursue to.")]
-    [SerializeField] private GameObject targetAgent;
+    [SerializeField] private GameObject target;
     [Tooltip("Distance at which we give our goal as reached and we stop our agent.")]
     [Min(0)]
     [SerializeField] private float arrivalDistance;
@@ -29,7 +31,11 @@ public class PursuitSteeringBehavior : SteeringBehavior
     /// <summary>
     /// Agent pursued.
     /// </summary>
-    public GameObject TargetAgent=> targetAgent;
+    public GameObject Target
+    {
+        get => target;
+        set => target = value;
+    }
 
     /// <summary>
     /// Distance at which we give our goal as reached and we stop our agent.
@@ -78,9 +84,9 @@ public class PursuitSteeringBehavior : SteeringBehavior
         _cosComingToUsSemiConeRadians = Mathf.Cos(comingToUsSemiConeDegrees * Mathf.Deg2Rad);
         seekSteeringBehaviour.ArrivalDistance = arrivalDistance;
         _predictedPositionMarker = new GameObject();
-        seekSteeringBehaviour.Target = targetAgent;
+        seekSteeringBehaviour.Target = target;
         _agentColor = GetComponent<AgentColor>().Color;
-        _targetColor = targetAgent.GetComponent<AgentColor>().Color;
+        _targetColor = target.GetComponent<AgentColor>().Color;
     }
 
     private void OnDestroy()
@@ -93,12 +99,12 @@ public class PursuitSteeringBehavior : SteeringBehavior
     /// </summary>
     private void UpdateTargetData()
     {
-        if (targetAgent != _currentTarget)
+        if (target != _currentTarget)
         {
-            _targetRigidBody = targetAgent.GetComponentInChildren<Rigidbody2D>();
-            _currentTarget = targetAgent;
+            _targetRigidBody = target.GetComponentInChildren<Rigidbody2D>();
+            _currentTarget = target;
         }
-        _targetPosition = targetAgent.transform.position;
+        _targetPosition = target.transform.position;
     }
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
@@ -107,7 +113,7 @@ public class PursuitSteeringBehavior : SteeringBehavior
         
         if (TargetIsComingToUs(args))
         {   // Target is coming to us so just go straight to it.
-            _predictedPositionMarker.transform.position = targetAgent.transform.position;
+            _predictedPositionMarker.transform.position = target.transform.position;
             seekSteeringBehaviour.Target = _predictedPositionMarker;
             return seekSteeringBehaviour.GetSteering(args);
         }
@@ -152,7 +158,7 @@ public class PursuitSteeringBehavior : SteeringBehavior
             Gizmos.DrawLine(transform.position, _predictedPositionMarker.transform.position);
             Gizmos.DrawWireSphere(_predictedPositionMarker.transform.position, 0.3f);
             Gizmos.color = _targetColor;
-            Gizmos.DrawLine(targetAgent.transform.position, _predictedPositionMarker.transform.position);
+            Gizmos.DrawLine(target.transform.position, _predictedPositionMarker.transform.position);
         }
     }
 #endif

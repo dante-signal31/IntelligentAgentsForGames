@@ -15,9 +15,12 @@ namespace Tests.PlayTests
         private Transform _alignStartPosition;
         private Transform _faceStartPosition;
         private Transform _fleeStartPosition;
+        private Transform _pursuitStartPosition;
+        private Transform _pursuitTargetStartPosition;
         private Transform _targetPosition;
         private Transform _targetPosition2;
         private Transform _targetPosition3;
+        private Transform _targetPosition4;
 
         private TargetPlacement _target;
 
@@ -26,6 +29,7 @@ namespace Tests.PlayTests
         private GameObject _faceGameObject;
         private GameObject _fleeGameObject;
         private GameObject _arriveGameObject;
+        private GameObject _pursuitGameObject;
     
         [UnitySetUp]
         public IEnumerator SetUp()
@@ -38,6 +42,8 @@ namespace Tests.PlayTests
                 _targetPosition2 = GameObject.Find("TargetPosition2").transform;
             if (_targetPosition3 == null)
                 _targetPosition3 = GameObject.Find("TargetPosition3").transform;
+            if (_targetPosition4 == null)
+                _targetPosition4 = GameObject.Find("TargetPosition4").transform;
             if (_target == null)
             {
                 _target = GameObject.Find("Target").GetComponent<TargetPlacement>();
@@ -53,6 +59,10 @@ namespace Tests.PlayTests
                 _faceStartPosition = GameObject.Find("FaceStartPosition").transform;
             if (_fleeStartPosition == null) 
                 _fleeStartPosition = GameObject.Find("FleeStartPosition").transform;
+            if (_pursuitStartPosition == null)
+                _pursuitStartPosition = GameObject.Find("PursuitStartPosition").transform;
+            if (_pursuitTargetStartPosition == null)
+                _pursuitTargetStartPosition = GameObject.Find("PursuitTargetStartPosition").transform;
             
             if (_seekGameObject == null)
             {
@@ -78,6 +88,11 @@ namespace Tests.PlayTests
             {
                 _arriveGameObject = GameObject.Find("ArriveMovingAgent");
                 _arriveGameObject.SetActive(false);
+            }
+            if (_pursuitGameObject == null)
+            {
+                _pursuitGameObject = GameObject.Find("PursuitMovingAgent");
+                _pursuitGameObject.SetActive(false);
             }
         }
         
@@ -154,7 +169,7 @@ namespace Tests.PlayTests
             yield return new WaitUntil(() =>
                 Vector3.Distance(_targetPosition.position, 
                     _arriveGameObject.transform.position) < 
-                    (arriveSteeringBehavior.BrakingRadius - 0.1f));
+                    (arriveSteeringBehavior.BrakingRadius - 0.2f));
             yield return null;
             yield return null;
             Assert.True(agentMover.CurrentSpeed > 0.0f && 
@@ -306,6 +321,45 @@ namespace Tests.PlayTests
             // Cleanup.
             _seekGameObject.SetActive(false);
             _faceGameObject.SetActive(false);
+            _target.Enabled = false;
+        }
+        
+        /// <summary>
+        /// Test that PursuitBehavior can intercept its target.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator PursuitBehaviourTest()
+        {
+            // Test setup.
+            _seekGameObject.transform.position = _pursuitTargetStartPosition.position;
+            var seekSteeringBehavior = _seekGameObject.GetComponent<SeekSteeringBehavior>();
+            var agentMover = _seekGameObject.GetComponent<AgentMover>();
+            agentMover.MaximumSpeed = 2.0f;
+            _target.Enabled = true;
+            _target.TargetPosition = _targetPosition4.position;
+            seekSteeringBehavior.Target = _target.gameObject;
+            seekSteeringBehavior.ArrivalDistance = 0.2f;
+            _pursuitGameObject.transform.position = _pursuitStartPosition.position;
+            var pursuitSteeringBehavior = _pursuitGameObject.GetComponent<PursuitSteeringBehavior>();
+            var pursuitAgentMover = _seekGameObject.GetComponent<AgentMover>();
+            pursuitAgentMover.MaximumSpeed = 2.0f;
+            pursuitSteeringBehavior.Target = _seekGameObject;
+            _seekGameObject.SetActive(true);
+            _pursuitGameObject.SetActive(true);
+            
+            // Give time for the chaser to get to the target.
+            yield return new WaitForSeconds(3.0f);
+            
+            // Assert the target was reached.
+            // We test for a distance ecual to the radius of both agents, plus
+            // a 0.1 of tolerance. That should be the distance of centers when
+            // both agents are touching.
+            Assert.True(Vector3.Distance(_seekGameObject.transform.position, 
+                            _pursuitGameObject.transform.position) <= (1.1f));
+            
+            // Cleanup.
+            _seekGameObject.SetActive(false);
+            _pursuitGameObject.SetActive(false);
             _target.Enabled = false;
         }
     }
