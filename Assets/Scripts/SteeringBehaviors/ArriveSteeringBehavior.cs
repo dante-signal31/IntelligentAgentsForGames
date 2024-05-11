@@ -20,6 +20,30 @@ public class ArriveSteeringBehavior : SteeringBehavior, ITargeter
     [Tooltip("Acceleration curve.")] 
     [SerializeField] private AnimationCurve accelerationCurve;
 
+    public GameObject Target
+    {
+        get => target; 
+        set => target = value;
+    }
+
+    public float BrakingRadius
+    {
+        get => brakingRadius;
+        set => brakingRadius = value;
+    }
+    
+    public float ArrivingRadius
+    {
+        get => arrivingRadius;
+        set => arrivingRadius = value;
+    }
+    
+    public float AccelerationRadius
+    {
+        get => accelerationRadius;
+        set => accelerationRadius = value;
+    }
+    
     private Vector2 _startPosition;
     private float _distanceFromStart;
     private bool _idle = true;
@@ -69,11 +93,5 @@ public class ArriveSteeringBehavior : SteeringBehavior, ITargeter
         Vector2 newVelocity = toTarget.normalized * newSpeed;
         
         return new SteeringOutput(newVelocity, 0);
-    }
-
-    public GameObject Target
-    {
-        get => target; 
-        set => target = value;
     }
 }
