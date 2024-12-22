@@ -82,6 +82,7 @@ SpriteRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -169,6 +170,7 @@ SpriteRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -213,10 +215,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8382297402706859929}
-  - component: {fileID: 1790575542233831108}
-  - component: {fileID: 8204225113415206209}
   - component: {fileID: 3252367746477992068}
   - component: {fileID: 2027878817541019284}
+  - component: {fileID: 1790575542233831108}
+  - component: {fileID: 8204225113415206209}
   m_Layer: 7
   m_Name: MovingAgent
   m_TagString: Untagged
@@ -241,9 +243,42 @@ Transform:
   - {fileID: 6441047819761128476}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3252367746477992068
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8870854829495726955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df868b957d895204dba13342dbb5f56f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agentColor: {r: 0, g: 1, b: 0, a: 1}
+  spriteRenderer: {fileID: 805878432534679699}
+--- !u!114 &2027878817541019284
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8870854829495726955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3d83550b99ef26438b9b356965efa6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maximumSpeed: 2
+  stopSpeed: 0
+  maximumRotationalSpeed: 0
+  maximumAcceleration: 0
+  maximumDeceleration: 0
+  steeringBehavior: {fileID: 0}
+  rigidBody: {fileID: 1790575542233831108}
 --- !u!50 &1790575542233831108
 Rigidbody2D:
-  serializedVersion: 4
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -254,8 +289,8 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
   m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -304,36 +339,3 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 0.5
---- !u!114 &3252367746477992068
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8870854829495726955}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df868b957d895204dba13342dbb5f56f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  spriteRenderer: {fileID: 805878432534679699}
-  agentColor: {r: 0, g: 1, b: 0, a: 1}
---- !u!114 &2027878817541019284
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8870854829495726955}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b3d83550b99ef26438b9b356965efa6d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  steeringBehavior: {fileID: 0}
-  rigidBody: {fileID: 1790575542233831108}
-  maximumSpeed: 2
-  stopSpeed: 0
-  maximumRotationalSpeed: 0
-  maximumAcceleration: 0
-  maximumDeceleration: 0

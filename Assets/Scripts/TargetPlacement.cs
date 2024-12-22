@@ -34,7 +34,8 @@ public class TargetPlacement : MonoBehaviour
     {
         if (context.performed)
         {
-            Vector3 newPosition = new Vector3(Mouse.current.position.x.ReadValue(),
+            Vector3 newPosition = new Vector3(
+                Mouse.current.position.x.ReadValue(), 
                 Mouse.current.position.y.ReadValue(), 
                 _mainCamera.nearClipPlane);
             targetTransform.position = _mainCamera.ScreenToWorldPoint(newPosition);

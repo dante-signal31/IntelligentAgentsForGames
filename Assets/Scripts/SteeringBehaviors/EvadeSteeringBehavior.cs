@@ -86,8 +86,8 @@ public class EvadeSteeringBehavior : SteeringBehavior
         //The look-ahead time is proportional to the distance between the evader
         //and the pursuer; and is inversely proportional to the sum of the
         //agents' velocities
-        float lookAheadTime = toThreath.magnitude / (maximumSpeed + _threathRigidBody.velocity.magnitude);
-        _predictedPositionMarker.transform.position = _threathPosition + _threathRigidBody.velocity * lookAheadTime;
+        float lookAheadTime = toThreath.magnitude / (maximumSpeed + _threathRigidBody.linearVelocity.magnitude);
+        _predictedPositionMarker.transform.position = _threathPosition + _threathRigidBody.linearVelocity * lookAheadTime;
         fleeSteeringBehaviour.Threath = _predictedPositionMarker;
         return fleeSteeringBehaviour.GetSteering(args);
     }

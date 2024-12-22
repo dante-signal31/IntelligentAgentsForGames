@@ -4,28 +4,29 @@ using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
 /// <summary>
-/// This componenet moves its gameobject using the velocity vector calculated
+/// This component moves its gameobject using the velocity vector calculated
 /// by an steering behavior component.
 /// </summary>
 public class AgentMover : MonoBehaviour
 {
-    [Header("WIRING:")]
-    [Tooltip("Steering behaviour component that will return movement vectors.")]
-    public SteeringBehavior steeringBehavior;
-    [Tooltip("This prefab's RigidBody to apply movement vectors over it.")]
-    [SerializeField] private Rigidbody2D rigidBody;
-
     [Header("CONFIGURATION:")]
     [Tooltip("Movement will now surpass this maximum speed.")]
     [SerializeField] private float maximumSpeed;
     [Tooltip("Speed at which we consider agent should stop.")]
     [SerializeField] private float stopSpeed;
-    [Tooltip("Movement rotation will not surpass this maximum rotational speed (degress).")]
+    [Tooltip("Movement rotation will not surpass this maximum rotational speed " +
+             "(degress).")]
     [SerializeField] private float maximumRotationalSpeed;
     [Tooltip("Maximum acceleration for this agent.")]
     [SerializeField] private float maximumAcceleration;
     [Tooltip("Maximum deceleration for this agent.")]
     [SerializeField] private float maximumDeceleration;
+    
+    [Header("WIRING:")]
+    [Tooltip("Steering behaviour component that will return movement vectors.")]
+    public SteeringBehavior steeringBehavior;
+    [Tooltip("This prefab's RigidBody to apply movement vectors over it.")]
+    [SerializeField] private Rigidbody2D rigidBody;
     
     /// <summary>
     /// This agent current speed
@@ -35,15 +36,15 @@ public class AgentMover : MonoBehaviour
     /// <summary>
     /// This agent current velocity.
     /// </summary>
-    public Vector2 Velocity => rigidBody.velocity;
+    public Vector2 Velocity => rigidBody.linearVelocity;
     
     /// <summary>
     /// This agent maximum speed.
     /// </summary>
     public float MaximumSpeed
     {
-        get { return maximumSpeed; }
-        set { maximumSpeed = value; }
+        get => maximumSpeed;
+        set => maximumSpeed = value;
     }
 
     /// <summary>
@@ -60,13 +61,13 @@ public class AgentMover : MonoBehaviour
     /// </summary>
     public float MaximumAcceleration
     {
-        get { return maximumAcceleration; }
-        set { maximumAcceleration = value; }
+        get => maximumAcceleration;
+        set => maximumAcceleration = value;
     }
     
     /// <summary>
-    /// This GameObject rotation in degrees(using Z as rotation axis because
-    /// this is a2D game).
+    /// This GameObject rotation is in degrees (using Z as rotation axis because
+    /// this is a 2D game).
     /// </summary>
     public float Orientation => transform.rotation.eulerAngles.z;
 
@@ -76,7 +77,7 @@ public class AgentMover : MonoBehaviour
     {
         return new SteeringBehaviorArgs(
             gameObject, 
-            rigidBody.velocity, 
+            rigidBody.linearVelocity, 
             maximumSpeed, 
             stopSpeed,
             maximumRotationalSpeed,
@@ -92,24 +93,33 @@ public class AgentMover : MonoBehaviour
 
     private void FixedUpdate()
     {
+        // Update steering behavior args.
         _behaviorArgs.MaximumSpeed = MaximumSpeed;
-        _behaviorArgs.CurrentVelocity = rigidBody.velocity;
+        _behaviorArgs.CurrentVelocity = rigidBody.linearVelocity;
         _behaviorArgs.MaximumAcceleration = MaximumAcceleration;
         _behaviorArgs.DeltaTime = Time.fixedDeltaTime;
+        
+        // Get steering output.
         SteeringOutput steeringOutput = steeringBehavior.GetSteering(_behaviorArgs);
-        rigidBody.velocity = steeringOutput.Linear;
-        if (steeringOutput.Angular == 0 && rigidBody.velocity != Vector2.zero)
+        
+        // Apply new steering output to our GameObject.
+        rigidBody.linearVelocity = steeringOutput.Linear;
+        if (steeringOutput.Angular == 0 && rigidBody.linearVelocity != Vector2.zero)
         {
-            transform.up = rigidBody.velocity;
+            // If no explicit angular steering, we will just look at the direction we
+            // are moving.
+            transform.up = rigidBody.linearVelocity;
         }
         else
         {
+            // In this case, our steering wants us to face and move in different
+            // directions.
+            // TODO: Recheck this. What happens if Angular is beyond our maximum rotational speed?
             transform.eulerAngles = new Vector3(transform.eulerAngles.x, 
                 transform.eulerAngles.y, 
                 transform.eulerAngles.z + steeringOutput.Angular);
         }
-        CurrentSpeed = rigidBody.velocity.magnitude;
-        // Debug.Log(CurrentSpeed);
+        CurrentSpeed = rigidBody.linearVelocity.magnitude;
     }
 
     /// <summary>
@@ -118,8 +128,11 @@ public class AgentMover : MonoBehaviour
     /// <returns>New velocity vector (older plus steering).</returns>
     private Vector2 GetNewVelocity(SteeringOutput newSteeringOutput, float delta)
     {
-        Vector2 newVelocity = rigidBody.velocity + newSteeringOutput.Linear * delta;
-        newVelocity = ClampVector2(newVelocity, 0, maximumSpeed);
+        Vector2 newVelocity = rigidBody.linearVelocity + newSteeringOutput.Linear * delta;
+        newVelocity = ClampVector2(
+            newVelocity, 
+            0, 
+            maximumSpeed);
         return newVelocity;
     }
 
@@ -134,14 +147,20 @@ public class AgentMover : MonoBehaviour
         if (isAccelerationSteering(steeringOutput))
         {
             return new SteeringOutput(
-                ClampVector2(steeringOutput.Linear, 0, maximumAcceleration),
+                ClampVector2(
+                    steeringOutput.Linear, 
+                    0, 
+                    maximumAcceleration),
                 steeringOutput.Angular
             );
         }
         else
         {
             return new SteeringOutput(
-                ClampVector2(steeringOutput.Linear, 0, maximumDeceleration),
+                ClampVector2(
+                    steeringOutput.Linear, 
+                    0, 
+                    maximumDeceleration),
                 steeringOutput.Angular
             );
         }
@@ -151,10 +170,11 @@ public class AgentMover : MonoBehaviour
     /// Whether this steering output is going to increase speed or not.
     /// </summary>
     /// <param name="steeringOutput">Current steering.</param>
-    /// <returns>True if this steering is going to accelerate the agent. False otherwise.</returns>
+    /// <returns>True if this steering is going to accelerate the agent. False
+    /// otherwise.</returns>
     private bool isAccelerationSteering(SteeringOutput steeringOutput)
     {
-        return Vector2.Dot(rigidBody.velocity, steeringOutput.Linear) >= 0;
+        return Vector2.Dot(rigidBody.linearVelocity, steeringOutput.Linear) >= 0;
     }
     
     /// <summary>
@@ -164,7 +184,10 @@ public class AgentMover : MonoBehaviour
     /// <param name="minimumMagnitude">Minimum length for the clamped vector.</param>
     /// <param name="maximumMagnitude">Maximin length for the clamped vector.</param>
     /// <returns>Vector clamped.</returns>
-    private Vector2 ClampVector2(Vector2 vectorToClamp, float minimumMagnitude, float maximumMagnitude)
+    private Vector2 ClampVector2(
+        Vector2 vectorToClamp, 
+        float minimumMagnitude, 
+        float maximumMagnitude)
     {
         if (vectorToClamp.magnitude > maximumMagnitude)
         {
@@ -178,6 +201,7 @@ public class AgentMover : MonoBehaviour
         }
         return vectorToClamp;
     }
+    
     //
     // /// <summary>
     // /// Get rotation scalar updated with current steering and clamped by maximum rotational speed.

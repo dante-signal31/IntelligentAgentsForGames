@@ -124,8 +124,8 @@ public class PursuitSteeringBehavior : SteeringBehavior, ITargeter
             // agents velocities.
             Vector2 currentPosition = args.Position;
             float currentSpeed = args.CurrentVelocity.magnitude;
-            float targetSpeed = _targetRigidBody.velocity.magnitude;
-            Vector3 targetVelocity = _targetRigidBody.velocity;
+            float targetSpeed = _targetRigidBody.linearVelocity.magnitude;
+            Vector3 targetVelocity = _targetRigidBody.linearVelocity;
             float distanceToTarget = (_targetPosition - currentPosition).magnitude;
             float lookAheadTime = distanceToTarget / (currentSpeed + targetSpeed);
             if (!float.IsInfinity(lookAheadTime))
@@ -144,7 +144,7 @@ public class PursuitSteeringBehavior : SteeringBehavior, ITargeter
         
         Vector2 toTarget = _targetPosition - currentPosition;
         bool targetInFrontOfUs = Vector2.Dot(currentVelocity.normalized, toTarget.normalized) > _cosAheadSemiConeRadians;
-        bool targetComingToUs = Vector2.Dot(currentVelocity.normalized, _targetRigidBody.velocity.normalized) < (-1 * _cosComingToUsSemiConeRadians);
+        bool targetComingToUs = Vector2.Dot(currentVelocity.normalized, _targetRigidBody.linearVelocity.normalized) < (-1 * _cosComingToUsSemiConeRadians);
         
         return targetInFrontOfUs && targetComingToUs;
     }

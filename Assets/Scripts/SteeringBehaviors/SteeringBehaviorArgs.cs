@@ -1,7 +1,11 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// Base class passed as argument to Steering Behaviors Process() methods.
+/// <p>Base class passed as argument to SteeringBehaviors Process() methods.</p>
+/// 
+/// <p>SteeringBehaviors needs a lot of parameters to be passed in order to work. Mainly
+/// about the state and position of the current agent. This class encapsulates all of
+/// them.</p>
 /// </summary>
 public class SteeringBehaviorArgs
 {
@@ -56,9 +60,15 @@ public class SteeringBehaviorArgs
     /// </summary>
     public float Orientation => CurrentAgent.transform.rotation.eulerAngles.z;
 
-    public SteeringBehaviorArgs(GameObject currentAgent, Vector2 currentVelocity,
-        float maximumSpeed, float stopSpeed, float maximumRotationalSpeed, float maximumAcceleration,
-        float maximumDeceleration, float deltaTime)
+    public SteeringBehaviorArgs(
+        GameObject currentAgent, 
+        Vector2 currentVelocity,
+        float maximumSpeed, 
+        float stopSpeed, 
+        float maximumRotationalSpeed, 
+        float maximumAcceleration,
+        float maximumDeceleration, 
+        float deltaTime)
     {
         CurrentVelocity = currentVelocity;
         MaximumSpeed = maximumSpeed;

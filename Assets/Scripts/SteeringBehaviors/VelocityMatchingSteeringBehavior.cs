@@ -56,10 +56,10 @@ public class VelocityMatchingSteeringBehavior : SteeringBehavior, ITargeter
         // 1. Target velocity has changed.
         // 2. Target velocity and current velocity are the same. So we should
         //    stop accelerating.
-        if ((_targetVelocity != _targetRigidBody.velocity) ||
+        if ((_targetVelocity != _targetRigidBody.linearVelocity) ||
             Mathf.Approximately(_targetVelocity.magnitude, _currentVelocity.magnitude))
         {
-            _targetVelocity = _targetRigidBody.velocity;
+            _targetVelocity = _targetRigidBody.linearVelocity;
             _currentAccelerationUpdateIsNeeded = true;
         }
     }

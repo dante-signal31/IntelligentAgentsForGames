@@ -1,14 +1,17 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// Monobehaviour to offer a Seek steering behaviour.
+/// <p>Monobehaviour to offer a Seek steering behaviour.</p>
+/// 
+/// <p>Seek steering behaviour makes the agent move towards a target position.</p>
 /// </summary>
+[RequireComponent(typeof(AgentMover))]
 public class SeekSteeringBehavior : SteeringBehavior, ITargeter
 {
     [Header("CONFIGURATION:")]
     [SerializeField] private GameObject target;
     [Tooltip("Distance at which we give our goal as reached and we stop our agent.")]
-    [SerializeField] private float arrivalDistance;
+    [SerializeField] private float arrivalDistance = .1f;
 
     public GameObject Target
     {
