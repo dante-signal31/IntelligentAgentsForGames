@@ -270,8 +270,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maximumSpeed: 2
-  stopSpeed: 0
-  maximumRotationalSpeed: 0
+  stopSpeed: 0.1
+  maximumRotationalSpeed: 1080
+  stopRotationThreshold: 1
   maximumAcceleration: 0
   maximumDeceleration: 0
   steeringBehavior: {fileID: 0}

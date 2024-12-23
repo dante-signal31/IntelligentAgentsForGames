@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8107029913467557822}
   - component: {fileID: 3469634065361099183}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Appearance
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -51,6 +51,7 @@ SpriteRenderer:
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -72,8 +73,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -608115165
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 5541373477215352518, guid: ca6e45c7d17205e4885041cbb55fb513, type: 3}
   m_Color: {r: 1, g: 0, b: 0, a: 1}
@@ -97,7 +98,7 @@ GameObject:
   - component: {fileID: 3374666069497621577}
   - component: {fileID: 6336762098621067301}
   - component: {fileID: 8514670286728287716}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Target
   m_TagString: Untagged
   m_Icon: {fileID: 0}

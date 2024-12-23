@@ -17,6 +17,9 @@ public class AgentMover : MonoBehaviour
     [Tooltip("Movement rotation will not surpass this maximum rotational speed " +
              "(degress).")]
     [SerializeField] private float maximumRotationalSpeed;
+    [Tooltip("Rotation will stop when the difference in degrees between the current " +
+             "rotation and current forward vector is less than this value.")]
+    [SerializeField] private float stopRotationThreshold;
     [Tooltip("Maximum acceleration for this agent.")]
     [SerializeField] private float maximumAcceleration;
     [Tooltip("Maximum deceleration for this agent.")]
@@ -71,7 +74,18 @@ public class AgentMover : MonoBehaviour
     /// </summary>
     public float Orientation => transform.rotation.eulerAngles.z;
 
+    /// <summary>
+    /// This agent forward vector.
+    /// </summary>
+    public Vector2 Forward
+    {
+        get => transform.up;
+        set => transform.up = value;
+    }
+
     private SteeringBehaviorArgs _behaviorArgs;
+    private float _maximumRotationSpeedRadNormalized;
+    private float _stopRotationRadThreshold;
 
     private SteeringBehaviorArgs GetSteeringBehaviorArgs()
     {
@@ -89,6 +103,9 @@ public class AgentMover : MonoBehaviour
     private void Awake()
     {
         _behaviorArgs = GetSteeringBehaviorArgs();
+        _maximumRotationSpeedRadNormalized = maximumRotationalSpeed * Mathf.Deg2Rad / 
+                                             (2 * Mathf.PI);
+        _stopRotationRadThreshold = stopRotationThreshold * Mathf.Deg2Rad;
     }
 
     private void FixedUpdate()
@@ -104,11 +121,20 @@ public class AgentMover : MonoBehaviour
         
         // Apply new steering output to our GameObject.
         rigidBody.linearVelocity = steeringOutput.Linear;
+        CurrentSpeed = rigidBody.linearVelocity.magnitude;
         if (steeringOutput.Angular == 0 && rigidBody.linearVelocity != Vector2.zero)
         {
             // If no explicit angular steering, we will just look at the direction we
-            // are moving.
-            transform.up = rigidBody.linearVelocity;
+            // are moving, but clamping our rotation by our rotational speed.
+            float totalRotationNeeded = Vector2.Angle(Forward, rigidBody.linearVelocity);
+            if (Mathf.Abs(totalRotationNeeded) > stopRotationThreshold)
+            {
+                Vector3 newHeading = Vector3.Slerp(
+                    Forward, 
+                    rigidBody.linearVelocity, 
+                    _maximumRotationSpeedRadNormalized * Time.fixedDeltaTime);
+                Forward = newHeading.normalized * CurrentSpeed;
+            }
         }
         else
         {
@@ -119,7 +145,7 @@ public class AgentMover : MonoBehaviour
                 transform.eulerAngles.y, 
                 transform.eulerAngles.z + steeringOutput.Angular);
         }
-        CurrentSpeed = rigidBody.linearVelocity.magnitude;
+        
     }
 
     /// <summary>
