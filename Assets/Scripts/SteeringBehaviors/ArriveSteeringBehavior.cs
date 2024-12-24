@@ -87,12 +87,14 @@ public class ArriveSteeringBehavior : SteeringBehavior, ITargeter
                 _idle = false;
             }
             _distanceFromStart = (currentPosition - _startPosition).magnitude;
-            newSpeed = maximumSpeed * accelerationCurve.Evaluate(_distanceFromStart / accelerationRadius);
+            newSpeed = maximumSpeed * accelerationCurve.Evaluate(
+                Mathf.InverseLerp(0, accelerationRadius, _distanceFromStart));
         }
         else if (distanceToTarget < brakingRadius && distanceToTarget >= arrivalDistance)
         { // Deceleration phase.
             newSpeed = currentVelocity.magnitude > stopSpeed?
-                maximumSpeed * decelerationCurve.Evaluate(distanceToTarget / brakingRadius):
+                maximumSpeed * decelerationCurve.Evaluate(
+                    Mathf.InverseLerp(brakingRadius, 0, distanceToTarget)):
                 0;
         }
         else if (distanceToTarget < arrivalDistance)

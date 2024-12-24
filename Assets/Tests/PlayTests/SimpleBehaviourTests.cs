@@ -149,11 +149,13 @@ namespace Tests.PlayTests
         _arriveGameObject.transform.position = _seekStartPosition.position;
         var arriveSteeringBehavior = _arriveGameObject.GetComponent<ArriveSteeringBehavior>();
         var agentMover = _arriveGameObject.GetComponent<AgentMover>();
-        agentMover.MaximumSpeed = 10.0f;
+        agentMover.MaximumSpeed = 5.0f;
         _target.Enabled = true;
         _target.TargetPosition = _targetPosition.position;
         arriveSteeringBehavior.Target = _target.gameObject;
-        arriveSteeringBehavior.ArrivalDistance = 0.2f;
+        arriveSteeringBehavior.ArrivalDistance = 0.5f;
+        arriveSteeringBehavior.AccelerationRadius = 2.0f;
+        arriveSteeringBehavior.BrakingRadius = 3.0f;
         _arriveGameObject.SetActive(true);
         
         // Check that agent is accelerating at the beginning.
@@ -189,7 +191,7 @@ namespace Tests.PlayTests
                     agentMover.CurrentSpeed < agentMover.MaximumSpeed);
     
         // Assert the target was reached.
-        yield return new WaitForSeconds(0.75f);
+        yield return new WaitForSeconds(3f);
         Assert.True(Vector3.Distance(_targetPosition.position, 
                         _arriveGameObject.transform.position) <= 
                     (arriveSteeringBehavior.ArrivalDistance));

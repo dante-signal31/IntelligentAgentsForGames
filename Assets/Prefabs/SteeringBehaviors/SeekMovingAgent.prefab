@@ -14,7 +14,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2027878817541019284, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
       propertyPath: stopSpeed
-      value: 0
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 2027878817541019284, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
       propertyPath: steeringBehavior
@@ -90,4 +90,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
-  arrivalDistance: 0
+  arrivalDistance: 0.1
