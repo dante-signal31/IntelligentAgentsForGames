@@ -153,10 +153,11 @@ namespace Tests.PlayTests
         _target.Enabled = true;
         _target.TargetPosition = _targetPosition.position;
         arriveSteeringBehavior.Target = _target.gameObject;
-        arriveSteeringBehavior.ArrivingRadius = 0.2f;
+        arriveSteeringBehavior.ArrivalDistance = 0.2f;
         _arriveGameObject.SetActive(true);
         
-        // Check that arriver is accelerating at the beginning.
+        // Check that agent is accelerating at the beginning.
+        // Wait until agent starts is movement.
         yield return new WaitUntil(() =>
             (Vector3.Distance(_seekStartPosition.position, 
                 _arriveGameObject.transform.position) >= 0.1f) && 
@@ -166,7 +167,7 @@ namespace Tests.PlayTests
         Assert.True(agentMover.CurrentSpeed > 0.0f && 
                     agentMover.CurrentSpeed < agentMover.MaximumSpeed);
         
-        // Check that arriver gets its full cruise speed. 
+        // Check that agent gets its full cruise speed. 
         yield return new WaitUntil(() =>
             Vector3.Distance(_seekStartPosition.position, 
                 _arriveGameObject.transform.position) > 
@@ -177,7 +178,7 @@ namespace Tests.PlayTests
             Mathf.Approximately(agentMover.CurrentSpeed, 
                 agentMover.MaximumSpeed));
         
-        // Check that arriver is braking at the end.
+        // Check that agent is braking at the end.
         yield return new WaitUntil(() =>
             Vector3.Distance(_targetPosition.position, 
                 _arriveGameObject.transform.position) < 
@@ -191,7 +192,7 @@ namespace Tests.PlayTests
         yield return new WaitForSeconds(0.75f);
         Assert.True(Vector3.Distance(_targetPosition.position, 
                         _arriveGameObject.transform.position) <= 
-                    (arriveSteeringBehavior.ArrivingRadius));
+                    (arriveSteeringBehavior.ArrivalDistance));
         
         // Cleanup.
         _arriveGameObject.SetActive(false);

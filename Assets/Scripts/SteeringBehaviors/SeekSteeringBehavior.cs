@@ -9,16 +9,23 @@
 public class SeekSteeringBehavior : SteeringBehavior, ITargeter
 {
     [Header("CONFIGURATION:")]
+    [Tooltip("Point this agent is going to.")]
     [SerializeField] private GameObject target;
     [Tooltip("Distance at which we give our goal as reached and we stop our agent.")]
     [SerializeField] private float arrivalDistance = .1f;
 
+    /// <summary>
+    /// Point this agent is going to.
+    /// </summary>
     public GameObject Target
     {
         get=> target; 
         set=> target = value;
     }
     
+    /// <summary>
+    /// Distance at which we give our goal as reached and we stop our agent.
+    /// </summary>
     public float ArrivalDistance
     {
         get=> arrivalDistance; 

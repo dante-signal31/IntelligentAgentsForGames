@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// Component to offer a Seek-like steering behaviour in which agent accelerates at the startup
@@ -9,35 +10,49 @@ public class ArriveSteeringBehavior : SteeringBehavior, ITargeter
     [Header("CONFIGURATION:")]
     [Tooltip("Point to arrive to.")]
     [SerializeField] private GameObject target;
-    [Tooltip("Radius to start to slow down.")]
+    [Tooltip("Radius to start slowing down using deceleration curve.")]
     [SerializeField] private float brakingRadius;
-    [Tooltip("At this distance from target agent will full stop.")]
-    [SerializeField] private float arrivingRadius;
+    [Tooltip("At this distance from target, agent will full stop.")]
+    [SerializeField] private float arrivalDistance;
     [Tooltip("Deceleration curve.")] 
     [SerializeField] private AnimationCurve decelerationCurve;
-    [Tooltip("At this distance from start point will be at full speed.")]
+    [Tooltip("At this distance from start, agent will be at full speed, finishing its " +
+             "acceleration curve.")]
     [SerializeField] private float accelerationRadius;
     [Tooltip("Acceleration curve.")] 
     [SerializeField] private AnimationCurve accelerationCurve;
 
+    /// <summary>
+    /// Point this agent is going to.
+    /// </summary>
     public GameObject Target
     {
         get => target; 
         set => target = value;
     }
 
+    /// <summary>
+    /// Radius to start slowing down using deceleration curve.
+    /// </summary>
     public float BrakingRadius
     {
         get => brakingRadius;
         set => brakingRadius = value;
     }
     
-    public float ArrivingRadius
+    /// <summary>
+    /// At this distance from target, agent will full stop.
+    /// </summary>
+    public float ArrivalDistance
     {
-        get => arrivingRadius;
-        set => arrivingRadius = value;
+        get => arrivalDistance;
+        set => arrivalDistance = value;
     }
     
+    /// <summary>
+    /// At this distance from start, agent will be at full speed, finishing its
+    /// acceleration curve.
+    /// </summary>
     public float AccelerationRadius
     {
         get => accelerationRadius;
@@ -64,7 +79,7 @@ public class ArriveSteeringBehavior : SteeringBehavior, ITargeter
         
         if (_idle && _distanceFromStart > 0) _distanceFromStart = 0;
         
-        if (distanceToTarget >= arrivingRadius && _distanceFromStart < accelerationRadius)
+        if (distanceToTarget >= arrivalDistance && _distanceFromStart < accelerationRadius)
         { // Acceleration phase.
             if (_idle)
             {
@@ -74,13 +89,13 @@ public class ArriveSteeringBehavior : SteeringBehavior, ITargeter
             _distanceFromStart = (currentPosition - _startPosition).magnitude;
             newSpeed = maximumSpeed * accelerationCurve.Evaluate(_distanceFromStart / accelerationRadius);
         }
-        else if (distanceToTarget < brakingRadius && distanceToTarget >= arrivingRadius)
+        else if (distanceToTarget < brakingRadius && distanceToTarget >= arrivalDistance)
         { // Deceleration phase.
             newSpeed = currentVelocity.magnitude > stopSpeed?
                 maximumSpeed * decelerationCurve.Evaluate(distanceToTarget / brakingRadius):
                 0;
         }
-        else if (distanceToTarget < arrivingRadius)
+        else if (distanceToTarget < arrivalDistance)
         { // Stop phase.
             newSpeed = 0;
             _idle = true;
