@@ -32,9 +32,6 @@ public class SeekSteeringBehavior : SteeringBehavior, ITargeter
         set=> arrivalDistance = value;
     }
     
-    // private GameObject _currentThreath;
-    // private Vector2 _threathPosition;
-    
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
         if (target == null) return new SteeringOutput(Vector2.zero, 0);

@@ -2,8 +2,10 @@
 using UnityEngine.Serialization;
 
 /// <summary>
-/// Component to offer a Seek-like steering behaviour in which agent accelerates at the startup
-/// and brakes gradually at deceleration.
+/// <p>Monobehaviour to offer an Arrive steering behaviour.</p>
+/// 
+/// <p> Arrive behavior is a Seek-like steering behaviour in which agent accelerates at
+/// the startup and brakes gradually when approachs the end.</p>
 /// </summary>
 public class ArriveSteeringBehavior : SteeringBehavior, ITargeter
 {
@@ -79,7 +81,8 @@ public class ArriveSteeringBehavior : SteeringBehavior, ITargeter
         
         if (_idle && _distanceFromStart > 0) _distanceFromStart = 0;
         
-        if (distanceToTarget >= arrivalDistance && _distanceFromStart < accelerationRadius)
+        if (distanceToTarget >= arrivalDistance && 
+            _distanceFromStart < accelerationRadius)
         { // Acceleration phase.
             if (_idle)
             {
