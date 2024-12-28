@@ -14,10 +14,6 @@ public class AlignSteeringBehavior : SteeringBehavior, ITargeter
     [SerializeField] private GameObject target;
     [Tooltip("Rotation to start to slow down (degress).")]
     [SerializeField] private float decelerationRadius;
-    // [FormerlySerializedAs("arrivingMargin")]
-    // [Tooltip("At this rotation from target angle will full stop (degress).")]
-    // [SerializeField] private float _arrivingMargin;
-    [FormerlySerializedAs("deccelerationCurve")]
     [Tooltip("Deceleration curve.")] 
     [SerializeField] private AnimationCurve decelerationCurve;
     [Tooltip("At this rotation start angle will be at full speed (degress).")]
@@ -36,15 +32,6 @@ public class AlignSteeringBehavior : SteeringBehavior, ITargeter
         get { return target; }
         set { target = value; }
     }
-    
-
-    // /// <summary>
-    // /// Load target data.
-    // /// </summary>
-    // private void UpdateTargetData()
-    // {
-    //     _targetOrientation = target.transform.rotation.eulerAngles.z;
-    // }
     
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     { // I want smooth rotations, so I will use the same approach than in
