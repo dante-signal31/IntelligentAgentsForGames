@@ -55,8 +55,8 @@ namespace Tests.PlayTests
             
             if (_seekStartPosition == null) 
                 _seekStartPosition = GameObject.Find("SeekStartPosition").transform;
-            // if (_alignStartPosition == null) 
-            //     _alignStartPosition = GameObject.Find("AlignStartPosition").transform;
+            if (_alignStartPosition == null) 
+                _alignStartPosition = GameObject.Find("AlignStartPosition").transform;
             // if (_faceStartPosition == null) 
             //     _faceStartPosition = GameObject.Find("FaceStartPosition").transform;
             if (_fleeStartPosition == null) 
@@ -71,11 +71,11 @@ namespace Tests.PlayTests
                 _seekGameObject = GameObject.Find("SeekMovingAgent");
                 _seekGameObject.SetActive(false);
             }
-            // if (_alignGameObject == null)
-            // {
-            //     _alignGameObject = GameObject.Find("AlignMovingAgent");
-            //     _alignGameObject.SetActive(false);
-            // }
+            if (_alignGameObject == null)
+            {
+                _alignGameObject = GameObject.Find("AlignMovingAgent");
+                _alignGameObject.SetActive(false);
+            }
             // if (_faceGameObject == null)
             // {
             //     _faceGameObject = GameObject.Find("FaceMovingAgent");
@@ -202,7 +202,7 @@ namespace Tests.PlayTests
     }
     
     /// <summary>
-    /// Test that FleeBehavior males game object go away from its threath.
+    /// Test that FleeBehavior makes agent go away from its threath.
     /// </summary>
     [UnityTest]
     public IEnumerator FleeBehaviourTest()
@@ -238,60 +238,60 @@ namespace Tests.PlayTests
         _fleeGameObject.SetActive(false);
         _target.Enabled = false;
     }
-    //     
-    //     /// <summary>
-    //     /// Test that AlignBehavior can face in the same direction as other GameObject.
-    //     /// </summary>
-    //     [UnityTest]
-    //     public IEnumerator AlignBehaviourTest()
-    //     {
-    //         // Test setup.
-    //         _seekGameObject.transform.position = _seekStartPosition.position;
-    //         var seekSteeringBehavior = _seekGameObject.GetComponent<SeekSteeringBehavior>();
-    //         var agentMover = _seekGameObject.GetComponent<AgentMover>();
-    //         agentMover.MaximumSpeed = 2.0f;
-    //         _target.Enabled = true;
-    //         _target.TargetPosition = _targetPosition.position;
-    //         seekSteeringBehavior.Target = _target.gameObject;
-    //         seekSteeringBehavior.ArrivalDistance = 0.2f;
-    //         _alignGameObject.transform.position = _alignStartPosition.position;
-    //         var alignSteeringBehavior = _alignGameObject.GetComponent<AlignSteeringBehavior>();
-    //         alignSteeringBehavior.Target = _seekGameObject;
-    //         _alignGameObject.SetActive(true);
-    //         _seekGameObject.SetActive(true);
-    //         
-    //         // Move seeker to face the first target.
-    //         _target.TargetPosition = _targetPosition.position;
-    //         yield return new WaitForSeconds(2.0f);
-    //         Assert.True(
-    //             Mathf.Abs(
-    //                 _seekGameObject.GetComponent<AgentMover>().Orientation-
-    //                  _alignGameObject.GetComponent<AgentMover>().Orientation) <= 
-    //                     alignSteeringBehavior.ArrivingMargin);
-    //         
-    //         // Move seeker to face the second target.
-    //         _target.TargetPosition = _targetPosition2.position;
-    //         yield return new WaitForSeconds(2.0f);
-    //         Assert.True(
-    //             Mathf.Abs(
-    //                 _seekGameObject.GetComponent<AgentMover>().Orientation- 
-    //                   _alignGameObject.GetComponent<AgentMover>().Orientation) <=
-    //                     alignSteeringBehavior.ArrivingMargin);
-    //         
-    //         // Move seeker to face the third target.
-    //         _target.TargetPosition = _targetPosition3.position;
-    //         yield return new WaitForSeconds(2.0f);
-    //         Assert.True(
-    //             Mathf.Abs(
-    //                 _seekGameObject.GetComponent<AgentMover>().Orientation- 
-    //                   _alignGameObject.GetComponent<AgentMover>().Orientation) <=
-    //                   alignSteeringBehavior.ArrivingMargin);
-    //         
-    //         // Cleanup.
-    //         _seekGameObject.SetActive(false);
-    //         _alignGameObject.SetActive(false);
-    //         _target.Enabled = false;
-    //     }
+    
+    /// <summary>
+    /// Test that AlignBehavior can face in the same direction as other GameObject.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator AlignBehaviourTest()
+    {
+        // Test setup.
+        _seekGameObject.transform.position = _seekStartPosition.position;
+        var seekSteeringBehavior = _seekGameObject.GetComponent<SeekSteeringBehavior>();
+        var agentMover = _seekGameObject.GetComponent<AgentMover>();
+        agentMover.MaximumSpeed = 2.0f;
+        _target.Enabled = true;
+        _target.TargetPosition = _targetPosition.position;
+        seekSteeringBehavior.Target = _target.gameObject;
+        seekSteeringBehavior.ArrivalDistance = 0.2f;
+        _alignGameObject.transform.position = _alignStartPosition.position;
+        var alignSteeringBehavior = _alignGameObject.GetComponent<AlignSteeringBehavior>();
+        alignSteeringBehavior.Target = _seekGameObject;
+        _alignGameObject.SetActive(true);
+        _seekGameObject.SetActive(true);
+        
+        // Move seeker to face the first target.
+        _target.TargetPosition = _targetPosition.position;
+        yield return new WaitForSeconds(2.0f);
+        Assert.True(
+            Mathf.Abs(
+                _seekGameObject.GetComponent<AgentMover>().Orientation-
+                 _alignGameObject.GetComponent<AgentMover>().Orientation) <= 
+            agentMover.StopRotationThreshold);
+        
+        // Move seeker to face the second target.
+        _target.TargetPosition = _targetPosition2.position;
+        yield return new WaitForSeconds(2.0f);
+        Assert.True(
+            Mathf.Abs(
+                _seekGameObject.GetComponent<AgentMover>().Orientation- 
+                  _alignGameObject.GetComponent<AgentMover>().Orientation) <= 
+            agentMover.StopRotationThreshold);
+        
+        // Move seeker to face the third target.
+        _target.TargetPosition = _targetPosition3.position;
+        yield return new WaitForSeconds(2.0f);
+        Assert.True(
+            Mathf.Abs(
+                _seekGameObject.GetComponent<AgentMover>().Orientation- 
+                  _alignGameObject.GetComponent<AgentMover>().Orientation) <=
+            agentMover.StopRotationThreshold);
+        
+        // Cleanup.
+        _seekGameObject.SetActive(false);
+        _alignGameObject.SetActive(false);
+        _target.Enabled = false;
+    }
     //     
     //     /// <summary>
     //     /// Test that FaceBehavior can face towards a target while it moves.

@@ -30,9 +30,15 @@ public class SteeringBehaviorArgs
     public Vector2 CurrentVelocity { get; set; }
     
     /// <summary>
-    /// Maximum rotational speed for this steering.
+    /// Maximum rotational speed for this steering in degress.
     /// </summary>
     public float MaximumRotationalSpeed { get; private set; }
+    
+    /// <summary>
+    /// Rotation will stop when the difference in degrees between the current
+    /// rotation and current forward vector is less than this value.
+    /// </summary>
+    public float StopRotationThreshold { get; private set; }
     
     /// <summary>
     /// Maximum acceleration for this steering.
@@ -55,7 +61,7 @@ public class SteeringBehaviorArgs
     public Vector2 Position => CurrentAgent.transform.position;
 
     /// <summary>
-    /// This GameObject rotation (using Z as rotation axis because this is a
+    /// This GameObject rotation in degress (using Z as rotation axis because this is a
     /// 2D game).
     /// </summary>
     public float Orientation => CurrentAgent.transform.rotation.eulerAngles.z;
@@ -65,7 +71,8 @@ public class SteeringBehaviorArgs
         Vector2 currentVelocity,
         float maximumSpeed, 
         float stopSpeed, 
-        float maximumRotationalSpeed, 
+        float maximumRotationalSpeed,
+        float stopRotationThreshold,
         float maximumAcceleration,
         float maximumDeceleration, 
         float deltaTime)
@@ -74,6 +81,7 @@ public class SteeringBehaviorArgs
         MaximumSpeed = maximumSpeed;
         StopSpeed = stopSpeed;
         MaximumRotationalSpeed = maximumRotationalSpeed;
+        StopRotationThreshold = stopRotationThreshold;
         CurrentAgent = currentAgent;
         MaximumAcceleration = maximumAcceleration;
         MaximumDeceleration = maximumDeceleration;

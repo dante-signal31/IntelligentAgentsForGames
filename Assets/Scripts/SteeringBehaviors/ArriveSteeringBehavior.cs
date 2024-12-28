@@ -90,6 +90,8 @@ public class ArriveSteeringBehavior : SteeringBehavior, ITargeter
                 _idle = false;
             }
             _distanceFromStart = (currentPosition - _startPosition).magnitude;
+            // Acceleration curve should start at more than 0 or agent will not
+            // start to move.
             newSpeed = maximumSpeed * accelerationCurve.Evaluate(
                 Mathf.InverseLerp(0, accelerationRadius, _distanceFromStart));
         }

@@ -1650,6 +1650,14 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3047221406920269648, guid: 77d4b54a2248ac24ca0d40f7d17032df, type: 3}
+      propertyPath: accelerationCurve.m_Curve.Array.data[0].time
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3047221406920269648, guid: 77d4b54a2248ac24ca0d40f7d17032df, type: 3}
+      propertyPath: accelerationCurve.m_Curve.Array.data[0].value
+      value: 0.20063782
+      objectReference: {fileID: 0}
+    - target: {fileID: 3047221406920269648, guid: 77d4b54a2248ac24ca0d40f7d17032df, type: 3}
       propertyPath: accelerationCurve.m_Curve.Array.data[0].inSlope
       value: 2.2046337
       objectReference: {fileID: 0}
@@ -1829,7 +1837,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3912465918369364895, guid: cda077cf5424eae4785994d1abbea7da, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4108306927066898285, guid: cda077cf5424eae4785994d1abbea7da, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1870,6 +1878,66 @@ PrefabInstance:
     - target: {fileID: 4108306927066898285, guid: cda077cf5424eae4785994d1abbea7da, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5869383816838028896, guid: cda077cf5424eae4785994d1abbea7da, type: 3}
+      propertyPath: maximumRotationalSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7238011200478024826, guid: cda077cf5424eae4785994d1abbea7da, type: 3}
+      propertyPath: target
+      value: 
+      objectReference: {fileID: 1723402903}
+    - target: {fileID: 7238011200478024826, guid: cda077cf5424eae4785994d1abbea7da, type: 3}
+      propertyPath: arrivingMargin
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7238011200478024826, guid: cda077cf5424eae4785994d1abbea7da, type: 3}
+      propertyPath: accelerationRadius
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7238011200478024826, guid: cda077cf5424eae4785994d1abbea7da, type: 3}
+      propertyPath: decelerationRadius
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7238011200478024826, guid: cda077cf5424eae4785994d1abbea7da, type: 3}
+      propertyPath: decelerationCurve.m_Curve.Array.data[0].time
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7238011200478024826, guid: cda077cf5424eae4785994d1abbea7da, type: 3}
+      propertyPath: decelerationCurve.m_Curve.Array.data[1].time
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7238011200478024826, guid: cda077cf5424eae4785994d1abbea7da, type: 3}
+      propertyPath: decelerationCurve.m_Curve.Array.data[0].value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7238011200478024826, guid: cda077cf5424eae4785994d1abbea7da, type: 3}
+      propertyPath: decelerationCurve.m_Curve.Array.data[1].value
+      value: 0.000000059604645
+      objectReference: {fileID: 0}
+    - target: {fileID: 7238011200478024826, guid: cda077cf5424eae4785994d1abbea7da, type: 3}
+      propertyPath: decelerationCurve.m_Curve.Array.data[0].inSlope
+      value: -0.22022934
+      objectReference: {fileID: 0}
+    - target: {fileID: 7238011200478024826, guid: cda077cf5424eae4785994d1abbea7da, type: 3}
+      propertyPath: decelerationCurve.m_Curve.Array.data[1].inSlope
+      value: -1.9706247
+      objectReference: {fileID: 0}
+    - target: {fileID: 7238011200478024826, guid: cda077cf5424eae4785994d1abbea7da, type: 3}
+      propertyPath: decelerationCurve.m_Curve.Array.data[0].outSlope
+      value: -0.22022934
+      objectReference: {fileID: 0}
+    - target: {fileID: 7238011200478024826, guid: cda077cf5424eae4785994d1abbea7da, type: 3}
+      propertyPath: decelerationCurve.m_Curve.Array.data[1].inWeight
+      value: 0.0466761
+      objectReference: {fileID: 0}
+    - target: {fileID: 7238011200478024826, guid: cda077cf5424eae4785994d1abbea7da, type: 3}
+      propertyPath: decelerationCurve.m_Curve.Array.data[1].outSlope
+      value: -1.9706247
+      objectReference: {fileID: 0}
+    - target: {fileID: 7238011200478024826, guid: cda077cf5424eae4785994d1abbea7da, type: 3}
+      propertyPath: decelerationCurve.m_Curve.Array.data[0].outWeight
+      value: 0.07496464
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3363,6 +3431,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1316877752}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1723402903 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1599485924749689140, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
+  m_PrefabInstance: {fileID: 414490154}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1766909187
 PrefabInstance:
   m_ObjectHideFlags: 0

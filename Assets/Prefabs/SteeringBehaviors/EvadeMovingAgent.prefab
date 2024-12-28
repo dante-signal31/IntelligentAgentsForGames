@@ -105,9 +105,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d4ebaa614c542a3b6a2f4eb2e6fb0ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  seekSteeringBehaviour: {fileID: 2344011181164910159}
   threath: {fileID: 0}
   panicDistance: 0
+  seekSteeringBehaviour: {fileID: 2344011181164910159}
 --- !u!114 &4663877203873210221
 MonoBehaviour:
   m_ObjectHideFlags: 0

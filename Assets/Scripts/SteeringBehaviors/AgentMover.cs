@@ -1,5 +1,6 @@
 using System.Numerics;
 using UnityEngine;
+using Quaternion = UnityEngine.Quaternion;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
@@ -75,6 +76,16 @@ public class AgentMover : MonoBehaviour
     public float Orientation => transform.rotation.eulerAngles.z;
 
     /// <summary>
+    /// Rotation will stop when the difference in degrees between the current
+    /// rotation and current forward vector is less than this value.
+    /// </summary>
+    public float StopRotationThreshold
+    {
+        get => stopRotationThreshold;
+        set => stopRotationThreshold = value;
+    }   
+    
+    /// <summary>
     /// This agent forward vector.
     /// </summary>
     public Vector2 Forward
@@ -95,6 +106,7 @@ public class AgentMover : MonoBehaviour
             maximumSpeed, 
             stopSpeed,
             maximumRotationalSpeed,
+            stopRotationThreshold,
             maximumAcceleration,
             maximumDeceleration,
             0);
@@ -139,8 +151,7 @@ public class AgentMover : MonoBehaviour
         else
         {
             // In this case, our steering wants us to face and move in different
-            // directions.
-            // TODO: Recheck this. What happens if Angular is beyond our maximum rotational speed?
+            // directions. Steering checks that no threshold is surpassed.
             transform.eulerAngles = new Vector3(transform.eulerAngles.x, 
                 transform.eulerAngles.y, 
                 transform.eulerAngles.z + steeringOutput.Angular);

@@ -91,7 +91,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 0}
   decelerationRadius: 5
-  arrivingMargin: 0.1
   decelerationCurve:
     serializedVersion: 2
     m_Curve:
