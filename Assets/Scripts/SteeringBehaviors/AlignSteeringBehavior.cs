@@ -22,7 +22,7 @@ public class AlignSteeringBehavior : SteeringBehavior, ITargeter
     [SerializeField] private AnimationCurve accelerationCurve;
 
     private float _startOrientation;
-    private float _rotationFromStart;
+    private float _rotationFromStartAbs;
     private bool _idle = true;
     
     private float _targetOrientation;
@@ -54,29 +54,40 @@ public class AlignSteeringBehavior : SteeringBehavior, ITargeter
         {
             return new SteeringOutput(Vector2.zero, 0);
         }
-        else if (_idle && _rotationFromStart > 0)
+        else if (_idle && _rotationFromStartAbs > 0)
         {
-            _rotationFromStart = 0;
+            _rotationFromStartAbs = 0;
         }
         
-        if (toTargetRotationAbs >= arrivingMargin && Mathf.Abs(_rotationFromStart) < accelerationRadius)
+        if (toTargetRotationAbs >= arrivingMargin && 
+            _rotationFromStartAbs < accelerationRadius)
         { // Acceleration phase.
             if (_idle)
             {
                 _startOrientation = currentOrientation;
                 _idle = false;
             }
-            _rotationFromStart = Mathf.DeltaAngle(currentOrientation, _startOrientation);
+            _rotationFromStartAbs = Mathf.Abs(
+                Mathf.DeltaAngle(currentOrientation, _startOrientation));
             // Acceleration curve should start at more than 0 or agent will not
             // start to move.
-            newRotationalSpeed = maximumRotationalSpeed * accelerationCurve.Evaluate(
-                Mathf.InverseLerp(0, accelerationRadius, _rotationFromStart)) * 
+            float accelerationProgress = Mathf.InverseLerp(
+                0, 
+                accelerationRadius, 
+                _rotationFromStartAbs);
+            newRotationalSpeed = maximumRotationalSpeed * 
+                                 accelerationCurve.Evaluate(accelerationProgress) * 
                                  rotationSide;
         }
-        else if (toTargetRotationAbs < decelerationRadius && toTargetRotationAbs >= arrivingMargin)
+        else if (toTargetRotationAbs < decelerationRadius && 
+                 toTargetRotationAbs >= arrivingMargin)
         { // Deceleration phase.
-            newRotationalSpeed = maximumRotationalSpeed * decelerationCurve.Evaluate(
-                Mathf.InverseLerp(decelerationRadius, 0, toTargetRotationAbs)) * 
+            float decelerationProgress = Mathf.InverseLerp(
+                decelerationRadius, 
+                0, 
+                toTargetRotationAbs);
+            newRotationalSpeed = maximumRotationalSpeed * 
+                                 decelerationCurve.Evaluate(decelerationProgress) * 
                                  rotationSide;
         }
         else if (toTargetRotationAbs < arrivingMargin)
