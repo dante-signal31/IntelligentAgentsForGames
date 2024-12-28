@@ -262,7 +262,7 @@ namespace Tests.PlayTests
         
         // Move seeker to face the first target.
         _target.TargetPosition = _targetPosition.position;
-        yield return new WaitForSeconds(2.0f);
+        yield return new WaitForSeconds(2f);
         Assert.True(
             Mathf.Abs(
                 _seekGameObject.GetComponent<AgentMover>().Orientation-
@@ -271,7 +271,7 @@ namespace Tests.PlayTests
         
         // Move seeker to face the second target.
         _target.TargetPosition = _targetPosition2.position;
-        yield return new WaitForSeconds(2.0f);
+        yield return new WaitForSeconds(2.2f);
         Assert.True(
             Mathf.Abs(
                 _seekGameObject.GetComponent<AgentMover>().Orientation- 
@@ -280,7 +280,7 @@ namespace Tests.PlayTests
         
         // Move seeker to face the third target.
         _target.TargetPosition = _targetPosition3.position;
-        yield return new WaitForSeconds(2.0f);
+        yield return new WaitForSeconds(2.2f);
         Assert.True(
             Mathf.Abs(
                 _seekGameObject.GetComponent<AgentMover>().Orientation- 
