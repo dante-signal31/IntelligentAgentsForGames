@@ -4,14 +4,13 @@ using Random = UnityEngine.Random;
 
 
 /// <summary>
-/// Monobehaviour to offer a Wandering steering behaviour.
+/// <p>Monobehaviour to offer a Wandering steering behaviour.</p>
+///
+/// <p>Wandering steering behaviour makes the agent move randomly around the scene.</p>
 /// </summary>
 [RequireComponent(typeof(SeekSteeringBehavior))]
 public class WanderingSteeringBehavior : SteeringBehavior
 {
-    [Header("WIRING:")] 
-    [SerializeField] private SeekSteeringBehavior seekSteeringBehaviour; 
-    
     [Header("CONFIGURATION:")]
     [Tooltip("Distance at which we give our goal as reached and we stop our agent.")]
     [SerializeField] private float arrivalDistance;
@@ -23,6 +22,9 @@ public class WanderingSteeringBehavior : SteeringBehavior
     [SerializeField] private float wanderJitter;
     [Tooltip("Time in seconds to recalculate the wander position.")]
     [SerializeField] private float wanderRecalculationTime;
+    
+    [Header("WIRING:")] 
+    [SerializeField] private SeekSteeringBehavior seekSteeringBehaviour;
     
     [Header("DEBUG:")]
     [Tooltip("Make visible position marker.")] 
