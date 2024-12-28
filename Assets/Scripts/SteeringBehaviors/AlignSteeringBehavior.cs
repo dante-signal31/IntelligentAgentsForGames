@@ -51,11 +51,14 @@ public class AlignSteeringBehavior : SteeringBehavior, ITargeter
         float newRotationalSpeed = 0.0f;
 
         if (_idle && toTargetRotationAbs < arrivingMargin)
-        {
+        { // If you are stopped and you are close enough to target rotation, you are done.
+          // Just stay there.
             return new SteeringOutput(Vector2.zero, 0);
         }
-        else if (_idle && _rotationFromStartAbs > 0)
-        {
+        
+        if (_idle && _rotationFromStartAbs > 0)
+        { // If you are stopped and you are not close enough to target rotation, you need
+          // to start rotating. But first, you need to reset your rotation counter.
             _rotationFromStartAbs = 0;
         }
         
