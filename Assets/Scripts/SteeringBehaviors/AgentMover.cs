@@ -154,7 +154,7 @@ public class AgentMover : MonoBehaviour
             // directions. Steering checks that no threshold is surpassed.
             transform.eulerAngles = new Vector3(transform.eulerAngles.x, 
                 transform.eulerAngles.y, 
-                transform.eulerAngles.z + steeringOutput.Angular);
+                transform.eulerAngles.z + steeringOutput.Angular * Time.fixedDeltaTime);
         }
         
     }

@@ -29,8 +29,8 @@ public class AlignSteeringBehavior : SteeringBehavior, ITargeter
 
     public GameObject Target
     {
-        get { return target; }
-        set { target = value; }
+        get => target;
+        set => target = value;
     }
     
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
