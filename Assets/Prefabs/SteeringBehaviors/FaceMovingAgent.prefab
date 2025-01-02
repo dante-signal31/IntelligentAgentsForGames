@@ -155,5 +155,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99c9ab69f7e24116bd0ff612a85e4650, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  alignSteeringBehavior: {fileID: 5918340287660111832}
   target: {fileID: 0}
+  alignSteeringBehavior: {fileID: 5918340287660111832}

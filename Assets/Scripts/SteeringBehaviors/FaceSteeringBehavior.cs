@@ -1,17 +1,19 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// Monobehaviour to offer a face to a target steering behaviour.
+/// <p>Monobehaviour to offer a face to a target steering behaviour.</p>
+///
+/// <p>This behavior makes its agent look at its target.</p>
 /// </summary>
 [RequireComponent(typeof(AlignSteeringBehavior))]
 public class FaceMatchingSteeringBehavior : SteeringBehavior, ITargeter
 {
-    [Header("WIRING:")] 
-    [SerializeField] private AlignSteeringBehavior alignSteeringBehavior;
-    
     [Header("CONFIGURATION:")]
     [Tooltip("Target to face to.")]
     [SerializeField] private GameObject target;
+    
+    [Header("WIRING:")] 
+    [SerializeField] private AlignSteeringBehavior alignSteeringBehavior;
 
     /// <summary>
     /// Target to look to.
@@ -27,8 +29,13 @@ public class FaceMatchingSteeringBehavior : SteeringBehavior, ITargeter
 
     private void Awake()
     {
-        _targetPosition = target.transform.position;
+        if (target != null) _targetPosition = target.transform.position;
+        // We use an align steering behavior to make the agent update its rotation. But
+        // align behavior copies another GameObject rotation, so we need a dummy
+        // GameObject to rotate it in the direction to look at. That dummy GameObject
+        // will be passed to align steering behavior, to give it something to copy.
         _marker = new GameObject("MarkerForAlignSteeringBehavior");
+        // Make the align steering behavior to copy the dummy GameObject rotation.
         alignSteeringBehavior.Target = _marker;
     }
 
@@ -58,6 +65,8 @@ public class FaceMatchingSteeringBehavior : SteeringBehavior, ITargeter
         }
         else
         {
+            // Rotate the dummy GameObject in the direction we want to look at. Remember
+            // that dummy GameObject is the align steering behavior target since Awake().
             _marker.transform.up = direction;
             return alignSteeringBehavior.GetSteering(args);
         }

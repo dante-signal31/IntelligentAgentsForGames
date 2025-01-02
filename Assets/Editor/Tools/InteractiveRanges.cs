@@ -54,7 +54,7 @@ namespace Editor.Tools
         /// <summary>
         /// Show a range sector with handle to set its angular width and its range.
         ///
-        /// Whereas a cone laterals go from center to its range, a sector laterals go
+        /// Whereas a cone laterals go from center to its range, a range laterals go
         /// from a minimum range to its range. 
         /// </summary>
         /// <param name="parentTransform">Transform of the GameObject this cone is attached to.</param>

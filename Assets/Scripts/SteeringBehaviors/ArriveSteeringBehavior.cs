@@ -4,7 +4,7 @@ using UnityEngine.Serialization;
 /// <summary>
 /// <p>Monobehaviour to offer an Arrive steering behaviour.</p>
 /// 
-/// <p> Arrive behavior is a Seek-like steering behaviour in which agent accelerates at
+/// <p>Arrive behavior is a Seek-like steering behaviour in which agent accelerates at
 /// the startup and brakes gradually when approachs the end.</p>
 /// </summary>
 public class ArriveSteeringBehavior : SteeringBehavior, ITargeter
