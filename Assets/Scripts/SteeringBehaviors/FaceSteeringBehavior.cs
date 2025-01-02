@@ -12,6 +12,7 @@ public class FaceMatchingSteeringBehavior : SteeringBehavior, ITargeter
     [Tooltip("Target to face to.")]
     [SerializeField] private GameObject target;
     
+    // TODO: Make this reference assignment automatic.
     [Header("WIRING:")] 
     [SerializeField] private AlignSteeringBehavior alignSteeringBehavior;
 
@@ -54,21 +55,16 @@ public class FaceMatchingSteeringBehavior : SteeringBehavior, ITargeter
     
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
+        if (target == null) return new SteeringOutput(Vector2.zero, 0);
+        
         UpdateTargetData();
         Vector2 currentPosition = args.Position;
 
         Vector2 direction = _targetPosition - currentPosition;
-
-        if (direction == Vector2.zero)
-        {
-            return new SteeringOutput(Vector2.zero, 0);
-        }
-        else
-        {
-            // Rotate the dummy GameObject in the direction we want to look at. Remember
-            // that dummy GameObject is the align steering behavior target since Awake().
-            _marker.transform.up = direction;
-            return alignSteeringBehavior.GetSteering(args);
-        }
+        
+        // Rotate the dummy GameObject in the direction we want to look at. Remember
+        // that dummy GameObject is the align steering behavior target since Awake().
+        _marker.transform.up = direction;
+        return alignSteeringBehavior.GetSteering(args);
     }
 }
