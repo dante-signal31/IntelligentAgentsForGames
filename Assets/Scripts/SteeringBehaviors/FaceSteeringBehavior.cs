@@ -12,7 +12,6 @@ public class FaceMatchingSteeringBehavior : SteeringBehavior, ITargeter
     [Tooltip("Target to face to.")]
     [SerializeField] private GameObject target;
     
-    // TODO: Make this reference assignment automatic.
     private AlignSteeringBehavior _alignSteeringBehavior;
 
     /// <summary>
