@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 /// <summary>
 /// <p>Monobehaviour to offer a Flee steering behaviour.</p>
@@ -17,8 +18,7 @@ public class FleeSteeringBehavior : SteeringBehavior
     [Min(MinimumPanicDistance)]
     [SerializeField] private float panicDistance;
     
-    [Header("WIRING:")] 
-    [SerializeField] private SeekSteeringBehavior seekSteeringBehaviour; 
+    private SeekSteeringBehavior _seekSteeringBehaviour; 
     
     public GameObject Threath
     {
@@ -26,8 +26,8 @@ public class FleeSteeringBehavior : SteeringBehavior
         set
         {
             threath = value;
-            if (seekSteeringBehaviour != null) 
-                seekSteeringBehaviour.Target = value;
+            if (_seekSteeringBehaviour != null) 
+                _seekSteeringBehaviour.Target = value;
         }
     }
 
@@ -39,10 +39,15 @@ public class FleeSteeringBehavior : SteeringBehavior
             panicDistance = Mathf.Max(MinimumPanicDistance, value);
         }
     }
-    
+
+    private void Awake()
+    {
+        _seekSteeringBehaviour = GetComponent<SeekSteeringBehavior>();
+    }
+
     private void Start()
     {
-        seekSteeringBehaviour.Target = threath;
+        _seekSteeringBehaviour.Target = threath;
     }
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
@@ -57,7 +62,7 @@ public class FleeSteeringBehavior : SteeringBehavior
         { // Threat inside panic distance, so run in the opposite direction seek
           // would advise. 
             SteeringOutput approachSteeringOutput = 
-                seekSteeringBehaviour.GetSteering(args);
+                _seekSteeringBehaviour.GetSteering(args);
             SteeringOutput fleeSteeringOutput = new SteeringOutput(
                 -approachSteeringOutput.Linear,
                 approachSteeringOutput.Angular

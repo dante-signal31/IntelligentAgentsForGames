@@ -13,8 +13,7 @@ public class FaceMatchingSteeringBehavior : SteeringBehavior, ITargeter
     [SerializeField] private GameObject target;
     
     // TODO: Make this reference assignment automatic.
-    [Header("WIRING:")] 
-    [SerializeField] private AlignSteeringBehavior alignSteeringBehavior;
+    private AlignSteeringBehavior _alignSteeringBehavior;
 
     /// <summary>
     /// Target to look to.
@@ -31,15 +30,16 @@ public class FaceMatchingSteeringBehavior : SteeringBehavior, ITargeter
     private void Awake()
     {
         if (target != null) _targetPosition = target.transform.position;
+        _alignSteeringBehavior = GetComponent<AlignSteeringBehavior>();
         // We use an align steering behavior to make the agent update its rotation. But
         // align behavior copies another GameObject rotation, so we need a dummy
         // GameObject to rotate it in the direction to look at. That dummy GameObject
         // will be passed to align steering behavior, to give it something to copy.
         _marker = new GameObject("MarkerForAlignSteeringBehavior");
         // Make the align steering behavior to copy the dummy GameObject rotation.
-        alignSteeringBehavior.Target = _marker;
+        _alignSteeringBehavior.Target = _marker;
     }
-
+    
     private void OnDestroy()
     {
         Destroy(_marker);
@@ -65,6 +65,6 @@ public class FaceMatchingSteeringBehavior : SteeringBehavior, ITargeter
         // Rotate the dummy GameObject in the direction we want to look at. Remember
         // that dummy GameObject is the align steering behavior target since Awake().
         _marker.transform.up = direction;
-        return alignSteeringBehavior.GetSteering(args);
+        return _alignSteeringBehavior.GetSteering(args);
     }
 }
