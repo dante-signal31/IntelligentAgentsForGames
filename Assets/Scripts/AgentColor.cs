@@ -12,8 +12,17 @@ public class AgentColor : MonoBehaviour
     [Header("WIRING:")]
     [Tooltip("Agent sprite renderer to change color.")]
     [SerializeField] private SpriteRenderer spriteRenderer;
-    
-    public Color Color => agentColor;
+
+    public Color Color
+    {
+        get => agentColor;
+        set 
+        {
+            if (agentColor == value) return;
+            agentColor = value;
+            spriteRenderer.color = agentColor;
+        }
+    }
     
     // Start is called before the first frame update
     void Start()

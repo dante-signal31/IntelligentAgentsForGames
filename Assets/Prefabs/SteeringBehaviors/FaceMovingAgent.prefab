@@ -156,4 +156,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
-  alignSteeringBehavior: {fileID: 5918340287660111832}

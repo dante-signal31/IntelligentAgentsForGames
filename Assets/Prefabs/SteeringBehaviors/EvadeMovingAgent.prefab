@@ -107,7 +107,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   threath: {fileID: 0}
   panicDistance: 0
-  seekSteeringBehaviour: {fileID: 2344011181164910159}
 --- !u!114 &4663877203873210221
 MonoBehaviour:
   m_ObjectHideFlags: 0

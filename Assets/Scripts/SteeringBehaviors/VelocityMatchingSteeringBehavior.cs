@@ -38,7 +38,9 @@ public class VelocityMatchingSteeringBehavior : SteeringBehavior, ITargeter
 
     private void Awake()
     {
-        _targetRigidBody = target.GetComponentInChildren<Rigidbody2D>();
+        // TODO: Don't need a reference to target RigidBody2D. You need target AgentMover offers a Velocity property.
+        if (Target != null) 
+            _targetRigidBody = Target.GetComponentInChildren<Rigidbody2D>();
     }
 
     /// <summary>
@@ -66,6 +68,8 @@ public class VelocityMatchingSteeringBehavior : SteeringBehavior, ITargeter
     
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
+        if (Target == null) return new SteeringOutput(Vector2.zero, 0);
+
         UpdateTargetData();
         _currentVelocity = args.CurrentVelocity;
         float deltaTime = args.DeltaTime;
@@ -75,7 +79,7 @@ public class VelocityMatchingSteeringBehavior : SteeringBehavior, ITargeter
             // Millington executes this code section in every frame, but I
             // think that is an error. Doing that way targets velocity is never
             // reached because current gap between target and current velocity
-            // is always divided by timeToMatch. So, solution is executing this
+            // is always divided by timeToMatch. So, my version is executing this
             // code section only when acceleration needs to really update
             // (target has changed its velocity or target velocity has been
             // reached and we no longer need an acceleration).
