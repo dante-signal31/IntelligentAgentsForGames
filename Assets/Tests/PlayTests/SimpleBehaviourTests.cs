@@ -262,6 +262,8 @@ namespace Tests.PlayTests
             _target.TargetPosition = _targetPosition.position;
             seekSteeringBehavior.Target = _target.gameObject;
             seekSteeringBehavior.ArrivalDistance = 0.2f;
+            var seekColor = _seekGameObject.GetComponent<AgentColor>();
+            seekColor.Color = Color.red;
             _alignGameObject.transform.position = _alignStartPosition.position;
             var alignSteeringBehavior =
                 _alignGameObject.GetComponent<AlignSteeringBehavior>();
@@ -318,6 +320,8 @@ namespace Tests.PlayTests
             _target.TargetPosition = _targetPosition.position;
             seekSteeringBehavior.Target = _target.gameObject;
             seekSteeringBehavior.ArrivalDistance = 0.2f;
+            var seekColor = _seekGameObject.GetComponent<AgentColor>();
+            seekColor.Color = Color.red;
             _faceGameObject.transform.position = _faceStartPosition.position;
             var faceSteeringBehavior =
                 _faceGameObject.GetComponent<FaceMatchingSteeringBehavior>();
