@@ -28,7 +28,8 @@ namespace Tests.PlayTests
         private GameObject _alignGameObject;
         private GameObject _faceGameObject;
         private GameObject _fleeGameObject;
-        private GameObject _arriveGameObject;
+        private GameObject _arriveNLAGameObject;
+        private GameObject _arriveLAGameObject;
         private GameObject _pursuitGameObject;
         private GameObject _evadeGameObject;
         private GameObject _velocityMatchingGameObject;
@@ -90,11 +91,18 @@ namespace Tests.PlayTests
                 _fleeGameObject.SetActive(false);
             }
 
-            if (_arriveGameObject == null)
+            if (_arriveNLAGameObject == null)
             {
-                _arriveGameObject = GameObject.Find("ArriveMovingAgent");
-                _arriveGameObject.SetActive(false);
+                _arriveNLAGameObject = GameObject.Find("ArriveNLAMovingAgent");
+                _arriveNLAGameObject.SetActive(false);
             }
+            
+            if (_arriveLAGameObject == null)
+            {
+                _arriveLAGameObject = GameObject.Find("ArriveLAMovingAgent");
+                _arriveLAGameObject.SetActive(false);
+            }
+            
             // if (_pursuitGameObject == null)
             // {
             //     _pursuitGameObject = GameObject.Find("PursuitMovingAgent");
@@ -144,17 +152,17 @@ namespace Tests.PlayTests
         }
 
         /// <summary>
-        /// Test that ArriveBehavior can reach a target and that it accelerates
+        /// Test that ArriveBehaviorNLA can reach a target and that it accelerates
         /// at the beginning and brakes at the end.
         /// </summary>
         [UnityTest]
-        public IEnumerator ArriveBehaviourTest()
+        public IEnumerator ArriveBehaviourNLATest()
         {
             // Test setup.
-            _arriveGameObject.transform.position = _seekStartPosition.position;
+            _arriveNLAGameObject.transform.position = _seekStartPosition.position;
             var arriveSteeringBehavior =
-                _arriveGameObject.GetComponent<ArriveSteeringBehavior>();
-            var agentMover = _arriveGameObject.GetComponent<AgentMover>();
+                _arriveNLAGameObject.GetComponent<ArriveSteeringBehaviorNLA>();
+            var agentMover = _arriveNLAGameObject.GetComponent<AgentMover>();
             agentMover.MaximumSpeed = 5.0f;
             _target.Enabled = true;
             _target.TargetPosition = _targetPosition.position;
@@ -162,15 +170,15 @@ namespace Tests.PlayTests
             arriveSteeringBehavior.ArrivalDistance = 0.5f;
             arriveSteeringBehavior.AccelerationRadius = 2.0f;
             arriveSteeringBehavior.BrakingRadius = 3.0f;
-            _arriveGameObject.SetActive(true);
+            _arriveNLAGameObject.SetActive(true);
 
             // Check that agent is accelerating at the beginning.
             // Wait until agent starts is movement.
             yield return new WaitUntil(() =>
                 (Vector3.Distance(_seekStartPosition.position,
-                    _arriveGameObject.transform.position) >= 0.1f) &&
+                    _arriveNLAGameObject.transform.position) >= 0.1f) &&
                 (Vector3.Distance(_seekStartPosition.position,
-                     _arriveGameObject.transform.position) <
+                     _arriveNLAGameObject.transform.position) <
                  arriveSteeringBehavior.AccelerationRadius));
             Assert.True(agentMover.CurrentSpeed > 0.0f &&
                         agentMover.CurrentSpeed < agentMover.MaximumSpeed);
@@ -178,7 +186,7 @@ namespace Tests.PlayTests
             // Check that agent gets its full cruise speed. 
             yield return new WaitUntil(() =>
                 Vector3.Distance(_seekStartPosition.position,
-                    _arriveGameObject.transform.position) >
+                    _arriveNLAGameObject.transform.position) >
                 (arriveSteeringBehavior.AccelerationRadius + 0.1f));
             yield return null;
             yield return null;
@@ -189,7 +197,7 @@ namespace Tests.PlayTests
             // Check that agent is braking at the end.
             yield return new WaitUntil(() =>
                 Vector3.Distance(_targetPosition.position,
-                    _arriveGameObject.transform.position) <
+                    _arriveNLAGameObject.transform.position) <
                 (arriveSteeringBehavior.BrakingRadius - 0.2f));
             yield return null;
             yield return null;
@@ -199,11 +207,71 @@ namespace Tests.PlayTests
             // Assert the target was reached.
             yield return new WaitForSeconds(3f);
             Assert.True(Vector3.Distance(_targetPosition.position,
-                            _arriveGameObject.transform.position) <=
+                            _arriveNLAGameObject.transform.position) <=
                         (arriveSteeringBehavior.ArrivalDistance));
 
             // Cleanup.
-            _arriveGameObject.SetActive(false);
+            _arriveNLAGameObject.SetActive(false);
+            _target.Enabled = false;
+        }
+        
+        /// <summary>
+        /// Test that ArriveBehaviorLA can reach a target and that it accelerates
+        /// at the beginning and brakes at the end.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator ArriveBehaviourLATest()
+        {
+            // Test setup.
+            _arriveLAGameObject.transform.position = _seekStartPosition.position;
+            var arriveSteeringBehavior =
+                _arriveLAGameObject.GetComponent<ArriveSteeringBehaviorLA>();
+            var agentMover = _arriveLAGameObject.GetComponent<AgentMover>();
+            agentMover.MaximumSpeed = 6.0f;
+            agentMover.StopSpeed = 0.01f;
+            agentMover.MaximumRotationalSpeed = 1080f;
+            agentMover.StopRotationThreshold = 1f;
+            agentMover.MaximumAcceleration = 4f;
+            agentMover.MaximumDeceleration = 4f;
+            _target.Enabled = true;
+            _target.TargetPosition = _targetPosition.position;
+            arriveSteeringBehavior.Target = _target.gameObject;
+            arriveSteeringBehavior.ArrivalDistance = 0.5f;
+            _arriveLAGameObject.SetActive(true);
+
+            // Check that agent is accelerating at the beginning.
+            // Wait until agent starts is movement.
+            yield return new WaitUntil(() =>
+                (Vector3.Distance(_seekStartPosition.position,
+                    _arriveLAGameObject.transform.position) >= 0.1f));
+            Assert.True(agentMover.CurrentSpeed > 0.0f &&
+                        agentMover.CurrentSpeed < agentMover.MaximumSpeed);
+
+            // Check that agent gets its full cruise speed. 
+            yield return new WaitUntil(() =>
+                Mathf.Approximately(agentMover.CurrentSpeed, agentMover.MaximumSpeed));
+            Assert.True(
+                Mathf.Approximately(agentMover.CurrentSpeed,
+                    agentMover.MaximumSpeed));
+
+            // Check that agent is braking at the end.
+            yield return new WaitUntil(() =>
+                Vector3.Distance(_targetPosition.position,
+                    _arriveLAGameObject.transform.position) <=
+                (arriveSteeringBehavior.BrakingRadius));
+            yield return null;
+            yield return null;
+            Assert.True(agentMover.CurrentSpeed > 0.0f &&
+                        agentMover.CurrentSpeed < agentMover.MaximumSpeed);
+
+            // Assert the target was reached.
+            yield return new WaitForSeconds(3f);
+            Assert.True(Vector3.Distance(_targetPosition.position,
+                            _arriveLAGameObject.transform.position) <=
+                        (arriveSteeringBehavior.ArrivalDistance));
+
+            // Cleanup.
+            _arriveLAGameObject.SetActive(false);
             _target.Enabled = false;
         }
 
@@ -443,16 +511,16 @@ namespace Tests.PlayTests
                 _velocityMatchingGameObject.GetComponent<Rigidbody2D>();
             var velocityMatchingAgentMover =
                 _velocityMatchingGameObject.GetComponent<AgentMover>();
-            _arriveGameObject.transform.position = _alignStartPosition.position;
+            _arriveNLAGameObject.transform.position = _alignStartPosition.position;
             var arriveSteeringBehavior =
-                _arriveGameObject.GetComponent<ArriveSteeringBehavior>();
-            var arriveAgentMover = _arriveGameObject.GetComponent<AgentMover>();
-            var arriveRigidbody = _arriveGameObject.GetComponent<Rigidbody2D>();
+                _arriveNLAGameObject.GetComponent<ArriveSteeringBehaviorNLA>();
+            var arriveAgentMover = _arriveNLAGameObject.GetComponent<AgentMover>();
+            var arriveRigidbody = _arriveNLAGameObject.GetComponent<Rigidbody2D>();
             arriveAgentMover.MaximumSpeed = 5.55f;
             arriveAgentMover.StopSpeed = 0.1f;
             arriveAgentMover.MaximumRotationalSpeed = 180f;
             arriveAgentMover.StopRotationThreshold = 1f;
-            var arriveColor = _arriveGameObject.GetComponent<AgentColor>();
+            var arriveColor = _arriveNLAGameObject.GetComponent<AgentColor>();
             arriveColor.Color = Color.red;
             velocityMatchingAgentMover.MaximumSpeed = 5.55f;
             velocityMatchingAgentMover.StopSpeed = 0.1f;
@@ -466,7 +534,7 @@ namespace Tests.PlayTests
             velocityMatchingRigidbody.linearVelocity = Vector2.zero;
             arriveRigidbody.linearVelocity = Vector2.zero;
             _velocityMatchingGameObject.SetActive(true);
-            _arriveGameObject.SetActive(true);
+            _arriveNLAGameObject.SetActive(true);
 
             // Give time for the followed agent to try to reach its target
             // cruise velocity and assert velocity matcher agent has matched the velocity
@@ -490,7 +558,7 @@ namespace Tests.PlayTests
 
             // Cleanup.
             _velocityMatchingGameObject.SetActive(false);
-            _arriveGameObject.SetActive(false);
+            _arriveNLAGameObject.SetActive(false);
         }
     }
 }

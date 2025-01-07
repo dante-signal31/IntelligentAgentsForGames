@@ -1,13 +1,14 @@
 ﻿using UnityEngine;
-using UnityEngine.Serialization;
 
 /// <summary>
 /// <p>Monobehaviour to offer an Arrive steering behaviour.</p>
 /// 
 /// <p>Arrive behavior is a Seek-like steering behaviour in which agent accelerates at
 /// the startup and brakes gradually when approachs the end.</p>
+/// <p> NLA behavior implements a Non-Linear-Acceleration approach. So, in this case
+/// acceleration is given by curves instead of a fixed acceleration value.</p>
 /// </summary>
-public class ArriveSteeringBehavior : SteeringBehavior, ITargeter
+public class ArriveSteeringBehaviorNLA : SteeringBehavior, ITargeter
 {
     [Header("CONFIGURATION:")]
     [Tooltip("Point to arrive to.")]
