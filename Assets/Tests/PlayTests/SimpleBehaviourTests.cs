@@ -39,13 +39,13 @@ namespace Tests.PlayTests
             yield return TestLevelManagement.ReLoadScene(CurrentScene);
 
             if (_targetPosition == null)
-                _targetPosition = GameObject.Find("TargetPosition").transform;
+                _targetPosition = GameObject.Find("Position1").transform;
             if (_targetPosition2 == null)
-                _targetPosition2 = GameObject.Find("TargetPosition2").transform;
+                _targetPosition2 = GameObject.Find("Position2").transform;
             if (_targetPosition3 == null)
-                _targetPosition3 = GameObject.Find("TargetPosition3").transform;
+                _targetPosition3 = GameObject.Find("Position3").transform;
             if (_targetPosition4 == null)
-                _targetPosition4 = GameObject.Find("TargetPosition4").transform;
+                _targetPosition4 = GameObject.Find("Position4").transform;
             if (_target == null)
             {
                 _target = GameObject.Find("Target").GetComponent<TargetPlacement>();
@@ -54,17 +54,17 @@ namespace Tests.PlayTests
             }
 
             if (_seekStartPosition == null)
-                _seekStartPosition = GameObject.Find("SeekStartPosition").transform;
+                _seekStartPosition = GameObject.Find("Position5").transform;
             if (_alignStartPosition == null)
-                _alignStartPosition = GameObject.Find("AlignStartPosition").transform;
+                _alignStartPosition = GameObject.Find("Position6").transform;
             if (_faceStartPosition == null)
-                _faceStartPosition = GameObject.Find("FaceStartPosition").transform;
+                _faceStartPosition = GameObject.Find("Position7").transform;
             if (_fleeStartPosition == null)
-                _fleeStartPosition = GameObject.Find("FleeStartPosition").transform;
+                _fleeStartPosition = GameObject.Find("Position8").transform;
             if (_pursuitStartPosition == null)
-                _pursuitStartPosition = GameObject.Find("PursuitStartPosition").transform;
+                _pursuitStartPosition = GameObject.Find("Position9").transform;
             if (_pursuitTargetStartPosition == null)
-                _pursuitTargetStartPosition = GameObject.Find("PursuitTargetStartPosition").transform;
+                _pursuitTargetStartPosition = GameObject.Find("Position10").transform;
 
             if (_seekGameObject == null)
             {
