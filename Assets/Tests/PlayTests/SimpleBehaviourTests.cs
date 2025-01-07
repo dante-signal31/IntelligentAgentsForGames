@@ -461,7 +461,7 @@ namespace Tests.PlayTests
             velocityMatchingAgentMover.MaximumAcceleration = 200f;
             velocityMatchingAgentMover.MaximumDeceleration = 400f;
             velocityMatchingSteeringBehavior.TimeToMatch = 0.1f;
-            velocityMatchingSteeringBehavior.Target = _arriveGameObject;
+            velocityMatchingSteeringBehavior.Target = arriveAgentMover;
             arriveSteeringBehavior.Target = _targetPosition.gameObject;
             velocityMatchingRigidbody.linearVelocity = Vector2.zero;
             arriveRigidbody.linearVelocity = Vector2.zero;
