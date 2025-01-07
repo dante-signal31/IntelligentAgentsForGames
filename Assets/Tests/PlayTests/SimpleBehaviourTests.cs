@@ -9,7 +9,7 @@ namespace Tests.PlayTests
 {
     public class SimpleBehaviourTests
     {
-        private string _currentScene = "TestClearTiledYard";
+        private const string CurrentScene = "TestClearTiledYard";
 
         private Transform _seekStartPosition;
         private Transform _alignStartPosition;
@@ -36,7 +36,7 @@ namespace Tests.PlayTests
         [UnitySetUp]
         public IEnumerator SetUp()
         {
-            yield return TestLevelManagement.ReLoadScene(_currentScene);
+            yield return TestLevelManagement.ReLoadScene(CurrentScene);
 
             if (_targetPosition == null)
                 _targetPosition = GameObject.Find("TargetPosition").transform;
