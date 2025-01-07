@@ -22,7 +22,7 @@ public class SteeringBehaviorArgs
     /// <summary>
     /// Minimum linear speed under which agent is considered stopped.
     /// </summary>
-    public float StopSpeed { get; private set; }
+    public float StopSpeed { get; set; }
     
     /// <summary>
     /// Current owner velocity vector.
@@ -32,13 +32,13 @@ public class SteeringBehaviorArgs
     /// <summary>
     /// Maximum rotational speed for this steering in degress.
     /// </summary>
-    public float MaximumRotationalSpeed { get; private set; }
+    public float MaximumRotationalSpeed { get; set; }
     
     /// <summary>
     /// Rotation will stop when the difference in degrees between the current
     /// rotation and current forward vector is less than this value.
     /// </summary>
-    public float StopRotationThreshold { get; private set; }
+    public float StopRotationThreshold { get; set; }
     
     /// <summary>
     /// Maximum acceleration for this steering.
@@ -48,7 +48,7 @@ public class SteeringBehaviorArgs
     /// <summary>
     /// Maximum deceleration for this steering.
     /// </summary>
-    public float MaximumDeceleration { get; private set; }
+    public float MaximumDeceleration { get; set; }
     
     /// <summary>
     /// Delta time since last steering behavior update.

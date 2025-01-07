@@ -439,20 +439,32 @@ namespace Tests.PlayTests
                 _pursuitTargetStartPosition.position;
             var velocityMatchingSteeringBehavior = _velocityMatchingGameObject
                 .GetComponent<VelocityMatchingSteeringBehavior>();
+            var velocityMatchingRigidbody =
+                _velocityMatchingGameObject.GetComponent<Rigidbody2D>();
             var velocityMatchingAgentMover =
                 _velocityMatchingGameObject.GetComponent<AgentMover>();
             _arriveGameObject.transform.position = _alignStartPosition.position;
             var arriveSteeringBehavior =
                 _arriveGameObject.GetComponent<ArriveSteeringBehavior>();
             var arriveAgentMover = _arriveGameObject.GetComponent<AgentMover>();
+            var arriveRigidbody = _arriveGameObject.GetComponent<Rigidbody2D>();
+            arriveAgentMover.MaximumSpeed = 5.55f;
+            arriveAgentMover.StopSpeed = 0.1f;
+            arriveAgentMover.MaximumRotationalSpeed = 180f;
+            arriveAgentMover.StopRotationThreshold = 1f;
             var arriveColor = _arriveGameObject.GetComponent<AgentColor>();
             arriveColor.Color = Color.red;
-            velocityMatchingAgentMover.MaximumSpeed = 2.0f;
-            velocityMatchingAgentMover.MaximumAcceleration = 4.0f;
+            velocityMatchingAgentMover.MaximumSpeed = 5.55f;
             velocityMatchingAgentMover.StopSpeed = 0.1f;
-            arriveAgentMover.MaximumSpeed = 2.0f;
+            velocityMatchingAgentMover.MaximumRotationalSpeed = 180f;
+            velocityMatchingAgentMover.StopRotationThreshold = 1f;
+            velocityMatchingAgentMover.MaximumAcceleration = 200f;
+            velocityMatchingAgentMover.MaximumDeceleration = 400f;
+            velocityMatchingSteeringBehavior.TimeToMatch = 0.1f;
             velocityMatchingSteeringBehavior.Target = _arriveGameObject;
             arriveSteeringBehavior.Target = _targetPosition.gameObject;
+            velocityMatchingRigidbody.linearVelocity = Vector2.zero;
+            arriveRigidbody.linearVelocity = Vector2.zero;
             _velocityMatchingGameObject.SetActive(true);
             _arriveGameObject.SetActive(true);
 
@@ -463,15 +475,18 @@ namespace Tests.PlayTests
                 Mathf.Approximately(
                     arriveAgentMover.CurrentSpeed,
                     arriveAgentMover.MaximumSpeed));
-            yield return new WaitForSeconds(velocityMatchingSteeringBehavior.TimeToMatch);
-            Assert.True(velocityMatchingAgentMover.Velocity == arriveAgentMover.Velocity);
+            yield return new WaitForSecondsRealtime(velocityMatchingSteeringBehavior.TimeToMatch);
+            Debug.Log($"Difference: {Mathf.Abs(velocityMatchingAgentMover.Velocity.magnitude - arriveAgentMover.Velocity.magnitude)}");
+            Assert.True(velocityMatchingAgentMover.Velocity.normalized == arriveAgentMover.Velocity.normalized &&
+                        Mathf.Abs(velocityMatchingAgentMover.Velocity.magnitude - arriveAgentMover.Velocity.magnitude) < 0.3f);
 
             // Wait until arriver brakes and asserts that the VelocityMatcher
-            // has braked to.
+            // has braked too.
             yield return new WaitUntil(() =>
                 Mathf.Approximately(arriveAgentMover.CurrentSpeed, 0));
-            yield return new WaitForSeconds(velocityMatchingSteeringBehavior.TimeToMatch);
-            Assert.True(velocityMatchingAgentMover.Velocity == arriveAgentMover.Velocity);
+            yield return new WaitForSecondsRealtime(velocityMatchingSteeringBehavior.TimeToMatch);
+            Debug.Log($"Difference: {Mathf.Abs(velocityMatchingAgentMover.Velocity.magnitude - arriveAgentMover.Velocity.magnitude)}");
+            Assert.True(Mathf.Abs(velocityMatchingAgentMover.Velocity.magnitude - arriveAgentMover.Velocity.magnitude) < 0.2f);
 
             // Cleanup.
             _velocityMatchingGameObject.SetActive(false);

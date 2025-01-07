@@ -59,22 +59,16 @@ public class AgentMover : MonoBehaviour
         get => stopSpeed;
         set => stopSpeed = value;
     }
-    
+
     /// <summary>
-    /// Maximum acceleration for this agent.
+    /// The agent maximum rotational speed in degrees.
     /// </summary>
-    public float MaximumAcceleration
+    public float MaximumRotationalSpeed
     {
-        get => maximumAcceleration;
-        set => maximumAcceleration = value;
+        get => maximumRotationalSpeed;
+        set => maximumRotationalSpeed = value;
     }
     
-    /// <summary>
-    /// This GameObject rotation is in degrees (using Z as rotation axis because
-    /// this is a 2D game).
-    /// </summary>
-    public float Orientation => transform.rotation.eulerAngles.z;
-
     /// <summary>
     /// Rotation will stop when the difference in degrees between the current
     /// rotation and current forward vector is less than this value.
@@ -84,6 +78,30 @@ public class AgentMover : MonoBehaviour
         get => stopRotationThreshold;
         set => stopRotationThreshold = value;
     }   
+    
+    /// <summary>
+    /// Maximum acceleration for this agent.
+    /// </summary>
+    public float MaximumAcceleration
+    {
+        get => maximumAcceleration;
+        set => maximumAcceleration = value;
+    }
+
+    /// <summary>
+    /// Maximum deceleration for this agent.
+    /// </summary>
+    public float MaximumDeceleration
+    {
+        get => maximumDeceleration;
+        set => maximumDeceleration = value;
+    }
+    
+    /// <summary>
+    /// This GameObject rotation is in degrees (using Z as rotation axis because
+    /// this is a 2D game).
+    /// </summary>
+    public float Orientation => transform.rotation.eulerAngles.z;
     
     /// <summary>
     /// This agent forward vector.
@@ -124,8 +142,12 @@ public class AgentMover : MonoBehaviour
     {
         // Update steering behavior args.
         _behaviorArgs.MaximumSpeed = MaximumSpeed;
+        _behaviorArgs.StopSpeed = StopSpeed;
         _behaviorArgs.CurrentVelocity = rigidBody.linearVelocity;
+        _behaviorArgs.MaximumRotationalSpeed = MaximumRotationalSpeed;
+        _behaviorArgs.StopRotationThreshold = StopRotationThreshold;
         _behaviorArgs.MaximumAcceleration = MaximumAcceleration;
+        _behaviorArgs.MaximumDeceleration = MaximumDeceleration;
         _behaviorArgs.DeltaTime = Time.fixedDeltaTime;
         
         // Get steering output.
@@ -159,19 +181,19 @@ public class AgentMover : MonoBehaviour
         
     }
 
-    /// <summary>
-    /// Get velocity vector updated with current steering and clamped by maximum speed.
-    /// </summary>
-    /// <returns>New velocity vector (older plus steering).</returns>
-    private Vector2 GetNewVelocity(SteeringOutput newSteeringOutput, float delta)
-    {
-        Vector2 newVelocity = rigidBody.linearVelocity + newSteeringOutput.Linear * delta;
-        newVelocity = ClampVector2(
-            newVelocity, 
-            0, 
-            maximumSpeed);
-        return newVelocity;
-    }
+    // /// <summary>
+    // /// Get velocity vector updated with current steering and clamped by maximum speed.
+    // /// </summary>
+    // /// <returns>New velocity vector (older plus steering).</returns>
+    // private Vector2 GetNewVelocity(SteeringOutput newSteeringOutput, float delta)
+    // {
+    //     Vector2 newVelocity = rigidBody.linearVelocity + newSteeringOutput.Linear * delta;
+    //     newVelocity = ClampVector2(
+    //         newVelocity, 
+    //         0, 
+    //         maximumSpeed);
+    //     return newVelocity;
+    // }
 
     /// <summary>
     /// <p>Clamp linear acceleration of an steering output.</p>
@@ -179,40 +201,40 @@ public class AgentMover : MonoBehaviour
     /// </summary>
     /// <param name="steeringOutput">Steering output to clamp.</param>
     /// <returns>Steering output clamped.</returns>
-    private SteeringOutput ClampSteeringOutput(SteeringOutput steeringOutput)
-    {
-        if (isAccelerationSteering(steeringOutput))
-        {
-            return new SteeringOutput(
-                ClampVector2(
-                    steeringOutput.Linear, 
-                    0, 
-                    maximumAcceleration),
-                steeringOutput.Angular
-            );
-        }
-        else
-        {
-            return new SteeringOutput(
-                ClampVector2(
-                    steeringOutput.Linear, 
-                    0, 
-                    maximumDeceleration),
-                steeringOutput.Angular
-            );
-        }
-    }
+    // private SteeringOutput ClampSteeringOutput(SteeringOutput steeringOutput)
+    // {
+    //     if (isAccelerationSteering(steeringOutput))
+    //     {
+    //         return new SteeringOutput(
+    //             ClampVector2(
+    //                 steeringOutput.Linear, 
+    //                 0, 
+    //                 maximumAcceleration),
+    //             steeringOutput.Angular
+    //         );
+    //     }
+    //     else
+    //     {
+    //         return new SteeringOutput(
+    //             ClampVector2(
+    //                 steeringOutput.Linear, 
+    //                 0, 
+    //                 maximumDeceleration),
+    //             steeringOutput.Angular
+    //         );
+    //     }
+    // }
 
-    /// <summary>
-    /// Whether this steering output is going to increase speed or not.
-    /// </summary>
-    /// <param name="steeringOutput">Current steering.</param>
-    /// <returns>True if this steering is going to accelerate the agent. False
-    /// otherwise.</returns>
-    private bool isAccelerationSteering(SteeringOutput steeringOutput)
-    {
-        return Vector2.Dot(rigidBody.linearVelocity, steeringOutput.Linear) >= 0;
-    }
+    // /// <summary>
+    // /// Whether this steering output is going to increase speed or not.
+    // /// </summary>
+    // /// <param name="steeringOutput">Current steering.</param>
+    // /// <returns>True if this steering is going to accelerate the agent. False
+    // /// otherwise.</returns>
+    // private bool isAccelerationSteering(SteeringOutput steeringOutput)
+    // {
+    //     return Vector2.Dot(rigidBody.linearVelocity, steeringOutput.Linear) >= 0;
+    // }
     
     /// <summary>
     /// Clamp vector magnitude between a minimum and a maximum length.
@@ -221,23 +243,23 @@ public class AgentMover : MonoBehaviour
     /// <param name="minimumMagnitude">Minimum length for the clamped vector.</param>
     /// <param name="maximumMagnitude">Maximin length for the clamped vector.</param>
     /// <returns>Vector clamped.</returns>
-    private Vector2 ClampVector2(
-        Vector2 vectorToClamp, 
-        float minimumMagnitude, 
-        float maximumMagnitude)
-    {
-        if (vectorToClamp.magnitude > maximumMagnitude)
-        {
-            vectorToClamp = vectorToClamp.normalized * maximumMagnitude;
-        } 
-        else if (vectorToClamp.magnitude < minimumMagnitude)
-        {   
-            vectorToClamp = Mathf.Approximately(minimumMagnitude, 0.0f)? 
-                Vector2.zero:  
-                vectorToClamp.normalized * minimumMagnitude;
-        }
-        return vectorToClamp;
-    }
+    // private Vector2 ClampVector2(
+    //     Vector2 vectorToClamp, 
+    //     float minimumMagnitude, 
+    //     float maximumMagnitude)
+    // {
+    //     if (vectorToClamp.magnitude > maximumMagnitude)
+    //     {
+    //         vectorToClamp = vectorToClamp.normalized * maximumMagnitude;
+    //     } 
+    //     else if (vectorToClamp.magnitude < minimumMagnitude)
+    //     {   
+    //         vectorToClamp = Mathf.Approximately(minimumMagnitude, 0.0f)? 
+    //             Vector2.zero:  
+    //             vectorToClamp.normalized * minimumMagnitude;
+    //     }
+    //     return vectorToClamp;
+    // }
     
     //
     // /// <summary>
