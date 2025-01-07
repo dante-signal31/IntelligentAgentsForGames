@@ -3,6 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using Tests.PlayTests.Common;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 using UnityEngine.TestTools;
 
 namespace Tests.PlayTests
@@ -501,7 +502,6 @@ namespace Tests.PlayTests
         [UnityTest]
         public IEnumerator VelocityMatchingBehaviourTest()
         {
-            // TODO: Normalize position markers names. A it is, it's a mess.
             // Test setup.
             _velocityMatchingGameObject.transform.position =
                 _pursuitTargetStartPosition.position;
@@ -511,30 +511,32 @@ namespace Tests.PlayTests
                 _velocityMatchingGameObject.GetComponent<Rigidbody2D>();
             var velocityMatchingAgentMover =
                 _velocityMatchingGameObject.GetComponent<AgentMover>();
-            _arriveNLAGameObject.transform.position = _alignStartPosition.position;
+            _arriveLAGameObject.transform.position = _alignStartPosition.position;
             var arriveSteeringBehavior =
-                _arriveNLAGameObject.GetComponent<ArriveSteeringBehaviorNLA>();
-            var arriveAgentMover = _arriveNLAGameObject.GetComponent<AgentMover>();
-            var arriveRigidbody = _arriveNLAGameObject.GetComponent<Rigidbody2D>();
+                _arriveLAGameObject.GetComponent<ArriveSteeringBehaviorLA>();
+            var arriveAgentMover = _arriveLAGameObject.GetComponent<AgentMover>();
+            var arriveRigidbody = _arriveLAGameObject.GetComponent<Rigidbody2D>();
             arriveAgentMover.MaximumSpeed = 5.55f;
             arriveAgentMover.StopSpeed = 0.1f;
             arriveAgentMover.MaximumRotationalSpeed = 180f;
             arriveAgentMover.StopRotationThreshold = 1f;
-            var arriveColor = _arriveNLAGameObject.GetComponent<AgentColor>();
+            arriveAgentMover.MaximumAcceleration = 4f;
+            arriveAgentMover.MaximumDeceleration = 4f;
+            arriveSteeringBehavior.Target = _targetPosition.gameObject;
+            var arriveColor = _arriveLAGameObject.GetComponent<AgentColor>();
             arriveColor.Color = Color.red;
             velocityMatchingAgentMover.MaximumSpeed = 5.55f;
             velocityMatchingAgentMover.StopSpeed = 0.1f;
             velocityMatchingAgentMover.MaximumRotationalSpeed = 180f;
             velocityMatchingAgentMover.StopRotationThreshold = 1f;
-            velocityMatchingAgentMover.MaximumAcceleration = 200f;
-            velocityMatchingAgentMover.MaximumDeceleration = 400f;
+            velocityMatchingAgentMover.MaximumAcceleration = 40f;
+            velocityMatchingAgentMover.MaximumDeceleration = 200f;
             velocityMatchingSteeringBehavior.TimeToMatch = 0.1f;
             velocityMatchingSteeringBehavior.Target = arriveAgentMover;
-            arriveSteeringBehavior.Target = _targetPosition.gameObject;
             velocityMatchingRigidbody.linearVelocity = Vector2.zero;
             arriveRigidbody.linearVelocity = Vector2.zero;
             _velocityMatchingGameObject.SetActive(true);
-            _arriveNLAGameObject.SetActive(true);
+            _arriveLAGameObject.SetActive(true);
 
             // Give time for the followed agent to try to reach its target
             // cruise velocity and assert velocity matcher agent has matched the velocity
@@ -546,7 +548,7 @@ namespace Tests.PlayTests
             yield return new WaitForSecondsRealtime(velocityMatchingSteeringBehavior.TimeToMatch);
             Debug.Log($"Difference: {Mathf.Abs(velocityMatchingAgentMover.Velocity.magnitude - arriveAgentMover.Velocity.magnitude)}");
             Assert.True(velocityMatchingAgentMover.Velocity.normalized == arriveAgentMover.Velocity.normalized &&
-                        Mathf.Abs(velocityMatchingAgentMover.Velocity.magnitude - arriveAgentMover.Velocity.magnitude) < 0.3f);
+                        Mathf.Abs(velocityMatchingAgentMover.Velocity.magnitude - arriveAgentMover.Velocity.magnitude) < 0.2f);
 
             // Wait until arriver brakes and asserts that the VelocityMatcher
             // has braked too.
@@ -558,7 +560,7 @@ namespace Tests.PlayTests
 
             // Cleanup.
             _velocityMatchingGameObject.SetActive(false);
-            _arriveNLAGameObject.SetActive(false);
+            _arriveLAGameObject.SetActive(false);
         }
     }
 }

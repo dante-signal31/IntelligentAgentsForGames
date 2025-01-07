@@ -17,6 +17,7 @@ public class VelocityMatchingSteeringBehavior : SteeringBehavior
     [SerializeField] private float timeToMatch; 
     
     private Vector2 _targetVelocity;
+    private Vector2 _currentVelocity;
     private Vector2 _currentAcceleration;
     private bool _currentAccelerationUpdateIsNeeded;
 
@@ -48,7 +49,7 @@ public class VelocityMatchingSteeringBehavior : SteeringBehavior
         // 2. Target velocity and current velocity are the same. So we should
         //    stop accelerating.
         if ((_targetVelocity != Target.Velocity) ||
-            Mathf.Approximately(_targetVelocity.magnitude, Target.Velocity.magnitude))
+            Mathf.Approximately(_currentVelocity.magnitude, Target.Velocity.magnitude))
         {
             _targetVelocity = Target.Velocity;
             _currentAccelerationUpdateIsNeeded = true;
@@ -61,7 +62,7 @@ public class VelocityMatchingSteeringBehavior : SteeringBehavior
 
         UpdateTargetData();
         
-        Vector2 currentVelocity = args.CurrentVelocity;
+        _currentVelocity = args.CurrentVelocity;
         float stopSpeed = args.StopSpeed;
         
         float deltaTime = args.DeltaTime;
@@ -77,11 +78,11 @@ public class VelocityMatchingSteeringBehavior : SteeringBehavior
             // reached and we no longer need an acceleration).
             float maximumAcceleration = args.MaximumAcceleration;
             float maximumDeceleration = args.MaximumDeceleration;
-            Vector2 neededAcceleration = (_targetVelocity - currentVelocity) / TimeToMatch;
+            Vector2 neededAcceleration = (_targetVelocity - _currentVelocity) / TimeToMatch;
             
             // if braking, then target velocity is zero or the opposite direction than current.
             bool braking = _targetVelocity == Vector2.zero || 
-                           Vector2.Dot(currentVelocity, _targetVelocity) < 0;
+                           Vector2.Dot(_currentVelocity, _targetVelocity) < 0;
             
             // Make sure velocity change is not greater than its maximum values.
             if (!braking && neededAcceleration.magnitude > maximumAcceleration)
@@ -89,7 +90,7 @@ public class VelocityMatchingSteeringBehavior : SteeringBehavior
                 Debug.LogWarning($"[{gameObject.name} - VelocityMatchingSteeringBehavior]: neededAcceleration magnitude {neededAcceleration.magnitude} is greater than maximumAcceleration {maximumAcceleration}. Clamping to maximumAcceleration.");
                 neededAcceleration = neededAcceleration.normalized * maximumAcceleration;
             }
-            else if (braking && currentVelocity.magnitude <= stopSpeed)
+            else if (braking && _currentVelocity.magnitude <= stopSpeed)
             {
                 return new SteeringOutput(Vector2.zero, 0);
             }
@@ -103,7 +104,7 @@ public class VelocityMatchingSteeringBehavior : SteeringBehavior
             _currentAccelerationUpdateIsNeeded = false;
         }
         
-        Vector2 newVelocity = currentVelocity + _currentAcceleration * deltaTime;
+        Vector2 newVelocity = _currentVelocity + _currentAcceleration * deltaTime;
         Debug.Log($"[{gameObject.name} - VelocityMatchingSteeringBehavior] New velocity: {newVelocity} Speed: {newVelocity.magnitude} Target speed: {_targetVelocity.magnitude}");    
         return new SteeringOutput(newVelocity, 0);
     }
