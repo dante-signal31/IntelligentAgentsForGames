@@ -102,9 +102,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f15452d180bc4c9ba592547317cea942, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  seekSteeringBehaviour: {fileID: 1454815751659104529}
   target: {fileID: 0}
   arrivalDistance: 0.1
-  aheadSemiConeDegrees: 28.474184
+  aheadSemiConeDegrees: 30.018782
   comingToUsSemiConeDegrees: 26.200506
   predictedPositionMarkerVisible: 1

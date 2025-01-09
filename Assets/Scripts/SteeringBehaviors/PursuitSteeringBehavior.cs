@@ -2,18 +2,18 @@
 using UnityEngine.Serialization;
 
 /// <summary>
-/// Monobehaviour to offer a Pursuit steering behaviour.
+/// <p>Monobehaviour to offer a Pursuit steering behaviour.</p>
+/// <p>To pursue another agent if won't be enough to go to its current position. If that
+/// agent displaces then we will only follow its trail. Instead, pursuer must predict
+/// whare chased agent will be and aim to that position.</p>
 /// </summary>
 [RequireComponent(typeof(SeekSteeringBehavior))]
-public class PursuitSteeringBehavior : SteeringBehavior, ITargeter
+public class PursuitSteeringBehavior : SteeringBehavior
 {
-    [Header("WIRING:")] 
-    [SerializeField] private SeekSteeringBehavior seekSteeringBehaviour; 
-    
     [FormerlySerializedAs("targetAgent")]
     [Header("CONFIGURATION:")]
     [Tooltip("Agent to pursue to.")]
-    [SerializeField] private GameObject target;
+    [SerializeField] private AgentMover target;
     [Tooltip("Distance at which we give our goal as reached and we stop our agent.")]
     [Min(0)]
     [SerializeField] private float arrivalDistance;
@@ -27,11 +27,11 @@ public class PursuitSteeringBehavior : SteeringBehavior, ITargeter
     [Header("DEBUG:")]
     [Tooltip("Make visible position marker.")] 
     [SerializeField] private bool predictedPositionMarkerVisible = true;
-
+    
     /// <summary>
     /// Agent pursued.
     /// </summary>
-    public GameObject Target
+    public AgentMover Target
     {
         get => target;
         set => target = value;
@@ -46,7 +46,7 @@ public class PursuitSteeringBehavior : SteeringBehavior, ITargeter
         set
         {
             arrivalDistance = Mathf.Max(0, value);
-            seekSteeringBehaviour.ArrivalDistance = arrivalDistance;
+            _seekSteeringBehaviour.ArrivalDistance = arrivalDistance;
         }
     }
 
@@ -67,11 +67,8 @@ public class PursuitSteeringBehavior : SteeringBehavior, ITargeter
         get => comingToUsSemiConeDegrees;
         set => comingToUsSemiConeDegrees = Mathf.Clamp(value, 0, 90);
     }
-
-    private Rigidbody2D _targetRigidBody;
-    private Vector2 _targetPosition;
-    private GameObject _currentTarget;
-
+    
+    private SeekSteeringBehavior _seekSteeringBehaviour; 
     private float _cosAheadSemiConeRadians;
     private float _cosComingToUsSemiConeRadians;
     private GameObject _predictedPositionMarker;
@@ -82,9 +79,10 @@ public class PursuitSteeringBehavior : SteeringBehavior, ITargeter
     {
         _cosAheadSemiConeRadians = Mathf.Cos(aheadSemiConeDegrees * Mathf.Deg2Rad);
         _cosComingToUsSemiConeRadians = Mathf.Cos(comingToUsSemiConeDegrees * Mathf.Deg2Rad);
-        seekSteeringBehaviour.ArrivalDistance = arrivalDistance;
+        _seekSteeringBehaviour = GetComponent<SeekSteeringBehavior>();
+        _seekSteeringBehaviour.ArrivalDistance = arrivalDistance;
         _predictedPositionMarker = new GameObject();
-        seekSteeringBehaviour.Target = target;
+        _seekSteeringBehaviour.Target = Target.gameObject;
         _agentColor = GetComponent<AgentColor>().Color;
         _targetColor = target.GetComponent<AgentColor>().Color;
     }
@@ -93,60 +91,58 @@ public class PursuitSteeringBehavior : SteeringBehavior, ITargeter
     {
         Destroy(_predictedPositionMarker);
     }
-
+    
     /// <summary>
-    /// Load target data.
+    /// Whether target is coming to us.
     /// </summary>
-    private void UpdateTargetData()
-    {
-        if (target != _currentTarget)
-        {
-            _targetRigidBody = target.GetComponentInChildren<Rigidbody2D>();
-            _currentTarget = target;
-        }
-        _targetPosition = target.transform.position;
-    }
-
-    public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
-    {
-        UpdateTargetData();
-        
-        if (TargetIsComingToUs(args))
-        {   // Target is coming to us so just go straight to it.
-            _predictedPositionMarker.transform.position = target.transform.position;
-            seekSteeringBehaviour.Target = _predictedPositionMarker;
-            return seekSteeringBehaviour.GetSteering(args);
-        }
-        else
-        {   // Target is not coming to us so we must predict where it will be.
-            // The look-ahead time is proportional to the distance between the evader
-            // and the pursuer and is inversely proportional to the sum of the
-            // agents velocities.
-            Vector2 currentPosition = args.Position;
-            float currentSpeed = args.CurrentVelocity.magnitude;
-            float targetSpeed = _targetRigidBody.linearVelocity.magnitude;
-            Vector3 targetVelocity = _targetRigidBody.linearVelocity;
-            float distanceToTarget = (_targetPosition - currentPosition).magnitude;
-            float lookAheadTime = distanceToTarget / (currentSpeed + targetSpeed);
-            if (!float.IsInfinity(lookAheadTime))
-            {
-                _predictedPositionMarker.transform.position = (Vector3) _targetPosition + (targetVelocity * lookAheadTime);
-                seekSteeringBehaviour.Target = _predictedPositionMarker;
-            }
-            return seekSteeringBehaviour.GetSteering(args);
-        }
-    }
-
+    /// <param name="args">Our current data.</param>
+    /// <returns>True if target has a velocity vector that is going toward us.</returns>
     private bool TargetIsComingToUs(SteeringBehaviorArgs args)
     {
         Vector2 currentPosition = args.Position;
         Vector2 currentVelocity = args.CurrentVelocity;
+        Vector2 targetPosition = Target.transform.position;
         
-        Vector2 toTarget = _targetPosition - currentPosition;
+        Vector2 toTarget = targetPosition - currentPosition;
         bool targetInFrontOfUs = Vector2.Dot(currentVelocity.normalized, toTarget.normalized) > _cosAheadSemiConeRadians;
-        bool targetComingToUs = Vector2.Dot(currentVelocity.normalized, _targetRigidBody.linearVelocity.normalized) < (-1 * _cosComingToUsSemiConeRadians);
+        bool targetComingToUs = Vector2.Dot(currentVelocity.normalized, Target.Velocity.normalized) < (-1 * _cosComingToUsSemiConeRadians);
         
         return targetInFrontOfUs && targetComingToUs;
+    }
+
+    public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
+    {
+        // UpdateTargetData();
+        
+        Vector2 targetPosition = Target.transform.position;
+        
+        if (TargetIsComingToUs(args))
+        {   // Target is coming to us so just go straight to it.
+            _predictedPositionMarker.transform.position = target.transform.position;
+            _seekSteeringBehaviour.Target = _predictedPositionMarker;
+            return _seekSteeringBehaviour.GetSteering(args);
+        }
+        else
+        {   // Target is not coming to us so we must predict where it will be.
+            // The look-ahead time is proportional to the distance between the chased
+            // and the pursuer and is inversely proportional to the sum of the
+            // agents velocities.
+            Vector2 currentPosition = args.Position;
+            float currentSpeed = args.CurrentVelocity.magnitude;
+            float targetSpeed = Target.Velocity.magnitude;
+            Vector3 targetVelocity = Target.Velocity;
+            float distanceToTarget = (targetPosition - currentPosition).magnitude;
+            float lookAheadTime = distanceToTarget / (currentSpeed + targetSpeed);
+            
+            if (!float.IsInfinity(lookAheadTime))
+            {
+                _predictedPositionMarker.transform.position = (Vector3) targetPosition + 
+                    (targetVelocity * lookAheadTime);
+                _seekSteeringBehaviour.Target = _predictedPositionMarker;
+            }
+            
+            return _seekSteeringBehaviour.GetSteering(args);
+        }
     }
     
 #if UNITY_EDITOR
@@ -158,7 +154,7 @@ public class PursuitSteeringBehavior : SteeringBehavior, ITargeter
             Gizmos.DrawLine(transform.position, _predictedPositionMarker.transform.position);
             Gizmos.DrawWireSphere(_predictedPositionMarker.transform.position, 0.3f);
             Gizmos.color = _targetColor;
-            Gizmos.DrawLine(target.transform.position, _predictedPositionMarker.transform.position);
+            Gizmos.DrawLine(Target.transform.position, _predictedPositionMarker.transform.position);
         }
     }
 #endif
