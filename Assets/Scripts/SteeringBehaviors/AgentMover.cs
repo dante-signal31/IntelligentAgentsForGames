@@ -35,7 +35,7 @@ public class AgentMover : MonoBehaviour
     /// <summary>
     /// This agent current speed
     /// </summary>
-    public float CurrentSpeed { get; private set;}
+    public float CurrentSpeed => rigidBody.linearVelocity.magnitude;
     
     /// <summary>
     /// This agent current velocity.
@@ -153,9 +153,10 @@ public class AgentMover : MonoBehaviour
         // Get steering output.
         SteeringOutput steeringOutput = steeringBehavior.GetSteering(_behaviorArgs);
         
-        // Apply new steering output to our GameObject.
+        // Apply new steering output to our GameObject. I don't enforce the StopSpeed
+        // because I've found more flexible to do it at steering behavior level.
         rigidBody.linearVelocity = steeringOutput.Linear;
-        CurrentSpeed = rigidBody.linearVelocity.magnitude;
+        
         if (steeringOutput.Angular == 0 && rigidBody.linearVelocity != Vector2.zero)
         {
             // If no explicit angular steering, we will just look at the direction we
@@ -170,7 +171,7 @@ public class AgentMover : MonoBehaviour
                 Forward = newHeading.normalized * CurrentSpeed;
             }
         }
-        else
+        else if (steeringOutput.Angular != 0)
         {
             // In this case, our steering wants us to face and move in different
             // directions. Steering checks that no threshold is surpassed.
