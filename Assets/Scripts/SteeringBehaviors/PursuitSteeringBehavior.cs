@@ -20,7 +20,8 @@ public class PursuitSteeringBehavior : SteeringBehavior
     [Tooltip("Degrees from forward vector inside which we consider an object is ahead.")]
     [Range(0, 90)]
     [SerializeField] private float aheadSemiConeDegrees;
-    [Tooltip("Degrees from forward vector inside which we consider an object is going toward us.")]
+    [Tooltip("Degrees from forward vector inside which we consider an object is going " +
+             "toward us.")]
     [Range(0, 90)]
     [SerializeField] private float comingToUsSemiConeDegrees;
     
@@ -77,12 +78,20 @@ public class PursuitSteeringBehavior : SteeringBehavior
 
     private void Start()
     {
+        // Most methods use radians as input, but most humans understand better degrees. 
+        // So, we accept degrees to configure scripts but convert them to radians to work.
         _cosAheadSemiConeRadians = Mathf.Cos(aheadSemiConeDegrees * Mathf.Deg2Rad);
-        _cosComingToUsSemiConeRadians = Mathf.Cos(comingToUsSemiConeDegrees * Mathf.Deg2Rad);
+        _cosComingToUsSemiConeRadians = Mathf.Cos(
+            comingToUsSemiConeDegrees * 
+            Mathf.Deg2Rad);
+        // Create an invisible object as marker to place it at target predicted future
+        // position. That marker will be used by seek steering behaviour as target.
+        _predictedPositionMarker = new GameObject();
+        _predictedPositionMarker.transform.position = Target.transform.position;
         _seekSteeringBehaviour = GetComponent<SeekSteeringBehavior>();
         _seekSteeringBehaviour.ArrivalDistance = arrivalDistance;
-        _predictedPositionMarker = new GameObject();
-        _seekSteeringBehaviour.Target = Target.gameObject;
+        _seekSteeringBehaviour.Target = _predictedPositionMarker;
+        // Configure our gizmos.
         _agentColor = GetComponent<AgentColor>().Color;
         _targetColor = target.GetComponent<AgentColor>().Color;
     }
@@ -100,12 +109,17 @@ public class PursuitSteeringBehavior : SteeringBehavior
     private bool TargetIsComingToUs(SteeringBehaviorArgs args)
     {
         Vector2 currentPosition = args.Position;
-        Vector2 currentVelocity = args.CurrentVelocity;
+        Vector2 currentDirection = args.CurrentVelocity.normalized;
         Vector2 targetPosition = Target.transform.position;
+        Vector2 targetDirection = Target.Velocity.normalized;
         
         Vector2 toTarget = targetPosition - currentPosition;
-        bool targetInFrontOfUs = Vector2.Dot(currentVelocity.normalized, toTarget.normalized) > _cosAheadSemiConeRadians;
-        bool targetComingToUs = Vector2.Dot(currentVelocity.normalized, Target.Velocity.normalized) < (-1 * _cosComingToUsSemiConeRadians);
+        bool targetInFrontOfUs = Vector2.Dot(
+            currentDirection, 
+            toTarget.normalized) > _cosAheadSemiConeRadians;
+        bool targetComingToUs = Vector2.Dot(
+            currentDirection, 
+            targetDirection) < (-1 * _cosComingToUsSemiConeRadians);
         
         return targetInFrontOfUs && targetComingToUs;
     }
@@ -119,7 +133,6 @@ public class PursuitSteeringBehavior : SteeringBehavior
         if (TargetIsComingToUs(args))
         {   // Target is coming to us so just go straight to it.
             _predictedPositionMarker.transform.position = target.transform.position;
-            _seekSteeringBehaviour.Target = _predictedPositionMarker;
             return _seekSteeringBehaviour.GetSteering(args);
         }
         else
@@ -133,13 +146,19 @@ public class PursuitSteeringBehavior : SteeringBehavior
             Vector3 targetVelocity = Target.Velocity;
             float distanceToTarget = (targetPosition - currentPosition).magnitude;
             float lookAheadTime = distanceToTarget / (currentSpeed + targetSpeed);
+
+            // Avoid divide-by-zero error when both agents are stationary.
+            if (float.IsInfinity(lookAheadTime))
+                return new SteeringOutput(Vector2.zero, 0);
             
-            if (!float.IsInfinity(lookAheadTime))
-            {
-                _predictedPositionMarker.transform.position = (Vector3) targetPosition + 
-                    (targetVelocity * lookAheadTime);
-                _seekSteeringBehaviour.Target = _predictedPositionMarker;
-            }
+            // Place the marker where we think the target will be at the look-ahead
+            // time.
+            _predictedPositionMarker.transform.position = (Vector3) targetPosition + 
+                (targetVelocity * lookAheadTime);
+            
+            // Let the seek steering behavior get to the new marker position.
+            _seekSteeringBehaviour.Target = _predictedPositionMarker;
+            
             
             return _seekSteeringBehaviour.GetSteering(args);
         }
