@@ -11,6 +11,7 @@
 /// </summary>
 public class ArriveSteeringBehaviorLA : SteeringBehavior, ITargeter
 {
+    // TODO: I don't know why, this agents stays stopped out of its test.
     [Header("CONFIGURATION:")]
     [Tooltip("Point to arrive to.")]
     [SerializeField] private GameObject target;
