@@ -542,7 +542,7 @@ namespace Tests.PlayTests
             velocityMatchingAgentMover.StopSpeed = 0.1f;
             velocityMatchingAgentMover.MaximumRotationalSpeed = 180f;
             velocityMatchingAgentMover.StopRotationThreshold = 1f;
-            velocityMatchingAgentMover.MaximumAcceleration = 40f;
+            velocityMatchingAgentMover.MaximumAcceleration = 10f;
             velocityMatchingAgentMover.MaximumDeceleration = 200f;
             velocityMatchingSteeringBehavior.TimeToMatch = 0.1f;
             velocityMatchingSteeringBehavior.Target = arriveAgentMover;
@@ -559,17 +559,17 @@ namespace Tests.PlayTests
                     arriveAgentMover.CurrentSpeed,
                     arriveAgentMover.MaximumSpeed));
             yield return new WaitForSecondsRealtime(velocityMatchingSteeringBehavior.TimeToMatch);
-            Debug.Log($"Difference: {Mathf.Abs(velocityMatchingAgentMover.Velocity.magnitude - arriveAgentMover.Velocity.magnitude)}");
+            Debug.Log($"Difference in acceleration phase: {Mathf.Abs(velocityMatchingAgentMover.Velocity.magnitude - arriveAgentMover.Velocity.magnitude)}");
             Assert.True(velocityMatchingAgentMover.Velocity.normalized == arriveAgentMover.Velocity.normalized &&
-                        Mathf.Abs(velocityMatchingAgentMover.Velocity.magnitude - arriveAgentMover.Velocity.magnitude) < 0.2f);
+                        Mathf.Abs(velocityMatchingAgentMover.Velocity.magnitude - arriveAgentMover.Velocity.magnitude) < 0.01f);
 
             // Wait until arriver brakes and asserts that the VelocityMatcher
             // has braked too.
             yield return new WaitUntil(() =>
                 Mathf.Approximately(arriveAgentMover.CurrentSpeed, 0));
             yield return new WaitForSecondsRealtime(velocityMatchingSteeringBehavior.TimeToMatch);
-            Debug.Log($"Difference: {Mathf.Abs(velocityMatchingAgentMover.Velocity.magnitude - arriveAgentMover.Velocity.magnitude)}");
-            Assert.True(Mathf.Abs(velocityMatchingAgentMover.Velocity.magnitude - arriveAgentMover.Velocity.magnitude) < 0.2f);
+            Debug.Log($"Difference in braking phase: {Mathf.Abs(velocityMatchingAgentMover.Velocity.magnitude - arriveAgentMover.Velocity.magnitude)}");
+            Assert.True(Mathf.Abs(velocityMatchingAgentMover.Velocity.magnitude - arriveAgentMover.Velocity.magnitude) < 0.01f);
 
             // Cleanup.
             _velocityMatchingGameObject.SetActive(false);
