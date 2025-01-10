@@ -64,7 +64,7 @@ namespace Tests.PlayTests
             if (_fleeStartPosition == null)
                 _fleeStartPosition = GameObject.Find("Position8").transform;
             if (_pursuitStartPosition == null)
-                _pursuitStartPosition = GameObject.Find("Position9").transform;
+                _pursuitStartPosition = GameObject.Find("Position1").transform;
             if (_pursuitTargetStartPosition == null)
                 _pursuitTargetStartPosition = GameObject.Find("Position10").transform;
 
@@ -460,7 +460,7 @@ namespace Tests.PlayTests
             _pursuitGameObject.SetActive(true);
             
             // Give time for the chaser to get to the target.
-            yield return new WaitForSeconds(1.4f);
+            yield return new WaitForSeconds(2.7f);
             
             // Assert the target was reached.
             // We test for a distance equal to the radius of both agents, plus
