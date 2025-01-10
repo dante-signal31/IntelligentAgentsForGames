@@ -559,7 +559,6 @@ namespace Tests.PlayTests
                     arriveAgentMover.CurrentSpeed,
                     arriveAgentMover.MaximumSpeed));
             yield return new WaitForSecondsRealtime(velocityMatchingSteeringBehavior.TimeToMatch);
-            Debug.Log($"Difference in acceleration phase: {Mathf.Abs(velocityMatchingAgentMover.Velocity.magnitude - arriveAgentMover.Velocity.magnitude)}");
             Assert.True(velocityMatchingAgentMover.Velocity.normalized == arriveAgentMover.Velocity.normalized &&
                         Mathf.Abs(velocityMatchingAgentMover.Velocity.magnitude - arriveAgentMover.Velocity.magnitude) < 0.01f);
 
@@ -568,7 +567,6 @@ namespace Tests.PlayTests
             yield return new WaitUntil(() =>
                 Mathf.Approximately(arriveAgentMover.CurrentSpeed, 0));
             yield return new WaitForSecondsRealtime(velocityMatchingSteeringBehavior.TimeToMatch);
-            Debug.Log($"Difference in braking phase: {Mathf.Abs(velocityMatchingAgentMover.Velocity.magnitude - arriveAgentMover.Velocity.magnitude)}");
             Assert.True(Mathf.Abs(velocityMatchingAgentMover.Velocity.magnitude - arriveAgentMover.Velocity.magnitude) < 0.01f);
 
             // Cleanup.
