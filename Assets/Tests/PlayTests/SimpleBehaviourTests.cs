@@ -440,6 +440,8 @@ namespace Tests.PlayTests
             targetMovingAgent.StopRotationThreshold = 1f;
             targetMovingAgent.MaximumAcceleration = 1.8f;
             targetMovingAgent.MaximumDeceleration = 1.8f;
+            var targetMovingAgentColor = _seekGameObject.GetComponent<AgentColor>();
+            targetMovingAgentColor.Color = Color.red;
             var seekSteeringBehavior = _seekGameObject.GetComponent<SeekSteeringBehavior>();
             seekSteeringBehavior.Target = _target.gameObject;
             seekSteeringBehavior.ArrivalDistance = 0.2f;
