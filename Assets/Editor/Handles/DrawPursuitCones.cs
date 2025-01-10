@@ -27,14 +27,14 @@ namespace Editor
 
         private static (float, float) DrawAheadCone(PursuitSteeringBehavior pursuer)
         {
-            return InteractiveRanges.RangeCone(pursuer.transform, pursuer.AheadSemiConeDegrees,
+            return InteractiveRanges.ConeRange(pursuer.transform, pursuer.AheadSemiConeDegrees,
                 Vector3.up, Vector3.forward, 
                 new Color(0f, 0f, 1f, 0.1f), 1.0f, false);
         }
     
         private static (float, float) DrawComingToUsCone(PursuitSteeringBehavior pursuer)
         {
-            return InteractiveRanges.RangeCone(pursuer.transform, pursuer.ComingToUsSemiConeDegrees,
+            return InteractiveRanges.ConeRange(pursuer.transform, pursuer.ComingToUsSemiConeDegrees,
                 -Vector3.up, Vector3.forward, 
                 new Color(1, 0.92f, 0.016f, 0.3f), 1.0f, false);
         }

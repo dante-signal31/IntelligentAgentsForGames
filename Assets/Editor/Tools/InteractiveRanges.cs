@@ -27,7 +27,7 @@ namespace Editor.Tools
         /// <param name="range">Length of this cone.</param>
         /// <param name="takeRange">Return the updated range after moving handle</param>
         /// <returns>Tuple of (new semiConeDegrees, new range)</returns>
-        public static (float, float) RangeCone(Transform parentTransform, float semiConeDegrees, 
+        public static (float, float) ConeRange(Transform parentTransform, float semiConeDegrees, 
             Vector3 localConeForward, Vector3 coneNormal, Color coneColor,
             float range=1.0f, bool takeNewRange=false)
         {
@@ -66,7 +66,7 @@ namespace Editor.Tools
         /// <param name="minimumRange">Minimum length of this cone.</param>
         /// <param name="takeNewRange">Return the updated range after moving handle</param>
         /// <returns>Tuple of (new semiConeDegrees, new range, new minimumRange)</returns>
-        public static (float, float, float) RangeSector(Transform parentTransform,
+        public static (float, float, float) SectorRange(Transform parentTransform,
             float semiConeDegrees,
             Vector3 localConeForward, Vector3 coneNormal, Color coneColor,
             float range = 0.5f, float minimumRange = 0.2f, bool takeNewRange = false)

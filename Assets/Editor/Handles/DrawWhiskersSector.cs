@@ -27,7 +27,7 @@ namespace Editor
 
         public static (float, float, float) DrawSector(Whiskers whiskers)
         {
-            return InteractiveRanges.RangeSector(
+            return InteractiveRanges.SectorRange(
                 whiskers.transform,
                 whiskers.SemiConeDegrees,
                 Vector3.up,
