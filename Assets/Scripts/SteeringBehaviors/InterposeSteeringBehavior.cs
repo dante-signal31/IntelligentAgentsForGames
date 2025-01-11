@@ -52,15 +52,7 @@ public class InterposeSteeringBehavior: SteeringBehavior
         _predictedPositionMarker.transform.position = GetMidPoint(
             agentA.transform.position, 
             agentB.transform.position);
-    }
-
-    private void OnDestroy()
-    {
-        Destroy(_predictedPositionMarker);
-    }
-
-    private void Start()
-    {
+        // Configure seek steering behaviour to go to that marker.
         _seekSteeringBehavior = GetComponent<SeekSteeringBehavior>();
         _seekSteeringBehavior.Target = _predictedPositionMarker;
         _seekSteeringBehavior.ArrivalDistance = arrivalDistance;
@@ -68,7 +60,12 @@ public class InterposeSteeringBehavior: SteeringBehavior
         _agentAColor = agentA.GetComponent<AgentColor>().Color;
         _agentBColor = agentB.GetComponent<AgentColor>().Color;
     }
-    
+
+    private void OnDestroy()
+    {
+        Destroy(_predictedPositionMarker);
+    }
+
     /// <summary>
     /// Get midway point between two positions.
     /// </summary>
