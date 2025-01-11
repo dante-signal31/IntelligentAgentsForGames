@@ -122,7 +122,7 @@ public class InterposeSteeringBehavior: SteeringBehavior
     }
 
 #if UNITY_EDITOR
-    private void OnDrawGizmosSelected()
+    private void OnDrawGizmos()
     {
         if (_predictedPositionMarker == null || 
             !predictedPositionMarkerVisible) return;

@@ -168,14 +168,13 @@ public class PursuitSteeringBehavior : SteeringBehavior
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
-        if (predictedPositionMarkerVisible && _predictedPositionMarker != null)
-        {
-            Gizmos.color = _agentColor;
-            Gizmos.DrawLine(transform.position, _predictedPositionMarker.transform.position);
-            Gizmos.DrawWireSphere(_predictedPositionMarker.transform.position, 0.3f);
-            Gizmos.color = _targetColor;
-            Gizmos.DrawLine(Target.transform.position, _predictedPositionMarker.transform.position);
-        }
+        if (_predictedPositionMarker == null || !predictedPositionMarkerVisible) return;
+        
+        Gizmos.color = _agentColor;
+        Gizmos.DrawLine(transform.position, _predictedPositionMarker.transform.position);
+        Gizmos.DrawWireSphere(_predictedPositionMarker.transform.position, 0.3f);
+        Gizmos.color = _targetColor;
+        Gizmos.DrawLine(Target.transform.position, _predictedPositionMarker.transform.position);
     }
 #endif
 }

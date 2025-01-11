@@ -626,6 +626,8 @@ namespace Tests.PlayTests
             velocityMatchingAgentMover.MaximumDeceleration = 200f;
             velocityMatchingSteeringBehavior.TimeToMatch = 0.1f;
             velocityMatchingSteeringBehavior.Target = arriveAgentMover;
+            var velocityMatchingColor = _velocityMatchingGameObject.GetComponent<AgentColor>();
+            velocityMatchingColor.Color = Color.red;
             _interposeGameObject.transform.position = _position11.position;
             interposeAgentMover.MaximumSpeed = 5.55f;
             interposeAgentMover.StopSpeed = 0.1f;
