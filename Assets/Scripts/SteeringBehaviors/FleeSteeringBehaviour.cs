@@ -43,10 +43,6 @@ public class FleeSteeringBehavior : SteeringBehavior
     private void Awake()
     {
         _seekSteeringBehaviour = GetComponent<SeekSteeringBehavior>();
-    }
-
-    private void Start()
-    {
         _seekSteeringBehaviour.Target = threath;
     }
 
