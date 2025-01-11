@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 /// <summary>
@@ -76,9 +77,8 @@ public class PursuitSteeringBehavior : SteeringBehavior
     private Color _agentColor;
     private Color _targetColor;
 
-    private void Start()
+    private void Awake()
     {
-        // TODO: Pass first half of this method to Awake().
         // Most methods use radians as input, but most humans understand better degrees. 
         // So, we accept degrees to configure scripts but convert them to radians to work.
         _cosAheadSemiConeRadians = Mathf.Cos(aheadSemiConeDegrees * Mathf.Deg2Rad);
