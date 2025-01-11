@@ -11,7 +11,6 @@
 /// </summary>
 public class ArriveSteeringBehaviorLA : SteeringBehavior, ITargeter
 {
-    // TODO: I don't know why, this agents stays stopped out of its test.
     [Header("CONFIGURATION:")]
     [Tooltip("Point to arrive to.")]
     [SerializeField] private GameObject target;
@@ -42,9 +41,6 @@ public class ArriveSteeringBehaviorLA : SteeringBehavior, ITargeter
     public float BrakingRadius=>
         GetBrakingRadius(_currentSpeed, _currentMaximumDeceleration);
     
-    // private Vector2 _startPosition;
-    // private float _distanceFromStart;
-    // private bool _idle = true;
     private float _currentSpeed;
     private float _currentMaximumDeceleration;
 
