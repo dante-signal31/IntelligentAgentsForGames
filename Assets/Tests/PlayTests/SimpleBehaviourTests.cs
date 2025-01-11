@@ -12,6 +12,7 @@ namespace Tests.PlayTests
     {
         private const string CurrentScene = "TestClearTiledYard";
 
+        // TODO: Unify all position names. As they are, it is a mess.
         private Transform _seekStartPosition;
         private Transform _alignStartPosition;
         private Transform _faceStartPosition;
@@ -22,6 +23,7 @@ namespace Tests.PlayTests
         private Transform _targetPosition2;
         private Transform _targetPosition3;
         private Transform _targetPosition4;
+        private Transform _position11;
 
         private TargetPlacement _target;
 
@@ -34,6 +36,7 @@ namespace Tests.PlayTests
         private GameObject _pursuitGameObject;
         private GameObject _evadeGameObject;
         private GameObject _velocityMatchingGameObject;
+        private GameObject _interposeGameObject;
 
         [UnitySetUp]
         public IEnumerator SetUp()
@@ -67,6 +70,8 @@ namespace Tests.PlayTests
                 _pursuitStartPosition = GameObject.Find("Position1").transform;
             if (_pursuitTargetStartPosition == null)
                 _pursuitTargetStartPosition = GameObject.Find("Position10").transform;
+            if (_position11 == null)
+                _position11 = GameObject.Find("Position11").transform;
 
             if (_seekGameObject == null)
             {
@@ -118,6 +123,11 @@ namespace Tests.PlayTests
             {
                 _velocityMatchingGameObject = GameObject.Find("VelocityMatchingMovingAgent");
                 _velocityMatchingGameObject.SetActive(false);
+            }
+            if (_interposeGameObject == null)
+            {
+                _interposeGameObject = GameObject.Find("InterposeMovingAgent");
+                _interposeGameObject.SetActive(false);
             }
         }
 
@@ -510,25 +520,25 @@ namespace Tests.PlayTests
         //     }
     
         /// <summary>
-        /// Test that VelocityMatchingBehavior can can copy its target's velocity.
+        /// Test that VelocityMatchingBehavior can copy its target's velocity.
         /// </summary>
         [UnityTest]
         public IEnumerator VelocityMatchingBehaviourTest()
         {
-            // Test setup.
-            _velocityMatchingGameObject.transform.position =
-                _pursuitTargetStartPosition.position;
+            // Get references to components.
             var velocityMatchingSteeringBehavior = _velocityMatchingGameObject
                 .GetComponent<VelocityMatchingSteeringBehavior>();
             var velocityMatchingRigidbody =
                 _velocityMatchingGameObject.GetComponent<Rigidbody2D>();
             var velocityMatchingAgentMover =
                 _velocityMatchingGameObject.GetComponent<AgentMover>();
-            _arriveLAGameObject.transform.position = _alignStartPosition.position;
             var arriveSteeringBehavior =
                 _arriveLAGameObject.GetComponent<ArriveSteeringBehaviorLA>();
             var arriveAgentMover = _arriveLAGameObject.GetComponent<AgentMover>();
             var arriveRigidbody = _arriveLAGameObject.GetComponent<Rigidbody2D>();
+            
+            // Setup agents before the test.
+            _arriveLAGameObject.transform.position = _alignStartPosition.position;
             arriveAgentMover.MaximumSpeed = 5.55f;
             arriveAgentMover.StopSpeed = 0.1f;
             arriveAgentMover.MaximumRotationalSpeed = 180f;
@@ -538,6 +548,8 @@ namespace Tests.PlayTests
             arriveSteeringBehavior.Target = _targetPosition.gameObject;
             var arriveColor = _arriveLAGameObject.GetComponent<AgentColor>();
             arriveColor.Color = Color.red;
+            _velocityMatchingGameObject.transform.position =
+                _pursuitTargetStartPosition.position;
             velocityMatchingAgentMover.MaximumSpeed = 5.55f;
             velocityMatchingAgentMover.StopSpeed = 0.1f;
             velocityMatchingAgentMover.MaximumRotationalSpeed = 180f;
@@ -572,6 +584,98 @@ namespace Tests.PlayTests
             // Cleanup.
             _velocityMatchingGameObject.SetActive(false);
             _arriveLAGameObject.SetActive(false);
+        }
+        
+        /// <summary>
+        /// Test that InterposeMatchingBehavior can place and agent between two
+        /// moving agents.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator InterposeBehaviourTest()
+        {
+            // Get references to components.
+            var velocityMatchingSteeringBehavior = _velocityMatchingGameObject
+                .GetComponent<VelocityMatchingSteeringBehavior>();
+            var velocityMatchingRigidbody =
+                _velocityMatchingGameObject.GetComponent<Rigidbody2D>();
+            var velocityMatchingAgentMover =
+                _velocityMatchingGameObject.GetComponent<AgentMover>();
+            var arriveSteeringBehavior =
+                _arriveLAGameObject.GetComponent<ArriveSteeringBehaviorLA>();
+            var arriveAgentMover = _arriveLAGameObject.GetComponent<AgentMover>();
+            var arriveRigidbody = _arriveLAGameObject.GetComponent<Rigidbody2D>();
+            var interposeSteeringBehavior =
+                _interposeGameObject.GetComponent<InterposeSteeringBehavior>();
+            var interposeAgentMover = _interposeGameObject.GetComponent<AgentMover>();
+            var interposeRigidbody = _interposeGameObject.GetComponent<Rigidbody2D>();
+            
+            // Setup agents before the test.
+            _arriveLAGameObject.transform.position = _alignStartPosition.position;
+            arriveAgentMover.MaximumSpeed = 5.55f;
+            arriveAgentMover.StopSpeed = 0.1f;
+            arriveAgentMover.MaximumRotationalSpeed = 180f;
+            arriveAgentMover.StopRotationThreshold = 1f;
+            arriveAgentMover.MaximumAcceleration = 4f;
+            arriveAgentMover.MaximumDeceleration = 4f;
+            arriveSteeringBehavior.Target = _targetPosition.gameObject;
+            var arriveColor = _arriveLAGameObject.GetComponent<AgentColor>();
+            arriveColor.Color = Color.red;
+            _velocityMatchingGameObject.transform.position =
+                _pursuitTargetStartPosition.position;
+            velocityMatchingAgentMover.MaximumSpeed = 5.55f;
+            velocityMatchingAgentMover.StopSpeed = 0.1f;
+            velocityMatchingAgentMover.MaximumRotationalSpeed = 180f;
+            velocityMatchingAgentMover.StopRotationThreshold = 1f;
+            velocityMatchingAgentMover.MaximumAcceleration = 10f;
+            velocityMatchingAgentMover.MaximumDeceleration = 200f;
+            velocityMatchingSteeringBehavior.TimeToMatch = 0.1f;
+            velocityMatchingSteeringBehavior.Target = arriveAgentMover;
+            _interposeGameObject.transform.position = _position11.position;
+            interposeAgentMover.MaximumSpeed = 5.55f;
+            interposeAgentMover.StopSpeed = 0.1f;
+            interposeAgentMover.MaximumRotationalSpeed = 180f;
+            interposeAgentMover.StopRotationThreshold = 1f;
+            interposeAgentMover.MaximumAcceleration = 10f;
+            interposeAgentMover.MaximumDeceleration = 200f;
+            interposeSteeringBehavior.AgentA = arriveAgentMover;
+            interposeSteeringBehavior.AgentB = velocityMatchingAgentMover;
+            interposeRigidbody.linearVelocity = Vector2.zero;
+            velocityMatchingRigidbody.linearVelocity = Vector2.zero;
+            arriveRigidbody.linearVelocity = Vector2.zero;
+            _velocityMatchingGameObject.SetActive(true);
+            _arriveLAGameObject.SetActive(true);
+            _interposeGameObject.SetActive(true);
+
+            // Start test.
+            
+            // Give time for the followed agent to try to reach its target
+            // cruise velocity and assert interposed agent in the middle of the two agents.
+            yield return new WaitUntil(() =>
+                Mathf.Approximately(
+                    arriveAgentMover.CurrentSpeed,
+                    arriveAgentMover.MaximumSpeed));
+            yield return new WaitForSecondsRealtime(velocityMatchingSteeringBehavior.TimeToMatch);
+            Assert.True(
+                ((Vector2) _interposeGameObject.transform.position -
+                InterposeSteeringBehavior.GetMidPoint(
+                    _velocityMatchingGameObject.transform.position, 
+                    _arriveLAGameObject.transform.position)).magnitude < 0.2f);
+
+            // Wait until arriver brakes and asserts that the interpose agent stays in
+            // the middle.
+            yield return new WaitUntil(() =>
+                Mathf.Approximately(arriveAgentMover.CurrentSpeed, 0));
+            yield return new WaitForSecondsRealtime(velocityMatchingSteeringBehavior.TimeToMatch);
+            Assert.True(
+                ((Vector2) _interposeGameObject.transform.position -
+                 InterposeSteeringBehavior.GetMidPoint(
+                     _velocityMatchingGameObject.transform.position, 
+                     _arriveLAGameObject.transform.position)).magnitude < 0.2f);
+            
+            // Cleanup.
+            _velocityMatchingGameObject.SetActive(false);
+            _arriveLAGameObject.SetActive(false);
+            _interposeGameObject.SetActive(false);
         }
     }
 }
