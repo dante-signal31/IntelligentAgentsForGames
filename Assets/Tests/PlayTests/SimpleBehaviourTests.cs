@@ -11,18 +11,16 @@ namespace Tests.PlayTests
     public class SimpleBehaviourTests
     {
         private const string CurrentScene = "TestClearTiledYard";
-
-        // TODO: Unify all position names. As they are, it is a mess.
-        private Transform _seekStartPosition;
-        private Transform _alignStartPosition;
-        private Transform _faceStartPosition;
-        private Transform _fleeStartPosition;
-        private Transform _pursuitStartPosition;
-        private Transform _pursuitTargetStartPosition;
-        private Transform _targetPosition;
-        private Transform _targetPosition2;
-        private Transform _targetPosition3;
-        private Transform _targetPosition4;
+        
+        private Transform _position5;
+        private Transform _position6;
+        private Transform _position7;
+        private Transform _position8;
+        private Transform _position10;
+        private Transform _position1;
+        private Transform _position2;
+        private Transform _position3;
+        private Transform _position4;
         private Transform _position11;
 
         private TargetPlacement _target;
@@ -43,33 +41,31 @@ namespace Tests.PlayTests
         {
             yield return TestLevelManagement.ReLoadScene(CurrentScene);
 
-            if (_targetPosition == null)
-                _targetPosition = GameObject.Find("Position1").transform;
-            if (_targetPosition2 == null)
-                _targetPosition2 = GameObject.Find("Position2").transform;
-            if (_targetPosition3 == null)
-                _targetPosition3 = GameObject.Find("Position3").transform;
-            if (_targetPosition4 == null)
-                _targetPosition4 = GameObject.Find("Position4").transform;
+            if (_position1 == null)
+                _position1 = GameObject.Find("Position1").transform;
+            if (_position2 == null)
+                _position2 = GameObject.Find("Position2").transform;
+            if (_position3 == null)
+                _position3 = GameObject.Find("Position3").transform;
+            if (_position4 == null)
+                _position4 = GameObject.Find("Position4").transform;
             if (_target == null)
             {
                 _target = GameObject.Find("Target").GetComponent<TargetPlacement>();
-                _target.TargetPosition = _targetPosition.position;
+                _target.TargetPosition = _position1.position;
                 _target.Enabled = false;
             }
 
-            if (_seekStartPosition == null)
-                _seekStartPosition = GameObject.Find("Position5").transform;
-            if (_alignStartPosition == null)
-                _alignStartPosition = GameObject.Find("Position6").transform;
-            if (_faceStartPosition == null)
-                _faceStartPosition = GameObject.Find("Position7").transform;
-            if (_fleeStartPosition == null)
-                _fleeStartPosition = GameObject.Find("Position8").transform;
-            if (_pursuitStartPosition == null)
-                _pursuitStartPosition = GameObject.Find("Position1").transform;
-            if (_pursuitTargetStartPosition == null)
-                _pursuitTargetStartPosition = GameObject.Find("Position10").transform;
+            if (_position5 == null)
+                _position5 = GameObject.Find("Position5").transform;
+            if (_position6 == null)
+                _position6 = GameObject.Find("Position6").transform;
+            if (_position7 == null)
+                _position7 = GameObject.Find("Position7").transform;
+            if (_position8 == null)
+                _position8 = GameObject.Find("Position8").transform;
+            if (_position10 == null)
+                _position10 = GameObject.Find("Position10").transform;
             if (_position11 == null)
                 _position11 = GameObject.Find("Position11").transform;
 
@@ -138,13 +134,13 @@ namespace Tests.PlayTests
         public IEnumerator SeekBehaviourTest()
         {
             // Test setup.
-            _seekGameObject.transform.position = _seekStartPosition.position;
+            _seekGameObject.transform.position = _position5.position;
             var seekSteeringBehavior =
                 _seekGameObject.GetComponent<SeekSteeringBehavior>();
             var agentMover = _seekGameObject.GetComponent<AgentMover>();
             agentMover.MaximumSpeed = 10.0f;
             _target.Enabled = true;
-            _target.TargetPosition = _targetPosition.position;
+            _target.TargetPosition = _position1.position;
             seekSteeringBehavior.Target = _target.gameObject;
             seekSteeringBehavior.ArrivalDistance = 0.2f;
             _seekGameObject.SetActive(true);
@@ -153,7 +149,7 @@ namespace Tests.PlayTests
             yield return new WaitForSeconds(2.0f);
 
             // Assert the target was reached.
-            Assert.True(Vector3.Distance(_targetPosition.position,
+            Assert.True(Vector3.Distance(_position1.position,
                             _seekGameObject.transform.position) <=
                         (seekSteeringBehavior.ArrivalDistance + 0.1));
 
@@ -170,13 +166,13 @@ namespace Tests.PlayTests
         public IEnumerator ArriveBehaviourNLATest()
         {
             // Test setup.
-            _arriveNLAGameObject.transform.position = _seekStartPosition.position;
+            _arriveNLAGameObject.transform.position = _position5.position;
             var arriveSteeringBehavior =
                 _arriveNLAGameObject.GetComponent<ArriveSteeringBehaviorNLA>();
             var agentMover = _arriveNLAGameObject.GetComponent<AgentMover>();
             agentMover.MaximumSpeed = 5.0f;
             _target.Enabled = true;
-            _target.TargetPosition = _targetPosition.position;
+            _target.TargetPosition = _position1.position;
             arriveSteeringBehavior.Target = _target.gameObject;
             arriveSteeringBehavior.ArrivalDistance = 0.5f;
             arriveSteeringBehavior.AccelerationRadius = 2.0f;
@@ -186,9 +182,9 @@ namespace Tests.PlayTests
             // Check that agent is accelerating at the beginning.
             // Wait until agent starts is movement.
             yield return new WaitUntil(() =>
-                (Vector3.Distance(_seekStartPosition.position,
+                (Vector3.Distance(_position5.position,
                     _arriveNLAGameObject.transform.position) >= 0.1f) &&
-                (Vector3.Distance(_seekStartPosition.position,
+                (Vector3.Distance(_position5.position,
                      _arriveNLAGameObject.transform.position) <
                  arriveSteeringBehavior.AccelerationRadius));
             Assert.True(agentMover.CurrentSpeed > 0.0f &&
@@ -196,7 +192,7 @@ namespace Tests.PlayTests
 
             // Check that agent gets its full cruise speed. 
             yield return new WaitUntil(() =>
-                Vector3.Distance(_seekStartPosition.position,
+                Vector3.Distance(_position5.position,
                     _arriveNLAGameObject.transform.position) >
                 (arriveSteeringBehavior.AccelerationRadius + 0.1f));
             yield return null;
@@ -207,7 +203,7 @@ namespace Tests.PlayTests
 
             // Check that agent is braking at the end.
             yield return new WaitUntil(() =>
-                Vector3.Distance(_targetPosition.position,
+                Vector3.Distance(_position1.position,
                     _arriveNLAGameObject.transform.position) <
                 (arriveSteeringBehavior.BrakingRadius - 0.2f));
             yield return null;
@@ -217,7 +213,7 @@ namespace Tests.PlayTests
 
             // Assert the target was reached.
             yield return new WaitForSeconds(3f);
-            Assert.True(Vector3.Distance(_targetPosition.position,
+            Assert.True(Vector3.Distance(_position1.position,
                             _arriveNLAGameObject.transform.position) <=
                         (arriveSteeringBehavior.ArrivalDistance));
 
@@ -234,7 +230,7 @@ namespace Tests.PlayTests
         public IEnumerator ArriveBehaviourLATest()
         {
             // Test setup.
-            _arriveLAGameObject.transform.position = _seekStartPosition.position;
+            _arriveLAGameObject.transform.position = _position5.position;
             var arriveSteeringBehavior =
                 _arriveLAGameObject.GetComponent<ArriveSteeringBehaviorLA>();
             var agentMover = _arriveLAGameObject.GetComponent<AgentMover>();
@@ -245,7 +241,7 @@ namespace Tests.PlayTests
             agentMover.MaximumAcceleration = 4f;
             agentMover.MaximumDeceleration = 4f;
             _target.Enabled = true;
-            _target.TargetPosition = _targetPosition.position;
+            _target.TargetPosition = _position1.position;
             arriveSteeringBehavior.Target = _target.gameObject;
             arriveSteeringBehavior.ArrivalDistance = 0.5f;
             _arriveLAGameObject.SetActive(true);
@@ -253,7 +249,7 @@ namespace Tests.PlayTests
             // Check that agent is accelerating at the beginning.
             // Wait until agent starts is movement.
             yield return new WaitUntil(() =>
-                (Vector3.Distance(_seekStartPosition.position,
+                (Vector3.Distance(_position5.position,
                     _arriveLAGameObject.transform.position) >= 0.1f));
             Assert.True(agentMover.CurrentSpeed > 0.0f &&
                         agentMover.CurrentSpeed < agentMover.MaximumSpeed);
@@ -267,7 +263,7 @@ namespace Tests.PlayTests
 
             // Check that agent is braking at the end.
             yield return new WaitUntil(() =>
-                Vector3.Distance(_targetPosition.position,
+                Vector3.Distance(_position1.position,
                     _arriveLAGameObject.transform.position) <=
                 (arriveSteeringBehavior.BrakingRadius));
             yield return null;
@@ -277,7 +273,7 @@ namespace Tests.PlayTests
 
             // Assert the target was reached.
             yield return new WaitForSeconds(3f);
-            Assert.True(Vector3.Distance(_targetPosition.position,
+            Assert.True(Vector3.Distance(_position1.position,
                             _arriveLAGameObject.transform.position) <=
                         (arriveSteeringBehavior.ArrivalDistance));
 
@@ -293,7 +289,7 @@ namespace Tests.PlayTests
         public IEnumerator FleeBehaviourTest()
         {
             // Test setup.
-            _fleeGameObject.transform.position = _fleeStartPosition.position;
+            _fleeGameObject.transform.position = _position8.position;
             var fleeSteeringBehavior =
                 _fleeGameObject.GetComponent<FleeSteeringBehavior>();
             fleeSteeringBehavior.Threath = _target.gameObject;
@@ -301,7 +297,7 @@ namespace Tests.PlayTests
             var agentMover = _fleeGameObject.GetComponent<AgentMover>();
             agentMover.MaximumSpeed = 10.0f;
             _target.Enabled = true;
-            _target.TargetPosition = _targetPosition.position;
+            _target.TargetPosition = _position1.position;
             _fleeGameObject.SetActive(true);
 
             // Place 5 targets in random positions and check that the agent flees.
@@ -332,18 +328,18 @@ namespace Tests.PlayTests
         public IEnumerator AlignBehaviourTest()
         {
             // Test setup.
-            _seekGameObject.transform.position = _seekStartPosition.position;
+            _seekGameObject.transform.position = _position5.position;
             var seekSteeringBehavior =
                 _seekGameObject.GetComponent<SeekSteeringBehavior>();
             var agentMover = _seekGameObject.GetComponent<AgentMover>();
             agentMover.MaximumSpeed = 2.0f;
             _target.Enabled = true;
-            _target.TargetPosition = _targetPosition.position;
+            _target.TargetPosition = _position1.position;
             seekSteeringBehavior.Target = _target.gameObject;
             seekSteeringBehavior.ArrivalDistance = 0.2f;
             var seekColor = _seekGameObject.GetComponent<AgentColor>();
             seekColor.Color = Color.red;
-            _alignGameObject.transform.position = _alignStartPosition.position;
+            _alignGameObject.transform.position = _position6.position;
             var alignSteeringBehavior =
                 _alignGameObject.GetComponent<AlignSteeringBehavior>();
             alignSteeringBehavior.Target = _seekGameObject;
@@ -351,7 +347,7 @@ namespace Tests.PlayTests
             _seekGameObject.SetActive(true);
 
             // Move seeker to face the first target.
-            _target.TargetPosition = _targetPosition.position;
+            _target.TargetPosition = _position1.position;
             yield return new WaitForSeconds(2f);
             Assert.True(
                 Mathf.Abs(
@@ -360,7 +356,7 @@ namespace Tests.PlayTests
                 agentMover.StopRotationThreshold);
 
             // Move seeker to face the second target.
-            _target.TargetPosition = _targetPosition2.position;
+            _target.TargetPosition = _position2.position;
             yield return new WaitForSeconds(2.2f);
             Assert.True(
                 Mathf.Abs(
@@ -369,7 +365,7 @@ namespace Tests.PlayTests
                 agentMover.StopRotationThreshold);
 
             // Move seeker to face the third target.
-            _target.TargetPosition = _targetPosition3.position;
+            _target.TargetPosition = _position3.position;
             yield return new WaitForSeconds(2.2f);
             Assert.True(
                 Mathf.Abs(
@@ -390,18 +386,18 @@ namespace Tests.PlayTests
         public IEnumerator FaceBehaviourTest()
         {
             // Test setup.
-            _seekGameObject.transform.position = _seekStartPosition.position;
+            _seekGameObject.transform.position = _position5.position;
             var seekSteeringBehavior =
                 _seekGameObject.GetComponent<SeekSteeringBehavior>();
             var agentMover = _seekGameObject.GetComponent<AgentMover>();
             agentMover.MaximumSpeed = 2.0f;
             _target.Enabled = true;
-            _target.TargetPosition = _targetPosition.position;
+            _target.TargetPosition = _position1.position;
             seekSteeringBehavior.Target = _target.gameObject;
             seekSteeringBehavior.ArrivalDistance = 0.2f;
             var seekColor = _seekGameObject.GetComponent<AgentColor>();
             seekColor.Color = Color.red;
-            _faceGameObject.transform.position = _faceStartPosition.position;
+            _faceGameObject.transform.position = _position7.position;
             var faceSteeringBehavior =
                 _faceGameObject.GetComponent<FaceMatchingSteeringBehavior>();
             faceSteeringBehavior.Target = _seekGameObject;
@@ -440,9 +436,9 @@ namespace Tests.PlayTests
         public IEnumerator PursuitBehaviourTest()
         {
             // Test setup.
-            _seekGameObject.transform.position = _pursuitTargetStartPosition.position;
+            _seekGameObject.transform.position = _position10.position;
             _target.Enabled = true;
-            _target.TargetPosition = _targetPosition4.position;
+            _target.TargetPosition = _position4.position;
             var targetMovingAgent = _seekGameObject.GetComponent<AgentMover>();
             targetMovingAgent.MaximumSpeed = 2.0f;
             targetMovingAgent.StopSpeed = 0.1f;
@@ -455,7 +451,7 @@ namespace Tests.PlayTests
             var seekSteeringBehavior = _seekGameObject.GetComponent<SeekSteeringBehavior>();
             seekSteeringBehavior.Target = _target.gameObject;
             seekSteeringBehavior.ArrivalDistance = 0.2f;
-            _pursuitGameObject.transform.position = _pursuitStartPosition.position;
+            _pursuitGameObject.transform.position = _position1.position;
             var pursueAgentMover = _pursuitGameObject.GetComponent<AgentMover>();
             pursueAgentMover.MaximumSpeed = 2.5f;
             pursueAgentMover.MaximumAcceleration = 4.0f;
@@ -538,18 +534,18 @@ namespace Tests.PlayTests
             var arriveRigidbody = _arriveLAGameObject.GetComponent<Rigidbody2D>();
             
             // Setup agents before the test.
-            _arriveLAGameObject.transform.position = _alignStartPosition.position;
+            _arriveLAGameObject.transform.position = _position6.position;
             arriveAgentMover.MaximumSpeed = 5.55f;
             arriveAgentMover.StopSpeed = 0.1f;
             arriveAgentMover.MaximumRotationalSpeed = 180f;
             arriveAgentMover.StopRotationThreshold = 1f;
             arriveAgentMover.MaximumAcceleration = 4f;
             arriveAgentMover.MaximumDeceleration = 4f;
-            arriveSteeringBehavior.Target = _targetPosition.gameObject;
+            arriveSteeringBehavior.Target = _position1.gameObject;
             var arriveColor = _arriveLAGameObject.GetComponent<AgentColor>();
             arriveColor.Color = Color.red;
             _velocityMatchingGameObject.transform.position =
-                _pursuitTargetStartPosition.position;
+                _position10.position;
             velocityMatchingAgentMover.MaximumSpeed = 5.55f;
             velocityMatchingAgentMover.StopSpeed = 0.1f;
             velocityMatchingAgentMover.MaximumRotationalSpeed = 180f;
@@ -610,18 +606,18 @@ namespace Tests.PlayTests
             var interposeRigidbody = _interposeGameObject.GetComponent<Rigidbody2D>();
             
             // Setup agents before the test.
-            _arriveLAGameObject.transform.position = _alignStartPosition.position;
+            _arriveLAGameObject.transform.position = _position6.position;
             arriveAgentMover.MaximumSpeed = 5.55f;
             arriveAgentMover.StopSpeed = 0.1f;
             arriveAgentMover.MaximumRotationalSpeed = 180f;
             arriveAgentMover.StopRotationThreshold = 1f;
             arriveAgentMover.MaximumAcceleration = 4f;
             arriveAgentMover.MaximumDeceleration = 4f;
-            arriveSteeringBehavior.Target = _targetPosition.gameObject;
+            arriveSteeringBehavior.Target = _position1.gameObject;
             var arriveColor = _arriveLAGameObject.GetComponent<AgentColor>();
             arriveColor.Color = Color.red;
             _velocityMatchingGameObject.transform.position =
-                _pursuitTargetStartPosition.position;
+                _position10.position;
             velocityMatchingAgentMover.MaximumSpeed = 5.55f;
             velocityMatchingAgentMover.StopSpeed = 0.1f;
             velocityMatchingAgentMover.MaximumRotationalSpeed = 180f;
