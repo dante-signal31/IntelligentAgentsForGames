@@ -508,7 +508,8 @@ namespace Tests.PlayTests
             
             // Assert the evader was not reached.
             Assert.True(Vector3.Distance(_seekGameObject.transform.position, 
-                _evadeGameObject.transform.position) >= (2.0f));
+                _evadeGameObject.transform.position) >= 
+                        (evadeSteeringBehavior.PanicDistance));
             
             // Cleanup.
             _seekGameObject.SetActive(false);

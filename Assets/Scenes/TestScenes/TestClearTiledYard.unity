@@ -1675,6 +1675,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 779731452}
     m_Modifications:
+    - target: {fileID: 4610528816202031183, guid: 5a08a8a7b8c040b4d8aba996db122f23, type: 3}
+      propertyPath: panicDistance
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 5949846610255021009, guid: 5a08a8a7b8c040b4d8aba996db122f23, type: 3}
       propertyPath: m_Name
       value: EvadeMovingAgent
