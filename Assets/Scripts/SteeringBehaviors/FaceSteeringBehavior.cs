@@ -28,7 +28,6 @@ public class FaceMatchingSteeringBehavior : SteeringBehavior, ITargeter
 
     private void Awake()
     {
-        if (target != null) _targetPosition = target.transform.position;
         _alignSteeringBehavior = GetComponent<AlignSteeringBehavior>();
         // We use an align steering behavior to make the agent update its rotation. But
         // align behavior copies another GameObject rotation, so we need a dummy
@@ -43,20 +42,12 @@ public class FaceMatchingSteeringBehavior : SteeringBehavior, ITargeter
     {
         Destroy(_marker);
     }
-
-    /// <summary>
-    /// Load target data.
-    /// </summary>
-    private void UpdateTargetData()
-    {
-        _targetPosition = target.transform.position;
-    }
     
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        if (target == null) return new SteeringOutput(Vector2.zero, 0);
+        if (Target == null) return new SteeringOutput(Vector2.zero, 0);
         
-        UpdateTargetData();
+        _targetPosition = Target.transform.position;
         Vector2 currentPosition = args.Position;
 
         Vector2 direction = _targetPosition - currentPosition;
