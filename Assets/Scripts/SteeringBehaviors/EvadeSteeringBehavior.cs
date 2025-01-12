@@ -14,7 +14,6 @@ public class EvadeSteeringBehavior : SteeringBehavior
     [FormerlySerializedAs("threathAgent")]
     [Header("CONFIGURATION:")]
     [Tooltip("Agent to run from.")]
-    // TODO: Theath is mispelled. Fix it to threat.
     [SerializeField] private AgentMover threatAgent;
     [Tooltip("Minimum distance to threath before fleeing.")]
     [SerializeField] private float panicDistance;
