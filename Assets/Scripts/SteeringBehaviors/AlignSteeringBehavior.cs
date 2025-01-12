@@ -21,33 +21,51 @@ public class AlignSteeringBehavior : SteeringBehavior, ITargeter
     [Tooltip("Acceleration curve.")] 
     [SerializeField] private AnimationCurve accelerationCurve;
 
-    private float _startOrientation;
-    private float _rotationFromStartAbs;
-    private bool _idle = true;
-    
-    private float _targetOrientation;
-
+    /// <summary>
+    /// Target to align with.
+    /// </summary>
     public GameObject Target
     {
         get => target;
         set => target = value;
     }
+
+    /// <summary>
+    /// Rotation to start to slow down (degress).
+    /// </summary>
+    public float DecelerationRadius
+    {
+        get => decelerationRadius;
+        set => decelerationRadius = value;
+    }
+    
+    /// <summary>
+    /// At this rotation start angle will be at full speed (degress).
+    /// </summary>
+    public float AccelerationRadius
+    {
+        get => accelerationRadius;
+        set => accelerationRadius = value;
+    }
+    
+    private float _startOrientation;
+    private float _rotationFromStartAbs;
+    private bool _idle = true;
     
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     { // I want smooth rotations, so I will use the same approach than in
       // ArriveSteeringBehavior.
-        if (target == null) return new SteeringOutput(Vector2.zero, 0);
+        if (Target == null) return new SteeringOutput(Vector2.zero, 0);
         
-        _targetOrientation = target.transform.rotation.eulerAngles.z;
+        float targetOrientation = Target.transform.rotation.eulerAngles.z;
         float currentOrientation = args.Orientation;
         float maximumRotationalSpeed = args.MaximumRotationalSpeed;
         float arrivingMargin = args.StopRotationThreshold;
         
-        float toTargetRotation = Mathf.DeltaAngle(currentOrientation, _targetOrientation);
+        float toTargetRotation = Mathf.DeltaAngle(currentOrientation, targetOrientation);
         int rotationSide = (toTargetRotation < 0) ? -1 : 1;
         float toTargetRotationAbs = Mathf.Abs(toTargetRotation);
         
-
         float newRotationalSpeed = 0.0f;
 
         if (_idle && toTargetRotationAbs < arrivingMargin)
@@ -63,7 +81,7 @@ public class AlignSteeringBehavior : SteeringBehavior, ITargeter
         }
         
         if (toTargetRotationAbs >= arrivingMargin && 
-            _rotationFromStartAbs < accelerationRadius)
+            _rotationFromStartAbs < AccelerationRadius)
         { // Acceleration phase.
             if (_idle)
             {
@@ -76,17 +94,17 @@ public class AlignSteeringBehavior : SteeringBehavior, ITargeter
             // start to move.
             float accelerationProgress = Mathf.InverseLerp(
                 0, 
-                accelerationRadius, 
+                AccelerationRadius, 
                 _rotationFromStartAbs);
             newRotationalSpeed = maximumRotationalSpeed * 
                                  accelerationCurve.Evaluate(accelerationProgress) * 
                                  rotationSide;
         }
-        else if (toTargetRotationAbs < decelerationRadius && 
+        else if (toTargetRotationAbs < DecelerationRadius && 
                  toTargetRotationAbs >= arrivingMargin)
         { // Deceleration phase.
             float decelerationProgress = Mathf.InverseLerp(
-                decelerationRadius, 
+                DecelerationRadius, 
                 0, 
                 toTargetRotationAbs);
             newRotationalSpeed = maximumRotationalSpeed * 
