@@ -20,8 +20,7 @@ public class VelocityMatchingSteeringBehavior : SteeringBehavior
     private Vector2 _currentVelocity;
     private Vector2 _currentAcceleration;
     private bool _isBraking;
-
-
+    
     /// <summary>
     /// Target to match its velocity.
     /// </summary>
