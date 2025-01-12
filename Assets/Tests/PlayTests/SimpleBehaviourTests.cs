@@ -494,7 +494,7 @@ namespace Tests.PlayTests
             var seekAgentMover = _seekGameObject.GetComponent<AgentMover>();
             _evadeGameObject.transform.position = _position8.position;
             evadeAgentMover.MaximumSpeed = 2.0f;
-            evadeSteeringBehavior.Threath = seekAgentMover;
+            evadeSteeringBehavior.Threat = seekAgentMover;
             evadeSteeringBehavior.PanicDistance = 3.0f;
             _seekGameObject.transform.position = _position10.position;
             seekAgentMover.GetComponent<AgentColor>().Color = Color.red;

@@ -11,10 +11,11 @@ using UnityEngine.Serialization;
 [RequireComponent(typeof(FleeSteeringBehavior))]
 public class EvadeSteeringBehavior : SteeringBehavior
 {
+    [FormerlySerializedAs("threathAgent")]
     [Header("CONFIGURATION:")]
     [Tooltip("Agent to run from.")]
     // TODO: Theath is mispelled. Fix it to threat.
-    [SerializeField] private AgentMover threathAgent;
+    [SerializeField] private AgentMover threatAgent;
     [Tooltip("Minimum distance to threath before fleeing.")]
     [SerializeField] private float panicDistance;
     
@@ -28,13 +29,13 @@ public class EvadeSteeringBehavior : SteeringBehavior
     private Color _agentColor;
     private Color _targetColor;
 
-    public AgentMover Threath
+    public AgentMover Threat
     {
-        get => threathAgent;
+        get => threatAgent;
         set
         {
-            threathAgent = value;
-            _targetColor = threathAgent.GetComponent<AgentColor>().Color;
+            threatAgent = value;
+            _targetColor = threatAgent.GetComponent<AgentColor>().Color;
         }
     }
     
@@ -59,16 +60,16 @@ public class EvadeSteeringBehavior : SteeringBehavior
 
     private void Start()
     {
-        if (Threath != null) _targetColor = Threath.GetComponent<AgentColor>().Color;
+        if (Threat != null) _targetColor = Threat.GetComponent<AgentColor>().Color;
     }
     
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        if (Threath == null) return new SteeringOutput(Vector2.zero, 0);
+        if (Threat == null) return new SteeringOutput(Vector2.zero, 0);
         
         Vector2 currentPosition = args.Position;
         float maximumSpeed = args.MaximumSpeed;
-        Vector2 threathPosition = Threath.transform.position;
+        Vector2 threathPosition = Threat.transform.position;
 
         Vector2 toThreath = threathPosition - currentPosition;
         
@@ -76,10 +77,10 @@ public class EvadeSteeringBehavior : SteeringBehavior
         // and the pursuer; and is inversely proportional to the sum of the
         // agent's velocities
         float lookAheadTime = toThreath.magnitude / 
-                              (maximumSpeed + Threath.Velocity.magnitude);
+                              (maximumSpeed + Threat.Velocity.magnitude);
         
         _predictedPositionMarker.transform.position = threathPosition + 
-                                                      Threath.Velocity * lookAheadTime;
+                                                      Threat.Velocity * lookAheadTime;
 
         return _fleeSteeringBehaviour.GetSteering(args);
     }
@@ -92,7 +93,7 @@ public class EvadeSteeringBehavior : SteeringBehavior
             Gizmos.DrawLine(transform.position, _predictedPositionMarker.transform.position);
             Gizmos.DrawWireSphere(_predictedPositionMarker.transform.position, 0.3f);
             Gizmos.color = _targetColor;
-            Gizmos.DrawLine(threathAgent.transform.position, _predictedPositionMarker.transform.position);
+            Gizmos.DrawLine(threatAgent.transform.position, _predictedPositionMarker.transform.position);
         }
     }
 }
