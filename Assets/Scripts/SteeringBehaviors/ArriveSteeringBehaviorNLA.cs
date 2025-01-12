@@ -68,7 +68,9 @@ public class ArriveSteeringBehaviorNLA : SteeringBehavior, ITargeter
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        Vector2 targetPosition = target.transform.position;
+        if (Target == null) return new SteeringOutput(Vector2.zero, 0);
+        
+        Vector2 targetPosition = Target.transform.position;
         Vector2 currentPosition = args.Position;
         Vector2 currentVelocity = args.CurrentVelocity;
         float stopSpeed = args.StopSpeed;
@@ -82,8 +84,8 @@ public class ArriveSteeringBehaviorNLA : SteeringBehavior, ITargeter
         
         if (_idle && _distanceFromStart > 0) _distanceFromStart = 0;
         
-        if (distanceToTarget >= arrivalDistance && 
-            _distanceFromStart < accelerationRadius)
+        if (distanceToTarget >= ArrivalDistance && 
+            _distanceFromStart < AccelerationRadius)
         { // Acceleration phase.
             if (_idle)
             {
@@ -96,14 +98,14 @@ public class ArriveSteeringBehaviorNLA : SteeringBehavior, ITargeter
             newSpeed = maximumSpeed * accelerationCurve.Evaluate(
                 Mathf.InverseLerp(0, accelerationRadius, _distanceFromStart));
         }
-        else if (distanceToTarget < brakingRadius && distanceToTarget >= arrivalDistance)
+        else if (distanceToTarget < BrakingRadius && distanceToTarget >= arrivalDistance)
         { // Deceleration phase.
             newSpeed = currentVelocity.magnitude > stopSpeed?
                 maximumSpeed * decelerationCurve.Evaluate(
-                    Mathf.InverseLerp(brakingRadius, 0, distanceToTarget)):
+                    Mathf.InverseLerp(BrakingRadius, 0, distanceToTarget)):
                 0;
         }
-        else if (distanceToTarget < arrivalDistance)
+        else if (distanceToTarget < ArrivalDistance)
         { // Stop phase.
             newSpeed = 0;
             _idle = true;
