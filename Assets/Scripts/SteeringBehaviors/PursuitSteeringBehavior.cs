@@ -101,7 +101,7 @@ public class PursuitSteeringBehavior : SteeringBehavior
         if (Target != null)
             _predictedPositionMarker.transform.position = Target.transform.position;
         _seekSteeringBehaviour = GetComponent<SeekSteeringBehavior>();
-        _seekSteeringBehaviour.ArrivalDistance = arrivalDistance;
+        _seekSteeringBehaviour.ArrivalDistance = ArrivalDistance;
         _seekSteeringBehaviour.Target = _predictedPositionMarker;
         // Configure our gizmos.
         _agentColor = GetComponent<AgentColor>().Color;
