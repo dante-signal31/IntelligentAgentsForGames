@@ -88,7 +88,8 @@ public class PursuitSteeringBehavior : SteeringBehavior
         // Create an invisible object as marker to place it at target predicted future
         // position. That marker will be used by seek steering behaviour as target.
         _predictedPositionMarker = new GameObject();
-        _predictedPositionMarker.transform.position = Target.transform.position;
+        if (Target != null)
+            _predictedPositionMarker.transform.position = Target.transform.position;
         _seekSteeringBehaviour = GetComponent<SeekSteeringBehavior>();
         _seekSteeringBehaviour.ArrivalDistance = arrivalDistance;
         _seekSteeringBehaviour.Target = _predictedPositionMarker;
@@ -127,13 +128,13 @@ public class PursuitSteeringBehavior : SteeringBehavior
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        // UpdateTargetData();
+        if (Target == null) return new SteeringOutput(Vector2.zero, 0);
         
         Vector2 targetPosition = Target.transform.position;
         
         if (TargetIsComingToUs(args))
         {   // Target is coming to us so just go straight to it.
-            _predictedPositionMarker.transform.position = target.transform.position;
+            _predictedPositionMarker.transform.position = targetPosition;
             return _seekSteeringBehaviour.GetSteering(args);
         }
         else
