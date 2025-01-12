@@ -110,11 +110,11 @@ namespace Tests.PlayTests
                 _pursuitGameObject = GameObject.Find("PursuitMovingAgent");
                 _pursuitGameObject.SetActive(false);
             }
-            // if (_evadeGameObject == null)
-            // {
-            //     _evadeGameObject = GameObject.Find("EvadeMovingAgent");
-            //     _evadeGameObject.SetActive(false);
-            // }
+            if (_evadeGameObject == null)
+            {
+                _evadeGameObject = GameObject.Find("EvadeMovingAgent");
+                _evadeGameObject.SetActive(false);
+            }
             if (_velocityMatchingGameObject == null)
             {
                 _velocityMatchingGameObject = GameObject.Find("VelocityMatchingMovingAgent");
@@ -480,40 +480,41 @@ namespace Tests.PlayTests
             _pursuitGameObject.SetActive(false);
             _target.Enabled = false;
         }
-        //     
-        //     /// <summary>
-        //     /// Test that EvadeBehavior can can keep away its agent from its chaser.
-        //     /// </summary>
-        //     [UnityTest]
-        //     public IEnumerator EvadeBehaviourTest()
-        //     {
-        //         // Test setup.
-        //         _evadeGameObject.transform.position = _fleeStartPosition.position;
-        //         var evadeSteeringBehavior = _evadeGameObject.GetComponent<EvadeSteeringBehavior>();
-        //         var evadeAgentMover = _evadeGameObject.GetComponent<AgentMover>();
-        //         _seekGameObject.transform.position = _seekStartPosition.position;
-        //         var seekSteeringBehavior = _seekGameObject.GetComponent<SeekSteeringBehavior>();
-        //         var seekAgentMover = _seekGameObject.GetComponent<AgentMover>();
-        //         seekAgentMover.MaximumSpeed = 2.0f;
-        //         evadeAgentMover.MaximumSpeed = 2.0f;
-        //         seekSteeringBehavior.Target = _evadeGameObject;
-        //         evadeSteeringBehavior.Threath = _seekGameObject;
-        //         evadeSteeringBehavior.PanicDistance = 3.0f;
-        //         _evadeGameObject.SetActive(true);
-        //         _seekGameObject.SetActive(true);
-        //         
-        //         // Give time for the chaser to try to reach evader.
-        //         yield return new WaitForSeconds(4.0f);
-        //         
-        //         // Assert the evader was not reached.
-        //         Assert.True(Vector3.Distance(_seekGameObject.transform.position, 
-        //             _evadeGameObject.transform.position) >= (2.0f));
-        //         
-        //         // Cleanup.
-        //         _seekGameObject.SetActive(false);
-        //         _evadeGameObject.SetActive(false);
-        //         _target.Enabled = false;
-        //     }
+        
+        /// <summary>
+        /// Test that EvadeBehavior can can keep away its agent from its chaser.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator EvadeBehaviourTest()
+        {
+            // Test setup.
+            var evadeAgentMover = _evadeGameObject.GetComponent<AgentMover>();
+            var evadeSteeringBehavior = _evadeGameObject.GetComponent<EvadeSteeringBehavior>();
+            var seekSteeringBehavior = _seekGameObject.GetComponent<SeekSteeringBehavior>();
+            var seekAgentMover = _seekGameObject.GetComponent<AgentMover>();
+            _evadeGameObject.transform.position = _position8.position;
+            evadeAgentMover.MaximumSpeed = 2.0f;
+            evadeSteeringBehavior.Threath = seekAgentMover;
+            evadeSteeringBehavior.PanicDistance = 3.0f;
+            _seekGameObject.transform.position = _position10.position;
+            seekAgentMover.GetComponent<AgentColor>().Color = Color.red;
+            seekAgentMover.MaximumSpeed = 2.0f;
+            seekSteeringBehavior.Target = _evadeGameObject;
+            _evadeGameObject.SetActive(true);
+            _seekGameObject.SetActive(true);
+            
+            // Give time for the chaser to try to reach evader.
+            yield return new WaitForSeconds(4.0f);
+            
+            // Assert the evader was not reached.
+            Assert.True(Vector3.Distance(_seekGameObject.transform.position, 
+                _evadeGameObject.transform.position) >= (2.0f));
+            
+            // Cleanup.
+            _seekGameObject.SetActive(false);
+            _evadeGameObject.SetActive(false);
+            _target.Enabled = false;
+        }
     
         /// <summary>
         /// Test that VelocityMatchingBehavior can copy its target's velocity.
