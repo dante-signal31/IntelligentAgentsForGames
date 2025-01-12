@@ -55,7 +55,7 @@ public class InterposeSteeringBehavior: SteeringBehavior
         // Configure seek steering behaviour to go to that marker.
         _seekSteeringBehavior = GetComponent<SeekSteeringBehavior>();
         _seekSteeringBehavior.Target = _predictedPositionMarker;
-        _seekSteeringBehavior.ArrivalDistance = arrivalDistance;
+        _seekSteeringBehavior.ArrivalDistance = ArrivalDistance;
         // Configure our gizmos.
         _agentAColor = agentA.GetComponent<AgentColor>().Color;
         _agentBColor = agentB.GetComponent<AgentColor>().Color;
