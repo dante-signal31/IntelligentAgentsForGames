@@ -36,13 +36,13 @@ public class SeekSteeringBehavior : SteeringBehavior, ITargeter
     {
         if (target == null) return new SteeringOutput(Vector2.zero, 0);
         
-        Vector2 targetPosition = target.transform.position;
+        Vector2 targetPosition = Target.transform.position;
         Vector2 currentPosition = args.CurrentAgent.transform.position;
         float maximumSpeed = args.MaximumSpeed;
 
         Vector2 toTarget = targetPosition - currentPosition;
         
-        Vector2 newVelocity = toTarget.magnitude > arrivalDistance? 
+        Vector2 newVelocity = toTarget.magnitude > ArrivalDistance? 
             toTarget.normalized * maximumSpeed:
             Vector2.zero;
         
