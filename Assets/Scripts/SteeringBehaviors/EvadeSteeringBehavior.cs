@@ -44,7 +44,8 @@ public class EvadeSteeringBehavior : SteeringBehavior
         set
         {
             panicDistance = value;
-            _fleeSteeringBehaviour.PanicDistance = panicDistance;
+            if (_fleeSteeringBehaviour != null)
+                _fleeSteeringBehaviour.PanicDistance = panicDistance;
         }
     }
 
