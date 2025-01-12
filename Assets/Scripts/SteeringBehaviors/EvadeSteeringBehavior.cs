@@ -78,9 +78,12 @@ public class EvadeSteeringBehavior : SteeringBehavior
         float lookAheadTime = toThreath.magnitude / 
                               (maximumSpeed + Threat.Velocity.magnitude);
         
+        // Place the marker where we think the chaser will be at the look-ahead
+        // time.
         _predictedPositionMarker.transform.position = threathPosition + 
                                                       Threat.Velocity * lookAheadTime;
 
+        // Make the flee behavior go away from the predicted position.
         return _fleeSteeringBehaviour.GetSteering(args);
     }
     

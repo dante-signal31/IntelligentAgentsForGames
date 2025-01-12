@@ -171,7 +171,6 @@ public class PursuitSteeringBehavior : SteeringBehavior
             // Let the seek steering behavior get to the new marker position.
             _seekSteeringBehaviour.Target = _predictedPositionMarker;
             
-            
             return _seekSteeringBehaviour.GetSteering(args);
         }
     }
