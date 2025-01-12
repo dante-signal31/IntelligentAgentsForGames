@@ -58,7 +58,11 @@ public class PursuitSteeringBehavior : SteeringBehavior
     public float AheadSemiConeDegrees
     {
         get => aheadSemiConeDegrees;
-        set => aheadSemiConeDegrees = Mathf.Clamp(value, 0, 90);
+        set
+        {
+            aheadSemiConeDegrees = Mathf.Clamp(value, 0, 90);
+            _cosAheadSemiConeRadians = Mathf.Cos(aheadSemiConeDegrees * Mathf.Deg2Rad);
+        }
     }
 
     /// <summary>
@@ -67,7 +71,13 @@ public class PursuitSteeringBehavior : SteeringBehavior
     public float ComingToUsSemiConeDegrees
     {
         get => comingToUsSemiConeDegrees;
-        set => comingToUsSemiConeDegrees = Mathf.Clamp(value, 0, 90);
+        set
+        {
+            comingToUsSemiConeDegrees = Mathf.Clamp(value, 0, 90);
+            _cosComingToUsSemiConeRadians = Mathf.Cos(
+                comingToUsSemiConeDegrees * 
+                Mathf.Deg2Rad);
+        }
     }
     
     private SeekSteeringBehavior _seekSteeringBehaviour; 
