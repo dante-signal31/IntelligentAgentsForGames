@@ -16,12 +16,14 @@ namespace Tests.PlayTests
         private Transform _position6;
         private Transform _position7;
         private Transform _position8;
+        private Transform _position9;
         private Transform _position10;
         private Transform _position1;
         private Transform _position2;
         private Transform _position3;
         private Transform _position4;
         private Transform _position11;
+        private Transform _position12;
 
         private TargetPlacement _target;
 
@@ -35,6 +37,7 @@ namespace Tests.PlayTests
         private GameObject _evadeGameObject;
         private GameObject _velocityMatchingGameObject;
         private GameObject _interposeGameObject;
+        private GameObject _separationGameObject;
 
         [UnitySetUp]
         public IEnumerator SetUp()
@@ -64,10 +67,14 @@ namespace Tests.PlayTests
                 _position7 = GameObject.Find("Position7").transform;
             if (_position8 == null)
                 _position8 = GameObject.Find("Position8").transform;
+            if (_position9 == null)
+                _position9 = GameObject.Find("Position9").transform;
             if (_position10 == null)
                 _position10 = GameObject.Find("Position10").transform;
             if (_position11 == null)
                 _position11 = GameObject.Find("Position11").transform;
+            if (_position12 == null)
+                _position12 = GameObject.Find("Position12").transform;
 
             if (_seekGameObject == null)
             {
@@ -124,6 +131,12 @@ namespace Tests.PlayTests
             {
                 _interposeGameObject = GameObject.Find("InterposeMovingAgent");
                 _interposeGameObject.SetActive(false);
+            }
+            
+            if (_separationGameObject == null)
+            {
+                _separationGameObject = GameObject.Find("SeparationMovingAgent");
+                _separationGameObject.SetActive(false);
             }
         }
 
@@ -676,6 +689,200 @@ namespace Tests.PlayTests
             _velocityMatchingGameObject.SetActive(false);
             _arriveLAGameObject.SetActive(false);
             _interposeGameObject.SetActive(false);
+        }
+        
+         /// <summary>
+         /// Test that SeparationMatchingBehavior can separate its agent from two moving agents
+         /// using a linear algorithm.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator SeparationBehaviourLinearTest()
+        {
+            // Get references to components.
+            var velocityMatchingSteeringBehavior = _velocityMatchingGameObject
+                .GetComponent<VelocityMatchingSteeringBehavior>();
+            var velocityMatchingRigidbody =
+                _velocityMatchingGameObject.GetComponent<Rigidbody2D>();
+            var velocityMatchingAgentMover =
+                _velocityMatchingGameObject.GetComponent<AgentMover>();
+            var arriveSteeringBehavior =
+                _arriveLAGameObject.GetComponent<ArriveSteeringBehaviorLA>();
+            var arriveAgentMover = _arriveLAGameObject.GetComponent<AgentMover>();
+            var arriveRigidbody = _arriveLAGameObject.GetComponent<Rigidbody2D>();
+            var separationSteeringBehavior =
+                _separationGameObject.GetComponent<SeparationSteeringBehavior>();
+            var separationAgentMover = _separationGameObject.GetComponent<AgentMover>();
+            var separationRigidbody = _separationGameObject.GetComponent<Rigidbody2D>();
+            
+            // Setup agents before the test.
+            _arriveLAGameObject.transform.position = _position6.position;
+            arriveAgentMover.MaximumSpeed = 5.55f;
+            arriveAgentMover.StopSpeed = 0.1f;
+            arriveAgentMover.MaximumRotationalSpeed = 180f;
+            arriveAgentMover.StopRotationThreshold = 1f;
+            arriveAgentMover.MaximumAcceleration = 4f;
+            arriveAgentMover.MaximumDeceleration = 4f;
+            arriveSteeringBehavior.Target = _position9.gameObject;
+            var arriveColor = _arriveLAGameObject.GetComponent<AgentColor>();
+            arriveColor.Color = Color.red;
+            _velocityMatchingGameObject.transform.position =
+                _position10.position;
+            velocityMatchingAgentMover.MaximumSpeed = 5.55f;
+            velocityMatchingAgentMover.StopSpeed = 0.1f;
+            velocityMatchingAgentMover.MaximumRotationalSpeed = 180f;
+            velocityMatchingAgentMover.StopRotationThreshold = 1f;
+            velocityMatchingAgentMover.MaximumAcceleration = 10f;
+            velocityMatchingAgentMover.MaximumDeceleration = 200f;
+            velocityMatchingSteeringBehavior.TimeToMatch = 0.1f;
+            velocityMatchingSteeringBehavior.Target = arriveAgentMover;
+            var velocityMatchingColor = _velocityMatchingGameObject.GetComponent<AgentColor>();
+            velocityMatchingColor.Color = Color.red;
+            _separationGameObject.transform.position = _position12.position;
+            separationAgentMover.MaximumSpeed = 5.55f;
+            separationAgentMover.StopSpeed = 0.1f;
+            separationAgentMover.MaximumRotationalSpeed = 180f;
+            separationAgentMover.StopRotationThreshold = 1f;
+            separationAgentMover.MaximumAcceleration = 10f;
+            separationAgentMover.MaximumDeceleration = 200f;
+            separationSteeringBehavior.Threats.Add(arriveAgentMover);
+            separationSteeringBehavior.Threats.Add(velocityMatchingAgentMover);
+            separationSteeringBehavior.SeparationThreshold = 4f;
+            separationSteeringBehavior.DecayCoefficient = 2f;
+            separationSteeringBehavior.SeparationAlgorithm = 
+                SeparationSteeringBehavior.SeparationAlgorithms.Linear;
+            separationRigidbody.linearVelocity = Vector2.zero;
+            velocityMatchingRigidbody.linearVelocity = Vector2.zero;
+            arriveRigidbody.linearVelocity = Vector2.zero;
+            _velocityMatchingGameObject.SetActive(true);
+            _arriveLAGameObject.SetActive(true);
+            _separationGameObject.SetActive(true);
+
+            // Start test.
+            
+            // Assert that both agents start under separation threshold.
+            Assert.True(
+                ( _velocityMatchingGameObject.transform.position -
+                _separationGameObject.transform.position).magnitude <= 
+                separationSteeringBehavior.SeparationThreshold);
+            Assert.True(
+                ( _arriveLAGameObject.transform.position -
+                  _separationGameObject.transform.position).magnitude <= 
+                separationSteeringBehavior.SeparationThreshold);
+
+            // Let separation agent time to go away from the two agents.
+            yield return new WaitForSecondsRealtime(4);
+
+            // Assert that both agents are above separation threshold.
+            Assert.True(
+                ( _velocityMatchingGameObject.transform.position -
+                  _separationGameObject.transform.position).magnitude >= 
+                separationSteeringBehavior.SeparationThreshold);
+            Assert.True(
+                ( _arriveLAGameObject.transform.position -
+                  _separationGameObject.transform.position).magnitude >= 
+                separationSteeringBehavior.SeparationThreshold);
+            
+            // Cleanup.
+            _velocityMatchingGameObject.SetActive(false);
+            _arriveLAGameObject.SetActive(false);
+            _separationGameObject.SetActive(false);
+        }
+         
+        /// <summary>
+        /// Test that SeparationMatchingBehavior can separate its agent from two
+        /// moving agents using an inverse square algorithm.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator SeparationBehaviourInverseSquareTest()
+        {
+            // Get references to components.
+            var velocityMatchingSteeringBehavior = _velocityMatchingGameObject
+                .GetComponent<VelocityMatchingSteeringBehavior>();
+            var velocityMatchingRigidbody =
+                _velocityMatchingGameObject.GetComponent<Rigidbody2D>();
+            var velocityMatchingAgentMover =
+                _velocityMatchingGameObject.GetComponent<AgentMover>();
+            var arriveSteeringBehavior =
+                _arriveLAGameObject.GetComponent<ArriveSteeringBehaviorLA>();
+            var arriveAgentMover = _arriveLAGameObject.GetComponent<AgentMover>();
+            var arriveRigidbody = _arriveLAGameObject.GetComponent<Rigidbody2D>();
+            var separationSteeringBehavior =
+                _separationGameObject.GetComponent<SeparationSteeringBehavior>();
+            var separationAgentMover = _separationGameObject.GetComponent<AgentMover>();
+            var separationRigidbody = _separationGameObject.GetComponent<Rigidbody2D>();
+            
+            // Setup agents before the test.
+            _arriveLAGameObject.transform.position = _position6.position;
+            arriveAgentMover.MaximumSpeed = 5.55f;
+            arriveAgentMover.StopSpeed = 0.1f;
+            arriveAgentMover.MaximumRotationalSpeed = 180f;
+            arriveAgentMover.StopRotationThreshold = 1f;
+            arriveAgentMover.MaximumAcceleration = 4f;
+            arriveAgentMover.MaximumDeceleration = 4f;
+            arriveSteeringBehavior.Target = _position9.gameObject;
+            var arriveColor = _arriveLAGameObject.GetComponent<AgentColor>();
+            arriveColor.Color = Color.red;
+            _velocityMatchingGameObject.transform.position =
+                _position10.position;
+            velocityMatchingAgentMover.MaximumSpeed = 5.55f;
+            velocityMatchingAgentMover.StopSpeed = 0.1f;
+            velocityMatchingAgentMover.MaximumRotationalSpeed = 180f;
+            velocityMatchingAgentMover.StopRotationThreshold = 1f;
+            velocityMatchingAgentMover.MaximumAcceleration = 10f;
+            velocityMatchingAgentMover.MaximumDeceleration = 200f;
+            velocityMatchingSteeringBehavior.TimeToMatch = 0.1f;
+            velocityMatchingSteeringBehavior.Target = arriveAgentMover;
+            var velocityMatchingColor = _velocityMatchingGameObject.GetComponent<AgentColor>();
+            velocityMatchingColor.Color = Color.red;
+            _separationGameObject.transform.position = _position12.position;
+            separationAgentMover.MaximumSpeed = 5.55f;
+            separationAgentMover.StopSpeed = 0.1f;
+            separationAgentMover.MaximumRotationalSpeed = 180f;
+            separationAgentMover.StopRotationThreshold = 1f;
+            separationAgentMover.MaximumAcceleration = 10f;
+            separationAgentMover.MaximumDeceleration = 200f;
+            separationSteeringBehavior.Threats.Add(arriveAgentMover);
+            separationSteeringBehavior.Threats.Add(velocityMatchingAgentMover);
+            separationSteeringBehavior.SeparationThreshold = 4f;
+            separationSteeringBehavior.DecayCoefficient = 2f;
+            separationSteeringBehavior.SeparationAlgorithm = 
+                SeparationSteeringBehavior.SeparationAlgorithms.InverseSquare;
+            separationRigidbody.linearVelocity = Vector2.zero;
+            velocityMatchingRigidbody.linearVelocity = Vector2.zero;
+            arriveRigidbody.linearVelocity = Vector2.zero;
+            _velocityMatchingGameObject.SetActive(true);
+            _arriveLAGameObject.SetActive(true);
+            _separationGameObject.SetActive(true);
+
+            // Start test.
+            
+            // Assert that both agents start under separation threshold.
+            Assert.True(
+                ( _velocityMatchingGameObject.transform.position -
+                _separationGameObject.transform.position).magnitude <= 
+                separationSteeringBehavior.SeparationThreshold);
+            Assert.True(
+                ( _arriveLAGameObject.transform.position -
+                  _separationGameObject.transform.position).magnitude <= 
+                separationSteeringBehavior.SeparationThreshold);
+
+            // Let separation agent time to go away from the two agents.
+            yield return new WaitForSecondsRealtime(4);
+
+            // Assert that both agents are above separation threshold.
+            Assert.True(
+                ( _velocityMatchingGameObject.transform.position -
+                  _separationGameObject.transform.position).magnitude >= 
+                separationSteeringBehavior.SeparationThreshold);
+            Assert.True(
+                ( _arriveLAGameObject.transform.position -
+                  _separationGameObject.transform.position).magnitude >= 
+                separationSteeringBehavior.SeparationThreshold);
+            
+            // Cleanup.
+            _velocityMatchingGameObject.SetActive(false);
+            _arriveLAGameObject.SetActive(false);
+            _separationGameObject.SetActive(false);
         }
     }
 }

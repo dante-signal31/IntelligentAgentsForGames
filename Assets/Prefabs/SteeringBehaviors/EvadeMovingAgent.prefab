@@ -119,7 +119,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc89e26b8db7464abcf499511192aa9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fleeSteeringBehaviour: {fileID: 4610528816202031183}
-  threathAgent: {fileID: 0}
+  threatAgent: {fileID: 0}
   panicDistance: 1
   predictedPositionMarkerVisible: 1
