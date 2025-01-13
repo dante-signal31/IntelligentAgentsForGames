@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -33,7 +34,7 @@ public class SeparationSteeringBehavior: SteeringBehavior
     [Header("DEBUG")]
     [Tooltip("Make visible velocity marker.")]
     [SerializeField] private bool _velocityMarkerVisible = false;
-    [SerializeField] private Color MarkerColor;
+    [SerializeField] private Color _markerColor;
     
     /// <summary>
     /// List of agents to separate from.
@@ -66,6 +67,11 @@ public class SeparationSteeringBehavior: SteeringBehavior
         get => _decayCoefficient; 
         set => _decayCoefficient = value;
     }
+    
+    /// <summary>
+    /// Color used for debugging gizmos.
+    /// </summary>
+    public Color MarkerColor => _markerColor;
 
     private Vector2 _currentVelocity;
     private float GetLinearSeparationStrength(
@@ -129,6 +135,19 @@ public class SeparationSteeringBehavior: SteeringBehavior
     }
     
 #if UNITY_EDITOR
+    // private void OnDrawGizmosSelected()
+    // {
+    //     Gizmos.color = MarkerColor;
+    //     Gizmos.DrawWireSphere(transform.position, SeparationThreshold);
+    //
+    //     // Create a draggable gizmo to set SeparationThreshold value
+    //     Vector2 thresholdHandlePosition= (Vector2) transform.position + Vector2.up * SeparationThreshold;
+    //     Vector3 newHandlePosition = Handles.PositionHandle(thresholdHandlePosition, transform.rotation);
+    //     float newThreshold = Vector3.Distance(transform.position, newHandlePosition);
+    //     SeparationThreshold = newThreshold;
+    //     Undo.RecordObject(this, "Changed Separation Threshold");
+    // }
+
     private void OnDrawGizmos()
     {
         if (!_velocityMarkerVisible) return;

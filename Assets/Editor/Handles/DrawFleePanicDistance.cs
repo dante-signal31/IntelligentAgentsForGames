@@ -12,7 +12,7 @@ namespace Editor
             var evade = (FleeSteeringBehavior)target;
         
             EditorGUI.BeginChangeCheck();
-            Handles.color =Color.red;
+            Handles.color = Color.red;
             float newPanicDistance =
                 InteractiveRanges.CircularRange(evade.transform.position, evade.PanicDistance);
             if (EditorGUI.EndChangeCheck())
@@ -21,7 +21,5 @@ namespace Editor
                 evade.PanicDistance = newPanicDistance;
             }
         }
-
-
     }
 }

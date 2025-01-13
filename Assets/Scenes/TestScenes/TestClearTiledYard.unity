@@ -2062,7 +2062,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 149419213698499219, guid: 4ce633a3a84c089418b21c1249e1cbf3, type: 3}
       propertyPath: _separationThreshold
-      value: 5
+      value: 1.59
       objectReference: {fileID: 0}
     - target: {fileID: 149419213698499219, guid: 4ce633a3a84c089418b21c1249e1cbf3, type: 3}
       propertyPath: '_threats.Array.data[0]'
