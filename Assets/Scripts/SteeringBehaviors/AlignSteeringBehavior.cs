@@ -38,6 +38,15 @@ public class AlignSteeringBehavior : SteeringBehavior, ITargeter
         get => decelerationRadius;
         set => decelerationRadius = value;
     }
+
+    /// <summary>
+    /// Deceleration curve.
+    /// </summary>
+    public AnimationCurve DecelerationCurve
+    {
+        get => decelerationCurve;
+        set => decelerationCurve = value;
+    }
     
     /// <summary>
     /// At this rotation start angle will be at full speed (degress).
@@ -46,6 +55,15 @@ public class AlignSteeringBehavior : SteeringBehavior, ITargeter
     {
         get => accelerationRadius;
         set => accelerationRadius = value;
+    }
+    
+    /// <summary>
+    /// Acceleration curve.
+    /// </summary>
+    public AnimationCurve AccelerationCurve
+    {
+        get => accelerationCurve;
+        set => accelerationCurve = value;
     }
     
     private float _startOrientation;
