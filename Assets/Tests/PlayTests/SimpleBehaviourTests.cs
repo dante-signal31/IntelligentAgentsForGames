@@ -38,6 +38,7 @@ namespace Tests.PlayTests
         private GameObject _velocityMatchingGameObject;
         private GameObject _interposeGameObject;
         private GameObject _separationGameObject;
+        private GameObject _groupAlignGameObject;
 
         [UnitySetUp]
         public IEnumerator SetUp()
@@ -137,6 +138,12 @@ namespace Tests.PlayTests
             {
                 _separationGameObject = GameObject.Find("SeparationMovingAgent");
                 _separationGameObject.SetActive(false);
+            }
+            
+            if (_groupAlignGameObject == null)
+            {
+                _groupAlignGameObject = GameObject.Find("GroupAlignMovingAgent");
+                _groupAlignGameObject.SetActive(false);
             }
         }
 
@@ -883,6 +890,88 @@ namespace Tests.PlayTests
             _velocityMatchingGameObject.SetActive(false);
             _arriveLAGameObject.SetActive(false);
             _separationGameObject.SetActive(false);
+        }
+        
+        /// <summary>
+        /// Test that GroupAlignBehavior calculates the average between two target agent's
+        /// orientations.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator GroupAlignBehaviorTest()
+        {
+            // Get references to components.
+            var groupAlignSteeringBehavior = _groupAlignGameObject
+                .GetComponent<GroupAlignSteeringBehavior>();
+            var groupAlignRigidbody =
+                _groupAlignGameObject.GetComponent<Rigidbody2D>();
+            var groupAlignAgentMover =
+                _groupAlignGameObject.GetComponent<AgentMover>();
+            var arriveSteeringBehavior =
+                _arriveLAGameObject.GetComponent<ArriveSteeringBehaviorLA>();
+            var arriveAgentMover = _arriveLAGameObject.GetComponent<AgentMover>();
+            var arriveRigidbody = _arriveLAGameObject.GetComponent<Rigidbody2D>();
+            var seekSteeringBehavior =
+                _seekGameObject.GetComponent<SeekSteeringBehavior>();
+            var seekAgentMover = _seekGameObject.GetComponent<AgentMover>();
+            var seekRigidbody = _seekGameObject.GetComponent<Rigidbody2D>();
+            
+            // Setup agents before the test.
+            _arriveLAGameObject.transform.position = _position10.position;
+            arriveAgentMover.MaximumSpeed = 5.55f;
+            arriveAgentMover.StopSpeed = 0.1f;
+            arriveAgentMover.MaximumRotationalSpeed = 180f;
+            arriveAgentMover.StopRotationThreshold = 1f;
+            arriveAgentMover.MaximumAcceleration = 4f;
+            arriveAgentMover.MaximumDeceleration = 4f;
+            arriveSteeringBehavior.Target = _position4.gameObject;
+            var arriveColor = _arriveLAGameObject.GetComponent<AgentColor>();
+            arriveColor.Color = Color.red;
+            _groupAlignGameObject.transform.position =
+                _position8.position;
+            groupAlignAgentMover.MaximumSpeed = 5.55f;
+            groupAlignAgentMover.StopSpeed = 0.1f;
+            groupAlignAgentMover.MaximumRotationalSpeed = 180f;
+            groupAlignAgentMover.StopRotationThreshold = 3f;
+            groupAlignAgentMover.MaximumAcceleration = 10f;
+            groupAlignAgentMover.MaximumDeceleration = 200f;
+            groupAlignSteeringBehavior.Targets.Add(_arriveLAGameObject);
+            groupAlignSteeringBehavior.Targets.Add(_seekGameObject);
+            _seekGameObject.transform.position = _position1.position;
+            seekAgentMover.MaximumSpeed = 0f;
+            seekAgentMover.StopSpeed = 0.1f;
+            seekAgentMover.MaximumRotationalSpeed = 180f;
+            seekAgentMover.StopRotationThreshold = 1f;
+            seekAgentMover.MaximumAcceleration = 10f;
+            seekAgentMover.MaximumDeceleration = 200f;
+            var seekColor = _seekGameObject.GetComponent<AgentColor>();
+            seekColor.Color = Color.red;
+            seekRigidbody.linearVelocity = Vector2.zero;
+            groupAlignRigidbody.linearVelocity = Vector2.zero;
+            arriveRigidbody.linearVelocity = Vector2.zero;
+            _groupAlignGameObject.SetActive(true);
+            _arriveLAGameObject.SetActive(true);
+            _seekGameObject.SetActive(true);
+
+            // Start test.
+            
+            // Assert that group align agent starts with 0 rotation.
+            Assert.True(Mathf.Approximately(groupAlignAgentMover.Orientation, 0));
+            
+            // Let time arrive agent to go to its target.
+            yield return new WaitForSecondsRealtime(4);
+            
+            // Assert that group align agent is no longer at 0 rotation but at the average
+            // of other two agents rotation.
+            Assert.False(Mathf.Approximately(groupAlignAgentMover.Orientation, 0));
+            float rotationAverage = (arriveAgentMover.Orientation + 
+                seekAgentMover.Orientation) / 2f;
+            Assert.True(Mathf.Abs(groupAlignAgentMover.Orientation - 
+                rotationAverage) <= groupAlignAgentMover.StopRotationThreshold);
+            
+            // Cleanup.
+            _groupAlignGameObject.SetActive(false);
+            _arriveLAGameObject.SetActive(false);
+            _seekGameObject.SetActive(false);
         }
     }
 }
