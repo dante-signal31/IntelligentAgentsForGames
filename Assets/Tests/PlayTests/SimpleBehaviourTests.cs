@@ -39,6 +39,7 @@ namespace Tests.PlayTests
         private GameObject _interposeGameObject;
         private GameObject _separationGameObject;
         private GameObject _groupAlignGameObject;
+        private GameObject _cohesionGameObject;
 
         [UnitySetUp]
         public IEnumerator SetUp()
@@ -144,6 +145,12 @@ namespace Tests.PlayTests
             {
                 _groupAlignGameObject = GameObject.Find("GroupAlignMovingAgent");
                 _groupAlignGameObject.SetActive(false);
+            }
+            
+            if (_cohesionGameObject == null)
+            {
+                _cohesionGameObject = GameObject.Find("CohesionMovingAgent");
+                _cohesionGameObject.SetActive(false);
             }
         }
 
@@ -971,6 +978,113 @@ namespace Tests.PlayTests
             // Cleanup.
             _groupAlignGameObject.SetActive(false);
             _arriveLAGameObject.SetActive(false);
+            _seekGameObject.SetActive(false);
+        }
+        
+        /// <summary>
+        /// Test that CohesionMatchingBehavior can place and agent in the center of mass of
+        /// a 3 agent group.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator CohesionBehaviourTest()
+        {
+            // Get references to components.
+            var velocityMatchingSteeringBehavior = _velocityMatchingGameObject
+                .GetComponent<VelocityMatchingSteeringBehavior>();
+            var velocityMatchingRigidbody =
+                _velocityMatchingGameObject.GetComponent<Rigidbody2D>();
+            var velocityMatchingAgentMover =
+                _velocityMatchingGameObject.GetComponent<AgentMover>();
+            var arriveSteeringBehavior =
+                _arriveLAGameObject.GetComponent<ArriveSteeringBehaviorLA>();
+            var arriveAgentMover = _arriveLAGameObject.GetComponent<AgentMover>();
+            var arriveRigidbody = _arriveLAGameObject.GetComponent<Rigidbody2D>();
+            var seekSteeringBehavior =
+                _seekGameObject.GetComponent<SeekSteeringBehavior>();
+            var seekAgentMover = _seekGameObject.GetComponent<AgentMover>();
+            var seekRigidbody = _seekGameObject.GetComponent<Rigidbody2D>();
+            var cohesionSteeringBehavior =
+                _cohesionGameObject.GetComponent<CohesionSteeringBehavior>();
+            var cohesionAgentMover = _cohesionGameObject.GetComponent<AgentMover>();
+            var cohesionRigidbody = _cohesionGameObject.GetComponent<Rigidbody2D>();
+            
+            // Setup agents before the test.
+            _arriveLAGameObject.transform.position = _position9.position;
+            arriveAgentMover.MaximumSpeed = 5.55f;
+            arriveAgentMover.StopSpeed = 0.1f;
+            arriveAgentMover.MaximumRotationalSpeed = 180f;
+            arriveAgentMover.StopRotationThreshold = 1f;
+            arriveAgentMover.MaximumAcceleration = 4f;
+            arriveAgentMover.MaximumDeceleration = 4f;
+            arriveSteeringBehavior.Target = _position1.gameObject;
+            var arriveColor = _arriveLAGameObject.GetComponent<AgentColor>();
+            arriveColor.Color = Color.red;
+            _velocityMatchingGameObject.transform.position =
+                _position5.position;
+            velocityMatchingAgentMover.MaximumSpeed = 5.55f;
+            velocityMatchingAgentMover.StopSpeed = 0.1f;
+            velocityMatchingAgentMover.MaximumRotationalSpeed = 180f;
+            velocityMatchingAgentMover.StopRotationThreshold = 1f;
+            velocityMatchingAgentMover.MaximumAcceleration = 10f;
+            velocityMatchingAgentMover.MaximumDeceleration = 200f;
+            velocityMatchingSteeringBehavior.TimeToMatch = 0.1f;
+            velocityMatchingSteeringBehavior.Target = arriveAgentMover;
+            var velocityMatchingColor = _velocityMatchingGameObject.GetComponent<AgentColor>();
+            velocityMatchingColor.Color = Color.red;
+            _seekGameObject.transform.position =
+                _position8.position;
+            seekAgentMover.MaximumSpeed = 5.55f;
+            seekAgentMover.StopSpeed = 0.1f;
+            seekAgentMover.MaximumRotationalSpeed = 180f;
+            seekAgentMover.StopRotationThreshold = 1f;
+            seekAgentMover.MaximumAcceleration = 10f;
+            seekAgentMover.MaximumDeceleration = 200f;
+            seekSteeringBehavior.ArrivalDistance = 0.1f;
+            seekSteeringBehavior.Target = _position3.gameObject;
+            var seekColor = _seekGameObject.GetComponent<AgentColor>();
+            seekColor.Color = Color.red;
+            _cohesionGameObject.transform.position = _position7.position;
+            cohesionAgentMover.MaximumSpeed = 5.55f;
+            cohesionAgentMover.StopSpeed = 0.1f;
+            cohesionAgentMover.MaximumRotationalSpeed = 180f;
+            cohesionAgentMover.StopRotationThreshold = 1f;
+            cohesionAgentMover.MaximumAcceleration = 10f;
+            cohesionAgentMover.MaximumDeceleration = 200f;
+            cohesionSteeringBehavior.Targets.Clear();
+            cohesionSteeringBehavior.Targets.Add(_arriveLAGameObject);
+            cohesionSteeringBehavior.Targets.Add(_velocityMatchingGameObject);
+            cohesionSteeringBehavior.Targets.Add(_seekGameObject);
+            cohesionSteeringBehavior.ArrivalDistance = 0.1f;
+            cohesionRigidbody.linearVelocity = Vector2.zero;
+            velocityMatchingRigidbody.linearVelocity = Vector2.zero;
+            arriveRigidbody.linearVelocity = Vector2.zero;
+            seekRigidbody.linearVelocity = Vector2.zero;
+            _velocityMatchingGameObject.SetActive(true);
+            _arriveLAGameObject.SetActive(true);
+            _cohesionGameObject.SetActive(true);
+            _seekGameObject.SetActive(true);
+
+            // Start test.
+            
+            // Check that agent starts out of place.
+            Assert.False(
+                ((Vector2) _cohesionGameObject.transform.position -
+                 cohesionSteeringBehavior.AveragePosition).magnitude <= 
+                cohesionSteeringBehavior.ArrivalDistance);
+            
+            // Let it time to reach its position.
+            yield return new WaitForSecondsRealtime(3f);
+            
+            // Check that agent now is in place.
+            Assert.True(
+                ((Vector2) _cohesionGameObject.transform.position -
+                 cohesionSteeringBehavior.AveragePosition).magnitude <= 
+                cohesionSteeringBehavior.ArrivalDistance);
+            
+            // Cleanup.
+            _velocityMatchingGameObject.SetActive(false);
+            _arriveLAGameObject.SetActive(false);
+            _cohesionGameObject.SetActive(false);
             _seekGameObject.SetActive(false);
         }
     }
