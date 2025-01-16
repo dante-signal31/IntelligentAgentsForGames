@@ -120,7 +120,11 @@ public class WanderSteeringBehavior : SteeringBehavior
 
     private void Start()
     {
-        InvokeRepeating(nameof(WanderPositionUpdate), 0f, wanderRecalculationTime);
+        // Run wander position update every wanderRecalculationTime seconds.
+        InvokeRepeating(
+            nameof(WanderPositionUpdate), 
+            0f, 
+            wanderRecalculationTime);
     }
 
     private void OnDestroy()
