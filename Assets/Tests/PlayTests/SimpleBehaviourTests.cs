@@ -1107,7 +1107,7 @@ namespace Tests.PlayTests
         public IEnumerator WanderBehaviourTest()
         {
             // Test setup.
-            int numberOfTestSamples = 3;
+            int numberOfTestSamples = 5;
             _wanderGameObject.transform.position = _position13.position;
             var wanderSteeringBehavior =
                 _wanderGameObject.GetComponent<WanderSteeringBehavior>();
@@ -1123,9 +1123,9 @@ namespace Tests.PlayTests
             wanderSteeringBehavior.WanderDistance = 6;
             wanderSteeringBehavior.WanderRecalculationTime = 0.2f;
             _wanderGameObject.SetActive(true);
-
+            
+            // Start test.
             List<Vector2> previousVelocities = new();
-
             foreach (var _ in Enumerable.Range(0, numberOfTestSamples))
             {
                 // Give time the wander agent to move.

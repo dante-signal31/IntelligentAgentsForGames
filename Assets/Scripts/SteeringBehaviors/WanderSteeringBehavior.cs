@@ -5,7 +5,7 @@ using Random = UnityEngine.Random;
 
 
 /// <summary>
-/// <p>Monobehaviour to offer a Wandering steering behaviour.</p>
+/// <p>Monobehaviour to offer a wandering steering behaviour.</p>
 ///
 /// <p>Wandering steering behaviour makes the agent move randomly around the scene.</p>
 /// </summary>
@@ -112,7 +112,8 @@ public class WanderSteeringBehavior : SteeringBehavior
         
         _agentColor = GetComponent<AgentColor>().Color;
         
-        // WanderPosition is a point constrained to the edge of a circle of radius wanderRadius.
+        // Place WanderPosition in a point constrained to the edge of a circle of
+        // radius wanderRadius.
         _wanderLocalPosition = GetRandomCircunferencePoint(Vector2.zero, 
             wanderRadius);
     }
@@ -154,15 +155,18 @@ public class WanderSteeringBehavior : SteeringBehavior
         if (_currentSteeringBehaviorArgs == null) return;
         
         SteeringBehaviorArgs args = _currentSteeringBehaviorArgs;
-        // Add random displacement over an area of a circle or radius wanderJitter.
-        _wanderLocalPosition += Random.insideUnitCircle * wanderJitter;
         
-        // Reproject this new vector back onto a unit circle.
-        _wanderLocalPosition = _wanderLocalPosition.normalized * wanderRadius;
+        // Add random displacement over an area of a circle of radius wanderJitter. This
+        // circle is around current wander local position.
+        _wanderLocalPosition += Random.insideUnitCircle * WanderJitter;
+        
+        // Reproject this new vector back onto a unit circle. This circle is around
+        // current agent.
+        _wanderLocalPosition = _wanderLocalPosition.normalized * WanderRadius;
         
         // Create a targetLocal into a position WanderDist distance in front of the agent.
         // Remember Y local axis is our forward axis.
-        Vector2 targetLocal = _wanderLocalPosition + new Vector2(0, wanderDistance);
+        Vector2 targetLocal = _wanderLocalPosition + new Vector2(0, WanderDistance);
         
         // Place targetLocal as relative to agent.
         _marker.transform.position = args.CurrentAgent.transform.TransformPoint(targetLocal);
