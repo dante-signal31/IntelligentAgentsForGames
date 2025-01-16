@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Tests.PlayTests.Common;
@@ -24,6 +25,7 @@ namespace Tests.PlayTests
         private Transform _position4;
         private Transform _position11;
         private Transform _position12;
+        private Transform _position13;
 
         private TargetPlacement _target;
 
@@ -40,6 +42,7 @@ namespace Tests.PlayTests
         private GameObject _separationGameObject;
         private GameObject _groupAlignGameObject;
         private GameObject _cohesionGameObject;
+        private GameObject _wanderGameObject;
 
         [UnitySetUp]
         public IEnumerator SetUp()
@@ -77,6 +80,8 @@ namespace Tests.PlayTests
                 _position11 = GameObject.Find("Position11").transform;
             if (_position12 == null)
                 _position12 = GameObject.Find("Position12").transform;
+            if (_position13 == null)
+                _position13 = GameObject.Find("Position13").transform;
 
             if (_seekGameObject == null)
             {
@@ -152,6 +157,11 @@ namespace Tests.PlayTests
                 _cohesionGameObject = GameObject.Find("CohesionMovingAgent");
                 _cohesionGameObject.SetActive(false);
             }
+            if (_wanderGameObject == null)
+            {
+                _wanderGameObject = GameObject.Find("WanderMovingAgent");
+                _wanderGameObject.SetActive(false);
+            }
         }
 
         /// <summary>
@@ -196,8 +206,10 @@ namespace Tests.PlayTests
             _arriveNLAGameObject.transform.position = _position5.position;
             var arriveSteeringBehavior =
                 _arriveNLAGameObject.GetComponent<ArriveSteeringBehaviorNLA>();
-            var agentMover = _arriveNLAGameObject.GetComponent<AgentMover>();
-            agentMover.MaximumSpeed = 5.0f;
+            var arriveMover = _arriveNLAGameObject.GetComponent<AgentMover>();
+            var arriveMoverRigidBody = _arriveNLAGameObject.GetComponent<Rigidbody2D>();
+            arriveMoverRigidBody.linearVelocity = Vector2.zero;
+            arriveMover.MaximumSpeed = 6.0f;
             _target.Enabled = true;
             _target.TargetPosition = _position1.position;
             arriveSteeringBehavior.Target = _target.gameObject;
@@ -214,8 +226,8 @@ namespace Tests.PlayTests
                 (Vector3.Distance(_position5.position,
                      _arriveNLAGameObject.transform.position) <
                  arriveSteeringBehavior.AccelerationRadius));
-            Assert.True(agentMover.CurrentSpeed > 0.0f &&
-                        agentMover.CurrentSpeed < agentMover.MaximumSpeed);
+            Assert.True(arriveMover.CurrentSpeed > 0.0f &&
+                        arriveMover.CurrentSpeed < arriveMover.MaximumSpeed);
 
             // Check that agent gets its full cruise speed. 
             yield return new WaitUntil(() =>
@@ -225,8 +237,8 @@ namespace Tests.PlayTests
             yield return null;
             yield return null;
             Assert.True(
-                Mathf.Approximately(agentMover.CurrentSpeed,
-                    agentMover.MaximumSpeed));
+                Mathf.Approximately(arriveMover.CurrentSpeed,
+                    arriveMover.MaximumSpeed));
 
             // Check that agent is braking at the end.
             yield return new WaitUntil(() =>
@@ -235,8 +247,8 @@ namespace Tests.PlayTests
                 (arriveSteeringBehavior.BrakingRadius - 0.2f));
             yield return null;
             yield return null;
-            Assert.True(agentMover.CurrentSpeed > 0.0f &&
-                        agentMover.CurrentSpeed < agentMover.MaximumSpeed);
+            Assert.True(arriveMover.CurrentSpeed > 0.0f &&
+                        arriveMover.CurrentSpeed < arriveMover.MaximumSpeed);
 
             // Assert the target was reached.
             yield return new WaitForSeconds(3f);
@@ -1086,6 +1098,49 @@ namespace Tests.PlayTests
             _arriveLAGameObject.SetActive(false);
             _cohesionGameObject.SetActive(false);
             _seekGameObject.SetActive(false);
+        }
+        
+        /// <summary>
+        /// Test that WanderSteeringBehavior constantly changes position and orientation.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator WanderBehaviourTest()
+        {
+            // Test setup.
+            int numberOfTestSamples = 3;
+            _wanderGameObject.transform.position = _position13.position;
+            var wanderSteeringBehavior =
+                _wanderGameObject.GetComponent<WanderSteeringBehavior>();
+            var wanderMover = _wanderGameObject.GetComponent<AgentMover>();
+            var wanderRigidbody = _seekGameObject.GetComponent<Rigidbody2D>();
+            wanderMover.MaximumSpeed = 1.0f;
+            wanderMover.StopSpeed = 0.1f;
+            wanderMover.MaximumRotationalSpeed = 1080f;
+            wanderMover.StopRotationThreshold = 1f;
+            wanderRigidbody.linearVelocity = Vector2.zero;
+            wanderSteeringBehavior.ArrivalDistance = 0.1f;
+            wanderSteeringBehavior.WanderRadius = 3f;
+            wanderSteeringBehavior.WanderDistance = 6;
+            wanderSteeringBehavior.WanderRecalculationTime = 0.2f;
+            _wanderGameObject.SetActive(true);
+
+            List<Vector2> previousVelocities = new();
+
+            foreach (var _ in Enumerable.Range(0, numberOfTestSamples))
+            {
+                // Give time the wander agent to move.
+                yield return new WaitForSeconds(1.0f);
+                // Sample its velocity.
+                Vector2 currentVelocity = wanderMover.Velocity;
+                // Check that velocity is different than the previous ones.
+                Assert.False(previousVelocities.Contains(currentVelocity));
+                // Store current velocity to be checked against in the next samples.
+                previousVelocities.Add(currentVelocity);
+            }
+
+            // Cleanup.
+            _wanderGameObject.SetActive(false);
+            _target.Enabled = false;
         }
     }
 }

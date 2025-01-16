@@ -114,7 +114,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 337ca56d7658414597e12feb54ae1d25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  seekSteeringBehaviour: {fileID: 623674406017337766}
   arrivalDistance: 0.1
   wanderRadius: 3
   wanderDistance: 6

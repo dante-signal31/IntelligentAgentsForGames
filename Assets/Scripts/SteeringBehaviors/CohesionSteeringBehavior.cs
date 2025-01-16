@@ -65,7 +65,9 @@ public class CohesionSteeringBehavior: SteeringBehavior
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        if (Targets == null || Targets.Count == 0 || _seekSteeringBehavior == null) 
+        if (Targets == null || 
+            Targets.Count == 0 || 
+            _seekSteeringBehavior == null) 
             return new SteeringOutput(Vector2.zero, 0);
 
         // Let's average position counting every agent's targets. 
@@ -86,7 +88,9 @@ public class CohesionSteeringBehavior: SteeringBehavior
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
-        if (!positionGizmoVisible || _positionMarker == null || Targets == null) return;
+        if (!positionGizmoVisible || 
+            _positionMarker == null || 
+            Targets == null) return;
 
         // Draw relationship between targets and center of mass.
         foreach (GameObject target in Targets)
