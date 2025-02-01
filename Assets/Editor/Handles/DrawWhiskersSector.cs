@@ -18,7 +18,9 @@ namespace Editor
                 float newMinimumRange) = DrawSector(whiskers);
             if (EditorGUI.EndChangeCheck())
             {
-                Undo.RecordObject(whiskers, "Changed ahead semicone degrees and ranges.");
+                Undo.RecordObject(
+                    whiskers, 
+                    "Changed ahead semicone degrees and ranges.");
                 whiskers.SemiConeDegrees = newAheadSemiConeDegrees;
                 whiskers.Range = newRange;
                 whiskers.MinimumRange = newMinimumRange;

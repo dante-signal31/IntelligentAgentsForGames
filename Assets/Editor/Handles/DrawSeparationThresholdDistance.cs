@@ -13,7 +13,9 @@ namespace Editor
             EditorGUI.BeginChangeCheck();
             Handles.color = separation.MarkerColor;
             float newSeparationThreshold =
-                InteractiveRanges.CircularRange(separation.transform.position, separation.SeparationThreshold);
+                InteractiveRanges.CircularRange(
+                    separation.transform.position, 
+                    separation.SeparationThreshold);
             if (EditorGUI.EndChangeCheck())
             {
                 Undo.RecordObject(separation, "Changed separation threshold.");

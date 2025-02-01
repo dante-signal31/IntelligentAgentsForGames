@@ -14,7 +14,9 @@ namespace Editor
             EditorGUI.BeginChangeCheck();
             Handles.color = Color.red;
             float newPanicDistance =
-                InteractiveRanges.CircularRange(evade.transform.position, evade.PanicDistance);
+                InteractiveRanges.CircularRange(
+                    evade.transform.position, 
+                    evade.PanicDistance);
             if (EditorGUI.EndChangeCheck())
             {
                 Undo.RecordObject(evade, "Changed panic distance.");
