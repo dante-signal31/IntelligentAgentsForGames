@@ -13,12 +13,6 @@ using UnityEngine.Serialization;
 /// </summary>
 public class RaySensor : MonoBehaviour
 {
-    [Header("WIRING:")]
-    [Tooltip("Point from ray starts.")]
-    [SerializeField] private Transform startPoint;
-    [Tooltip("Point ray ends to.")]
-    [SerializeField] private Transform endPoint;
-
     [Header("CONFIGURATION:")] 
     [Tooltip("Layers to be detected by this sensor.")] 
     [SerializeField] private LayerMask layerMask;
@@ -36,6 +30,12 @@ public class RaySensor : MonoBehaviour
     [Tooltip("Radius for the gizmos that mark the ray ends.")]
     [Range(0.01f, 1.0f)]
     [SerializeField] private float gizmoRadius;
+    
+    [Header("WIRING:")]
+    [Tooltip("Point from ray starts.")]
+    [SerializeField] private Transform startPoint;
+    [Tooltip("Point ray ends to.")]
+    [SerializeField] private Transform endPoint;
 
     /// <summary>
     /// Whether this sensor has detected any collider.
@@ -77,6 +77,24 @@ public class RaySensor : MonoBehaviour
     }
     
     public RaycastHit2D DetectedHit { get; private set; }
+
+    /// <summary>
+    /// Raycast start position.
+    /// </summary>
+    public Vector3 StartPosition
+    {
+        get => startPoint.position;
+        set => startPoint.position = value;
+    }
+    
+    /// <summary>
+    /// Raycast end position.
+    /// </summary>
+    public Vector3 TargetPosition
+    {
+        get => endPoint.position;
+        set => endPoint.position = value;
+    }
 
     /// <summary>
     /// Whether to show gizmos for this sensor for debugging.
