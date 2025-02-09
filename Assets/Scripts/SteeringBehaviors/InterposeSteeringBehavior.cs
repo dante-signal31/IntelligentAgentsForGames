@@ -1,6 +1,7 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
+namespace SteeringBehaviors
+{
 /// <summary>
 /// <p>Monobehaviour to offer an Interpose steering behaviour.</p>
 /// <p>Interpose make an agent to place itself between two other agents.</p>
@@ -24,19 +25,19 @@ public class InterposeSteeringBehavior: SteeringBehavior
         get => agentA;
         set => agentA = value;
     }
-    
+
     public AgentMover AgentB
     {
         get => agentB;
         set => agentB = value;
     }
-    
+
     public float ArrivalDistance
     {
         get => arrivalDistance;
         set => arrivalDistance = value;
     }
-    
+
     private SeekSteeringBehavior _seekSteeringBehavior;
     private GameObject _predictedPositionMarker;
     private Vector2 _previousPositionAgentA;
@@ -89,11 +90,11 @@ public class InterposeSteeringBehavior: SteeringBehavior
             Vector2 midPoint = GetMidPoint(
                 AgentA.transform.position, 
                 AgentB.transform.position);
-        
+    
             // If target agents where static, how much time we'd need to get to midPoint?
             float TimeToReachMidPoint = (midPoint - currentPosition).magnitude / 
                                         maximumSpeed;
-        
+    
             // But actually agents won't be static, so while we move to midPoint,
             // they will move too. So, we must figure out where target agents are going
             // to be after TimeToReachMidPoint has passed. To get that we'll assume both
@@ -104,20 +105,20 @@ public class InterposeSteeringBehavior: SteeringBehavior
                                              AgentA.Velocity * TimeToReachMidPoint;
             Vector2 futurePositionOfAgentB = (Vector2) AgentB.transform.position + 
                                              AgentB.Velocity * TimeToReachMidPoint;
-            
+        
             // Now we have the future position of target agents, we can get the estimated
             // future midpoint position.
             Vector2 futureMidPoint = GetMidPoint(
                 futurePositionOfAgentA, 
                 futurePositionOfAgentB);
-        
+    
             // So, to not been left behind, we must go to the future midpoint.
             _predictedPositionMarker.transform.position = futureMidPoint;
 
             _previousPositionAgentA = AgentA.transform.position;
             _previousPositionAgentB = AgentB.transform.position;
         }
-        
+    
         return _seekSteeringBehavior.GetSteering(args);
     }
 
@@ -140,4 +141,5 @@ public class InterposeSteeringBehavior: SteeringBehavior
         );
     }
 #endif
+}
 }

@@ -1,10 +1,10 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
 
+namespace SteeringBehaviors
+{
 /// <summary>
 /// <p>Monobehaviour to offer a separation steering behaviour.</p>
 /// <p>Separation steering behaviour makes the agent go away from other GameObjects
@@ -18,7 +18,7 @@ public class SeparationSteeringBehavior: SteeringBehavior
         Linear,
         InverseSquare
     }
-    
+
     [Header("CONFIGURATION")]
     [Tooltip("List of agents to separate from.")]
     [SerializeField] private List<AgentMover> _threats = new List<AgentMover>();
@@ -30,13 +30,13 @@ public class SeparationSteeringBehavior: SteeringBehavior
     [FormerlySerializedAs("DecayCoefficient")]
     [Tooltip("Coefficient for inverse square law separation algorithm.")]
     [SerializeField] private float _decayCoefficient = 1f;
-    
+
     [Header("DEBUG")]
     [Tooltip("Make visible velocity marker.")]
     [SerializeField] private bool _velocityMarkerVisible = false;
     [Tooltip("Color used for debugging gizmos.")]
     [SerializeField] private Color _markerColor;
-    
+
     /// <summary>
     /// List of agents to separate from.
     /// </summary>
@@ -68,7 +68,7 @@ public class SeparationSteeringBehavior: SteeringBehavior
         get => _decayCoefficient; 
         set => _decayCoefficient = value;
     }
-    
+
     /// <summary>
     /// <p>Color used for debugging gizmos.</p>
     /// <p>Property read by editor handle script.</p>
@@ -92,7 +92,7 @@ public class SeparationSteeringBehavior: SteeringBehavior
         float normalizedDistance = currentDistance / SeparationThreshold;
         return Mathf.Min(k / Mathf.Pow(normalizedDistance, 2f), maximumAcceleration);    
     }
-    
+
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
         if (Threats == null || Threats.Count == 0) 
@@ -135,16 +135,17 @@ public class SeparationSteeringBehavior: SteeringBehavior
         _currentVelocity = newVelocity;
         return new SteeringOutput(newVelocity, 0);
     }
-    
+
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         if (!_velocityMarkerVisible) return;
-        
+    
         Gizmos.color = MarkerColor;
         Gizmos.DrawLine(
             transform.position, 
             (Vector2) transform.position + _currentVelocity);
     }
 #endif
+}
 }

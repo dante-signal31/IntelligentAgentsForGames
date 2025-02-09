@@ -1,7 +1,8 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Serialization;
 
+namespace SteeringBehaviors
+{
 /// <summary>
 /// <p>Monobehaviour to offer a Pursuit steering behaviour.</p>
 /// <p>To pursue another agent if won't be enough to go to its current position. If that
@@ -25,11 +26,11 @@ public class PursuitSteeringBehavior : SteeringBehavior
              "toward us.")]
     [Range(0, 90)]
     [SerializeField] private float comingToUsSemiConeDegrees;
-    
+
     [Header("DEBUG:")]
     [Tooltip("Make visible position marker.")] 
     [SerializeField] private bool predictedPositionMarkerVisible = true;
-    
+
     /// <summary>
     /// Agent pursued.
     /// </summary>
@@ -79,7 +80,7 @@ public class PursuitSteeringBehavior : SteeringBehavior
                 Mathf.Deg2Rad);
         }
     }
-    
+
     private SeekSteeringBehavior _seekSteeringBehaviour; 
     private float _cosAheadSemiConeRadians;
     private float _cosComingToUsSemiConeRadians;
@@ -112,7 +113,7 @@ public class PursuitSteeringBehavior : SteeringBehavior
     {
         Destroy(_predictedPositionMarker);
     }
-    
+
     /// <summary>
     /// Whether target is coming to us.
     /// </summary>
@@ -124,7 +125,7 @@ public class PursuitSteeringBehavior : SteeringBehavior
         Vector2 currentDirection = args.CurrentVelocity.normalized;
         Vector2 targetPosition = Target.transform.position;
         Vector2 targetDirection = Target.Velocity.normalized;
-        
+    
         Vector2 toTarget = targetPosition - currentPosition;
         bool targetInFrontOfUs = Vector2.Dot(
             currentDirection, 
@@ -132,16 +133,16 @@ public class PursuitSteeringBehavior : SteeringBehavior
         bool targetComingToUs = Vector2.Dot(
             currentDirection, 
             targetDirection) < (-1 * _cosComingToUsSemiConeRadians);
-        
+    
         return targetInFrontOfUs && targetComingToUs;
     }
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
         if (Target == null) return new SteeringOutput(Vector2.zero, 0);
-        
+    
         Vector2 targetPosition = Target.transform.position;
-        
+    
         if (TargetIsComingToUs(args))
         {   // Target is coming to us so just go straight to it.
             _predictedPositionMarker.transform.position = targetPosition;
@@ -162,24 +163,24 @@ public class PursuitSteeringBehavior : SteeringBehavior
             // Avoid divide-by-zero error when both agents are stationary.
             if (float.IsInfinity(lookAheadTime))
                 return new SteeringOutput(Vector2.zero, 0);
-            
+        
             // Place the marker where we think the target will be at the look-ahead
             // time.
             _predictedPositionMarker.transform.position = (Vector3) targetPosition + 
                 (targetVelocity * lookAheadTime);
-            
+        
             // Let the seek steering behavior get to the new marker position.
             _seekSteeringBehaviour.Target = _predictedPositionMarker;
-            
+        
             return _seekSteeringBehaviour.GetSteering(args);
         }
     }
-    
+
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         if (_predictedPositionMarker == null || !predictedPositionMarkerVisible) return;
-        
+    
         Gizmos.color = _agentColor;
         Gizmos.DrawLine(transform.position, _predictedPositionMarker.transform.position);
         Gizmos.DrawWireSphere(_predictedPositionMarker.transform.position, 0.3f);
@@ -187,4 +188,5 @@ public class PursuitSteeringBehavior : SteeringBehavior
         Gizmos.DrawLine(Target.transform.position, _predictedPositionMarker.transform.position);
     }
 #endif
+}
 }

@@ -1,7 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
+namespace SteeringBehaviors
+{
 /// <summary>
 /// <p> Monobehaviour to offer an Align steering behaviour. </p>
 /// <p> Group align steering behaviour makes the agent look at the same direction than
@@ -21,7 +22,7 @@ public class GroupAlignSteeringBehavior: SteeringBehavior
     [SerializeField] private float accelerationRadius = 30f;
     [Tooltip("Acceleration curve.")]
     [SerializeField] private AnimationCurve accelerationCurve;
-    
+
     [Header("DEBUG")]
     [Tooltip("Make orientation gizmos visible.")]
     [SerializeField] private bool orientationGizmosVisible;
@@ -33,7 +34,7 @@ public class GroupAlignSteeringBehavior: SteeringBehavior
     [SerializeField] private Color ownOrientationGizmosColor;
     [Tooltip("Agent's own orientation gizmos length.")]
     [SerializeField] private float ownOrientationGizmosLength;
-    
+
     /// <summary>
     /// List of agents to align with averaging their orientations.
     /// </summary>
@@ -52,7 +53,7 @@ public class GroupAlignSteeringBehavior: SteeringBehavior
                 _alignSteeringBehavior.DecelerationRadius = value;
         }
     }
-    
+
     /// <summary>
     /// Deceleration curve.
     /// </summary>
@@ -66,7 +67,7 @@ public class GroupAlignSteeringBehavior: SteeringBehavior
                 _alignSteeringBehavior.DecelerationCurve = value;
         }
     }
-    
+
     /// <summary>
     /// At this rotation start angle will be at full speed (degress).
     /// </summary>
@@ -80,7 +81,7 @@ public class GroupAlignSteeringBehavior: SteeringBehavior
                 _alignSteeringBehavior.AccelerationRadius = value;
         }
     }
-    
+
     /// <summary>
     /// Acceleration curve.
     /// </summary>
@@ -94,7 +95,7 @@ public class GroupAlignSteeringBehavior: SteeringBehavior
                 _alignSteeringBehavior.AccelerationCurve = value;
         }
     }
-    
+
     /// <summary>
     /// <p>Average orientation counting every agent's targets.</p>
     /// </summary>
@@ -102,7 +103,7 @@ public class GroupAlignSteeringBehavior: SteeringBehavior
 
     private GameObject _orientationMarker;
     private AlignSteeringBehavior _alignSteeringBehavior;
-    
+
     private void Awake()
     {
         _orientationMarker = new GameObject("OrientationMarker");
@@ -137,14 +138,14 @@ public class GroupAlignSteeringBehavior: SteeringBehavior
             headingSum += (Vector2) target.transform.up;
         }
         Vector2 averageHeading = (headingSum / Targets.Count);
-        
+    
         // Rotate our marker to point at the average heading.
         _orientationMarker.transform.up = averageHeading;
-        
+    
         // Store resulting orientation.
         AverageOrientation =
             _orientationMarker.transform.rotation.eulerAngles.z;
-        
+    
         return _alignSteeringBehavior.GetSteering(args);
     }
 
@@ -164,10 +165,10 @@ public class GroupAlignSteeringBehavior: SteeringBehavior
                 transform.position, 
                 transform.position + (Vector3) targetOrientation);
         }
-        
+    
         // Draw resulting average orientation.
         Gizmos.color = ownOrientationGizmosColor;
-        
+    
         Vector2 ownOrientationDirection = Quaternion.AngleAxis(
             AverageOrientation, 
             Vector3.forward) * Vector2.up * ownOrientationGizmosLength;
@@ -176,4 +177,5 @@ public class GroupAlignSteeringBehavior: SteeringBehavior
             transform.position + (Vector3) ownOrientationDirection);
     }
 #endif
+}
 }

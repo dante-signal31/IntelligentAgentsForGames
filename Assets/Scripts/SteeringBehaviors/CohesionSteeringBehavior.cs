@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+namespace SteeringBehaviors
+{
 /// <summary>
 /// <p> Monobehaviour to offer a cohesion steering behaviour. </p>
 /// <p> Cohesion steering behaviour makes the agent to place himself in the center of a
@@ -14,7 +16,7 @@ public class CohesionSteeringBehavior: SteeringBehavior
     [SerializeField] private List<GameObject> targets = new List<GameObject>();
     [Tooltip("Distance at which we give our goal as reached and we stop our agent.")]
     [SerializeField] private float arrivalDistance = 30f;
-    
+
     [Header("DEBUG")]
     [Tooltip("Make position gizmos visible.")]
     [SerializeField] private bool positionGizmoVisible;
@@ -22,7 +24,7 @@ public class CohesionSteeringBehavior: SteeringBehavior
     [SerializeField] private Color positionGizmosColor;
     [Tooltip("Radius for the position marker gizmo.")]
     [SerializeField] private float positionGizmoRadius;
-    
+
     /// <summary>
     /// List of agents to align with averaging their orientations.
     /// </summary>
@@ -41,7 +43,7 @@ public class CohesionSteeringBehavior: SteeringBehavior
                 _seekSteeringBehavior.ArrivalDistance = value;
         }
     }
-    
+
     /// <summary>
     /// <p>Average orientation counting every agent's targets.</p>
     /// </summary>
@@ -49,7 +51,7 @@ public class CohesionSteeringBehavior: SteeringBehavior
 
     private GameObject _positionMarker;
     private SeekSteeringBehavior _seekSteeringBehavior;
-    
+
     private void Awake()
     {
         _positionMarker = new GameObject("OrientationMarker");
@@ -77,11 +79,11 @@ public class CohesionSteeringBehavior: SteeringBehavior
             positionSum += (Vector2) target.transform.position;
         }
         AveragePosition = (positionSum / Targets.Count);
-        
+    
         // Place our position marker in the average position to make
         // _seekSteeringBehavior makes us get there.
         _positionMarker.transform.position = AveragePosition;
-        
+    
         return _seekSteeringBehavior.GetSteering(args);
     }
 
@@ -100,11 +102,11 @@ public class CohesionSteeringBehavior: SteeringBehavior
                 target.transform.position, 
                 _positionMarker.transform.position);
         }
-        
+    
         // Draw center of mass.
         Gizmos.color = positionGizmosColor;
         Gizmos.DrawWireSphere(_positionMarker.transform.position, positionGizmoRadius);
-        
+    
         // Draw heading from current agent to center of mass.
         Gizmos.color = positionGizmosColor;
         Gizmos.DrawLine(
@@ -112,4 +114,5 @@ public class CohesionSteeringBehavior: SteeringBehavior
             _positionMarker.transform.position);
     }
 #endif
+}
 }

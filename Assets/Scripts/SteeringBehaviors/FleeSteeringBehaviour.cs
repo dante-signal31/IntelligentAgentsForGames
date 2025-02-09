@@ -1,6 +1,7 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
+namespace SteeringBehaviors
+{
 /// <summary>
 /// <p>Monobehaviour to offer a Flee steering behaviour.</p>
 ///
@@ -11,15 +12,15 @@ using UnityEngine;
 public class FleeSteeringBehavior : SteeringBehavior
 {
     private const float MinimumPanicDistance = 0.3f;
-    
+
     [Header("CONFIGURATION:")]
     [SerializeField] private GameObject threath;
     [Tooltip("Minimum distance to threath before fleeing.")]
     [Min(MinimumPanicDistance)]
     [SerializeField] private float panicDistance;
-    
+
     private SeekSteeringBehavior _seekSteeringBehaviour; 
-    
+
     public GameObject Threath
     {
         get => threath;
@@ -56,7 +57,7 @@ public class FleeSteeringBehavior : SteeringBehavior
         }
         else
         { // Threat inside panic distance, so run in the opposite direction seek
-          // would advise. 
+            // would advise. 
             SteeringOutput approachSteeringOutput = 
                 _seekSteeringBehaviour.GetSteering(args);
             SteeringOutput fleeSteeringOutput = new SteeringOutput(
@@ -66,4 +67,5 @@ public class FleeSteeringBehavior : SteeringBehavior
             return fleeSteeringOutput;
         }
     }
+}
 }

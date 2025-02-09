@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 
+namespace SteeringBehaviors
+{
 /// <summary>
 /// <p>Basic template for a steering behavior.</p>
 ///
@@ -15,4 +17,5 @@ public abstract class SteeringBehavior: MonoBehaviour
     /// <param name="args">Current agent state.</param>
     /// <returns>An object with new linear velocity and rotation as properties.</returns>
     public abstract SteeringOutput GetSteering(SteeringBehaviorArgs args);
+}
 }

@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 
+namespace SteeringBehaviors
+{
 /// <summary>
 /// <p>Monobehaviour to offer an Arrive steering behaviour.</p>
 /// 
@@ -25,7 +27,7 @@ public class ArriveSteeringBehaviorLA : SteeringBehavior, ITargeter
         get => target; 
         set => target = value;
     }
-    
+
     /// <summary>
     /// At this distance from target, agent will full stop.
     /// </summary>
@@ -34,13 +36,13 @@ public class ArriveSteeringBehaviorLA : SteeringBehavior, ITargeter
         get => arrivalDistance;
         set => arrivalDistance = value;
     }
-    
+
     /// <summary>
     /// Radius to start slowing down using deceleration curve.
     /// </summary>
     public float BrakingRadius=>
         GetBrakingRadius(_currentSpeed, _currentMaximumDeceleration);
-    
+
     private float _currentSpeed;
     private float _currentMaximumDeceleration;
 
@@ -48,11 +50,11 @@ public class ArriveSteeringBehaviorLA : SteeringBehavior, ITargeter
     {
         return Mathf.Pow(speed, 2) / (2 * deceleration);
     }
-    
+
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
         if (Target == null) return new SteeringOutput(Vector2.zero, 0);
-        
+    
         Vector2 targetPosition = Target.transform.position;
         Vector2 currentPosition = args.Position;
         Vector2 currentVelocity = args.CurrentVelocity;
@@ -61,12 +63,12 @@ public class ArriveSteeringBehaviorLA : SteeringBehavior, ITargeter
         float currentMaximumAcceleration = args.MaximumAcceleration;
         _currentMaximumDeceleration = args.MaximumDeceleration;
         float deltaTime = args.DeltaTime;
-        
+    
         Vector2 toTarget = targetPosition - currentPosition;
         float distanceToTarget = toTarget.magnitude;
 
         float newSpeed = 0.0f;
-        
+    
         if (distanceToTarget >= ArrivalDistance &&
             distanceToTarget > BrakingRadius &&
             _currentSpeed < maximumSpeed)
@@ -92,10 +94,11 @@ public class ArriveSteeringBehaviorLA : SteeringBehavior, ITargeter
         { // Full stop phase.
             newSpeed = 0;
         }
-        
+    
         Vector2 newVelocity = toTarget.normalized * newSpeed;
-        
+    
         return new SteeringOutput(newVelocity, 0);
     }
+}
 }
 

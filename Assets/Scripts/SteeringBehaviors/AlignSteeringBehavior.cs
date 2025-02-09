@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
-using UnityEngine.Serialization;
 
+namespace SteeringBehaviors
+{
 /// <summary>
 /// <p> Monobehaviour to offer an Align steering behaviour. </p>
 ///
@@ -47,7 +48,7 @@ public class AlignSteeringBehavior : SteeringBehavior, ITargeter
         get => decelerationCurve;
         set => decelerationCurve = value;
     }
-    
+
     /// <summary>
     /// At this rotation start angle will be at full speed (degress).
     /// </summary>
@@ -56,7 +57,7 @@ public class AlignSteeringBehavior : SteeringBehavior, ITargeter
         get => accelerationRadius;
         set => accelerationRadius = value;
     }
-    
+
     /// <summary>
     /// Acceleration curve.
     /// </summary>
@@ -65,39 +66,39 @@ public class AlignSteeringBehavior : SteeringBehavior, ITargeter
         get => accelerationCurve;
         set => accelerationCurve = value;
     }
-    
+
     private float _startOrientation;
     private float _rotationFromStartAbs;
     private bool _idle = true;
-    
+
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     { // I want smooth rotations, so I will use the same approach than in
-      // ArriveSteeringBehavior.
+        // ArriveSteeringBehavior.
         if (Target == null) return new SteeringOutput(Vector2.zero, 0);
-        
+    
         float targetOrientation = Target.transform.rotation.eulerAngles.z;
         float currentOrientation = args.Orientation;
         float maximumRotationalSpeed = args.MaximumRotationalSpeed;
         float arrivingMargin = args.StopRotationThreshold;
-        
+    
         float toTargetRotation = Mathf.DeltaAngle(currentOrientation, targetOrientation);
         int rotationSide = (toTargetRotation < 0) ? -1 : 1;
         float toTargetRotationAbs = Mathf.Abs(toTargetRotation);
-        
+    
         float newRotationalSpeed = 0.0f;
 
         if (_idle && toTargetRotationAbs < arrivingMargin)
         { // If you are stopped and you are close enough to target rotation, you are done.
-          // Just stay there.
+            // Just stay there.
             return new SteeringOutput(Vector2.zero, 0);
         }
-        
+    
         if (_idle && _rotationFromStartAbs > 0)
         { // If you are stopped and you are not close enough to target rotation, you need
-          // to start rotating. But first, you need to reset your rotation counter.
+            // to start rotating. But first, you need to reset your rotation counter.
             _rotationFromStartAbs = 0;
         }
-        
+    
         if (toTargetRotationAbs >= arrivingMargin && 
             _rotationFromStartAbs < AccelerationRadius)
         { // Acceleration phase.
@@ -138,7 +139,8 @@ public class AlignSteeringBehavior : SteeringBehavior, ITargeter
         { // Cruise speed phase.
             newRotationalSpeed = maximumRotationalSpeed * rotationSide;
         }
-        
+    
         return new SteeringOutput(Vector2.zero, newRotationalSpeed);
     }
+}
 }

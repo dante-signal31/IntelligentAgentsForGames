@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 
+namespace SteeringBehaviors
+{
 /// <summary>
 /// <p>Monobehaviour to offer a Seek steering behaviour.</p>
 /// 
@@ -22,7 +24,7 @@ public class SeekSteeringBehavior : SteeringBehavior, ITargeter
         get=> target; 
         set=> target = value;
     }
-    
+
     /// <summary>
     /// Distance at which we give our goal as reached and we stop our agent.
     /// </summary>
@@ -31,21 +33,22 @@ public class SeekSteeringBehavior : SteeringBehavior, ITargeter
         get=> arrivalDistance; 
         set=> arrivalDistance = value;
     }
-    
+
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
         if (target == null) return new SteeringOutput(Vector2.zero, 0);
-        
+    
         Vector2 targetPosition = Target.transform.position;
         Vector2 currentPosition = args.CurrentAgent.transform.position;
         float maximumSpeed = args.MaximumSpeed;
 
         Vector2 toTarget = targetPosition - currentPosition;
-        
+    
         Vector2 newVelocity = toTarget.magnitude > ArrivalDistance? 
             toTarget.normalized * maximumSpeed:
             Vector2.zero;
-        
+    
         return new SteeringOutput(newVelocity, 0);
     }
+}
 }

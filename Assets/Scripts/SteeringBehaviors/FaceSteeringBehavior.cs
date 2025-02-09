@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 
+namespace SteeringBehaviors
+{
 /// <summary>
 /// <p>Monobehaviour to offer a face to a target steering behaviour.</p>
 ///
@@ -11,7 +13,7 @@ public class FaceMatchingSteeringBehavior : SteeringBehavior, ITargeter
     [Header("CONFIGURATION:")]
     [Tooltip("Target to face to.")]
     [SerializeField] private GameObject target;
-    
+
     private AlignSteeringBehavior _alignSteeringBehavior;
 
     /// <summary>
@@ -22,7 +24,7 @@ public class FaceMatchingSteeringBehavior : SteeringBehavior, ITargeter
         get => target;
         set => target = value;
     }
-    
+
     private Vector2 _targetPosition;
     private GameObject _marker;
 
@@ -37,24 +39,25 @@ public class FaceMatchingSteeringBehavior : SteeringBehavior, ITargeter
         // Make the align steering behavior to copy the dummy GameObject rotation.
         _alignSteeringBehavior.Target = _marker;
     }
-    
+
     private void OnDestroy()
     {
         Destroy(_marker);
     }
-    
+
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
         if (Target == null) return new SteeringOutput(Vector2.zero, 0);
-        
+    
         _targetPosition = Target.transform.position;
         Vector2 currentPosition = args.Position;
 
         Vector2 direction = _targetPosition - currentPosition;
-        
+    
         // Rotate the dummy GameObject in the direction we want to look at. Remember
         // that dummy GameObject is the align steering behavior target since Awake().
         _marker.transform.up = direction;
         return _alignSteeringBehavior.GetSteering(args);
     }
+}
 }

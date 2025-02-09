@@ -1,9 +1,9 @@
-﻿using System;
-using UnityEngine;
-using UnityEngine.Serialization;
+﻿using UnityEngine;
 using Random = UnityEngine.Random;
 
 
+namespace SteeringBehaviors
+{
 /// <summary>
 /// <p>Monobehaviour to offer a wandering steering behaviour.</p>
 ///
@@ -26,7 +26,7 @@ public class WanderSteeringBehavior : SteeringBehavior
     [SerializeField] private float wanderJitter;
     [Tooltip("Time in seconds to recalculate the wander position.")]
     [SerializeField] private float wanderRecalculationTime;
-    
+
     [Header("DEBUG:")]
     [Tooltip("Make visible position marker.")] 
     [SerializeField] private bool predictedPositionMarkerVisible = true;
@@ -94,7 +94,7 @@ public class WanderSteeringBehavior : SteeringBehavior
             wanderRecalculationTime = value;
         }
     }
-    
+
     private GameObject _marker;
     private Vector2 _wanderLocalPosition;
 
@@ -109,9 +109,9 @@ public class WanderSteeringBehavior : SteeringBehavior
         _seekSteeringBehaviour = GetComponent<SeekSteeringBehavior>();
         _seekSteeringBehaviour.Target = _marker;
         _seekSteeringBehaviour.ArrivalDistance = arrivalDistance;
-        
+    
         _agentColor = GetComponent<AgentColor>().Color;
-        
+    
         // Place WanderPosition in a point constrained to the edge of a circle of
         // radius wanderRadius.
         _wanderLocalPosition = GetRandomCircunferencePoint(Vector2.zero, 
@@ -142,7 +142,7 @@ public class WanderSteeringBehavior : SteeringBehavior
     {
         return center + Random.insideUnitCircle.normalized * radius;
     } 
-    
+
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
         _currentSteeringBehaviorArgs = args;
@@ -157,21 +157,21 @@ public class WanderSteeringBehavior : SteeringBehavior
     private void WanderPositionUpdate()
     {
         if (_currentSteeringBehaviorArgs == null) return;
-        
+    
         SteeringBehaviorArgs args = _currentSteeringBehaviorArgs;
-        
+    
         // Add random displacement over an area of a circle of radius wanderJitter. This
         // circle is around current wander local position.
         _wanderLocalPosition += Random.insideUnitCircle * WanderJitter;
-        
+    
         // Reproject this new vector back onto a unit circle. This circle is around
         // current agent.
         _wanderLocalPosition = _wanderLocalPosition.normalized * WanderRadius;
-        
+    
         // Create a targetLocal into a position WanderDist distance in front of the agent.
         // Remember Y local axis is our forward axis.
         Vector2 targetLocal = _wanderLocalPosition + new Vector2(0, WanderDistance);
-        
+    
         // Place targetLocal as relative to agent.
         _marker.transform.position = args.CurrentAgent.transform.TransformPoint(targetLocal);
     }
@@ -188,4 +188,5 @@ public class WanderSteeringBehavior : SteeringBehavior
         }
     }
 #endif    
+}
 }

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using SteeringBehaviors;
 using Tests.PlayTests.Common;
 using UnityEngine;
 using UnityEngine.PlayerLoop;

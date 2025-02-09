@@ -1,8 +1,7 @@
-﻿using System.Diagnostics;
-using UnityEngine;
-using UnityEngine.PlayerLoop;
-using Debug = UnityEngine.Debug;
+﻿using UnityEngine;
 
+namespace SteeringBehaviors
+{
 /// <summary>
 /// <p>Monobehaviour to offer a velocity match steering behaviour.</p>
 /// <p> Velocity matching steering behaviour makes the agent get the same velocity than
@@ -15,12 +14,12 @@ public class VelocityMatchingSteeringBehavior : SteeringBehavior
     [SerializeField] private AgentMover target;
     [Tooltip("Time to match velocity.")] 
     [SerializeField] private float timeToMatch; 
-    
+
     private Vector2 _targetVelocity;
     private Vector2 _currentVelocity;
     private Vector2 _currentAcceleration;
     private bool _isBraking;
-    
+
     /// <summary>
     /// Target to match its velocity.
     /// </summary>
@@ -29,7 +28,7 @@ public class VelocityMatchingSteeringBehavior : SteeringBehavior
         get => target;
         set => target = value;
     }
-    
+
     /// <summary>
     /// Time to match velocity.
     /// </summary>
@@ -38,21 +37,21 @@ public class VelocityMatchingSteeringBehavior : SteeringBehavior
         get => timeToMatch;
         set => timeToMatch = value;
     }
-    
+
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
         if (Target == null) return new SteeringOutput(Vector2.zero, 0);
-        
+    
         _currentVelocity = args.CurrentVelocity;
         float stopSpeed = args.StopSpeed;
         float deltaTime = args.DeltaTime;
         float maximumAcceleration = args.MaximumAcceleration;
         float maximumDeceleration = args.MaximumDeceleration;
-    
+
         if (_targetVelocity != Target.Velocity)
         {
             _targetVelocity = Target.Velocity;
-            
+        
             // Millington recalculates neededAcceleration in every frame, but I
             // think that is an error. Doing that way apparently works but, actually,
             // target velocity is never entirely reached because current gap between
@@ -63,7 +62,7 @@ public class VelocityMatchingSteeringBehavior : SteeringBehavior
             // make us overpass target velocity.
             Vector2 neededAcceleration = (_targetVelocity - _currentVelocity) / 
                                          TimeToMatch;
-            
+        
             // If braking, then target velocity is zero or the acceleration vector is
             // opposed to current velocity direction.
             _isBraking = _targetVelocity == Vector2.zero || 
@@ -71,7 +70,7 @@ public class VelocityMatchingSteeringBehavior : SteeringBehavior
                              Vector2.Dot(
                                  neededAcceleration.normalized, 
                                  _currentVelocity.normalized), -1);
-    
+
             // Make sure velocity change is not greater than its maximum values.
             if (!_isBraking && neededAcceleration.magnitude > maximumAcceleration)
             {
@@ -85,10 +84,10 @@ public class VelocityMatchingSteeringBehavior : SteeringBehavior
             {
                 neededAcceleration = neededAcceleration.normalized * maximumDeceleration;
             }
-    
+
             _currentAcceleration = neededAcceleration;
         }
-        
+    
         Vector2 frameAcceleration = _currentAcceleration * deltaTime;
 
         // Check for border cases, where just a minimum amount of acceleration can make 
@@ -111,7 +110,8 @@ public class VelocityMatchingSteeringBehavior : SteeringBehavior
         {
             newVelocity = _currentVelocity + frameAcceleration;
         }
-        
+    
         return new SteeringOutput(newVelocity, 0);
     }
+}
 }

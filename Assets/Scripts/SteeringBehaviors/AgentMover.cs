@@ -1,9 +1,9 @@
-using System.Numerics;
 using UnityEngine;
-using Quaternion = UnityEngine.Quaternion;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
+namespace SteeringBehaviors
+{
 /// <summary>
 /// This component moves its gameobject using the velocity vector calculated
 /// by an steering behavior component.
@@ -25,23 +25,23 @@ public class AgentMover : MonoBehaviour
     [SerializeField] private float maximumAcceleration;
     [Tooltip("Maximum deceleration for this agent.")]
     [SerializeField] private float maximumDeceleration;
-    
+
     [Header("WIRING:")]
     [Tooltip("Steering behaviour component that will return movement vectors.")]
     public SteeringBehavior steeringBehavior;
     [Tooltip("This prefab's RigidBody to apply movement vectors over it.")]
     [SerializeField] private Rigidbody2D rigidBody;
-    
+
     /// <summary>
     /// This agent current speed
     /// </summary>
     public float CurrentSpeed => rigidBody.linearVelocity.magnitude;
-    
+
     /// <summary>
     /// This agent current velocity.
     /// </summary>
     public Vector2 Velocity => rigidBody.linearVelocity;
-    
+
     /// <summary>
     /// This agent maximum speed.
     /// </summary>
@@ -68,7 +68,7 @@ public class AgentMover : MonoBehaviour
         get => maximumRotationalSpeed;
         set => maximumRotationalSpeed = value;
     }
-    
+
     /// <summary>
     /// Rotation will stop when the difference in degrees between the current
     /// rotation and current forward vector is less than this value.
@@ -78,7 +78,7 @@ public class AgentMover : MonoBehaviour
         get => stopRotationThreshold;
         set => stopRotationThreshold = value;
     }   
-    
+
     /// <summary>
     /// Maximum acceleration for this agent.
     /// </summary>
@@ -96,13 +96,13 @@ public class AgentMover : MonoBehaviour
         get => maximumDeceleration;
         set => maximumDeceleration = value;
     }
-    
+
     /// <summary>
     /// This GameObject rotation is in degrees (using Z as rotation axis because
     /// this is a 2D game).
     /// </summary>
     public float Orientation => transform.rotation.eulerAngles.z;
-    
+
     /// <summary>
     /// This agent forward vector.
     /// </summary>
@@ -111,6 +111,8 @@ public class AgentMover : MonoBehaviour
         get => transform.up;
         set => transform.up = value;
     }
+
+    public LayerMask CollisionLayer => gameObject.layer;
 
     private SteeringBehaviorArgs _behaviorArgs;
     private float _maximumRotationSpeedRadNormalized;
@@ -149,14 +151,14 @@ public class AgentMover : MonoBehaviour
         _behaviorArgs.MaximumAcceleration = MaximumAcceleration;
         _behaviorArgs.MaximumDeceleration = MaximumDeceleration;
         _behaviorArgs.DeltaTime = Time.fixedDeltaTime;
-        
+    
         // Get steering output.
         SteeringOutput steeringOutput = steeringBehavior.GetSteering(_behaviorArgs);
-        
+    
         // Apply new steering output to our GameObject. I don't enforce the StopSpeed
         // because I've found more flexible to do it at steering behavior level.
         rigidBody.linearVelocity = steeringOutput.Linear;
-        
+    
         if (steeringOutput.Angular == 0 && rigidBody.linearVelocity != Vector2.zero)
         {
             // If no explicit angular steering, we will just look at the direction we
@@ -179,7 +181,7 @@ public class AgentMover : MonoBehaviour
                 transform.eulerAngles.y, 
                 transform.eulerAngles.z + steeringOutput.Angular * Time.fixedDeltaTime);
         }
-        
+    
     }
 
     // /// <summary>
@@ -236,7 +238,7 @@ public class AgentMover : MonoBehaviour
     // {
     //     return Vector2.Dot(rigidBody.linearVelocity, steeringOutput.Linear) >= 0;
     // }
-    
+
     /// <summary>
     /// Clamp vector magnitude between a minimum and a maximum length.
     /// </summary>
@@ -261,7 +263,7 @@ public class AgentMover : MonoBehaviour
     //     }
     //     return vectorToClamp;
     // }
-    
+
     //
     // /// <summary>
     // /// Get rotation scalar updated with current steering and clamped by maximum rotational speed.
@@ -274,4 +276,5 @@ public class AgentMover : MonoBehaviour
     //         maximumRotationalSpeed);
     //     return newRotation;
     // }
+}
 }
