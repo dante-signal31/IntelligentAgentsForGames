@@ -16,6 +16,8 @@ public class RaySensor : MonoBehaviour
     [Header("CONFIGURATION:")] 
     [Tooltip("Layers to be detected by this sensor.")] 
     [SerializeField] private LayerMask layerMask;
+    [Tooltip("Whether to ignore colliders overlapping start point.")]
+    [SerializeField] private bool ignoreCollidersOverlappingStartPoint = true;
     [Space]
     [Tooltip("Event to trigger when a collider is detected by this sensor.")]    
     [SerializeField] private UnityEvent<Collider2D> colliderDetected;
@@ -50,7 +52,24 @@ public class RaySensor : MonoBehaviour
     public LayerMask SensorLayerMask
     {
         get => layerMask;
-        set => layerMask = value;
+        set
+        {
+            layerMask = value;
+            UpdateRayData();
+        }
+    }
+
+    /// <summary>
+    /// Whether to ignore colliders overlapping start point.
+    /// </summary>
+    public bool IgnoreCollidersOverlappingStartPoint
+    {
+        get => ignoreCollidersOverlappingStartPoint;
+        set
+        {
+            ignoreCollidersOverlappingStartPoint = value;
+            UpdateRayData();
+        }
     }
 
     /// <summary>
@@ -189,13 +208,41 @@ public class RaySensor : MonoBehaviour
     /// </summary>
     private void PerformRaycast()
     {
-        RaycastHit2D hit = Physics2D.Raycast(
+        RaycastHit2D[] hits = Physics2D.RaycastAll(
             startPoint.position, 
             _rayDirection, 
             _rayDistance, 
             layerMask);
-        DetectedHit = hit;
-        DetectedCollider = hit.collider;
+        
+        // Nothing detected.
+        if (hits.Length == 0)
+        {
+            DetectedHit = new RaycastHit2D();
+            DetectedCollider = null;
+            return;
+        }
+        
+        // If we are not ignoring colliders overlapping start point,
+        // then first is good.
+        if (!IgnoreCollidersOverlappingStartPoint)
+        {
+            DetectedHit = hits[0];
+            DetectedCollider = DetectedHit.collider;;
+            return;
+        }
+        
+        // If we are ignoring colliders overlapping start point,
+        // then we are searching for the first collider whose distance to start point
+        // is greater than zero.
+        foreach (RaycastHit2D hit in hits)
+        {
+            if (hit.distance > 0)
+            {
+                DetectedHit = hit;
+                DetectedCollider = hit.collider;
+                return;
+            }
+        }
     }
 
     /// <summary>

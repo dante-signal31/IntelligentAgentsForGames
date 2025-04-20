@@ -2616,6 +2616,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _obstaclesTilemap: {fileID: 1553933385}
+--- !u!114 &1481667476 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2929689529775559017, guid: f89ebc74ef2390046b2980f2905b4dbc, type: 3}
+  m_PrefabInstance: {fileID: 1920108321}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb633cc7f59647f0b8dbafc9df7d94ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1553933382
 GameObject:
   m_ObjectHideFlags: 0
@@ -3111,8 +3122,12 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 166441708068112394, guid: f89ebc74ef2390046b2980f2905b4dbc, type: 3}
+      propertyPath: m_Name
+      value: ThreatRaySensor
+      objectReference: {fileID: 0}
+    - target: {fileID: 166441708068112394, guid: f89ebc74ef2390046b2980f2905b4dbc, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2056356970077275489, guid: f89ebc74ef2390046b2980f2905b4dbc, type: 3}
       propertyPath: threat
@@ -3122,6 +3137,10 @@ PrefabInstance:
       propertyPath: innerRayStep
       value: 0.03
       objectReference: {fileID: 0}
+    - target: {fileID: 2056356970077275489, guid: f89ebc74ef2390046b2980f2905b4dbc, type: 3}
+      propertyPath: rayCastToThreat
+      value: 
+      objectReference: {fileID: 1481667476}
     - target: {fileID: 2056356970077275489, guid: f89ebc74ef2390046b2980f2905b4dbc, type: 3}
       propertyPath: threatLayerMask.m_Bits
       value: 128

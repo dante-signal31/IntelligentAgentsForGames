@@ -43,7 +43,7 @@ public class HideSteeringBehavior : SteeringBehavior
     [SerializeField] private Color gizmosColor = Color.green;
     
     [Header("WIRING:")]
-    // [SerializeField] private RaySensor rayCastToThreat; 
+    [SerializeField] private RaySensor rayCastToThreat; 
     [SerializeField] private NavigationAgent navigationAgent;
     [SerializeField] private HidingPointsDetector hidingPointsDetector;
 
@@ -58,8 +58,8 @@ public class HideSteeringBehavior : SteeringBehavior
             threat = value;
             if (hidingPointsDetector != null) 
                 hidingPointsDetector.Threat = threat.gameObject;
-            // if (rayCastToThreat != null)
-            //     rayCastToThreat.SensorLayerMask = threatLayerMask | ObstaclesLayer;
+            if (rayCastToThreat != null)
+                rayCastToThreat.SensorLayerMask = threatLayerMask | ObstaclesLayer;
 
         }
     }
@@ -179,9 +179,9 @@ public class HideSteeringBehavior : SteeringBehavior
 
     private void InitRayCast()
     {
-        // if (rayCastToThreat == null) return;
-        // if (Threat != null) 
-        //     rayCastToThreat.SensorLayerMask = threatLayerMask | ObstaclesLayer;
+        if (rayCastToThreat == null) return;
+        if (Threat != null) 
+            rayCastToThreat.SensorLayerMask = threatLayerMask | ObstaclesLayer;
         // TODO: Asses RaySensor implementation to make it similar to Godot Raycast api.
         // TODO: Some configurations are missing here compared with Godot version. They may be needed.
     }
@@ -217,18 +217,18 @@ public class HideSteeringBehavior : SteeringBehavior
 
     private void FixedUpdate()
     {
-        // if (Threat == null || rayCastToThreat == null) return;
-        //
-        // // Check if there is a line of sight with the threat.
-        // rayCastToThreat.TargetPosition = Threat.transform.position;
-        // if (rayCastToThreat.IsColliderDetected)
-        // {
-        //     _threatCanSeeUs = rayCastToThreat.DetectedCollider.gameObject == Threat.gameObject;
-        // }
-        // else
-        // {
-        //     _threatCanSeeUs = false;
-        // }
+        if (Threat == null || rayCastToThreat == null) return;
+        
+        // Check if there is a line of sight with the threat.
+        rayCastToThreat.TargetPosition = Threat.transform.position;
+        if (rayCastToThreat.IsColliderDetected)
+        {
+            _threatCanSeeUs = rayCastToThreat.DetectedCollider.gameObject == Threat.gameObject;
+        }
+        else
+        {
+            _threatCanSeeUs = false;
+        }
     
         // Starting threat position counts as ThreatHasJustMoved because
         // _previousThreatPosition is init as Vector2.Zero.
