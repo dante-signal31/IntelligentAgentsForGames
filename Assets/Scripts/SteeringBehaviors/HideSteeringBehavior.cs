@@ -237,7 +237,7 @@ public class HideSteeringBehavior : SteeringBehavior
     
         // TODO: Check if this is actually needed.
         // Do not query when the map has never synchronized and is empty.
-        if (!navigationAgent.IsReady) return;
+        //if (!navigationAgent.IsReady) return;
         // Only query when the navigation agent has not reached the target yet.
         if (!navigationAgent.IsNavigationFinished)
             _nextMovementTarget.transform.position = navigationAgent.GetNextPathPosition();

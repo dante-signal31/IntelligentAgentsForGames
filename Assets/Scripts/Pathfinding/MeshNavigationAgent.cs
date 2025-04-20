@@ -14,7 +14,6 @@ public class MeshNavigationAgent: NavigationAgent
     
     private Vector2 _targetPosition;
     private float _radius;
-    private bool _isReady;
     private Vector2[] _pathToTarget;
     private Vector2 _pathFinalPosition;
 
@@ -40,7 +39,7 @@ public class MeshNavigationAgent: NavigationAgent
         }
     }
 
-    public override bool IsReady => _isReady;
+    public override bool IsReady => _pathToTarget.Length > 0;
 
     public override bool IsTargetReachable => 
         TargetPosition == PathFinalPosition;
@@ -69,6 +68,7 @@ public class MeshNavigationAgent: NavigationAgent
         // Path distance.
         for (int i = _currentPathIndex; i < _pathToTarget.Length; i++)
         {
+            if (i == _pathToTarget.Length - 1) break;
             distance += Vector2.Distance(_pathToTarget[i], _pathToTarget[i + 1]);
         }
         // Distance to path start.
@@ -106,6 +106,7 @@ public class MeshNavigationAgent: NavigationAgent
         {
             _currentPathIndex++;
         }
+        
     }
 }
 }
