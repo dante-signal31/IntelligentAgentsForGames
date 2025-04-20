@@ -1,6 +1,4 @@
-﻿
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -15,7 +13,11 @@ public class Courtyard : MonoBehaviour
 
     private void Start()
     {
-        // TODO: Implement.
+        GameObject[] obstacles = GameObject.FindGameObjectsWithTag("InnerObstacle");
+        foreach (GameObject obstacle in obstacles)
+        {
+            ObstaclePositions.Add(obstacle.transform.position);
+        }
     }
 }
 }

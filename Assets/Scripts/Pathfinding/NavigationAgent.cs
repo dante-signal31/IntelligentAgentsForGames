@@ -36,7 +36,7 @@ public abstract class NavigationAgent: MonoBehaviour
 
     /// <summary>
     /// <p>Returns true if the navigation path's final position has been reached.</p>
-    /// <p>If target is not rechable, then paths final position is the nearest point
+    /// <p>If target is not reachable, then paths final position is the nearest point
     /// to target.</p>
     /// </summary>
     public abstract bool IsNavigationFinished { get; }
@@ -47,7 +47,7 @@ public abstract class NavigationAgent: MonoBehaviour
     public abstract Vector2[] PathToTarget { get; }
 
     /// <summary>
-    /// <p>It is the last position in the path to target.<p>
+    /// <p>It is the last position in the path to target.</p>
     /// <p>If path is reachable, then this is the target position. If not, then it is
     /// the nearest reachable point to target.</p>
     /// </summary>

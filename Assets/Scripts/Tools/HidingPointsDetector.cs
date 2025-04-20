@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace Tools
 {
-[RequireComponent(typeof(RaySensor))]    
 public class HidingPointsDetector : MonoBehaviour
 {
     [Header("CONFIGURATION:")]
@@ -25,14 +24,18 @@ public class HidingPointsDetector : MonoBehaviour
 
     [Tooltip("Step length to advance the inner ray. The smaller value gives more " +
              "accuracy to calculate the exit point but it's slower to calculate.")]
-    [SerializeField] private float innerRayStep;
+    [SerializeField] private float innerRayStep = 0.3f;
+    
+    [Header("WIRING:")]
+    [Tooltip("Ray sensor to detect obstacles.")]
+    [SerializeField] private RaySensor _raySensor;
     
     [Header("DEBUG:")]
     [SerializeField] private bool showGizmos = true;
     [SerializeField] private Color gizmosColor = Color.green;
     [SerializeField] private Color cleanRadiusColor = Color.red;
-    [SerializeField] private float collisionPointRadius;
-    [SerializeField] private float hidingPointRadius;
+    [SerializeField] private float collisionPointRadius = 0.2f;
+    [SerializeField] private float hidingPointRadius = 0.5f;
     
     /// <summary>
     /// Agent to hide from.
@@ -40,7 +43,11 @@ public class HidingPointsDetector : MonoBehaviour
     public GameObject Threat
     {
         get => threat;
-        set => threat = value;
+        set
+        {
+            threat = value;
+            _raySensor.StartPosition = value.transform.position;;
+        }
     }
     
     /// <summary>
@@ -54,7 +61,11 @@ public class HidingPointsDetector : MonoBehaviour
     public LayerMask ObstaclesLayer
     {
         get => obstaclesLayer;
-        set => obstaclesLayer = value;
+        set
+        {
+            obstaclesLayer = value;
+            if (_raySensor != null) _raySensor.SensorLayerMask = ObstaclesLayer;
+        }
     }
     
     /// <summary>
@@ -89,30 +100,52 @@ public class HidingPointsDetector : MonoBehaviour
     /// List of hiding points currently detected.
     /// </summary>
     public List<Vector2> HidingPoints { get; private set; } = new();
+    
+    /// <summary>
+    /// Maximum scene obstacles inner distance.
+    /// </summary>
+    public float MaximumAdvanceAfterCollision
+    {
+        get => maximumAdvanceAfterCollision;
+        set
+        {
+            maximumAdvanceAfterCollision = value;
+            UpdateCleanHidingPoints();
+        }
+    }
+
+    /// <summary>
+    /// Step length to advance the inner ray. The smaller value gives more
+    /// accuracy to calculate the exit point but it's slower to calculate.
+    /// </summary>
+    public float InnerRayStep
+    {
+        get => innerRayStep;
+        set
+        {
+            innerRayStep = value;
+            UpdateCleanHidingPoints();
+        }
+    }
 
     /// <summary>
     /// Minimum radius free from obstacles and other obstacles to be a valid hiding point.
     /// </summary>
     private float MinimumCleanRadius => SeparationFromObstacles + AgentRadius;
     
-    private RaySensor _raySensor;
     private List<Vector2> _rayCollisionPoints = new();
     private List <(Vector2, Vector2)> _afterCollisionRayEnds = new();
 
-    private void Awake()
-    {
-        _raySensor = GetComponent<RaySensor>();
-    }
-
     private void Start()
     {
+        if (_raySensor == null || Threat == null) return;
         InitRaySensor();
     }
 
     private void InitRaySensor()
     {
         _raySensor.SensorLayerMask = ObstaclesLayer;
-        _raySensor.StartPosition = transform.position;
+        _raySensor.StartPosition = Threat.transform.position;
     }
 
     private void FixedUpdate()
@@ -132,7 +165,7 @@ public class HidingPointsDetector : MonoBehaviour
     private void UpdateRayCollisionPoints()
     {
         _rayCollisionPoints.Clear();
-        _raySensor.StartPosition = threat.transform.position;
+        _raySensor.StartPosition = Threat.transform.position;
         foreach (Vector2 obstaclePosition in ObstaclesPositions)
         {
             _raySensor.TargetPosition = obstaclePosition;
@@ -156,7 +189,7 @@ public class HidingPointsDetector : MonoBehaviour
         foreach (Vector2 rayCollisionPoint in _rayCollisionPoints)
         {
             Vector2 rayDirection = (rayCollisionPoint - 
-                                     (Vector2)threat.transform.position).normalized;
+                                     (Vector2)Threat.transform.position).normalized;
             float innerAdvance = 0;
             while (innerAdvance < maximumAdvanceAfterCollision)
             {
@@ -175,7 +208,13 @@ public class HidingPointsDetector : MonoBehaviour
     }
 
     /// <summary>
-    /// Whether this point is free from obstacles to be a valid hiding point.
+    /// <p>Whether this point is free from obstacles to be a valid hiding point.</p>
+    ///
+    /// <p><b>WARNING:</b> If you are using a Composite Collider 2D to make the obstacles,
+    /// remember to set its Geometry Type to "Polygons" or this method may
+    /// malfunction. In case it would be set to "Outlines" the method would
+    /// return wrongly true if projected circle fits inside the obstacle without
+    /// touching any of its sides.</p>
     /// </summary>
     /// <param name="candidateHidingPoint">Position to check</param>
     /// <returns>True if position is free from obstacles, false otherwise</returns>
@@ -191,13 +230,13 @@ public class HidingPointsDetector : MonoBehaviour
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
-        if (!showGizmos) return;
+        if (!showGizmos || Threat == null) return;
 
         // Draw a Line from Threat to Obstacles position.
         Gizmos.color = gizmosColor;
         foreach (Vector2 obstaclePosition in ObstaclesPositions)
         {
-            Gizmos.DrawLine((Vector2)threat.transform.position, obstaclePosition);
+            Gizmos.DrawLine((Vector2)Threat.transform.position, obstaclePosition);
         }
         
         // Draw a circle at each ray collision point with the obstacle.

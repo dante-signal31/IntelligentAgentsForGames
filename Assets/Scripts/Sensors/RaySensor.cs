@@ -84,7 +84,11 @@ public class RaySensor : MonoBehaviour
     public Vector3 StartPosition
     {
         get => startPoint.position;
-        set => startPoint.position = value;
+        set
+        {
+            startPoint.position = value;
+            UpdateRayData();
+        }
     }
     
     /// <summary>
@@ -93,7 +97,11 @@ public class RaySensor : MonoBehaviour
     public Vector3 TargetPosition
     {
         get => endPoint.position;
-        set => endPoint.position = value;
+        set
+        {
+            endPoint.position = value;
+            UpdateRayData();
+        }
     }
 
     /// <summary>
@@ -110,7 +118,18 @@ public class RaySensor : MonoBehaviour
 
     private void Awake()
     {
+        UpdateRayData();
+    }
+
+    /// <summary>
+    /// Start or target point may have changed, so ray direction and distance
+    /// need to be updated and a new raycast performed.
+    /// </summary>
+    private void UpdateRayData()
+    {
+        _rayDirection = GetRayDirection();
         _rayDistance = GetRayDistance();
+        PerformRaycast();
     }
 
     /// <summary>
@@ -161,14 +180,24 @@ public class RaySensor : MonoBehaviour
 
     private void FixedUpdate()
     {
-        RaycastHit2D hit = Physics2D.Raycast(startPoint.position, 
-            GetRayDirection(), 
+        PerformRaycast();
+    }
+
+    /// <summary>
+    /// Performs a raycast using the current origin, direction, distance,
+    /// and layer mask, and updates the detected collider and hit information.
+    /// </summary>
+    private void PerformRaycast()
+    {
+        RaycastHit2D hit = Physics2D.Raycast(
+            startPoint.position, 
+            _rayDirection, 
             _rayDistance, 
             layerMask);
         DetectedHit = hit;
         DetectedCollider = hit.collider;
     }
-    
+
     /// <summary>
     /// Sets the target position for the ray, using the provided target position in 3D space.
     /// </summary>

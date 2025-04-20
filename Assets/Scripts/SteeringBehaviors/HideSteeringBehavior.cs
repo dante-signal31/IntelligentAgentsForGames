@@ -3,6 +3,7 @@ using Levels;
 using Pathfinding;
 using Tools;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace SteeringBehaviors
 {
@@ -21,21 +22,28 @@ public class HideSteeringBehavior : SteeringBehavior
     [SerializeField] private float arrivalDistance;
     [Tooltip("At which physics layers the obstacles belong to?")]
     [SerializeField] private LayerMask obstaclesLayer;
+    [Tooltip("Maximum scene obstacles inner distance.")]
+    [SerializeField] private float maximumInnerObstacleSpace = 3.0f;
     [Tooltip("How much separation our hiding point must show from obstacles?")]
     [SerializeField] private float separationFromObstacles = 1f;
     [Tooltip("How wide is the agent we want to hide?")] 
     [SerializeField] private float agentRadius = 0.5f;
+    [Tooltip("Step length to advance the inner ray. The smaller value gives more " +
+             "accuracy to calculate the hiding point but it's slower to calculate.")]
+    [SerializeField] private float innerRayStep = 0.3f;
     [Tooltip("A position with any of this physic layers objects is not empty ground " +
              "to be a valid hiding point.")]
     [SerializeField] private LayerMask notEmptyGroundLayers;
+    [Tooltip("Layer where threats are.")]
+    [SerializeField] private LayerMask threatLayerMask;
 
     [Header("DEBUG:")]
     [Tooltip("Show gizmos for debugging.")]
     [SerializeField] private bool showGizmos = true;
     [SerializeField] private Color gizmosColor = Color.green;
-
+    
     [Header("WIRING:")]
-    [SerializeField] private RaySensor rayCast; 
+    // [SerializeField] private RaySensor rayCastToThreat; 
     [SerializeField] private NavigationAgent navigationAgent;
     [SerializeField] private HidingPointsDetector hidingPointsDetector;
 
@@ -50,8 +58,8 @@ public class HideSteeringBehavior : SteeringBehavior
             threat = value;
             if (hidingPointsDetector != null) 
                 hidingPointsDetector.Threat = threat.gameObject;
-            if (rayCast != null)
-                rayCast.SensorLayerMask = Threat.CollisionLayer | ObstaclesLayer;
+            // if (rayCastToThreat != null)
+            //     rayCastToThreat.SensorLayerMask = threatLayerMask | ObstaclesLayer;
 
         }
     }
@@ -171,9 +179,9 @@ public class HideSteeringBehavior : SteeringBehavior
 
     private void InitRayCast()
     {
-        if (rayCast == null) return;
-        if (Threat != null) 
-            rayCast.SensorLayerMask = Threat.CollisionLayer | ObstaclesLayer;
+        // if (rayCastToThreat == null) return;
+        // if (Threat != null) 
+        //     rayCastToThreat.SensorLayerMask = threatLayerMask | ObstaclesLayer;
         // TODO: Asses RaySensor implementation to make it similar to Godot Raycast api.
         // TODO: Some configurations are missing here compared with Godot version. They may be needed.
     }
@@ -192,6 +200,8 @@ public class HideSteeringBehavior : SteeringBehavior
         hidingPointsDetector.SeparationFromObstacles = SeparationFromObstacles;
         hidingPointsDetector.AgentRadius = AgentRadius;
         hidingPointsDetector.NotEmptyGroundLayers = NotEmptyGroundLayers;
+        hidingPointsDetector.MaximumAdvanceAfterCollision = maximumInnerObstacleSpace;
+        hidingPointsDetector.InnerRayStep = innerRayStep;
     }
 
     private void InitNavigationAgent()
@@ -207,18 +217,18 @@ public class HideSteeringBehavior : SteeringBehavior
 
     private void FixedUpdate()
     {
-        if (Threat == null || rayCast == null) return;
-    
-        // Check if there is a line of sight with the threat.
-        rayCast.TargetPosition = Threat.transform.position;
-        if (rayCast.IsColliderDetected)
-        {
-            _threatCanSeeUs = rayCast.DetectedCollider.gameObject == Threat.gameObject;
-        }
-        else
-        {
-            _threatCanSeeUs = false;
-        }
+        // if (Threat == null || rayCastToThreat == null) return;
+        //
+        // // Check if there is a line of sight with the threat.
+        // rayCastToThreat.TargetPosition = Threat.transform.position;
+        // if (rayCastToThreat.IsColliderDetected)
+        // {
+        //     _threatCanSeeUs = rayCastToThreat.DetectedCollider.gameObject == Threat.gameObject;
+        // }
+        // else
+        // {
+        //     _threatCanSeeUs = false;
+        // }
     
         // Starting threat position counts as ThreatHasJustMoved because
         // _previousThreatPosition is init as Vector2.Zero.

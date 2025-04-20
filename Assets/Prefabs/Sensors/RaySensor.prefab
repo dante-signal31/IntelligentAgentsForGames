@@ -45,8 +45,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb633cc7f59647f0b8dbafc9df7d94ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startPoint: {fileID: 4802882678125161671}
-  endPoint: {fileID: 3619156509210103031}
   layerMask:
     serializedVersion: 2
     m_Bits: 0
@@ -59,6 +57,8 @@ MonoBehaviour:
   showGizmos: 1
   gizmoColor: {r: 0, g: 1, b: 0, a: 1}
   gizmoRadius: 0.01
+  startPoint: {fileID: 4802882678125161671}
+  endPoint: {fileID: 3619156509210103031}
 --- !u!1 &1516181276950358065
 GameObject:
   m_ObjectHideFlags: 0
@@ -100,7 +100,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4802882678125161671}
   m_Layer: 0
-  m_Name: StarPoint
+  m_Name: StartPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
