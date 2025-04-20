@@ -102,6 +102,7 @@ public class MeshNavigationAgent: NavigationAgent
     private void FixedUpdate()
     {
         if (PathToTarget.Length == 0 || IsNavigationFinished) return;
+        // TODO: Implement an arrival distance algorithm.
         if ((Vector2)transform.position == _pathToTarget[_currentPathIndex])
         {
             _currentPathIndex++;
