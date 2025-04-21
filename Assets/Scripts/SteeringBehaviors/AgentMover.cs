@@ -158,8 +158,15 @@ public class AgentMover : MonoBehaviour
         // Apply new steering output to our GameObject. I don't enforce the StopSpeed
         // because I've found more flexible to do it at steering behavior level.
         rigidBody.linearVelocity = steeringOutput.Linear;
-    
-        if (steeringOutput.Angular == 0 && rigidBody.linearVelocity != Vector2.zero)
+
+        if (steeringOutput.Angular == 0 && rigidBody.linearVelocity == Vector2.zero)
+        {
+            // Sometimes, when an agent touches a surface, a residual angular velocity
+            // is left behind. This is a problem because when agent stops it starts to
+            // spin. The solution I found is to set angular velocity to zero.
+            rigidBody.angularVelocity = 0;
+        }
+        else if (steeringOutput.Angular == 0 && rigidBody.linearVelocity != Vector2.zero)
         {
             // If no explicit angular steering, we will just look at the direction we
             // are moving, but clamping our rotation by our rotational speed.
@@ -181,7 +188,6 @@ public class AgentMover : MonoBehaviour
                 transform.eulerAngles.y, 
                 transform.eulerAngles.z + steeringOutput.Angular * Time.fixedDeltaTime);
         }
-    
     }
 
     // /// <summary>
