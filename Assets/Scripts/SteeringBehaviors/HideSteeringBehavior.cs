@@ -12,6 +12,7 @@ namespace SteeringBehaviors
 /// <p> Hiding makes an agent to place itself after an obstacle between him and a
 /// threat. </p>
 /// </summary>
+// TODO: Create a test for this behavior.
 [RequireComponent(typeof(SeekSteeringBehavior), typeof(AgentMover))]
 public class HideSteeringBehavior : SteeringBehavior
 {
