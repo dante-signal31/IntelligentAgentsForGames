@@ -3229,6 +3229,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1897641217611637597, guid: f89ebc74ef2390046b2980f2905b4dbc, type: 3}
+      propertyPath: showGizmos
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2056356970077275489, guid: f89ebc74ef2390046b2980f2905b4dbc, type: 3}
       propertyPath: threat
       value: 
@@ -3256,6 +3260,10 @@ PrefabInstance:
     - target: {fileID: 2056356970077275489, guid: f89ebc74ef2390046b2980f2905b4dbc, type: 3}
       propertyPath: notEmptyGroundLayers.m_Bits
       value: 64
+      objectReference: {fileID: 0}
+    - target: {fileID: 2929689529775559017, guid: f89ebc74ef2390046b2980f2905b4dbc, type: 3}
+      propertyPath: showGizmos
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5810333675480897971, guid: f89ebc74ef2390046b2980f2905b4dbc, type: 3}
       propertyPath: m_Name

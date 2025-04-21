@@ -8,6 +8,11 @@ namespace Pathfinding
 public abstract class NavigationAgent: MonoBehaviour
 {
     /// <summary>
+    /// Distance at which we give our goal as reached.
+    /// </summary>
+    public abstract float ArrivalDistance { get; set; }
+    
+    /// <summary>
     /// Position to navigate to.
     /// </summary>
     public abstract Vector2 TargetPosition { get; set; }

@@ -234,10 +234,7 @@ public class HideSteeringBehavior : SteeringBehavior
         // _previousThreatPosition is init as Vector2.Zero.
         if (ThreatHasJustMoved) _hidingPointRecheckNeeded = true;
         _previousThreatPosition = Threat.transform.position;
-    
-        // TODO: Check if this is actually needed.
-        // Do not query when the map has never synchronized and is empty.
-        //if (!navigationAgent.IsReady) return;
+        
         // Only query when the navigation agent has not reached the target yet.
         if (!navigationAgent.IsNavigationFinished)
             _nextMovementTarget.transform.position = navigationAgent.GetNextPathPosition();
@@ -245,9 +242,9 @@ public class HideSteeringBehavior : SteeringBehavior
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        // Look for a new hiding point if the threat can see us and if it is threat first 
-        // position (only once) or has just moved.
-        if (_threatCanSeeUs && _hidingPointRecheckNeeded)
+        // Look for a new hiding point if the threat can see us and has just moved (or
+        // if it is threat first position (only once).
+        if (_threatCanSeeUs && _hidingPointRecheckNeeded) 
         {   // Search for the nearest hiding point.
             List<Vector2> hidingPoints = hidingPointsDetector.HidingPoints;
             if (hidingPoints.Count > 0)

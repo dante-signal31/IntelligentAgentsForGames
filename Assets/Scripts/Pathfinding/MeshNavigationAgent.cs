@@ -10,12 +10,24 @@ namespace Pathfinding
 public class MeshNavigationAgent: NavigationAgent
 {
     [Header("CONFIGURATION:")]
-    [SerializeField] private LayerMask navigationLayers;
+    [Tooltip("Distance at which we give our goal as reached.")]
+    [SerializeField] private float arrivalDistance = 0.1f;
     
     private Vector2 _targetPosition;
     private float _radius;
     private Vector2[] _pathToTarget;
     private Vector2 _pathFinalPosition;
+
+    public override float ArrivalDistance
+    {
+        get => arrivalDistance;
+        set
+        { 
+            if (Mathf.Approximately(arrivalDistance, value)) return;
+            arrivalDistance = value;
+            RecalculatePath();
+        }
+    }
 
     public override Vector2 TargetPosition
     {
@@ -47,8 +59,8 @@ public class MeshNavigationAgent: NavigationAgent
     public override bool IsTargetReached => 
         (Vector2)transform.position == TargetPosition;
 
-    public override bool IsNavigationFinished => 
-        (Vector2)transform.position == PathFinalPosition;
+    private bool _isNavigationFinished;
+    public override bool IsNavigationFinished => _isNavigationFinished;
 
     public override Vector2[] PathToTarget => _pathToTarget;
 
@@ -56,6 +68,7 @@ public class MeshNavigationAgent: NavigationAgent
     
     private NavMeshPath _navMeshPath;
     private int _currentPathIndex = 0;
+    private float _arrivalDistance;
 
     private void Awake()
     {
@@ -101,10 +114,16 @@ public class MeshNavigationAgent: NavigationAgent
 
     private void FixedUpdate()
     {
-        if (PathToTarget.Length == 0 || IsNavigationFinished) return;
-        // TODO: Implement an arrival distance algorithm.
-        if ((Vector2)transform.position == _pathToTarget[_currentPathIndex])
+        if (PathToTarget.Length == 0) return;
+        if (Vector2.Distance(transform.position, 
+                _pathToTarget[_currentPathIndex]) < ArrivalDistance)
         {
+            if (_currentPathIndex == _pathToTarget.Length - 1)
+            {
+                _isNavigationFinished = true;
+                return;
+            }
+            _isNavigationFinished = false;
             _currentPathIndex++;
         }
         
