@@ -5,7 +5,6 @@ using NUnit.Framework;
 using SteeringBehaviors;
 using Tests.PlayTests.Common;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 using UnityEngine.TestTools;
 
 namespace Tests.PlayTests

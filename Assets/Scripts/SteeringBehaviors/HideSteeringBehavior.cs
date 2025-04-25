@@ -12,7 +12,6 @@ namespace SteeringBehaviors
 /// <p> Hiding makes an agent to place itself after an obstacle between him and a
 /// threat. </p>
 /// </summary>
-// TODO: Create a test for this behavior.
 [RequireComponent(typeof(SeekSteeringBehavior), typeof(AgentMover))]
 public class HideSteeringBehavior : SteeringBehavior
 {
@@ -85,6 +84,7 @@ public class HideSteeringBehavior : SteeringBehavior
             obstaclesLayer = value;
             if (hidingPointsDetector != null) 
                 hidingPointsDetector.ObstaclesLayer = value;
+            InitRayCast();
         }
     }
 
@@ -131,6 +131,20 @@ public class HideSteeringBehavior : SteeringBehavior
         }
     }
 
+
+    /// <summary>
+    /// Defines the layer mask for identifying threats in the environment.
+    /// </summary>
+    public LayerMask ThreatLayerMask
+    {
+        get => threatLayerMask;
+        set
+        {
+            threatLayerMask = value;
+            InitRayCast();
+        }
+    }
+
     private Vector2 _hidingPoint;
     /// <summary>
     /// Current hiding point position selected by this behavior.
@@ -145,6 +159,11 @@ public class HideSteeringBehavior : SteeringBehavior
                 navigationAgent.TargetPosition = value;
         }
     }
+
+    /// <summary>
+    /// Indicates whether the threat currently has a clear line of sight to the agent.
+    /// </summary>
+    public bool ThreatCanSeeUs => _threatCanSeeUs;
 
     // private INavigationAgent _navigationAgent;
     private SeekSteeringBehavior _seekSteeringBehavior;
@@ -183,8 +202,6 @@ public class HideSteeringBehavior : SteeringBehavior
         if (rayCastToThreat == null) return;
         if (Threat != null) 
             rayCastToThreat.SensorLayerMask = threatLayerMask | ObstaclesLayer;
-        // TODO: Asses RaySensor implementation to make it similar to Godot Raycast api.
-        // TODO: Some configurations are missing here compared with Godot version. They may be needed.
     }
 
     private void InitSeekSteeringBehavior()
