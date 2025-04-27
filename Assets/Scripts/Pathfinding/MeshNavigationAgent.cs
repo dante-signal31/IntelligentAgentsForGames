@@ -96,7 +96,10 @@ public class MeshNavigationAgent: NavigationAgent
     
     private void RecalculatePath()
     {
-        NavMesh.CalculatePath(transform.position, TargetPosition, NavMesh.AllAreas, _navMeshPath);
+        NavMesh.CalculatePath(transform.position, 
+            TargetPosition, 
+            NavMesh.AllAreas, 
+            _navMeshPath);
         UpdatePathToTarget();
         _currentPathIndex = 0;
     }
