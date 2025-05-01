@@ -43,6 +43,7 @@ namespace Tests.PlayTests
         private GameObject _groupAlignGameObject;
         private GameObject _cohesionGameObject;
         private GameObject _wanderGameObject;
+        private GameObject _offsetFollowGameObject;
 
         [UnitySetUp]
         public IEnumerator SetUp()
@@ -161,6 +162,11 @@ namespace Tests.PlayTests
             {
                 _wanderGameObject = GameObject.Find("WanderMovingAgent");
                 _wanderGameObject.SetActive(false);
+            }
+            if (_offsetFollowGameObject == null)
+            {
+                _offsetFollowGameObject = GameObject.Find("OffsetFollowMovingAgent");
+                _offsetFollowGameObject.SetActive(false);
             }
         }
 
@@ -487,7 +493,8 @@ namespace Tests.PlayTests
             targetMovingAgent.MaximumDeceleration = 1.8f;
             var targetMovingAgentColor = _seekGameObject.GetComponent<AgentColor>();
             targetMovingAgentColor.Color = Color.red;
-            var seekSteeringBehavior = _seekGameObject.GetComponent<SeekSteeringBehavior>();
+            var seekSteeringBehavior = 
+                _seekGameObject.GetComponent<SeekSteeringBehavior>();
             seekSteeringBehavior.Target = _target.gameObject;
             seekSteeringBehavior.ArrivalDistance = 0.2f;
             _pursuitGameObject.transform.position = _position1.position;
@@ -499,7 +506,8 @@ namespace Tests.PlayTests
             pursueAgentMover.StopSpeed = 0.1f;
             pursueAgentMover.MaximumAcceleration = 2;
             pursueAgentMover.MaximumDeceleration = 4;
-            var pursueSteeringBehavior = _pursuitGameObject.GetComponent<PursuitSteeringBehavior>();
+            var pursueSteeringBehavior = 
+                _pursuitGameObject.GetComponent<PursuitSteeringBehavior>();
             pursueSteeringBehavior.Target = targetMovingAgent;
             _seekGameObject.SetActive(true);
             _pursuitGameObject.SetActive(true);
@@ -517,6 +525,76 @@ namespace Tests.PlayTests
             // Cleanup.
             _seekGameObject.SetActive(false);
             _pursuitGameObject.SetActive(false);
+            _target.Enabled = false;
+        }
+        
+        /// <summary>
+        /// Test that OffsetFollowBehavior can follow its target keeping its offset.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator OffsetFollowBehaviourTest()
+        {
+            // Test setup.
+            _seekGameObject.transform.position = _position10.position;
+            _target.Enabled = true;
+            _target.TargetPosition = _position4.position;
+            var targetMovingAgent = _seekGameObject.GetComponent<AgentMover>();
+            targetMovingAgent.MaximumSpeed = 2.0f;
+            targetMovingAgent.StopSpeed = 0.1f;
+            targetMovingAgent.MaximumRotationalSpeed = 180f;
+            targetMovingAgent.StopRotationThreshold = 1f;
+            targetMovingAgent.MaximumAcceleration = 1.8f;
+            targetMovingAgent.MaximumDeceleration = 1.8f;
+            var targetMovingAgentColor = _seekGameObject.GetComponent<AgentColor>();
+            targetMovingAgentColor.Color = Color.red;
+            var seekSteeringBehavior = 
+                _seekGameObject.GetComponent<SeekSteeringBehavior>();
+            seekSteeringBehavior.Target = _target.gameObject;
+            seekSteeringBehavior.ArrivalDistance = 0.2f;
+            
+            _offsetFollowGameObject.transform.position = _position1.position;
+            var pursueAgentMover = _offsetFollowGameObject.GetComponent<AgentMover>();
+            pursueAgentMover.MaximumSpeed = 2.5f;
+            pursueAgentMover.MaximumAcceleration = 4.0f;
+            pursueAgentMover.MaximumRotationalSpeed = 180f;
+            pursueAgentMover.StopRotationThreshold = 1f;
+            pursueAgentMover.StopSpeed = 0.1f;
+            pursueAgentMover.MaximumAcceleration = 2;
+            pursueAgentMover.MaximumDeceleration = 4;
+            var offsetFollowBehavior = 
+                _offsetFollowGameObject.GetComponent<OffsetFollowBehavior>();
+            offsetFollowBehavior.Target = targetMovingAgent;
+            GameObject offsetFromTargetMarker = 
+                _offsetFollowGameObject.transform.Find("OffsetFromTargetMarker").gameObject;
+            
+            Vector2 offsetFromTarget = new Vector2(1, -1);
+            offsetFromTargetMarker.transform.position =
+                targetMovingAgent.transform.TransformPoint(offsetFromTarget);
+            offsetFollowBehavior.UpdateOffsetFromTarget();
+            
+            _seekGameObject.SetActive(true);
+            _offsetFollowGameObject.SetActive(true);
+            
+            // Give time for the follower to get to the target.
+            yield return new WaitForSeconds(3.5f);
+            
+            // Assert follow agent is at the offset position from target agent.
+            Assert.True(Vector3.Distance(_offsetFollowGameObject.transform.position,
+                targetMovingAgent.transform.TransformPoint(offsetFromTarget)) <= (1.5f));
+            
+            // Move again target agent.
+            _target.TargetPosition = _position1.position;
+            
+            // Give time for the follower to get to the target.
+            yield return new WaitForSeconds(3.0f);
+            
+            // Assert follow agent is at the offset position from target agent.
+            Assert.True(Vector3.Distance(_offsetFollowGameObject.transform.position,
+                targetMovingAgent.transform.TransformPoint(offsetFromTarget)) <= (1.5f));
+            
+            // Cleanup.
+            _seekGameObject.SetActive(false);
+            _offsetFollowGameObject.SetActive(false);
             _target.Enabled = false;
         }
         

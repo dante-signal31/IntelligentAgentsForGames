@@ -20,6 +20,11 @@ public class OffsetFollowBehavior: SteeringBehavior
     [Header("DEBUG:")] 
     [SerializeField] private bool showGizmos;
     
+    /// <summary>
+    /// Target to follow.
+    /// </summary>
+    public AgentMover Target { get => target; set => target = value; }
+    
     private ArriveSteeringBehaviorNLA _followSteeringBehavior;
     private GameObject _offsetFromTargetMarker;
     private AgentMover _currentAgent;
@@ -43,7 +48,7 @@ public class OffsetFollowBehavior: SteeringBehavior
     /// <summary>
     /// <p>Updates the offset position from the target in the local coordinate space.</p>
     /// </summary>
-    private void UpdateOffsetFromTarget()
+    public void UpdateOffsetFromTarget()
     {
         _offsetFromTargetMarker.transform.position = target.transform.TransformPoint(
             offsetFromTarget);
