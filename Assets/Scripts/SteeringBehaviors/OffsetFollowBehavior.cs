@@ -51,17 +51,25 @@ public class OffsetFollowBehavior: SteeringBehavior
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
+        // Buckland uses a look-ahead algorithm to place marker. In my tests I didn't
+        // like it because in movement the follower approached nearer than offset and
+        // when target stopped the follower retreated in an oddly way. So I discarded
+        // the look-ahead algorithm. Nevertheless I let it commented if you want to
+        // assess it.
+        //
         // The look-ahead time is proportional to the distance between the target and
         // the followed; and is inversely proportional to the sum of the agent's
         // velocities.
-        float lookAheadTime = offsetFromTarget.magnitude / 
-                              (args.MaximumSpeed + target.CurrentSpeed);
-        
+        // float lookAheadTime = offsetFromTarget.magnitude / 
+        //                       (args.MaximumSpeed + target.CurrentSpeed);
         // Place the marker where we think the target will be at the look-ahead
         // time.
-        _offsetFromTargetMarker.transform.position = 
-            target.transform.TransformPoint(offsetFromTarget) + 
-            (Vector3)target.Velocity * lookAheadTime;
+        // _offsetFromTargetMarker.transform.position = 
+        //     target.transform.TransformPoint(offsetFromTarget) + 
+        //     (Vector3)target.Velocity * lookAheadTime;
+
+        _offsetFromTargetMarker.transform.position =
+            target.transform.TransformPoint(offsetFromTarget);
         
         // Let the child steering behavior get to the new marker position.
         return _followSteeringBehavior.GetSteering(args);
