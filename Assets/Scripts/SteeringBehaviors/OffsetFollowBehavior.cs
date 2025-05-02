@@ -14,7 +14,6 @@ public class OffsetFollowBehavior: SteeringBehavior
     [Header("CONFIGURATION:")]
     [Tooltip("Target to follow")]
     [SerializeField] public AgentMover target;
-    // TODO: Create a handle to set this field visually.
     [SerializeField] public Vector2 offsetFromTarget;
 
     [Header("DEBUG:")] 
