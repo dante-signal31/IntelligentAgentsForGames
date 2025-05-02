@@ -1,7 +1,7 @@
-﻿using System;
-using SteeringBehaviors;
-using UnityEngine;
+﻿using UnityEngine;
 
+namespace SteeringBehaviors
+{
 /// <summary>
 /// Steering behavior to avoid walls ans obstacles.
 /// </summary>
@@ -12,11 +12,11 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
     [SerializeField] private Whiskers whiskers;
     [Tooltip("Layers to avoid.")] 
     [SerializeField] private LayerMask layerMask;
-    
+
     [Header("DEBUG:")]
     [Tooltip("Show closest hit marker and evasion velocity vector.")]
     [SerializeField] private bool markersVisible = false;
-    [Tooltip("Color fot this object markers.")]
+    [Tooltip("Color for this object markers.")]
     [SerializeField] private Color markerColor = Color.red;
 
     private RaycastHit2D _closestHit;
@@ -46,8 +46,8 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
     /// <summary>
     /// Start timer for running away from obstacle.
     ///
-    /// While timer is on the object will run away from obstacle, so will keep its evasion vector.
-    /// This is useful to avoid jittering whan avoiding small obstacles. 
+    /// While timer is on the object will run away from obstacle, so will keep its
+    /// evasion vector. This is useful to avoid jittering whan avoiding small obstacles. 
     /// </summary>
     private void StartRunningAwayTimer()
     {
@@ -58,7 +58,8 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
     /// <summary>
     /// End running away timer.
     ///
-    /// At this time object will stop running away from obstacle, so will stop its evasion vector.
+    /// At this time object will stop running away from obstacle, so will stop its
+    /// evasion vector.
     /// </summary>
     private void EndRunningAway()
     {
@@ -68,8 +69,9 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
     private void OnEnable()
     {
         // OnEnable runs before Start, so first time OnEnable is called, sensors are not
-        // initialized. That's why I call to SubscribeToSensorsEvents in Start. Nevertheless
-        // I call it here too just in case object is disabled and then enabled again.
+        // initialized. That's why I call to SubscribeToSensorsEvents in Start.
+        // Nevertheless I call it here too just in case object is disabled and then
+        // enabled again.
         whiskers.SubscribeToColliderDetected(OnColliderDetected);
         whiskers.SubscribeToNoColliderDetected(OnNoColliderDetected);
     }
@@ -105,24 +107,28 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
                 closestHit, 
                 sensorIndexClosestDetectedHit) = GetClosestHitData(args);
             _closestHit = closestHit;
-            
+        
             float overShootFactor = GetOverShootFactor(sensorIndexClosestDetectedHit, 
                 closestDistance);
 
             if (whiskers.IsCenterSensor(sensorIndexClosestDetectedHit))
             {
-                // Buckland uses this approach for every sensor, but I only use it for center sensor
-                // to only brake when obstacle is just in front of us.
+                // Buckland uses this approach for every sensor, but I only use it for
+                // center sensor to only brake when obstacle is just in front of us.
                 _avoidVector = closestHit.normal * (args.MaximumSpeed * overShootFactor);
             }
             else
             {
-                // For every other sensor than front one I only project normal vector as a lateral push.
-                // This way I make agent rotate without braking when obstacle is not in front of it.
-                float lateralPush = Vector3.Dot(closestHit.normal, transform.right);
-                _avoidVector = transform.right * lateralPush * args.MaximumSpeed * overShootFactor;
+                // For every other sensor than front one I only project normal vector as
+                // a lateral push. This way I make agent rotate without braking when
+                // obstacle is not in front of it.
+                float lateralPush = Vector3.Dot(
+                    closestHit.normal, 
+                    transform.right);
+                _avoidVector = transform.right * lateralPush * 
+                               args.MaximumSpeed * overShootFactor;
             }
-            
+        
             StartRunningAwayTimer();
             return new SteeringOutput(_avoidVector, 0);
         }
@@ -138,7 +144,9 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
     /// <param name="sensorIndexClosestDetectedHit"></param>
     /// <param name="closestDistance"></param>
     /// <returns></returns>
-    private float GetOverShootFactor(int sensorIndexClosestDetectedHit, float closestDistance)
+    private float GetOverShootFactor(
+        int sensorIndexClosestDetectedHit, 
+        float closestDistance)
     {
         float sensorLength = whiskers.GetSensorLength(sensorIndexClosestDetectedHit);
         float closestDistanceFromObjectSurface = closestDistance - whiskers.MinimumRange;
@@ -154,10 +162,13 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
     /// <see cref="GetSteering"/> method.</param>
     /// <returns>A tuple with the closest distance, the closest hit and
     /// the sensor index which detected the closest hit.</returns>
-    private (float closestDistance, RaycastHit2D closestHit, int sensorIndexClosestDetectedHit)
+    private (
+        float closestDistance, 
+        RaycastHit2D closestHit, 
+        int sensorIndexClosestDetectedHit)
         GetClosestHitData(SteeringBehaviorArgs args)
     {
-        
+    
         float closestDistance = float.MaxValue;
         RaycastHit2D closestHit = new RaycastHit2D();
         int sensorIndexClosestDetectedHit = 0;
@@ -178,7 +189,7 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
 
         return (closestDistance, closestHit, sensorIndexClosestDetectedHit);
     }
-    
+
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
@@ -190,4 +201,5 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
         }
     }
 #endif
+}
 }

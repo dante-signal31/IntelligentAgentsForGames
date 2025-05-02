@@ -17,7 +17,6 @@ namespace Editor
             EditorGUI.BeginChangeCheck();
             
             // Draw handle to place offset marker visually.
-            Handles.color = Color.red;
             Vector2 newMarkerPosition = Handles.PositionHandle(
                 follower.Target.transform.TransformPoint(follower.offsetFromTarget),
                 Quaternion.identity);
@@ -26,6 +25,7 @@ namespace Editor
             Handles.color = Color.green;
             Handles.DrawLine(follower.transform.position, newMarkerPosition);
             Handles.DrawWireDisc(newMarkerPosition, Vector3.forward, 0.1f);
+            Handles.color = Color.red;
             Handles.DrawLine(newMarkerPosition, follower.Target.transform.position);
             
             if (EditorGUI.EndChangeCheck())
