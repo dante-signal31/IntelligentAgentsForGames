@@ -35,21 +35,24 @@ public class Instantiator : MonoBehaviour
         /// <summary>
         /// Rotation to instantiate at.
         /// </summary>
-        [Tooltip("Initial rotation for spawned object, in degrees. Origin is up direction in local space.")]
+        [Tooltip("Initial rotation for spawned object, in degrees. Origin is up " +
+                 "direction in local space.")]
         [Range(-180, 180)]
         public float rotation;
     }
     
     [Header("CONFIGURATION:")]
-    [Tooltip("Prefab to instantiate as target.")]
+    [Tooltip("Prefab to instantiate.")]
     [SerializeField] private Instantiable[] _objectsToInstantiate;
     
     [Header("DEBUG:")]
-    [Tooltip("Whether to show gizmos for sensors.")]
+    [Tooltip("Whether to show gizmos.")]
     [SerializeField] private bool showGizmos = true;
-    [Tooltip("Radius for gizmo markers of position for instantiable objects spawn points.")]
+    [Tooltip("Radius for gizmo markers of position for instantiable objects spawn " +
+             "points.")]
     [SerializeField] private float gizmoRadius = 1.0f;
-    [Tooltip("Arrow length to show instantiable objects initial rotation at spawn point.")]
+    [Tooltip("Arrow length to show instantiable objects initial rotation at spawn " +
+             "point.")]
     [SerializeField] private float gizmoArrowLength = 1.0f;
     [Tooltip("Rotation arrow head size.")]
     [SerializeField] private float gizmoArrowHeadSize = 0.25f;
@@ -72,7 +75,8 @@ public class Instantiator : MonoBehaviour
         {
             GameObject instantiated = Instantiate(instantiableGameObject.gameObject, 
                 transform.TransformPoint(instantiableGameObject.position), 
-                Quaternion.AngleAxis(instantiableGameObject.rotation, Vector3.forward));
+                Quaternion.AngleAxis(instantiableGameObject.rotation, 
+                    Vector3.forward));
             InstantiatedObjects[instantiableGameObject.name] = instantiated;
         }
     }
@@ -83,7 +87,8 @@ public class Instantiator : MonoBehaviour
     {
         foreach (Instantiable instantiableGameObject in _objectsToInstantiate)
         {
-            Gizmos.DrawWireSphere(transform.TransformPoint(instantiableGameObject.position), 
+            Gizmos.DrawWireSphere(
+                transform.TransformPoint(instantiableGameObject.position), 
                 gizmoRadius);
         }
     }
@@ -92,8 +97,10 @@ public class Instantiator : MonoBehaviour
     {
         foreach (Instantiable instantiableGameObject in _objectsToInstantiate)
         {
-            GizmoTools.DrawArrow(transform.TransformPoint(instantiableGameObject.position), 
-                Quaternion.AngleAxis(instantiableGameObject.rotation, Vector3.forward) * Vector3.up * gizmoArrowLength, 
+            GizmoTools.DrawArrow(
+                transform.TransformPoint(instantiableGameObject.position), 
+                Quaternion.AngleAxis(instantiableGameObject.rotation, 
+                    Vector3.forward) * Vector3.up * gizmoArrowLength, 
                 gizmoArrowHeadSize, 20.0f); 
         }
     }

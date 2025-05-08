@@ -1,10 +1,13 @@
 ﻿using UnityEngine;
 
+namespace Sensors
+{
 /// <summary>
-/// This script allows to resize a box collider in realtime.
+/// <p>This script allows to resize a box collider in realtime.<p>
 ///
-/// WARNING! when using this component, collider offset should be set only by this script. So
-/// let collider component offset property alone and do not edit it through the inspector.
+/// <p>WARNING! when using this component, collider offset should be set only by this
+/// script. So let collider component offset property alone and do not edit it through
+/// the inspector.<p>
 /// </summary>
 [ExecuteAlways]
 public class BoxRangeManager : MonoBehaviour
@@ -17,10 +20,7 @@ public class BoxRangeManager : MonoBehaviour
         Left,
         Right  
     }
-    
-    [Header("WIRING:")]
-    [SerializeField] private BoxCollider2D boxCollider;
-    
+
     [Header("CONFIGURATION:")]
     [Tooltip("Initial offset for this sensor.")]
     [SerializeField] private Vector2 initialOffset;
@@ -30,7 +30,10 @@ public class BoxRangeManager : MonoBehaviour
     [SerializeField] private float width;
     [Tooltip("Grow direction for this sensor when width or range is change")]
     [SerializeField] private GrowDirection growDirection;
-    
+
+    [Header("WIRING:")]
+    [SerializeField] private BoxCollider2D boxCollider;
+
     public float Range
     {
         get => range;
@@ -50,9 +53,14 @@ public class BoxRangeManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Managed box collider.
+    /// </summary>
+    public BoxCollider2D BoxCollider => boxCollider;
+
     private Vector2 _currentSize;
     private const float OffsetBias = 0.5f;
-    
+
     private Vector2 GetGrowOffsetVector()
     {
         switch (growDirection)
@@ -76,18 +84,18 @@ public class BoxRangeManager : MonoBehaviour
     {
         return newSize - currentSize;
     }
-    
+
     private void Awake()
     {
         _currentSize = new Vector2(width, range);
     }
-    
+
     private void Start()
     {
         boxCollider.offset = initialOffset;
         SetBoxSize(width, range);
     }
-    
+
     private void SetBoxSize(float newWidth, float newRange)
     {
         Vector2 newSize = new Vector2(newWidth, newRange);
@@ -115,4 +123,5 @@ public class BoxRangeManager : MonoBehaviour
     }
 #endif
 
+}
 }
