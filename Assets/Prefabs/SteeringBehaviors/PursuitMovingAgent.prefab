@@ -104,6 +104,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 0}
   arrivalDistance: 0.1
-  aheadSemiConeDegrees: 30.018782
+  aheadSemiConeDegrees: 33.394516
   comingToUsSemiConeDegrees: 26.200506
   predictedPositionMarkerVisible: 1

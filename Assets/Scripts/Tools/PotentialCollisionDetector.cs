@@ -1,4 +1,5 @@
 ﻿
+using System;
 using Sensors;
 using SteeringBehaviors;
 using UnityEngine;
@@ -8,7 +9,6 @@ namespace Tools
 /// <summary>
 /// <p>Script to detect future collisions with other agents nearby.</p>
 /// </summary>
-[RequireComponent(typeof(BoxRangeManager))]
 [ExecuteAlways]
 public class PotentialCollisionDetector : MonoBehaviour
 {
@@ -23,6 +23,10 @@ public class PotentialCollisionDetector : MonoBehaviour
     [SerializeField] private LayerMask layersToDetect;
     [Tooltip("Represents the radius of an agent used for potential collision detection.")]
     [SerializeField] private float agentRadius;
+    
+    [Header("WIRING:")]
+    [SerializeField] private BoxRangeManager boxRangeManager;
+    [SerializeField] private ConeRange2D coneRange;
 
     /// <summary>
     /// Range to detect possible collisions.
@@ -89,28 +93,35 @@ public class PotentialCollisionDetector : MonoBehaviour
         CurrentRelativePositionToPotentialCollisionAgent.magnitude;
     
     public float CollisionDistance { get; private set; }
-
-    private BoxRangeManager _boxRangeManager;
-    private BoxCollider2D _detectionArea;
+    
     private AgentMover _currentAgent;
 
+    public void OnConeRangeUpdated(float range, float semiConeDegrees)
+    {
+        DetectionRange = range;
+        DetectionSemiconeAngle = semiConeDegrees;
+    }
+    
     private void UpdateDetectionArea()
     {
-        if (_boxRangeManager == null) return;
-        _boxRangeManager.Range = detectionRange;
-        _boxRangeManager.Width = DetectionRange * 
-                                 Mathf.Sin(detectionSemiconeAngle * 
-                                           Mathf.Deg2Rad);
+        if (boxRangeManager == null) return;
+        boxRangeManager.Range = DetectionRange;
+        boxRangeManager.Width = DetectionRange * 
+                                 Mathf.Sin(DetectionSemiconeAngle * 
+                                           Mathf.Deg2Rad) * 2;
     }
     
     private void Awake()
     {
-        _boxRangeManager = GetComponent<BoxRangeManager>();
-        _detectionArea = GetComponent<BoxCollider2D>();
         _currentAgent = GetComponentInParent<AgentMover>();
         CollisionDistance = 2 * agentRadius;
     }
-    
+
+    private void Start()
+    {
+        coneRange.Initialize(detectionRange, detectionSemiconeAngle);
+    }
+
 #if UNITY_EDITOR
     private void OnValidate()
     {

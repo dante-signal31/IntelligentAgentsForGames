@@ -4058,6 +4058,14 @@ PrefabInstance:
       propertyPath: target
       value: 
       objectReference: {fileID: 414490156}
+    - target: {fileID: 3946981090246576400, guid: e25cbca14cd22e74ebb876a467974266, type: 3}
+      propertyPath: aheadSemiConeDegrees
+      value: 28.002377
+      objectReference: {fileID: 0}
+    - target: {fileID: 3946981090246576400, guid: e25cbca14cd22e74ebb876a467974266, type: 3}
+      propertyPath: comingToUsSemiConeDegrees
+      value: 26.222063
+      objectReference: {fileID: 0}
     - target: {fileID: 6934463756096397237, guid: e25cbca14cd22e74ebb876a467974266, type: 3}
       propertyPath: m_LocalPosition.x
       value: -14.35
