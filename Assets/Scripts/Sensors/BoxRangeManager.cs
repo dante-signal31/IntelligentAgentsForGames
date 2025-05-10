@@ -24,7 +24,6 @@ public class BoxRangeManager : MonoBehaviour
     }
 
     [Header("CONFIGURATION:")]
-    [Tooltip("Initial offset for this sensor.")]
     [SerializeField] private Vector2 initialOffset;
     [Tooltip("Length for this sensor.")]
     [SerializeField] private float range;
@@ -32,13 +31,6 @@ public class BoxRangeManager : MonoBehaviour
     [SerializeField] private float width;
     [Tooltip("Grow direction for this sensor when width or range is change")]
     [SerializeField] private GrowDirection growDirection;
-    [Space] 
-    [SerializeField] private UnityEvent<Collision2D> OnCollisionEnter;
-    [SerializeField] private UnityEvent<Collision2D> OnCollisionExit;
-    [SerializeField] private UnityEvent<Collision2D> OnCollisionStay;
-    [SerializeField] private UnityEvent<Collider2D> OnTriggerEnter;
-    [SerializeField] private UnityEvent<Collider2D> OnTriggerExit;
-    [SerializeField] private UnityEvent<Collider2D> OnTriggerStay;
 
     [Header("WIRING:")]
     [SerializeField] private BoxCollider2D boxCollider;
@@ -68,7 +60,6 @@ public class BoxRangeManager : MonoBehaviour
     public BoxCollider2D BoxCollider => boxCollider;
 
     private Vector2 _currentSize;
-    private Vector2 _currentInitialOffset;
     private GrowDirection _currentGrowDirection;
     private const float OffsetBias = 0.5f;
 
@@ -103,7 +94,6 @@ public class BoxRangeManager : MonoBehaviour
 
     private void Start()
     {
-        boxCollider.offset = initialOffset;
         RefreshBoxSize();
     }
 
@@ -115,21 +105,12 @@ public class BoxRangeManager : MonoBehaviour
     private void SetBoxSize(float newWidth, float newRange)
     {
         Vector2 newSize = new Vector2(newWidth, newRange);
-        if (newSize != _currentSize)
-        {
-            Vector2 growOffsetVector = GetGrowOffsetVector();
-            Vector2 growVector = GetGrowVector(_currentSize, newSize);
-            _currentSize = newSize;
-            boxCollider.size = newSize;
-            if (boxCollider.offset == Vector2.zero)
-            {
-                boxCollider.offset = initialOffset + growVector * growOffsetVector;
-            }
-            else
-            {
-                boxCollider.offset += growVector * growOffsetVector;
-            }
-        }
+        boxCollider.offset = Vector2.zero;
+        boxCollider.size = Vector2.one;
+        Vector2 growOffsetVector = GetGrowOffsetVector();
+        Vector2 growVector = GetGrowVector(boxCollider.size, newSize);
+        boxCollider.size = newSize;
+        boxCollider.offset = initialOffset + growVector * growOffsetVector;
     }
 
     [ContextMenu("Reset Box Collider")]
@@ -141,45 +122,12 @@ public class BoxRangeManager : MonoBehaviour
         RefreshBoxSize();
     }
     
-    private void OnCollisionEnter2D(Collision2D other)
-    {
-        if (OnCollisionEnter != null) OnCollisionEnter.Invoke(other);
-    }
-
-    private void OnCollisionExit2D(Collision2D other)
-    {
-        if (OnCollisionExit != null) OnCollisionExit.Invoke(other);
-    }
-
-    private void OnCollisionStay2D(Collision2D other)
-    {
-        if (OnCollisionStay != null) OnCollisionStay.Invoke(other);
-    }
-
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (OnTriggerEnter != null) OnTriggerEnter.Invoke(other);
-    }
-
-    private void OnTriggerExit2D(Collider2D other)
-    {
-        if (OnTriggerExit != null) OnTriggerExit.Invoke(other);
-    }
-
-    private void OnTriggerStay2D(Collider2D other)
-    {
-        if (OnTriggerStay != null) OnTriggerStay.Invoke(other);
-    }
-
 #if UNITY_EDITOR
     private void OnValidate()
     {
-        if (growDirection != _currentGrowDirection || 
-            boxCollider.offset != _currentInitialOffset)
+        if (growDirection != _currentGrowDirection)
         {
             ResetBoxCollider();
-            boxCollider.offset = initialOffset;
-            _currentInitialOffset = boxCollider.offset;
             _currentSize = Vector2.zero;
             _currentGrowDirection = growDirection;
         }

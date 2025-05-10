@@ -21,7 +21,7 @@ public class ConeRange2D : MonoBehaviour
     [Range(0, 90)]
     [SerializeField] private float semiConeDegrees;
     [Tooltip("Color to display this cone in editor.")]
-    [SerializeField] private Color coneColor;
+    [SerializeField] private Color coneColor = new Color(1.0f, 0,0, 0.5f);
     [Space]
     [Tooltip("Event to trigger when the cone is updated.")]
     [SerializeField] private UnityEvent<float, float> coneUpdated;
@@ -75,13 +75,12 @@ public class ConeRange2D : MonoBehaviour
     public void Initialize(
         float range,
         float semiConeDegrees,
-        bool fixedRange = false,
-        Color coneColor = default)
+        bool fixedRange = false
+        )
     {
         this.range = range;
         this.semiConeDegrees = semiConeDegrees;
         this.fixedRange = fixedRange;
-        this.coneColor = coneColor;
     }
 }
 }

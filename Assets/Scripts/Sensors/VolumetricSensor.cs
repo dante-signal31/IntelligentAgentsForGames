@@ -9,10 +9,6 @@ using UnityEngine.Events;
 [ExecuteAlways]
 public class VolumetricSensor : MonoBehaviour
 {
-    [Header("WIRING:")] 
-    [Tooltip("Volumetric collider trigger.")] 
-    [SerializeField] private BoxCollider2D volumetricCollider;
-    
     [Header("CONFIGURATION:")] 
     [Tooltip("Subscribers for detection events.")] 
     [SerializeField] private UnityEvent<GameObject> objectEnteredDetectionArea;
@@ -20,6 +16,10 @@ public class VolumetricSensor : MonoBehaviour
     [SerializeField] private UnityEvent<GameObject> objectStayDetectionArea;
     [Tooltip("Subscribers to object leaving volumetric area.")] 
     [SerializeField] private UnityEvent<GameObject> objectLeftDetectionArea;
+    
+    [Header("WIRING:")] 
+    [Tooltip("Volumetric collider trigger.")] 
+    [SerializeField] private BoxCollider2D volumetricCollider;
  
     private HashSet<GameObject> _objectsDetected;
     private HashSet<ContactPoint2D> _contactPoints;
