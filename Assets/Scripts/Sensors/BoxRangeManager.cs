@@ -68,6 +68,7 @@ public class BoxRangeManager : MonoBehaviour
     public BoxCollider2D BoxCollider => boxCollider;
 
     private Vector2 _currentSize;
+    private Vector2 _currentInitialOffset;
     private GrowDirection _currentGrowDirection;
     private const float OffsetBias = 0.5f;
 
@@ -103,6 +104,11 @@ public class BoxRangeManager : MonoBehaviour
     private void Start()
     {
         boxCollider.offset = initialOffset;
+        RefreshBoxSize();
+    }
+
+    private void RefreshBoxSize()
+    {
         SetBoxSize(width, range);
     }
 
@@ -126,11 +132,13 @@ public class BoxRangeManager : MonoBehaviour
         }
     }
 
-    private void ResetBoxCollider()
+    [ContextMenu("Reset Box Collider")]
+    public void ResetBoxCollider()
     {
         if (boxCollider == null) return;
         boxCollider.offset = Vector2.zero;
         boxCollider.size = Vector2.one;
+        RefreshBoxSize();
     }
     
     private void OnCollisionEnter2D(Collision2D other)
@@ -166,12 +174,16 @@ public class BoxRangeManager : MonoBehaviour
 #if UNITY_EDITOR
     private void OnValidate()
     {
-        if (growDirection != _currentGrowDirection)
+        if (growDirection != _currentGrowDirection || 
+            boxCollider.offset != _currentInitialOffset)
         {
             ResetBoxCollider();
+            boxCollider.offset = initialOffset;
+            _currentInitialOffset = boxCollider.offset;
+            _currentSize = Vector2.zero;
             _currentGrowDirection = growDirection;
         }
-        SetBoxSize(width, range);
+        RefreshBoxSize();
     }
 #endif
 
