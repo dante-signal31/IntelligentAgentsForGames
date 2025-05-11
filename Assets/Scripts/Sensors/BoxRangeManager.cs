@@ -14,6 +14,31 @@ namespace Sensors
 [ExecuteAlways]
 public class BoxRangeManager : MonoBehaviour
 {
+    /// <summary>
+    /// <p>Possible grow directions for the box collider:</p>
+    /// <list type="bullet">
+    /// <item>
+    /// <b>Symmetric</b>: grow in every direction. If you change range, then UP and DOWN
+    /// grow. If you change width, then LEFT and RIGHT grow.
+    /// </item>
+    /// <item>
+    /// <b>Up</b>: grow in the UP direction if you change range. If you change width,
+    /// then LEFT and RIGHT grow.
+    /// </item>
+    /// <item>
+    /// <b>Down</b>: grow in the DOWN direction if you change range. If you change width,
+    /// then LEFT and RIGHT grow.
+    /// </item>
+    /// <item>
+    /// <b>Left</b>: grow in the LEFT direction if you change width. If you change range,
+    /// then UP and DOWN grow.
+    /// </item>
+    /// <item>
+    /// <b>Right</b>: grow in the RIGHT direction if you change width. If you change
+    /// range, then UP and DOWN grow.
+    /// </item>
+    /// </list>
+    /// </summary>
     private enum GrowDirection
     {   
         Symmetric,
@@ -25,9 +50,9 @@ public class BoxRangeManager : MonoBehaviour
 
     [Header("CONFIGURATION:")]
     [SerializeField] private Vector2 initialOffset;
-    [Tooltip("Length for this sensor.")]
+    [Tooltip("Length for this sensor. It moves UP and DOWN of the box.")]
     [SerializeField] private float range;
-    [Tooltip("Width for this sensor.")]
+    [Tooltip("Width for this sensor. It moves LEFT and RIGHT of the box.")]
     [SerializeField] private float width;
     [Tooltip("Grow direction for this sensor when width or range is change")]
     [SerializeField] private GrowDirection growDirection;
@@ -35,6 +60,9 @@ public class BoxRangeManager : MonoBehaviour
     [Header("WIRING:")]
     [SerializeField] private BoxCollider2D boxCollider;
 
+    /// <summary>
+    /// Length for this sensor. It moves UP and DOWN of the box.
+    /// </summary>
     public float Range
     {
         get => range;
@@ -45,6 +73,9 @@ public class BoxRangeManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Width for this sensor. It moves LEFT and RIGHT of the box.
+    /// </summary>
     public float Width {
         get => width;
         set
@@ -63,6 +94,11 @@ public class BoxRangeManager : MonoBehaviour
     private GrowDirection _currentGrowDirection;
     private const float OffsetBias = 0.5f;
 
+    /// <summary>
+    /// Get offset vector needed to keep the box collider in the same position as before
+    /// after changing the size.
+    /// </summary>
+    /// <returns>New offset vector.</returns>
     private Vector2 GetGrowOffsetVector()
     {
         switch (growDirection)
@@ -82,6 +118,12 @@ public class BoxRangeManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Get the vector needed to grow the box collider to the new size.
+    /// </summary>
+    /// <param name="currentSize">Current box dimensions.</param>
+    /// <param name="newSize">New box dimensions.</param>
+    /// <returns>Vector with dimensions changes.</returns>
     private Vector2 GetGrowVector(Vector2 currentSize, Vector2 newSize)
     {
         return newSize - currentSize;
@@ -97,11 +139,19 @@ public class BoxRangeManager : MonoBehaviour
         RefreshBoxSize();
     }
 
+    /// <summary>
+    /// Update the box with its new dimensions.
+    /// </summary>
     private void RefreshBoxSize()
     {
         SetBoxSize(width, range);
     }
 
+    /// <summary>
+    /// Sets the size of the box collider and adjusts its offset accordingly.
+    /// </summary>
+    /// <param name="newWidth">The new width of the box collider.</param>
+    /// <param name="newRange">The new range (height) of the box collider.</param>
     private void SetBoxSize(float newWidth, float newRange)
     {
         if (boxCollider == null) return;
@@ -114,6 +164,11 @@ public class BoxRangeManager : MonoBehaviour
         boxCollider.offset = initialOffset + growVector * growOffsetVector;
     }
 
+    // TODO: Implement a button to reset box collider.
+    /// <summary>
+    /// Resets the box collider to its default settings, including offset and size.
+    /// Updates the box dimensions to align with the specified width and range values.
+    /// </summary>
     [ContextMenu("Reset Box Collider")]
     public void ResetBoxCollider()
     {
