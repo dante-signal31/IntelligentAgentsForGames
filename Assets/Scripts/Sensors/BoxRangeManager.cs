@@ -5,11 +5,11 @@ using UnityEngine.Events;
 namespace Sensors
 {
 /// <summary>
-/// <p>This script allows to resize a box collider in realtime.<p>
+/// <p>This script allows resizing a box collider in realtime.<p>
 ///
 /// <p>WARNING! when using this component, collider offset should be set only by this
-/// script. So let collider component offset property alone and do not edit it through
-/// the inspector.<p>
+/// script. So let the collider component offset the property alone and do not edit it
+/// through the inspector.<p>
 /// </summary>
 [ExecuteAlways]
 public class BoxRangeManager : MonoBehaviour
@@ -104,6 +104,7 @@ public class BoxRangeManager : MonoBehaviour
 
     private void SetBoxSize(float newWidth, float newRange)
     {
+        if (boxCollider == null) return;
         Vector2 newSize = new Vector2(newWidth, newRange);
         boxCollider.offset = Vector2.zero;
         boxCollider.size = Vector2.one;

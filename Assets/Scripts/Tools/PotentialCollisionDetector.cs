@@ -24,20 +24,15 @@ public class PotentialCollisionDetector : MonoBehaviour
     [SerializeField] private float agentRadius;
     
     [Header("WIRING:")]
-    [SerializeField] private GameObject sensor;
-    [SerializeField] private ConeRange2D coneRange;
+    [SerializeField] private ConeSensor sensor;
 
     /// <summary>
     /// Range to detect possible collisions.
     /// </summary>
     public float DetectionRange
     {
-        get => detectionRange;
-        set
-        {
-            detectionRange = value;
-            UpdateDetectionArea();
-        }
+        get => sensor.DetectionRange;
+        set => sensor.DetectionRange = value;
     }
     
     /// <summary>
@@ -45,12 +40,8 @@ public class PotentialCollisionDetector : MonoBehaviour
     /// </summary>
     public float DetectionSemiconeAngle
     {
-        get => detectionSemiconeAngle;
-        set
-        {
-            detectionSemiconeAngle = value;
-            UpdateDetectionArea();
-        }
+        get => sensor.DetectionSemiconeAngle;
+        set => sensor.DetectionSemiconeAngle = value;
     }
     
     /// <summary>
@@ -58,8 +49,8 @@ public class PotentialCollisionDetector : MonoBehaviour
     /// </summary>
     public LayerMask LayersToDetect
     {
-        get => layersToDetect;
-        set => layersToDetect = value;
+        get => sensor.LayersToDetect;
+        set => sensor.LayersToDetect = value;
     }
     
     /// <summary>
@@ -125,105 +116,63 @@ public class PotentialCollisionDetector : MonoBehaviour
     
     private AgentMover _currentAgent;
     private List<AgentMover> _detectedAgents;
-    private BoxRangeManager _boxRangeManager;
-    private VolumetricSensor _volumetricSensor;
-
-    /// <summary>
-    /// Whether the provided object layer is included in the provided LayerMask.
-    /// </summary>
-    /// <param name="obj">Object to check.</param>
-    /// <param name="layerMask">List of layers.</param>
-    /// <returns>True if object's layer is in layermask.</returns>
-    private bool ObjectIsInLayerMask(GameObject obj, LayerMask layerMask)
-    {
-        return (layersToDetect.value & (1 << obj.layer)) != 0;
-    }
-
-    /// <summary>
-    /// Whether a global position is inside the cone range of the agent.
-    /// </summary>
-    /// <param name="position">Global position to check.</param>
-    /// <returns>True if the position is inside the cone./returns>
-    private bool PositionIsInConeRange(Vector2 position)
-    {
-        float distance = Vector2.Distance(position, _currentAgent.transform.position);
-        float heading = Vector2.Angle(_currentAgent.Forward,
-            _currentAgent.transform.InverseTransformPoint(position));
-        return distance <= DetectionRange && heading <= DetectionSemiconeAngle;
-    }
-    
-    /// <summary>
-    /// <p>Event handler launched when the cone range gizmo is updated.</p>
-    /// <p>This way DetectionRange and DetectionSemiconeAngle are updated.</p>
-    /// </summary>
-    /// <param name="range">How far we will detect other agents.</param>
-    /// <param name="semiConeDegrees">How many degrees from forward we will admit
-    /// to detect an agent.</param>
-    public void OnConeRangeUpdated(float range, float semiConeDegrees)
-    {
-        DetectionRange = range;
-        DetectionSemiconeAngle = semiConeDegrees;
-    }
 
     /// <summary>
     /// Event handler to use when another agent enters our detection area.
     /// </summary>
-    /// <param name="otherAgent">The agent who enters our detection area.</param>
-    public void OnAgentAreaEntered(GameObject otherAgent)
+    /// <param name="otherObject">The agent who enters our detection area.</param>
+    public void OnObjectEnteredSensor(GameObject otherObject)
     {
-        if (ObjectIsInLayerMask(otherAgent, LayersToDetect))
-        {
-            AgentMover otherAgentMover = otherAgent.GetComponent<AgentMover>();
-            
-            if (otherAgentMover == null || 
-                !PositionIsInConeRange(otherAgentMover.transform.position)) 
-                return;
-            
-            _detectedAgents.Add(otherAgentMover);
-        }
+        AgentMover otherAgentMover = otherObject.GetComponent<AgentMover>();
+        
+        if (otherAgentMover == null) return;
+        
+        _detectedAgents.Add(otherAgentMover);
     }
 
     /// <summary>
     /// Event handler to use when another agent exits our detection area.
     /// </summary>
     /// <param name="otherAgent">The agent who exits our detection area.</param>
-    public void OnAgentAreaExited(GameObject otherAgent)
+    public void OnObjectExitedSensor(GameObject otherAgent)
     {
-        if (ObjectIsInLayerMask(otherAgent, LayersToDetect))
-        {
-            AgentMover otherAgentMover = otherAgent.GetComponent<AgentMover>();
-            
-            if (otherAgentMover == null ||
-                !_detectedAgents.Contains(otherAgentMover)) return;
-            
-            _detectedAgents.Remove(otherAgentMover);
-        }
+        AgentMover otherAgentMover = otherAgent.GetComponent<AgentMover>();
+        
+        if (otherAgentMover == null ||
+            !_detectedAgents.Contains(otherAgentMover)) return;
+        
+        _detectedAgents.Remove(otherAgentMover);
+    }
+
+    /// <summary>
+    /// Event handler to use when the cone sensor changes its dimensions.
+    /// </summary>
+    /// <param name="range">New range.</param>
+    /// <param name="semiConeDegrees">New semiConeDegrees.</param>
+    public void OnSensorDimensionsChanged(float range, float semiConeDegrees)
+    {
+        if (!Mathf.Approximately(detectionRange, range)) 
+            detectionRange = range;
+        if (!Mathf.Approximately(detectionSemiconeAngle, semiConeDegrees)) 
+            detectionSemiconeAngle = semiConeDegrees;
     }
     
-    /// <summary>
-    /// Change the detection area to its new dimensions.
-    /// </summary>
-    private void UpdateDetectionArea()
+    private void UpdateSensorConfiguration()
     {
-        if (_boxRangeManager == null) return;
-        _boxRangeManager.Range = DetectionRange;
-        _boxRangeManager.Width = DetectionRange * 
-                                 Mathf.Sin(DetectionSemiconeAngle * 
-                                           Mathf.Deg2Rad) * 2;
+        sensor.DetectionRange = detectionRange; 
+        sensor.DetectionSemiconeAngle = detectionSemiconeAngle;
+        sensor.LayersToDetect = layersToDetect;
     }
     
     private void Awake()
     {
         _currentAgent = GetComponentInParent<AgentMover>();
         CollisionDistance = 2 * agentRadius;
-        _boxRangeManager = sensor.GetComponent<BoxRangeManager>();
-        _volumetricSensor = sensor.GetComponent<VolumetricSensor>();
     }
 
     private void Start()
     {
-        coneRange.Initialize(detectionRange, detectionSemiconeAngle);
-        UpdateDetectionArea();
+        UpdateSensorConfiguration();
     }
 
     private void FixedUpdate()
@@ -246,14 +195,14 @@ public class PotentialCollisionDetector : MonoBehaviour
             Vector2 relativeVelocity = target.Velocity - _currentAgent.Velocity;
             float relativeSpeed = relativeVelocity.magnitude;
             
-            // I've used Millington algorithm as reference, but here mine differs his.
-            // Millington algorithm uses de positive dot product between relativePosition
-            // and relativeVelocity. I guess it's an error because, in my calculations,
-            // that would get a positive result for a non-collision approach,
-            // that wouldn't be correct because timeToClosestPosition should be negative
-            // if agents go away from each other and positive if they go towards each
-            // other.
-            // Besides, I've found sources where this formula is defined and they 
+            // I've used Millington algorithm as a reference, but here mine differs from
+            // his. Millington algorithm uses de positive dot product between
+            // relativePosition and relativeVelocity. I guess it's an error.
+            // In my calculations, that would get a positive result for a non-collision
+            // approach, that wouldn't be correct because timeToClosestPosition should
+            // be negative if agents go away from each other and positive if they go
+            // towards each other.
+            // Besides, I've found sources where this formula is defined, and they 
             // multiply by -1.0 the numerator:
             // https://medium.com/@knave/collision-avoidance-the-math-1f6cdf383b5c
             //
@@ -261,7 +210,7 @@ public class PotentialCollisionDetector : MonoBehaviour
             float timeToClosestPosition = Vector2.Dot(
                                               -relativePosition, 
                                               relativeVelocity) / 
-                                          (float) Mathf.Pow(relativeSpeed, 2.0f);
+                                          Mathf.Pow(relativeSpeed, 2.0f);
             
             // They are moving away, so no collision possible.
             if (timeToClosestPosition < 0) continue;
@@ -274,8 +223,8 @@ public class PotentialCollisionDetector : MonoBehaviour
                 relativePosition + relativeVelocity * timeToClosestPosition; 
             float minSeparation = minRelativePosition.magnitude;
             
-            // If minSeparation is greater than _collisionDistance then we have no
-            // collision at all, so we assess next target.
+            // If minSeparation is greater than _collisionDistance, then we have no
+            // collision at all, so we assess the next target.
             if (minSeparation > CollisionDistance) continue;
             
             // OK, we have a candidate potential collision, but is it the nearest?
@@ -305,7 +254,7 @@ public class PotentialCollisionDetector : MonoBehaviour
 #if UNITY_EDITOR
     private void OnValidate()
     {
-        UpdateDetectionArea();
+        UpdateSensorConfiguration();
     }
 #endif
 }
