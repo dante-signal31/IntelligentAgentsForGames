@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Sensors;
 using SteeringBehaviors;
 using UnityEngine;
@@ -7,7 +6,7 @@ using UnityEngine;
 namespace Tools
 {
 /// <summary>
-/// <p>Script to detect future collisions with other agents nearby.</p>
+/// <p>Script to detect potential collisions with other agents nearby.</p>
 /// </summary>
 [ExecuteAlways]
 public class PotentialCollisionDetector : MonoBehaviour
@@ -75,23 +74,53 @@ public class PotentialCollisionDetector : MonoBehaviour
             CollisionDistance = 2 * agentRadius;
         }
     }
+    
+    /// <summary>
+    /// Whether there is a near agent on a potential collision heading.
+    /// </summary>
     public bool PotentialCollisionDetected { get; private set; }
     
+    /// <summary>
+    /// Agent whose heading con collide with us.
+    /// </summary>
     public AgentMover PotentialCollisionAgent { get; private set; }
     
+    /// <summary>
+    /// Time to potential collision with the other agent.
+    /// </summary>
     public float TimeToPotentialCollision {get; private set; }
     
+    /// <summary>
+    /// Vector from us to the agent we can collide with at the point with minimum
+    /// separation.
+    /// </summary>
     public Vector2 RelativePositionAtPotentialCollision {get; private set; }
     
+    /// <summary>
+    /// Separation between us and the agent we can collide with at the point with minimum
+    /// separation.
+    /// </summary>
     public float SeparationAtPotentialCollision {get; private set; }
     
+    /// <summary>
+    /// Present vector from us to the agent we can collide with.
+    /// </summary>
     public Vector2 CurrentRelativePositionToPotentialCollisionAgent {get; private set; }
     
+    /// <summary>
+    /// Difference between agent we can collide with velocity and our own velocity. 
+    /// </summary>
     public Vector2 CurrentRelativeVelocityToPotentialCollisionAgent {get; private set; }
     
+    /// <summary>
+    /// Present distance from us to the agent we can collide with.
+    /// </summary>
     public float CurrentDistanceToPotentialCollisionAgent => 
         CurrentRelativePositionToPotentialCollisionAgent.magnitude;
     
+    /// <summary>
+    /// Minimum distance under with we assume two agents have collided.
+    /// </summary>
     public float CollisionDistance { get; private set; }
     
     private AgentMover _currentAgent;
@@ -100,7 +129,7 @@ public class PotentialCollisionDetector : MonoBehaviour
     private VolumetricSensor _volumetricSensor;
 
     /// <summary>
-    /// Whether provided object layer is included in the provided LayerMask.
+    /// Whether the provided object layer is included in the provided LayerMask.
     /// </summary>
     /// <param name="obj">Object to check.</param>
     /// <param name="layerMask">List of layers.</param>
@@ -111,10 +140,10 @@ public class PotentialCollisionDetector : MonoBehaviour
     }
 
     /// <summary>
-    /// Whether a global position is inside cone range of the agent.
+    /// Whether a global position is inside the cone range of the agent.
     /// </summary>
     /// <param name="position">Global position to check.</param>
-    /// <returns>True if position is inside the cone./returns>
+    /// <returns>True if the position is inside the cone./returns>
     private bool PositionIsInConeRange(Vector2 position)
     {
         float distance = Vector2.Distance(position, _currentAgent.transform.position);
@@ -123,12 +152,23 @@ public class PotentialCollisionDetector : MonoBehaviour
         return distance <= DetectionRange && heading <= DetectionSemiconeAngle;
     }
     
+    /// <summary>
+    /// <p>Event handler launched when the cone range gizmo is updated.</p>
+    /// <p>This way DetectionRange and DetectionSemiconeAngle are updated.</p>
+    /// </summary>
+    /// <param name="range">How far we will detect other agents.</param>
+    /// <param name="semiConeDegrees">How many degrees from forward we will admit
+    /// to detect an agent.</param>
     public void OnConeRangeUpdated(float range, float semiConeDegrees)
     {
         DetectionRange = range;
         DetectionSemiconeAngle = semiConeDegrees;
     }
 
+    /// <summary>
+    /// Event handler to use when another agent enters our detection area.
+    /// </summary>
+    /// <param name="otherAgent">The agent who enters our detection area.</param>
     public void OnAgentAreaEntered(GameObject otherAgent)
     {
         if (ObjectIsInLayerMask(otherAgent, LayersToDetect))
@@ -143,6 +183,10 @@ public class PotentialCollisionDetector : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Event handler to use when another agent exits our detection area.
+    /// </summary>
+    /// <param name="otherAgent">The agent who exits our detection area.</param>
     public void OnAgentAreaExited(GameObject otherAgent)
     {
         if (ObjectIsInLayerMask(otherAgent, LayersToDetect))
@@ -156,6 +200,9 @@ public class PotentialCollisionDetector : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// Change the detection area to its new dimensions.
+    /// </summary>
     private void UpdateDetectionArea()
     {
         if (_boxRangeManager == null) return;
