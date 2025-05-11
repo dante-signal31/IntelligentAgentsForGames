@@ -1,10 +1,12 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
+namespace Sensors
+{
 /// <summary>
-/// This script emits events when objects are detected by the volumetric sensor. 
+/// This component emits events when objects are detected by the volumetric sensor it is
+/// attached to. 
 /// </summary>
 [ExecuteAlways]
 public class VolumetricSensor : MonoBehaviour
@@ -16,11 +18,11 @@ public class VolumetricSensor : MonoBehaviour
     [SerializeField] private UnityEvent<GameObject> objectStayDetectionArea;
     [Tooltip("Subscribers to object leaving volumetric area.")] 
     [SerializeField] private UnityEvent<GameObject> objectLeftDetectionArea;
-    
+
     [Header("WIRING:")] 
     [Tooltip("Volumetric collider trigger.")] 
-    [SerializeField] private BoxCollider2D volumetricCollider;
- 
+    [SerializeField] private Collider2D volumetricCollider;
+
     private HashSet<GameObject> _objectsDetected;
     private HashSet<ContactPoint2D> _contactPoints;
 
@@ -33,18 +35,18 @@ public class VolumetricSensor : MonoBehaviour
     /// If sensor has any detected object under its range.
     /// </summary>
     public bool anyObjectDetected => ObjectsDetected.Count > 0;
-    
+
     /// <summary>
     /// This sensor collider. Useful to find approximate contact points.
     /// </summary>
     public Collider2D SensorCollider => volumetricCollider;
-    
+
     private void Awake()
     {
         _objectsDetected = new HashSet<GameObject>();
         _contactPoints = new HashSet<ContactPoint2D>();
     }
-    
+
     private void AddDetectedObject(GameObject obj)
     {
         ObjectsDetected.Add(obj);
@@ -80,4 +82,5 @@ public class VolumetricSensor : MonoBehaviour
         GameObject detectedGameObject = GetGameObject(other);
         if (objectStayDetectionArea != null) objectStayDetectionArea.Invoke(detectedGameObject);
     }
+}
 }
