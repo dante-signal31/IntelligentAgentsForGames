@@ -3,13 +3,14 @@ using System;
 using System.Timers;
 using Tools;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace SteeringBehaviors
 {
 /// <summary>
-/// <p>Component to offer an agent avoider steering behaviour.</p>
-/// <p>Represents a steering behavior where an agent avoids another agents it may
-/// collision with in its path.</p>
+/// <p>Component to offer an agent avoider steering behavior.</p>
+/// <p>Represents a steering behavior where an agent avoids another agent it may
+/// collide with in its path.</p>
 /// <p>The difference with an obstacle avoidance algorithm is that obstacles don't move
 /// while agents do.</p>
 /// </summary>
@@ -70,11 +71,12 @@ public class AgentAvoiderSteeringBehavior : SteeringBehavior, ITargeter
     private ITargeter _targeter;
     private SteeringBehavior _steeringBehavior;
     private PotentialCollisionDetector _potentialCollisionDetector;
-    private Timer _avoidanceTimer;
     private bool _waitingForAvoidanceTimeout;
     private AgentMover _currentAgent;
     private SteeringOutput _currentSteeringOutput;
     private AgentColor _agentColor;
+    
+    private Timer _avoidanceTimer;
 
     private Color AgentColor => _agentColor.Color;
 
@@ -94,6 +96,13 @@ public class AgentAvoiderSteeringBehavior : SteeringBehavior, ITargeter
         _targeter.Target = Target;
     }
 
+    /// <summary>
+    /// If we head to the main target as soon a collision forecast dissapears, we can end
+    /// with jittering. That's because when we head again to the main target we can put
+    /// ourselves in the same collision path we were just an instant ago. To avoid that
+    /// we let our avoidance maneuver act for a moment before heading again towards our
+    /// main target. This avoidance timer defines how long that moment takes.
+    /// </summary>
     private void SetUpAvoidanceTimer()
     {
         if (_avoidanceTimer == null) return;
@@ -102,12 +111,20 @@ public class AgentAvoiderSteeringBehavior : SteeringBehavior, ITargeter
         _avoidanceTimer.Elapsed += OnAvoidanceTimeout;
     }
 
+    /// <summary>
+    /// Start avoidance timer from zero.
+    /// </summary>
     private void StartAvoidanceTimer()
     {
         _avoidanceTimer.Start();
         _waitingForAvoidanceTimeout = true;
     }
 
+    /// <summary>
+    /// Event handler when the avoidance timer emits its timeout event.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void OnAvoidanceTimeout(object sender, ElapsedEventArgs e)
     {
         _waitingForAvoidanceTimeout = false;
@@ -115,7 +132,89 @@ public class AgentAvoiderSteeringBehavior : SteeringBehavior, ITargeter
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        throw new System.NotImplementedException();
+        // If no potential collision detected, and we are not already avoiding another
+        // agent, then head to the target.
+        SteeringOutput steeringToTargetVelocity = _steeringBehavior.GetSteering(args);
+        if (!_potentialCollisionDetector.PotentialCollisionDetected &&
+            !_waitingForAvoidanceTimeout)
+            return steeringToTargetVelocity;
+        
+        // If we are already avoiding another agent, we need to keep avoidance maneuver
+        // until timer times out.
+        if (!_potentialCollisionDetector.PotentialCollisionDetected)
+            return _currentSteeringOutput;
+        
+        // If we get here, it means we have detected an agent we can collide with if
+        // the current heading is not changed.
+        // So, if we're going to collide, or are already colliding, then we do the steering
+        // based on the current position.
+        Vector2 minimumDistanceRelativePosition;
+        if (_potentialCollisionDetector.SeparationAtPotentialCollision <= 0
+            ||
+            _potentialCollisionDetector.CurrentDistanceToPotentialCollisionAgent <
+            _potentialCollisionDetector.CollisionDistance)
+        {
+            minimumDistanceRelativePosition = _potentialCollisionDetector
+                .CurrentRelativePositionToPotentialCollisionAgent;
+        }
+        else
+        {
+            // If a collision is going to happen in the future, then calculate the 
+            // relative position at that moment.
+            minimumDistanceRelativePosition = 
+                _potentialCollisionDetector.RelativePositionAtPotentialCollision;
+        }
+        
+        // Another issue I have with the Millington algorithm is that it multiplies
+        // relativePosition with MaximumAcceleration. But I think the right thing to
+        // do is to multiply the opposite of relativePosition vector, because that
+        // vector goes from agent to its target, so as it is that vector would approach
+        // those two agents. To make them farther away, you should take the opposite
+        // vector as I'm doing here with -minimumDistanceRelativePosition.
+        Vector2 avoidanceVelocity = -minimumDistanceRelativePosition.normalized *
+                                    args.MaximumSpeed;
+        
+        // Compose our avoidance maneuver mixin our current velocity with the one
+        // needed to avoid collision.
+        Vector2 newVelocity = steeringToTargetVelocity.Linear + avoidanceVelocity;
+        
+        // This is another change from Millington algorithm.
+        float relativeAvoidance = Vector2.Dot(_potentialCollisionDetector
+                .CurrentRelativePositionToPotentialCollisionAgent
+                .normalized,
+            _potentialCollisionDetector.CurrentRelativeVelocityToPotentialCollisionAgent
+                .normalized);
+
+        if (Mathf.Abs(relativeAvoidance) >= TooAlignedFactor)
+        {
+            // If relative velocity is too aligned with relative position, then our
+            // avoidance vector can end in a direct hit or a chase, so we try an
+            // avoidance vector that is perpendicular to the collision agent's velocity.
+            newVelocity = 
+                Vector2.Perpendicular(
+                        _potentialCollisionDetector.PotentialCollisionAgent.Velocity)
+                    .normalized * (newVelocity.magnitude * (Random.Range(0,2) * 2 - 1)); 
+        } 
+        else
+        {
+            // It's harder to evade collision agent if we end going along the same
+            // direction. So, we want to use a resulting vector pointing in the opposite
+            // direction than the velocity of the collision agent. This way we will
+            // avoid it passing it across its tail.
+            int sign = 
+                Vector2.Dot(
+                    _potentialCollisionDetector.PotentialCollisionAgent.Velocity, 
+                    newVelocity) > 0
+                    ? -1
+                    : 1;
+            newVelocity *= sign;
+        }
+        
+        _currentSteeringOutput = new SteeringOutput(
+            newVelocity, 
+            steeringToTargetVelocity.Angular);
+        StartAvoidanceTimer();
+        return _currentSteeringOutput;
     }
     
 #if UNITY_EDITOR
@@ -150,7 +249,6 @@ public class AgentAvoiderSteeringBehavior : SteeringBehavior, ITargeter
                 _potentialCollisionDetector.PotentialCollisionAgent.transform.position + 
                 (Vector3) _potentialCollisionDetector.PotentialCollisionAgent.Velocity);
         }
-
     }
 #endif
     
