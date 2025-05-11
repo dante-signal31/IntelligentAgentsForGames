@@ -25,8 +25,13 @@ public class AgentAvoiderSteeringBehavior : SteeringBehavior, ITargeter
     [Tooltip("Timeout started after no further collision detected, before resuming " +
              "travel to target.")]
     [SerializeField] private float avoidanceTimeout = 1.0f;
+
     [Tooltip("Threshold factor for determining when to use normal vector avoidance.")]
-    [SerializeField] private float tooAlignedFactor = 0.95f;
+    [SerializeField]
+    private float tooAlignedFactor = 0.95f;
+    
+    [Header("WIRING:")]
+    [SerializeField] private PotentialCollisionDetector potentialCollisionDetector;
     
     [Header("DEBUG:")]
     [SerializeField] private bool showGizmos = true;
@@ -70,7 +75,6 @@ public class AgentAvoiderSteeringBehavior : SteeringBehavior, ITargeter
 
     private ITargeter _targeter;
     private SteeringBehavior _steeringBehavior;
-    private PotentialCollisionDetector _potentialCollisionDetector;
     private bool _waitingForAvoidanceTimeout;
     private AgentMover _currentAgent;
     private SteeringOutput _currentSteeringOutput;
@@ -86,7 +90,6 @@ public class AgentAvoiderSteeringBehavior : SteeringBehavior, ITargeter
         _agentColor = GetComponent<AgentColor>();
         _targeter = GetComponent<ITargeter>();
         _steeringBehavior = (SteeringBehavior)_targeter;
-        _potentialCollisionDetector = GetComponent<PotentialCollisionDetector>();
     }
 
     private void Start()
@@ -135,13 +138,13 @@ public class AgentAvoiderSteeringBehavior : SteeringBehavior, ITargeter
         // If no potential collision detected, and we are not already avoiding another
         // agent, then head to the target.
         SteeringOutput steeringToTargetVelocity = _steeringBehavior.GetSteering(args);
-        if (!_potentialCollisionDetector.PotentialCollisionDetected &&
+        if (!potentialCollisionDetector.PotentialCollisionDetected &&
             !_waitingForAvoidanceTimeout)
             return steeringToTargetVelocity;
         
         // If we are already avoiding another agent, we need to keep avoidance maneuver
         // until timer times out.
-        if (!_potentialCollisionDetector.PotentialCollisionDetected)
+        if (!potentialCollisionDetector.PotentialCollisionDetected)
             return _currentSteeringOutput;
         
         // If we get here, it means we have detected an agent we can collide with if
@@ -149,12 +152,12 @@ public class AgentAvoiderSteeringBehavior : SteeringBehavior, ITargeter
         // So, if we're going to collide, or are already colliding, then we do the steering
         // based on the current position.
         Vector2 minimumDistanceRelativePosition;
-        if (_potentialCollisionDetector.SeparationAtPotentialCollision <= 0
+        if (potentialCollisionDetector.SeparationAtPotentialCollision <= 0
             ||
-            _potentialCollisionDetector.CurrentDistanceToPotentialCollisionAgent <
-            _potentialCollisionDetector.CollisionDistance)
+            potentialCollisionDetector.CurrentDistanceToPotentialCollisionAgent <
+            potentialCollisionDetector.CollisionDistance)
         {
-            minimumDistanceRelativePosition = _potentialCollisionDetector
+            minimumDistanceRelativePosition = potentialCollisionDetector
                 .CurrentRelativePositionToPotentialCollisionAgent;
         }
         else
@@ -162,7 +165,7 @@ public class AgentAvoiderSteeringBehavior : SteeringBehavior, ITargeter
             // If a collision is going to happen in the future, then calculate the 
             // relative position at that moment.
             minimumDistanceRelativePosition = 
-                _potentialCollisionDetector.RelativePositionAtPotentialCollision;
+                potentialCollisionDetector.RelativePositionAtPotentialCollision;
         }
         
         // Another issue I have with the Millington algorithm is that it multiplies
@@ -179,10 +182,10 @@ public class AgentAvoiderSteeringBehavior : SteeringBehavior, ITargeter
         Vector2 newVelocity = steeringToTargetVelocity.Linear + avoidanceVelocity;
         
         // This is another change from Millington algorithm.
-        float relativeAvoidance = Vector2.Dot(_potentialCollisionDetector
+        float relativeAvoidance = Vector2.Dot(potentialCollisionDetector
                 .CurrentRelativePositionToPotentialCollisionAgent
                 .normalized,
-            _potentialCollisionDetector.CurrentRelativeVelocityToPotentialCollisionAgent
+            potentialCollisionDetector.CurrentRelativeVelocityToPotentialCollisionAgent
                 .normalized);
 
         if (Mathf.Abs(relativeAvoidance) >= TooAlignedFactor)
@@ -192,7 +195,7 @@ public class AgentAvoiderSteeringBehavior : SteeringBehavior, ITargeter
             // avoidance vector that is perpendicular to the collision agent's velocity.
             newVelocity = 
                 Vector2.Perpendicular(
-                        _potentialCollisionDetector.PotentialCollisionAgent.Velocity)
+                        potentialCollisionDetector.PotentialCollisionAgent.Velocity)
                     .normalized * (newVelocity.magnitude * (Random.Range(0,2) * 2 - 1)); 
         } 
         else
@@ -203,7 +206,7 @@ public class AgentAvoiderSteeringBehavior : SteeringBehavior, ITargeter
             // avoid it passing it across its tail.
             int sign = 
                 Vector2.Dot(
-                    _potentialCollisionDetector.PotentialCollisionAgent.Velocity, 
+                    potentialCollisionDetector.PotentialCollisionAgent.Velocity, 
                     newVelocity) > 0
                     ? -1
                     : 1;
@@ -222,32 +225,32 @@ public class AgentAvoiderSteeringBehavior : SteeringBehavior, ITargeter
     {
         if (!showGizmos || Target == null) return;
 
-        if (_potentialCollisionDetector.PotentialCollisionDetected)
+        if (potentialCollisionDetector.PotentialCollisionDetected)
         {
             Vector2 currentAgentCollisionPosition =
-                _potentialCollisionDetector.TimeToPotentialCollision *
+                potentialCollisionDetector.TimeToPotentialCollision *
                 _currentAgent.Velocity + 
                 (Vector2) _currentAgent.transform.position;
             Vector2 otherAgentCollisionPosition =
-                _potentialCollisionDetector.TimeToPotentialCollision *
-                _potentialCollisionDetector.PotentialCollisionAgent.Velocity +
-                (Vector2) _potentialCollisionDetector.PotentialCollisionAgent.transform.position;
+                potentialCollisionDetector.TimeToPotentialCollision *
+                potentialCollisionDetector.PotentialCollisionAgent.Velocity +
+                (Vector2) potentialCollisionDetector.PotentialCollisionAgent.transform.position;
             
             // Draw positions for potential collision.
             Gizmos.color = Color.red;
             Gizmos.DrawLine(transform.position, currentAgentCollisionPosition);
             Gizmos.DrawWireSphere(currentAgentCollisionPosition, 0.1f);
             Gizmos.DrawLine(
-                _potentialCollisionDetector.PotentialCollisionAgent.transform.position,
+                potentialCollisionDetector.PotentialCollisionAgent.transform.position,
                 otherAgentCollisionPosition);
             Gizmos.DrawWireSphere(otherAgentCollisionPosition, 0.1f);
             
             // Draw current collision agent velocity.
             Gizmos.color = Color.green;
             Gizmos.DrawLine(
-                _potentialCollisionDetector.PotentialCollisionAgent.transform.position, 
-                _potentialCollisionDetector.PotentialCollisionAgent.transform.position + 
-                (Vector3) _potentialCollisionDetector.PotentialCollisionAgent.Velocity);
+                potentialCollisionDetector.PotentialCollisionAgent.transform.position, 
+                potentialCollisionDetector.PotentialCollisionAgent.transform.position + 
+                (Vector3) potentialCollisionDetector.PotentialCollisionAgent.Velocity);
         }
     }
 #endif
