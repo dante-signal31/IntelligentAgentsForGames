@@ -1,25 +1,22 @@
-﻿using System;
-using UnityEngine;
-using UnityEngine.Events;
+﻿using UnityEngine;
 
-namespace Sensors
+namespace Tools
 {
 /// <summary>
-/// <p>This script allows resizing a box collider in realtime.<p>
+/// <p>This script allows resizing a box collider in realtime.</p>
 ///
 /// <p>WARNING! when using this component, collider offset should be set only by this
 /// script. So let the collider component offset the property alone and do not edit it
-/// through the inspector.<p>
+/// through the inspector.</p>
 /// </summary>
-[ExecuteAlways]
 public class BoxRangeManager : MonoBehaviour
 {
     /// <summary>
     /// <p>Possible grow directions for the box collider:</p>
     /// <list type="bullet">
     /// <item>
-    /// <b>Symmetric</b>: grow in every direction. If you change range, then UP and DOWN
-    /// grow. If you change width, then LEFT and RIGHT grow.
+    /// <b>Symmetric</b>: grow in every direction. If you change the range, then UP and
+    /// DOWN grow. If you change width, then LEFT and RIGHT grow.
     /// </item>
     /// <item>
     /// <b>Up</b>: grow in the UP direction if you change range. If you change width,
@@ -30,12 +27,12 @@ public class BoxRangeManager : MonoBehaviour
     /// then LEFT and RIGHT grow.
     /// </item>
     /// <item>
-    /// <b>Left</b>: grow in the LEFT direction if you change width. If you change range,
-    /// then UP and DOWN grow.
+    /// <b>Left</b>: grow in the LEFT direction if you change width. If you change the
+    /// range, then UP and DOWN grow.
     /// </item>
     /// <item>
     /// <b>Right</b>: grow in the RIGHT direction if you change width. If you change
-    /// range, then UP and DOWN grow.
+    /// the range, then UP and DOWN grow.
     /// </item>
     /// </list>
     /// </summary>
@@ -90,7 +87,7 @@ public class BoxRangeManager : MonoBehaviour
     /// </summary>
     public BoxCollider2D BoxCollider => boxCollider;
 
-    private Vector2 _currentSize;
+    // private Vector2 _currentSize;
     private GrowDirection _currentGrowDirection;
     private const float OffsetBias = 0.5f;
 
@@ -129,11 +126,6 @@ public class BoxRangeManager : MonoBehaviour
         return newSize - currentSize;
     }
 
-    private void Awake()
-    {
-        _currentSize = new Vector2(width, range);
-    }
-
     private void Start()
     {
         RefreshBoxSize();
@@ -163,13 +155,22 @@ public class BoxRangeManager : MonoBehaviour
         boxCollider.size = newSize;
         boxCollider.offset = initialOffset + growVector * growOffsetVector;
     }
-
-    // TODO: Implement a button to reset box collider.
+    
+    [ContextMenu("Reset Box Manager")]
+    public void ResetBoxManager()
+    {
+        initialOffset = new Vector2(0, 0);
+        range = 1;
+        width = 1;
+        growDirection = GrowDirection.Symmetric;
+        ResetBoxCollider();
+        RefreshBoxSize();
+    }
+    
     /// <summary>
     /// Resets the box collider to its default settings, including offset and size.
     /// Updates the box dimensions to align with the specified width and range values.
     /// </summary>
-    [ContextMenu("Reset Box Collider")]
     public void ResetBoxCollider()
     {
         if (boxCollider == null) return;
@@ -184,7 +185,6 @@ public class BoxRangeManager : MonoBehaviour
         if (growDirection != _currentGrowDirection)
         {
             ResetBoxCollider();
-            _currentSize = Vector2.zero;
             _currentGrowDirection = growDirection;
         }
         RefreshBoxSize();
