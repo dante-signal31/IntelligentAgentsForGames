@@ -72,9 +72,8 @@ public class AgentAvoiderSteeringBehavior : SteeringBehavior, ITargeter
         get => tooAlignedFactor;
         set => tooAlignedFactor = value;
     }
-
-    private ITargeter _targeter;
-    private SteeringBehavior _steeringBehavior;
+    
+    private SeekSteeringBehavior _seekSteeringBehavior;
     private bool _waitingForAvoidanceTimeout;
     private AgentMover _currentAgent;
     private SteeringOutput _currentSteeringOutput;
@@ -88,15 +87,14 @@ public class AgentAvoiderSteeringBehavior : SteeringBehavior, ITargeter
     {
         _currentAgent = GetComponent<AgentMover>();
         _agentColor = GetComponent<AgentColor>();
-        _targeter = GetComponent<ITargeter>();
-        _steeringBehavior = (SteeringBehavior)_targeter;
+        _seekSteeringBehavior = GetComponent<SeekSteeringBehavior>();
     }
 
     private void Start()
     {
         _avoidanceTimer = new Timer();
         SetUpAvoidanceTimer();
-        _targeter.Target = Target;
+        _seekSteeringBehavior.Target = Target;
     }
 
     /// <summary>
@@ -135,9 +133,9 @@ public class AgentAvoiderSteeringBehavior : SteeringBehavior, ITargeter
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        // If no potential collision detected, and we are not already avoiding another
+        // If no potential collision detected, and we are not yet avoiding another
         // agent, then head to the target.
-        SteeringOutput steeringToTargetVelocity = _steeringBehavior.GetSteering(args);
+        SteeringOutput steeringToTargetVelocity = _seekSteeringBehavior.GetSteering(args);
         if (!potentialCollisionDetector.PotentialCollisionDetected &&
             !_waitingForAvoidanceTimeout)
             return steeringToTargetVelocity;

@@ -115,7 +115,7 @@ public class PotentialCollisionDetector : MonoBehaviour
     public float CollisionDistance { get; private set; }
     
     private AgentMover _currentAgent;
-    private List<AgentMover> _detectedAgents;
+    private HashSet<AgentMover> _detectedAgents = new();
 
     /// <summary>
     /// Event handler to use when another agent enters our detection area.
@@ -127,6 +127,21 @@ public class PotentialCollisionDetector : MonoBehaviour
         
         if (otherAgentMover == null) return;
         
+        _detectedAgents.Add(otherAgentMover);
+    }
+
+    /// <summary>
+    /// Event handler to use when an agent stays within the detection area.
+    /// </summary>
+    /// <param name="otherObject">The agent that remains within the detection
+    /// area.</param>
+    public void OnObjectStaySensor(GameObject otherObject)
+    {
+        AgentMover otherAgentMover = otherObject.GetComponent<AgentMover>();
+        
+        if (otherAgentMover == null) return;
+        
+        if (_detectedAgents.Contains(otherAgentMover)) return;
         _detectedAgents.Add(otherAgentMover);
     }
 

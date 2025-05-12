@@ -144,10 +144,10 @@ public class ConeSensor : MonoBehaviour
                 return;
             
             DetectedObjects.Add(otherObject);
+            
+            if (objectEnteredCone != null) 
+                objectEnteredCone.Invoke(otherObject);
         }
-        
-        if (objectEnteredCone != null) 
-            objectEnteredCone.Invoke(otherObject);
     }
     
     /// <summary>
@@ -160,6 +160,8 @@ public class ConeSensor : MonoBehaviour
         {
             if (!PositionIsInConeRange(otherObject.transform.position)) 
                 return;
+            
+            if (!DetectedObjects.Contains(otherObject)) DetectedObjects.Add(otherObject);
             
             if (objectStayCone != null)
                 objectStayCone.Invoke(otherObject);
@@ -177,10 +179,10 @@ public class ConeSensor : MonoBehaviour
             if (!DetectedObjects.Contains(otherObject)) return;
             
             DetectedObjects.Remove(otherObject);
+            
+            if (objectLeftCone != null) 
+                objectLeftCone.Invoke(otherObject);
         }
-        
-        if (objectLeftCone != null) 
-            objectLeftCone.Invoke(otherObject);
     }
     
     /// <summary>

@@ -57,29 +57,24 @@ public class VolumetricSensor : MonoBehaviour
         ObjectsDetected.Remove(obj);
     }
 
-    private GameObject GetGameObject(Collider2D col)
-    {
-        return col.transform.root.gameObject;
-    }
-
     private void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log("Trigger entered: " + other.name);
-        GameObject detectedGameObject = GetGameObject(other);
+        GameObject detectedGameObject = other.gameObject;
         AddDetectedObject(detectedGameObject);
         if (objectEnteredDetectionArea != null) objectEnteredDetectionArea.Invoke(detectedGameObject);
     }
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        GameObject detectedGameObject = GetGameObject(other);
+        GameObject detectedGameObject = other.gameObject;
         RemoveDetectedObject(detectedGameObject);
         if (objectLeftDetectionArea != null) objectLeftDetectionArea.Invoke(detectedGameObject);
     }
 
     private void OnTriggerStay2D(Collider2D other)
     {
-        GameObject detectedGameObject = GetGameObject(other);
+        GameObject detectedGameObject = other.gameObject;
+        if (!ObjectsDetected.Contains(detectedGameObject)) AddDetectedObject(detectedGameObject);
         if (objectStayDetectionArea != null) objectStayDetectionArea.Invoke(detectedGameObject);
     }
 }
