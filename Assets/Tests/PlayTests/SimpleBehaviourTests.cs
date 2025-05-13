@@ -26,6 +26,7 @@ namespace Tests.PlayTests
         private Transform _position11;
         private Transform _position12;
         private Transform _position13;
+        private Transform _position14;
 
         private TargetPlacement _target;
 
@@ -44,6 +45,7 @@ namespace Tests.PlayTests
         private GameObject _cohesionGameObject;
         private GameObject _wanderGameObject;
         private GameObject _offsetFollowGameObject;
+        private GameObject _agentAvoiderGameObject;
 
         [UnitySetUp]
         public IEnumerator SetUp()
@@ -83,6 +85,8 @@ namespace Tests.PlayTests
                 _position12 = GameObject.Find("Position12").transform;
             if (_position13 == null)
                 _position13 = GameObject.Find("Position13").transform;
+            if (_position14 == null)
+                _position14 = GameObject.Find("Position14").transform;
 
             if (_seekGameObject == null)
             {
@@ -167,6 +171,11 @@ namespace Tests.PlayTests
             {
                 _offsetFollowGameObject = GameObject.Find("OffsetFollowMovingAgent");
                 _offsetFollowGameObject.SetActive(false);
+            }
+            if (_agentAvoiderGameObject == null)
+            {
+                _agentAvoiderGameObject = GameObject.Find("AgentAvoiderMovingAgent");
+                _agentAvoiderGameObject.SetActive(false);
             }
         }
 
@@ -1218,6 +1227,67 @@ namespace Tests.PlayTests
 
             // Cleanup.
             _wanderGameObject.SetActive(false);
+            _target.Enabled = false;
+        }
+        
+         /// <summary>
+        /// Test that AgentAvoiderBehavior can reach its target without touching another
+        /// moving agent that goes across its path.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator AgentAvoiderBehaviorTestFirstScenario()
+        {
+            // Test setup.
+            var obstacleMovingAgent = _seekGameObject.GetComponent<AgentMover>();
+            obstacleMovingAgent.MaximumSpeed = 2.0f;
+            obstacleMovingAgent.StopSpeed = 0.1f;
+            obstacleMovingAgent.MaximumRotationalSpeed = 180f;
+            obstacleMovingAgent.StopRotationThreshold = 1f;
+            obstacleMovingAgent.MaximumAcceleration = 1.8f;
+            obstacleMovingAgent.MaximumDeceleration = 1.8f;
+            var obstacleMovingAgentColor = _seekGameObject.GetComponent<AgentColor>();
+            obstacleMovingAgentColor.Color = Color.red;
+            var seekSteeringBehavior = 
+                _seekGameObject.GetComponent<SeekSteeringBehavior>();
+            seekSteeringBehavior.ArrivalDistance = 0.2f;
+            
+            var agentAvoider = _pursuitGameObject.GetComponent<AgentMover>();
+            agentAvoider.MaximumSpeed = 2.7f;
+            agentAvoider.MaximumAcceleration = 4.0f;
+            agentAvoider.MaximumRotationalSpeed = 180f;
+            agentAvoider.StopRotationThreshold = 1f;
+            agentAvoider.StopSpeed = 0.1f;
+            agentAvoider.MaximumAcceleration = 2;
+            agentAvoider.MaximumDeceleration = 4;
+            var agentAvoiderSteeringBehavior = 
+                _agentAvoiderGameObject.GetComponent<AgentAvoiderSteeringBehavior>();
+            
+            // FIRST SCENARIO:
+            _target.TargetPosition = _position11.position;
+            _agentAvoiderGameObject.transform.position = _position14.position;
+            _seekGameObject.transform.position = _position10.position;
+            seekSteeringBehavior.Target = _position1.gameObject;
+            agentAvoiderSteeringBehavior.Target = _target.gameObject;
+            _target.Enabled = true;
+            _seekGameObject.SetActive(true);
+            _agentAvoiderGameObject.SetActive(true);
+            
+            // Assert we move without touching the obstacle agent.
+            int steps = 9;
+            for (int i=0; i < steps; i++)
+            {
+                yield return new WaitForSeconds(1.0f);
+                Assert.True(Vector3.Distance(_seekGameObject.transform.position, 
+                    _agentAvoiderGameObject.transform.position) >= (1.5f));
+            }
+            
+            // Assert we reached target.
+            Assert.True(Vector3.Distance(_agentAvoiderGameObject.transform.position, 
+                    _target.transform.position) <= (0.1f));
+            
+            // Cleanup.
+            _seekGameObject.SetActive(false);
+            _agentAvoiderGameObject.SetActive(false);
             _target.Enabled = false;
         }
     }
