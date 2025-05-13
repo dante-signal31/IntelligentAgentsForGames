@@ -250,6 +250,12 @@ public class AgentAvoiderSteeringBehavior : SteeringBehavior, ITargeter
                 potentialCollisionDetector.PotentialCollisionAgent.transform.position + 
                 (Vector3) potentialCollisionDetector.PotentialCollisionAgent.Velocity);
         }
+
+        if (_currentAgent == null) return;
+        
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(transform.position, 
+            (Vector2) transform.position + _currentAgent.Velocity);
     }
 #endif
     
