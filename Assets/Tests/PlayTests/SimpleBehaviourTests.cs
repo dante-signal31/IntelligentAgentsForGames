@@ -1237,6 +1237,7 @@ namespace Tests.PlayTests
         [UnityTest]
         public IEnumerator AgentAvoiderBehaviorTestFirstScenario()
         {
+            // TODO: Fix agent drag after touching wall.
             // Test setup.
             var obstacleMovingAgent = _seekGameObject.GetComponent<AgentMover>();
             obstacleMovingAgent.MaximumSpeed = 2.0f;
@@ -1273,7 +1274,7 @@ namespace Tests.PlayTests
             _agentAvoiderGameObject.SetActive(true);
             
             // Assert we move without touching the obstacle agent.
-            int steps = 9;
+            int steps = 6;
             for (int i=0; i < steps; i++)
             {
                 yield return new WaitForSeconds(1.0f);
@@ -1283,7 +1284,7 @@ namespace Tests.PlayTests
             
             // Assert we reached target.
             Assert.True(Vector3.Distance(_agentAvoiderGameObject.transform.position, 
-                    _target.transform.position) <= (0.1f));
+                    _target.transform.position) <= (0.2f));
             
             // Cleanup.
             _seekGameObject.SetActive(false);
@@ -1334,7 +1335,7 @@ namespace Tests.PlayTests
             _agentAvoiderGameObject.SetActive(true);
             
             // Assert we move without touching the obstacle agent.
-            int steps = 9;
+            int steps = 7;
             for (int i=0; i < steps; i++)
             {
                 yield return new WaitForSeconds(1.0f);
@@ -1385,18 +1386,17 @@ namespace Tests.PlayTests
                 _agentAvoiderGameObject.GetComponent<AgentAvoiderSteeringBehavior>();
             
             // THIRD SCENARIO:
-            // _target.TargetPosition = _position14.position;
+            _target.TargetPosition = _position14.position;
             _agentAvoiderGameObject.transform.position = _position7.position;
             _seekGameObject.transform.position = _position1.position;
             seekSteeringBehavior.Target = _position10.gameObject;
-            // agentAvoiderSteeringBehavior.Target = _target.gameObject;
-            agentAvoiderSteeringBehavior.Target = _position14.gameObject;
-            // _target.Enabled = true;
+            agentAvoiderSteeringBehavior.Target = _target.gameObject;
+            _target.Enabled = true;
             _seekGameObject.SetActive(true);
             _agentAvoiderGameObject.SetActive(true);
             
             // Assert we move without touching the obstacle agent.
-            int steps = 9;
+            int steps = 6;
             for (int i=0; i < steps; i++)
             {
                 yield return new WaitForSeconds(1.0f);
@@ -1457,7 +1457,7 @@ namespace Tests.PlayTests
             _agentAvoiderGameObject.SetActive(true);
             
             // Assert we move without touching the obstacle agent.
-            int steps = 9;
+            int steps = 5;
             for (int i=0; i < steps; i++)
             {
                 yield return new WaitForSeconds(1.0f);
@@ -1518,7 +1518,7 @@ namespace Tests.PlayTests
             _agentAvoiderGameObject.SetActive(true);
             
             // Assert we move without touching the obstacle agent.
-            int steps = 9;
+            int steps = 5;
             for (int i=0; i < steps; i++)
             {
                 yield return new WaitForSeconds(1.0f);

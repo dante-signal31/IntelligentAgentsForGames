@@ -114,8 +114,9 @@ public class ConeSensor : MonoBehaviour
     private bool PositionIsInConeRange(Vector2 position)
     {
         float distance = Vector2.Distance(position, transform.position);
-        float heading = Vector2.Angle(Forward,
-            transform.InverseTransformPoint(position));
+        float heading = Vector2.Angle(
+            Forward,
+            position - (Vector2) transform.position);
         return distance <= DetectionRange && heading <= DetectionSemiconeAngle;
     }
     
