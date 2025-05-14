@@ -171,6 +171,8 @@ public class AgentMover : MonoBehaviour
             // If no explicit angular steering, we will just look at the direction we
             // are moving, but clamping our rotation by our rotational speed.
             float totalRotationNeeded = Vector2.Angle(Forward, rigidBody.linearVelocity);
+            // TODO: Check if below Abs() is really needed. I think angle returns an
+            // unsigned value.
             if (Mathf.Abs(totalRotationNeeded) > stopRotationThreshold)
             {
                 Vector3 newHeading = Vector3.Slerp(

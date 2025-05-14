@@ -42,7 +42,14 @@ public class AgentAvoiderSteeringBehavior : SteeringBehavior, ITargeter
     public GameObject Target
     {
         get => target;
-        set => target = value;
+        set
+        {
+            if (target == value) return;
+            target = value;
+            
+            if (_seekSteeringBehavior == null) return;
+            _seekSteeringBehavior.Target = value;
+        }
     }
 
     /// <summary>
