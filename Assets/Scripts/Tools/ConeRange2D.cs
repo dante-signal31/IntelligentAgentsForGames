@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace Tools
@@ -82,6 +83,15 @@ public class ConeRange2D : MonoBehaviour
         this.semiConeDegrees = semiConeDegrees;
         this.fixedRange = fixedRange;
     }
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        // Call properties to force event emission.
+        Range = range;
+        SemiConeDegrees = semiConeDegrees;
+    }
+#endif
 }
 }
 

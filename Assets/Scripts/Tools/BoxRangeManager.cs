@@ -46,6 +46,7 @@ public class BoxRangeManager : MonoBehaviour
     }
 
     [Header("CONFIGURATION:")]
+    [Tooltip("Offset of this sensor at its (1,1) dimensions.")]
     [SerializeField] private Vector2 initialOffset;
     [Tooltip("Length for this sensor. It moves UP and DOWN of the box.")]
     [SerializeField] private float range;
@@ -55,6 +56,7 @@ public class BoxRangeManager : MonoBehaviour
     [SerializeField] private GrowDirection growDirection;
 
     [Header("WIRING:")]
+    [Tooltip("Managed box collider.")]
     [SerializeField] private BoxCollider2D boxCollider;
 
     /// <summary>

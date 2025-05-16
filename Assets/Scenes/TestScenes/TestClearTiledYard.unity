@@ -2391,6 +2391,18 @@ PrefabInstance:
       propertyPath: target
       value: 
       objectReference: {fileID: 172854090}
+    - target: {fileID: 2189334383398303143, guid: a5d357c6e8bd9e9489bdfbe8d9b0afc4, type: 3}
+      propertyPath: m_Size.x
+      value: 8.526478
+      objectReference: {fileID: 0}
+    - target: {fileID: 2189334383398303143, guid: a5d357c6e8bd9e9489bdfbe8d9b0afc4, type: 3}
+      propertyPath: m_Size.y
+      value: 4.263239
+      objectReference: {fileID: 0}
+    - target: {fileID: 2189334383398303143, guid: a5d357c6e8bd9e9489bdfbe8d9b0afc4, type: 3}
+      propertyPath: m_Offset.y
+      value: 2.1316195
+      objectReference: {fileID: 0}
     - target: {fileID: 2660583837546112545, guid: a5d357c6e8bd9e9489bdfbe8d9b0afc4, type: 3}
       propertyPath: m_LocalPosition.x
       value: -12.61
@@ -2470,6 +2482,14 @@ PrefabInstance:
     - target: {fileID: 6581669389491866556, guid: a5d357c6e8bd9e9489bdfbe8d9b0afc4, type: 3}
       propertyPath: objectStayCone.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 6755977188967783514, guid: a5d357c6e8bd9e9489bdfbe8d9b0afc4, type: 3}
+      propertyPath: range
+      value: 4.263239
+      objectReference: {fileID: 0}
+    - target: {fileID: 6755977188967783514, guid: a5d357c6e8bd9e9489bdfbe8d9b0afc4, type: 3}
+      propertyPath: semiConeDegrees
+      value: 90.00013
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

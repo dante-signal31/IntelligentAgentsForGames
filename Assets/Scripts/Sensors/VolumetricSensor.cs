@@ -11,7 +11,7 @@ namespace Sensors
 [ExecuteAlways]
 public class VolumetricSensor : MonoBehaviour
 {
-    [Header("CONFIGURATION:")] 
+    [Header("EVENTS:")] 
     [Tooltip("Subscribers for detection events.")] 
     [SerializeField] private UnityEvent<GameObject> objectEnteredDetectionArea;
     [Tooltip("Subscribers to object staying in volumetric area.")]

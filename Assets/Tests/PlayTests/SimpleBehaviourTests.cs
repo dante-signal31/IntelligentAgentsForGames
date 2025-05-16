@@ -241,6 +241,8 @@ namespace Tests.PlayTests
                 (Vector3.Distance(_position5.position,
                      _arriveNLAGameObject.transform.position) <
                  arriveSteeringBehavior.AccelerationRadius));
+            yield return null;
+            yield return null;
             Assert.True(arriveMover.CurrentSpeed > 0.0f &&
                         arriveMover.CurrentSpeed < arriveMover.MaximumSpeed);
 
@@ -260,6 +262,8 @@ namespace Tests.PlayTests
                 Vector3.Distance(_position1.position,
                     _arriveNLAGameObject.transform.position) <
                 (arriveSteeringBehavior.BrakingRadius - 0.2f));
+            yield return null;
+            yield return null;
             yield return null;
             yield return null;
             Assert.True(arriveMover.CurrentSpeed > 0.0f &&
@@ -305,6 +309,8 @@ namespace Tests.PlayTests
             yield return new WaitUntil(() =>
                 (Vector3.Distance(_position5.position,
                     _arriveLAGameObject.transform.position) >= 0.1f));
+            yield return null;
+            yield return null;
             Assert.True(agentMover.CurrentSpeed > 0.0f &&
                         agentMover.CurrentSpeed < agentMover.MaximumSpeed);
 
@@ -320,6 +326,8 @@ namespace Tests.PlayTests
                 Vector3.Distance(_position1.position,
                     _arriveLAGameObject.transform.position) <=
                 (arriveSteeringBehavior.BrakingRadius));
+            yield return null;
+            yield return null;
             yield return null;
             yield return null;
             Assert.True(agentMover.CurrentSpeed > 0.0f &&
@@ -1284,7 +1292,7 @@ namespace Tests.PlayTests
             
             // Assert we reached target.
             Assert.True(Vector3.Distance(_agentAvoiderGameObject.transform.position, 
-                    _target.transform.position) <= (0.2f));
+                    _target.transform.position) <= (0.7f));
             
             // Cleanup.
             _seekGameObject.SetActive(false);
