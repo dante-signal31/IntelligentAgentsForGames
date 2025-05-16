@@ -149,9 +149,9 @@ public class ConeSensor : MonoBehaviour
     }
 
     /// <summary>
-    /// Event handler to use when another object enters our cone area.
+    /// Event handler to use when another object enters the detection area.
     /// </summary>
-    /// <param name="otherObject">The object who enters our cone area.</param>
+    /// <param name="otherObject">The object who enters the detection area.</param>
     public void OnObjectEnteredCone(GameObject otherObject)
     {
         if (ObjectIsInLayerMask(otherObject, LayersToDetect))
@@ -167,16 +167,27 @@ public class ConeSensor : MonoBehaviour
     }
     
     /// <summary>
-    /// Event handler to use when another object stays in our cone area.
+    /// Event handler to use when another object stays in the detection area.
     /// </summary>
-    /// <param name="otherObject">The object who stays in our cone area.</param>
+    /// <param name="otherObject">The object who stays in the detection area.</param>
     public void OnObjectStayCone(GameObject otherObject)
     {
         if (ObjectIsInLayerMask(otherObject, LayersToDetect))
         {
+            // Only keep in DetectedObjects those who are in the detection area and in
+            // cone range.
+            if (!PositionIsInConeRange(otherObject.transform.position) &&
+                DetectedObjects.Contains(otherObject))
+            {
+                DetectedObjects.Remove(otherObject);
+                return;
+            }
+            
+            // Not in the cone range nor in DetectedObjects, so just ignore it.
             if (!PositionIsInConeRange(otherObject.transform.position)) 
                 return;
             
+            // If the object is in cone range but not in DetectedObjects, then add it.
             if (!DetectedObjects.Contains(otherObject)) DetectedObjects.Add(otherObject);
             
             if (objectStayCone != null)

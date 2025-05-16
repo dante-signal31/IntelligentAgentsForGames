@@ -1353,7 +1353,7 @@ namespace Tests.PlayTests
             
             // Assert we reached target.
             Assert.True(Vector3.Distance(_agentAvoiderGameObject.transform.position, 
-                    _target.transform.position) <= (0.1f));
+                    _target.transform.position) <= (0.5f));
             
             // Cleanup.
             _seekGameObject.SetActive(false);

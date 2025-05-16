@@ -148,10 +148,10 @@ public class PotentialCollisionDetector : MonoBehaviour
     /// <summary>
     /// Event handler to use when another agent exits our detection area.
     /// </summary>
-    /// <param name="otherAgent">The agent who exits our detection area.</param>
-    public void OnObjectExitedSensor(GameObject otherAgent)
+    /// <param name="otherObject">The agent who exits our detection area.</param>
+    public void OnObjectExitedSensor(GameObject otherObject)
     {
-        AgentMover otherAgentMover = otherAgent.GetComponent<AgentMover>();
+        AgentMover otherAgentMover = otherObject.GetComponent<AgentMover>();
         
         if (otherAgentMover == null ||
             !_detectedAgents.Contains(otherAgentMover)) return;

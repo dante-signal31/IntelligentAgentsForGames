@@ -72,7 +72,7 @@ public class VolumetricSensor : MonoBehaviour
     }
 
     private void OnTriggerStay2D(Collider2D other)
-    {
+    { 
         GameObject detectedGameObject = other.gameObject;
         if (!ObjectsDetected.Contains(detectedGameObject)) AddDetectedObject(detectedGameObject);
         if (objectStayDetectionArea != null) objectStayDetectionArea.Invoke(detectedGameObject);
