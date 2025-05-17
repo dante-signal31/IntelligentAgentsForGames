@@ -216,7 +216,7 @@ namespace Tests.PlayTests
         /// </summary>
         [UnityTest]
         public IEnumerator ArriveBehaviourNLATest()
-        { // TODO: This test fails too often. There's something worng with. Must check it.
+        { // TODO: This test fails too often. There's something wrong with. Must check it.
             // Test setup.
             _arriveNLAGameObject.transform.position = _position5.position;
             var arriveSteeringBehavior =

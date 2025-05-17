@@ -234,7 +234,7 @@ public class HideSteeringBehavior : SteeringBehavior
     }
 
     private void FixedUpdate()
-    {
+    { // TODO: Hide agent stays frozen while threat moves. Fix it.
         if (Threat == null || rayCastToThreat == null) return;
         
         // Check if there is a line of sight with the threat.
