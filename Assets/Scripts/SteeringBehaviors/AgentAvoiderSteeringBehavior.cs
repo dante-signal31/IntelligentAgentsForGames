@@ -154,8 +154,8 @@ public class AgentAvoiderSteeringBehavior : SteeringBehavior, ITargeter
         
         // If we get here, it means we have detected an agent we can collide with if
         // the current heading is not changed.
-        // So, if we're going to collide, or are already colliding, then we do the steering
-        // based on the current position.
+        // So, if we're going to collide, or are already colliding, then we do the
+        // steering based on the current position.
         Vector2 minimumDistanceRelativePosition;
         if (potentialCollisionDetector.SeparationAtPotentialCollision <= 0
             ||

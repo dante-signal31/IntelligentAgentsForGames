@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using SteeringBehaviors;
 using Tools;
 using UnityEngine;
 using UnityEngine.Events;
@@ -35,7 +34,8 @@ public class ConeSensor : MonoBehaviour
     [SerializeField] private VolumetricSensor sensor;
     [SerializeField] private BoxRangeManager boxRangeManager;
     [SerializeField] private ConeRange2D coneRange;
-    
+
+    private bool _parameterSetFromHere = false;
     /// <summary>
     /// Range to detect objects.
     /// </summary>
@@ -44,18 +44,16 @@ public class ConeSensor : MonoBehaviour
         get => detectionRange;
         set
         {
-            // Guard needed to avoid infinite calls between this component and _coneRange
-            // when changing the range.
-            if (Mathf.Approximately(detectionRange, value)) return;
-            
             detectionRange = value;
             UpdateDetectionArea();
             if (coneSensorDimensionsChanged != null) 
                 coneSensorDimensionsChanged.Invoke(
                     DetectionRange, 
                     DetectionSemiconeAngle);
-
-            if (Mathf.Approximately(detectionRange, value)) return;
+            
+            // Guard needed to avoid infinite calls between this component and _coneRange
+            // when changing the range.
+            _parameterSetFromHere = true;
             coneRange.Range = DetectionRange;
         }
     }
@@ -68,18 +66,16 @@ public class ConeSensor : MonoBehaviour
         get => detectionSemiconeAngle;
         set
         {
-            // Guard needed to avoid infinite calls between this component and _coneRange
-            // when changing the angle.
-            if (Mathf.Approximately(detectionSemiconeAngle, value)) return;
-            
             detectionSemiconeAngle = value;
             UpdateDetectionArea();
             if (coneSensorDimensionsChanged != null) 
                 coneSensorDimensionsChanged.Invoke(
                     DetectionRange, 
                     DetectionSemiconeAngle);
-            
-            if (Mathf.Approximately(detectionSemiconeAngle, value)) return;
+
+            // Guard needed to avoid infinite calls between this component and _coneRange
+            // when changing the angle.
+            _parameterSetFromHere = true;
             coneRange.SemiConeDegrees = DetectionSemiconeAngle;
         }
     }
@@ -108,7 +104,7 @@ public class ConeSensor : MonoBehaviour
     /// to ConeSensor.</p> 
     /// </summary>
     // TODO: Try to change this type for an HashSet.
-    public List<GameObject> DetectedObjects { get; private set; } = new();
+    public HashSet<GameObject> DetectedObjects { get; private set; } = new();
     
     /// <summary>
     /// Whether the provided object layer is included in the provided LayerMask.
@@ -144,6 +140,13 @@ public class ConeSensor : MonoBehaviour
     /// detecting an agent.</param>
     public void OnConeRangeUpdated(float range, float semiConeDegrees)
     {
+        // Guard needed to avoid infinite calls between this component and _coneRange
+        // when changing the range or angle.
+        if (_parameterSetFromHere)
+        {
+            _parameterSetFromHere = false;
+            return;
+        }
         DetectionRange = range;
         DetectionSemiconeAngle = semiConeDegrees;
     }
@@ -223,5 +226,14 @@ public class ConeSensor : MonoBehaviour
                                 Mathf.Sin(DetectionSemiconeAngle * 
                                           Mathf.Deg2Rad) * 2;
     }
+    
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        // Force the use of properties to make them update cone range.
+        DetectionRange = detectionRange;
+        DetectionSemiconeAngle = detectionSemiconeAngle;
+    }
+#endif
 }
 }

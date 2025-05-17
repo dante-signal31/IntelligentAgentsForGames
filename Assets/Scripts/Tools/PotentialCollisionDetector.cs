@@ -222,8 +222,8 @@ public class PotentialCollisionDetector : MonoBehaviour
             // https://medium.com/@knave/collision-avoidance-the-math-1f6cdf383b5c
             //
             // So, I've multiplied by -1.0 the numerator.
-            float timeToClosestPosition = Vector2.Dot(
-                                              -relativePosition, 
+            float timeToClosestPosition = -1.0f * Vector2.Dot(
+                                              relativePosition, 
                                               relativeVelocity) / 
                                           Mathf.Pow(relativeSpeed, 2.0f);
             

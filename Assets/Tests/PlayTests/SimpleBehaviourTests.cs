@@ -216,7 +216,7 @@ namespace Tests.PlayTests
         /// </summary>
         [UnityTest]
         public IEnumerator ArriveBehaviourNLATest()
-        {
+        { // TODO: This test fails too often. There's something worng with. Must check it.
             // Test setup.
             _arriveNLAGameObject.transform.position = _position5.position;
             var arriveSteeringBehavior =
@@ -241,8 +241,7 @@ namespace Tests.PlayTests
                 (Vector3.Distance(_position5.position,
                      _arriveNLAGameObject.transform.position) <
                  arriveSteeringBehavior.AccelerationRadius));
-            yield return null;
-            yield return null;
+            yield return new WaitForSeconds(0.03f);
             Assert.True(arriveMover.CurrentSpeed > 0.0f &&
                         arriveMover.CurrentSpeed < arriveMover.MaximumSpeed);
 
@@ -251,8 +250,7 @@ namespace Tests.PlayTests
                 Vector3.Distance(_position5.position,
                     _arriveNLAGameObject.transform.position) >
                 (arriveSteeringBehavior.AccelerationRadius + 0.1f));
-            yield return null;
-            yield return null;
+            yield return new WaitForSeconds(0.06f);
             Assert.True(
                 Mathf.Approximately(arriveMover.CurrentSpeed,
                     arriveMover.MaximumSpeed));
@@ -262,10 +260,7 @@ namespace Tests.PlayTests
                 Vector3.Distance(_position1.position,
                     _arriveNLAGameObject.transform.position) <
                 (arriveSteeringBehavior.BrakingRadius - 0.2f));
-            yield return null;
-            yield return null;
-            yield return null;
-            yield return null;
+            yield return new WaitForSeconds(0.06f);
             Assert.True(arriveMover.CurrentSpeed > 0.0f &&
                         arriveMover.CurrentSpeed < arriveMover.MaximumSpeed);
 
