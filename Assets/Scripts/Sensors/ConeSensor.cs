@@ -103,7 +103,6 @@ public class ConeSensor : MonoBehaviour
     /// <p>Only are considered those objects included in the layermask provided
     /// to ConeSensor.</p> 
     /// </summary>
-    // TODO: Try to change this type for an HashSet.
     public HashSet<GameObject> DetectedObjects { get; private set; } = new();
     
     /// <summary>
