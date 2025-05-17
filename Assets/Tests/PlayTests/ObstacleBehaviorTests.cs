@@ -90,7 +90,7 @@ namespace Tests.PlayTests
             _seekGameObject.SetActive(true);
             
             _hideGameObject.transform.position = _position2.position;
-            _hideAgent.MaximumSpeed = 6.0f;
+            _hideAgent.MaximumSpeed = 7.0f;
             _hideAgent.StopSpeed = 0.01f;
             _hideAgent.MaximumRotationalSpeed = 1080f;
             _hideAgent.StopRotationThreshold = 1f;
