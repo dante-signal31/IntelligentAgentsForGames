@@ -78,7 +78,7 @@ public class Whiskers : MonoBehaviour
         /// <summary>
         /// Remove every sensor in the list.
         ///
-        /// This method leaves list empty.
+        /// This method leaves the list empty.
         /// </summary>
         public void Clear()
         {
@@ -108,8 +108,7 @@ public class Whiskers : MonoBehaviour
     /// <summary>
     /// Struct to represent ray ends for every sensor in prefab local space.
     /// </summary>
-    [Serializable]
-    public struct RayEnds
+    [Serializable] public struct RayEnds
     {
         public Vector3 start;
         public Vector3 end;
@@ -150,7 +149,7 @@ public class Whiskers : MonoBehaviour
     [Header("DEBUG")]
     [Tooltip("Whether to show gizmos for sensors.")]
     [SerializeField] private bool showGizmos = true;
-    [Tooltip("Color for this scripts gizmos.")]
+    [Tooltip("Color for this script gizmos.")]
     [SerializeField] private Color gizmoColor = Color.yellow;
 
     /// <summary>
@@ -259,9 +258,8 @@ public class Whiskers : MonoBehaviour
     }
 
     /// <summary>
-    /// List of detected hits.
-    ///
-    /// It's got as a list of tuples of (hit, detecting sensor index).
+    /// <p>List of detected hits.</p>
+    /// <p>It's got as a list of tuples of (hit, detecting sensor index).</p>
     /// </summary>
     public List<(RaycastHit2D, int)> DetectedHits
     {
@@ -546,7 +544,7 @@ public class Whiskers : MonoBehaviour
     /// Whether this index is the one of the center sensor.
     /// </summary>
     /// <param name="index">Sensor index</param>
-    /// <returns>True if center sensor has this index.</returns>
+    /// <returns>True if the center sensor has this index.</returns>
     public bool IsCenterSensor(int index)=> index == SensorAmount / 2;
     
     /// <summary>

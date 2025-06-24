@@ -3,7 +3,7 @@
 namespace SteeringBehaviors
 {
 /// <summary>
-/// Steering behavior to avoid walls ans obstacles.
+/// Steering behavior to avoid walls and obstacles.
 /// </summary>
 public class WallAvoidanceSteeringBehavior : SteeringBehavior
 {
@@ -44,13 +44,13 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
     }
 
     /// <summary>
-    /// Start timer for running away from obstacle.
+    /// Start a timer for running away from an obstacle.
     ///
-    /// While timer is on the object will run away from obstacle, so will keep its
-    /// evasion vector. This is useful to avoid jittering whan avoiding small obstacles. 
+    /// While the timer is on, the object will run away from an obstacle, so will keep its
+    /// evasion vector. This is useful to avoid jittering when avoiding small obstacles. 
     /// </summary>
     private void StartRunningAwayTimer()
-    {
+    { // TODO: Reimplement this timer. Actually, is doing nothing now.
         _runningAwayFromObstacle = true;
         _runningAwayElapsedTime = 0.0f;
     }
@@ -58,7 +58,7 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
     /// <summary>
     /// End running away timer.
     ///
-    /// At this time object will stop running away from obstacle, so will stop its
+    /// At this time an object will stop running away from obstacle, so will stop its
     /// evasion vector.
     /// </summary>
     private void EndRunningAway()
@@ -68,10 +68,10 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
 
     private void OnEnable()
     {
-        // OnEnable runs before Start, so first time OnEnable is called, sensors are not
-        // initialized. That's why I call to SubscribeToSensorsEvents in Start.
-        // Nevertheless I call it here too just in case object is disabled and then
-        // enabled again.
+        // OnEnable runs before Start, so the first time OnEnable is called, sensors are
+        // not initialized. That's why I call SubscribeToSensorsEvents in Start.
+        // Nevertheless, I call it here too just in case the current object is disabled
+        // and then enabled again.
         whiskers.SubscribeToColliderDetected(OnColliderDetected);
         whiskers.SubscribeToNoColliderDetected(OnNoColliderDetected);
     }
@@ -114,14 +114,15 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
             if (whiskers.IsCenterSensor(sensorIndexClosestDetectedHit))
             {
                 // Buckland uses this approach for every sensor, but I only use it for
-                // center sensor to only brake when obstacle is just in front of us.
+                // the center sensor to only brake when an obstacle is just in front of
+                // us.
                 _avoidVector = closestHit.normal * (args.MaximumSpeed * overShootFactor);
             }
             else
             {
-                // For every other sensor than front one I only project normal vector as
-                // a lateral push. This way I make agent rotate without braking when
-                // obstacle is not in front of it.
+                // For every other sensor than front one I only project a normal vector
+                // as a lateral push. This way I make the agent rotate without braking
+                // when an obstacle is not in front of it.
                 float lateralPush = Vector3.Dot(
                     closestHit.normal, 
                     transform.right);

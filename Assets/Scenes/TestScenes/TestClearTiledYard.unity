@@ -2393,15 +2393,15 @@ PrefabInstance:
       objectReference: {fileID: 172854090}
     - target: {fileID: 2189334383398303143, guid: a5d357c6e8bd9e9489bdfbe8d9b0afc4, type: 3}
       propertyPath: m_Size.x
-      value: 8.526478
+      value: 7.339984
       objectReference: {fileID: 0}
     - target: {fileID: 2189334383398303143, guid: a5d357c6e8bd9e9489bdfbe8d9b0afc4, type: 3}
       propertyPath: m_Size.y
-      value: 4.263239
+      value: 3.67
       objectReference: {fileID: 0}
     - target: {fileID: 2189334383398303143, guid: a5d357c6e8bd9e9489bdfbe8d9b0afc4, type: 3}
       propertyPath: m_Offset.y
-      value: 2.1316195
+      value: 1.835
       objectReference: {fileID: 0}
     - target: {fileID: 2660583837546112545, guid: a5d357c6e8bd9e9489bdfbe8d9b0afc4, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2458,6 +2458,18 @@ PrefabInstance:
     - target: {fileID: 6071003726882822311, guid: a5d357c6e8bd9e9489bdfbe8d9b0afc4, type: 3}
       propertyPath: m_Enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6071003726882822311, guid: a5d357c6e8bd9e9489bdfbe8d9b0afc4, type: 3}
+      propertyPath: detectionRange
+      value: 3.67
+      objectReference: {fileID: 0}
+    - target: {fileID: 6581669389491866556, guid: a5d357c6e8bd9e9489bdfbe8d9b0afc4, type: 3}
+      propertyPath: detectionRange
+      value: 4.96
+      objectReference: {fileID: 0}
+    - target: {fileID: 6581669389491866556, guid: a5d357c6e8bd9e9489bdfbe8d9b0afc4, type: 3}
+      propertyPath: detectionSemiconeAngle
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 6581669389491866556, guid: a5d357c6e8bd9e9489bdfbe8d9b0afc4, type: 3}
       propertyPath: objectStayCone.m_PersistentCalls.m_Calls.Array.size
