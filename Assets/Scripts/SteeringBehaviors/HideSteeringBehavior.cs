@@ -238,7 +238,7 @@ public class HideSteeringBehavior : SteeringBehavior
         if (Threat == null || rayCastToThreat == null) return;
         
         // Check if there is a line of sight with the threat.
-        rayCastToThreat.TargetPosition = Threat.transform.position;
+        rayCastToThreat.EndPosition = Threat.transform.position;
         if (rayCastToThreat.IsColliderDetected)
         {
             _threatCanSeeUs = rayCastToThreat.DetectedCollider.gameObject == Threat.gameObject;

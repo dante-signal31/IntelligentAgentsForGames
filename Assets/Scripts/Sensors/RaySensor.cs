@@ -1,60 +1,59 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
 
 
 /// <summary>
 /// <p>Generic component for ray sensors.</p>
 ///
-/// <p>Just place it and give it the layer were you want to detect colliders. It will emit
-/// a colliderDetected event whenever one is hit by ray and a noColliderDetected event when
-/// ray is clear. </p>s
+/// <p>Just place it and give it the layer were you want to detect colliders. It will
+/// emit a colliderDetected event whenever one is hit by ray and a noColliderDetected
+/// event when ray is clear. </p>s
 /// </summary>
 public class RaySensor : MonoBehaviour
 {
     [Header("CONFIGURATION:")] 
     [Tooltip("Layers to be detected by this sensor.")] 
-    [SerializeField] private LayerMask layerMask;
+    [SerializeField] private LayerMask detectionLayers;
     [Tooltip("Whether to ignore colliders overlapping start point.")]
     [SerializeField] private bool ignoreCollidersOverlappingStartPoint = true;
     [Space]
     [Tooltip("Event to trigger when a collider is detected by this sensor.")]    
-    [SerializeField] private UnityEvent<Collider2D> colliderDetected;
+    public UnityEvent<RaySensor> colliderDetected;
     [Tooltip("Event to trigger when no collider is detected by this sensor.")]
-    [SerializeField] private UnityEvent noColliderDetected;
+    public UnityEvent noColliderDetected;
     
     [Header("DEBUG:")] 
     [Tooltip("Whether to show gizmos for this sensor.")]
     [SerializeField] private bool showGizmos = true;
     [Tooltip("Gizmo color for this sensor.")]
-    [SerializeField] private Color gizmoColor = Color.green;
+    [SerializeField] private Color gizmoColor = Color.red;
+    [Tooltip("Color to show when the sensor detects an object.")] 
+    [SerializeField] private Color gizmoDetectedColor = Color.green;
     [Tooltip("Radius for the gizmos that mark the ray ends.")]
     [Range(0.01f, 1.0f)]
     [SerializeField] private float gizmoRadius;
     
     [Header("WIRING:")]
     [Tooltip("Point from ray starts.")]
-    [SerializeField] private Transform startPoint;
+    public Transform startPoint;
     [Tooltip("Point ray ends to.")]
-    [SerializeField] private Transform endPoint;
-
+    public Transform endPoint;
+    
+    
     /// <summary>
     /// Whether this sensor has detected any collider.
     /// </summary>
     public bool IsColliderDetected => DetectedCollider != null;
-
-    private Collider2D _detectedCollider;
     
     /// <summary>
     /// This ray sensor layer mask.
     /// </summary>
     public LayerMask SensorLayerMask
     {
-        get => layerMask;
+        get => detectionLayers;
         set
         {
-            layerMask = value;
+            detectionLayers = value;
             UpdateRayData();
         }
     }
@@ -72,6 +71,8 @@ public class RaySensor : MonoBehaviour
         }
     }
 
+    private Collider2D _detectedCollider;
+    
     /// <summary>
     /// Collider currently detected by sensor.
     /// </summary>
@@ -80,17 +81,15 @@ public class RaySensor : MonoBehaviour
         get => _detectedCollider;
         private set
         {
-            if (_detectedCollider != value)
+            if (_detectedCollider == value) return;
+            _detectedCollider = value;
+            if (value == null && noColliderDetected != null)
             {
-                _detectedCollider = value;
-                if (value == null && noColliderDetected != null)
-                {
-                    noColliderDetected.Invoke();
-                } 
-                else if (value != null && colliderDetected != null)
-                {
-                    colliderDetected.Invoke(value);
-                }
+                noColliderDetected.Invoke();
+            } 
+            else if (value != null && colliderDetected != null)
+            {
+                colliderDetected.Invoke(this);
             }
         }
     }
@@ -113,7 +112,7 @@ public class RaySensor : MonoBehaviour
     /// <summary>
     /// Raycast end position.
     /// </summary>
-    public Vector3 TargetPosition
+    public Vector3 EndPosition
     {
         get => endPoint.position;
         set
@@ -148,43 +147,6 @@ public class RaySensor : MonoBehaviour
     {
         _rayDirection = GetRayDirection();
         _rayDistance = GetRayDistance();
-        PerformRaycast();
-    }
-
-    /// <summary>
-    /// Bind a listener to the colliderDetected event.
-    /// </summary>
-    /// <param name="action">Method to bind.</param>
-    public void SubscribeToColliderDetected(UnityAction<Collider2D> action)
-    {
-        colliderDetected.AddListener(action);
-    }
-    
-    /// <summary>
-    /// Unbind a listener from the colliderDetected event.
-    /// </summary>
-    /// <param name="action">Method to unbind.</param>
-    public void UnsubscribeFromColliderDetected(UnityAction<Collider2D> action)
-    {
-        colliderDetected.RemoveListener(action);
-    }
-
-    /// <summary>
-    /// Bind a listener to the noColliderDetected event.
-    /// </summary>
-    /// <param name="action">Method to bind.</param>
-    public void SubscribeToNoColliderDetected(UnityAction action)
-    {
-        noColliderDetected.AddListener(action);
-    }
-    
-    /// <summary>
-    /// Unbind a listener from the noColliderDetected event.
-    /// </summary>
-    /// <param name="action">Method to unbind.</param>
-    public void UnsubscribeFromNoColliderDetected(UnityAction action)
-    {
-        noColliderDetected.RemoveListener(action);
     }
     
     private Vector3 GetRayDirection()
@@ -208,11 +170,12 @@ public class RaySensor : MonoBehaviour
     /// </summary>
     private void PerformRaycast()
     {
+        // I use RaycastAll to get every collider along the ray, not only the first one.
         RaycastHit2D[] hits = Physics2D.RaycastAll(
             startPoint.position, 
             _rayDirection, 
             _rayDistance, 
-            layerMask);
+            detectionLayers);
         
         // Nothing detected.
         if (hits.Length == 0)
@@ -227,7 +190,7 @@ public class RaySensor : MonoBehaviour
         if (!IgnoreCollidersOverlappingStartPoint)
         {
             DetectedHit = hits[0];
-            DetectedCollider = DetectedHit.collider;;
+            DetectedCollider = DetectedHit.collider;
             return;
         }
         
@@ -244,44 +207,6 @@ public class RaySensor : MonoBehaviour
             }
         }
     }
-
-    /// <summary>
-    /// Sets the target position for the ray, using the provided target position in 3D space.
-    /// </summary>
-    /// <param name="target">Position for the ray target.</param>
-    public void SetRayTarget(Vector3 target)
-    {
-        endPoint.position = target;
-        UpdateRayVectorData();
-    }
-
-    /// <summary>
-    /// Set the ray origin, using the provided position in 3D space.
-    /// </summary>
-    /// <param name="origin">Position for the ray origin.</param>
-    public void SetRayOrigin(Vector3 origin)
-    {
-        startPoint.position = origin;
-        UpdateRayVectorData();
-    }
-    
-    /// <summary>
-    /// Update the ray distance and direction data based on the current ray origin and target.
-    /// </summary>
-    private void UpdateRayVectorData()
-    {
-        _rayDistance = GetRayDistance();
-        _rayDirection = GetRayDirection();
-    }
-    
-    // /// <summary>
-    // /// Set this ray sensor layer mask.
-    // /// </summary>
-    // /// <param name="layerMask">Layermask for this sensor.</param>
-    // public void SetLayerMask(LayerMask layerMask)
-    // {
-    //     this.layerMask = layerMask;
-    // }
     
 #if UNITY_EDITOR
     private void OnDrawGizmos()
@@ -295,8 +220,11 @@ public class RaySensor : MonoBehaviour
         Gizmos.color = gizmoColor;
         Gizmos.DrawCube(startPoint.position, gizmoSize);
         Gizmos.DrawSphere(endPoint.position, gizmoRadius);
-        Gizmos.color = IsColliderDetected ? Color.green : Color.red;
+        Gizmos.color = Color.red;
         Gizmos.DrawLine(startPoint.position, endPoint.position);
+        if (!IsColliderDetected) return;
+        Gizmos.color = Color.green;
+        Gizmos.DrawLine(startPoint.position, DetectedHit.point);
     }
 #endif
 }

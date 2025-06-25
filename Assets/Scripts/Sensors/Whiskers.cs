@@ -16,8 +16,9 @@ using UnityEditor.SceneManagement;
 /// is the local UP direction.
 ///
 /// Be aware, that Unity cannot instance object while in prefab mode. So when this
-/// script detects that you are in prefab mode it will just populate a list of placements shown
-/// with gizmos, but it won't instance any sensor until this prefab is placed in the scene.
+/// script detects that you are in prefab mode it will just populate a list of placements
+/// shown with gizmos, but it won't instance any sensor until this prefab is placed in
+/// the scene.
 /// </summary>
 [ExecuteAlways]
 public class Whiskers : MonoBehaviour
@@ -63,7 +64,8 @@ public class Whiskers : MonoBehaviour
         public RaySensor GetSensorFromLeft(int index) => _raySensors[index];
         
         /// <summary>
-        ///  Get the sensor at the given index counting from the rightmost sensor to center.
+        ///  Get the sensor at the given index counting from the rightmost sensor to
+        /// center.
         /// </summary>
         /// <param name="index">0 index is the rightmost sensor</param>
         /// <returns></returns>
@@ -370,10 +372,11 @@ public class Whiskers : MonoBehaviour
     /// <summary>
     /// Called when a collider is detected.
     /// </summary>
-    /// <param name="collider">Collided detected by sensor.</param>
-    public void OnColliderDetected(Collider2D collider)
+    /// <param name="detectionSensor">RaySensor that detected collider.</param>
+    public void OnColliderDetected(RaySensor detectionSensor)
     {
-        if (colliderDetected != null) colliderDetected.Invoke(collider);
+        if (colliderDetected != null) 
+            colliderDetected.Invoke(detectionSensor.DetectedCollider);;
     }
     
     /// <summary>
@@ -418,8 +421,8 @@ public class Whiskers : MonoBehaviour
         if (_sensors == null) return;
         foreach (RaySensor raySensor in _sensors)
         {
-            raySensor.SubscribeToColliderDetected(OnColliderDetected);
-            raySensor.SubscribeToNoColliderDetected(OnColliderNoLongerDetected);
+            raySensor.colliderDetected.AddListener(OnColliderDetected);
+            raySensor.noColliderDetected.AddListener(OnColliderNoLongerDetected);
         }
     }
 
@@ -431,8 +434,8 @@ public class Whiskers : MonoBehaviour
         if (_sensors == null) return;
         foreach (RaySensor raySensor in _sensors)
         {
-            raySensor.UnsubscribeFromColliderDetected(OnColliderDetected);
-            raySensor.UnsubscribeFromNoColliderDetected(OnColliderNoLongerDetected);
+            raySensor.colliderDetected.RemoveListener(OnColliderDetected);
+            raySensor.noColliderDetected.RemoveListener(OnColliderNoLongerDetected);
         }
     }
 
@@ -445,7 +448,8 @@ public class Whiskers : MonoBehaviour
     }
 
     /// <summary>
-    /// <p>Destroy any child rays sensor that may be left behind after clearing the sensor list.</p>
+    /// <p>Destroy any child rays sensor that may be left behind after clearing the
+    /// sensor list.</p>
     /// <br/>
     /// <p>When domain reloading the child sensor objects are not destroyed although
     /// list is cleared. So I need to search and destroy for child sensors manually.</p>
@@ -465,7 +469,8 @@ public class Whiskers : MonoBehaviour
     
 
     /// <summary>
-    /// Place sensors in the correct positions for current resolution and current range sector
+    /// Place sensors in the correct positions for current resolution and current range
+    /// sector.
     /// </summary>
     private void PlaceSensors()
     {
@@ -474,8 +479,10 @@ public class Whiskers : MonoBehaviour
         int i = 0;
         foreach (RayEnds rayEnd in rayEnds)
         {
-            _sensors.GetSensorFromLeft(i).SetRayOrigin(transform.TransformPoint(rayEnd.start));
-            _sensors.GetSensorFromLeft(i).SetRayTarget(transform.TransformPoint(rayEnd.end));
+            _sensors.GetSensorFromLeft(i).StartPosition = transform.TransformPoint(
+                rayEnd.start);
+            _sensors.GetSensorFromLeft(i).EndPosition = transform.TransformPoint(
+                rayEnd.end);
             i++;
         }
     }

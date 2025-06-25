@@ -168,7 +168,7 @@ public class HidingPointsDetector : MonoBehaviour
         _raySensor.StartPosition = Threat.transform.position;
         foreach (Vector2 obstaclePosition in ObstaclesPositions)
         {
-            _raySensor.TargetPosition = obstaclePosition;
+            _raySensor.EndPosition = obstaclePosition;
             if (_raySensor.IsColliderDetected)
             {
                 _rayCollisionPoints.Add(_raySensor.DetectedHit.point);
