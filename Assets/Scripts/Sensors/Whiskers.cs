@@ -10,15 +10,10 @@ using UnityEditor.SceneManagement;
 #endif
 
 /// <summary>
-/// An array of ray sensors placed over a circular sector.
+/// <p>An array of ray sensors placed over a circular sector.</p>
 ///
-/// The sector is placed around the local Y axis, so forward direction for this sensor
-/// is the local UP direction.
-///
-/// Be aware, that Unity cannot instance object while in prefab mode. So when this
-/// script detects that you are in prefab mode it will just populate a list of placements
-/// shown with gizmos, but it won't instance any sensor until this prefab is placed in
-/// the scene.
+/// <p>The sector is placed around the local Y axis, so forward direction for this sensor
+/// is the local UP direction.</p>
 /// </summary>
 [ExecuteAlways]
 public class Whiskers : MonoBehaviour
@@ -86,11 +81,7 @@ public class Whiskers : MonoBehaviour
         {
             foreach (RaySensor sensor in _raySensors)
             {
-#if UNITY_EDITOR
-                if (sensor != null) DestroyImmediate(sensor.gameObject);
-#else
                 if (sensor != null) Destroy(sensor.gameObject);
-#endif
             }
             _raySensors?.Clear();
             Count = 0;
@@ -114,6 +105,12 @@ public class Whiskers : MonoBehaviour
     {
         public Vector3 start;
         public Vector3 end;
+        
+        public RayEnds(Vector2 start, Vector2 end)
+        {
+            this.start = start;
+            this.end = end;
+        }
     }
     
     [Header("CONFIGURATION:")]
@@ -121,6 +118,10 @@ public class Whiskers : MonoBehaviour
     [SerializeField] private GameObject sensor;
     [Tooltip("Layers to be detected by this sensor.")] 
     [SerializeField] private LayerMask layerMask;
+
+    [Tooltip("Whether this sensor should detect its own agent if its ray sensors start " +
+             "inside him.")]
+    public bool ignoreOwnerAgent = true;
     [Tooltip("Number of rays for this sensor: (sensorResolution * 2) + 3")]
     [Range(0.0f, 10.0f)]
     [SerializeField] private int sensorResolution = 1;
@@ -129,15 +130,18 @@ public class Whiskers : MonoBehaviour
     [SerializeField] private float semiConeDegrees = 45.0f;
     [Tooltip("Maximum range for these rays.")]
     [SerializeField] private float range = 1.0f;
-    [Tooltip("Minimum range for these rays. Useful to make rays start not at the agent's center.")]
+    [Tooltip("Minimum range for these rays. Useful to make rays start not at the " +
+             "agent's center.")]
     [SerializeField] private float minimumRange = 0.2f;
-    [Tooltip("Range proportion for whiskers at left side. 0.0 = leftmost sensor, 1.0 = center sensor.")]
+    [Tooltip("Range proportion for whiskers at left side. 0.0 = leftmost sensor, " +
+             "1.0 = center sensor.")]
     [SerializeField] private AnimationCurve leftRangeSemiCone = AnimationCurve.EaseInOut(
         0.0f, 
         0.2f, 
         1.0f, 
         1.0f);
-    [Tooltip("Range proportion for whiskers at right side. 0.0 = center sensor, 1.0 = rightmost sensor.")]
+    [Tooltip("Range proportion for whiskers at right side. 0.0 = center sensor, " +
+             "1.0 = rightmost sensor.")]
     [SerializeField] private AnimationCurve rightRangeSemiCone = AnimationCurve.EaseInOut(
         0.0f,
         1.0f,
@@ -148,11 +152,15 @@ public class Whiskers : MonoBehaviour
     [SerializeField] private UnityEvent<Collider2D> colliderDetected;
     [Tooltip("Event to trigger when no collider is detected by this sensor.")]
     [SerializeField] private UnityEvent noColliderDetected;
+    [Header("WIRING:")] 
+    [SerializeField] private SectorRange sectorRange;
     [Header("DEBUG")]
     [Tooltip("Whether to show gizmos for sensors.")]
     [SerializeField] private bool showGizmos = true;
     [Tooltip("Color for this script gizmos.")]
     [SerializeField] private Color gizmoColor = Color.yellow;
+    [Tooltip("Radius for the sensor ends.")]
+    [SerializeField] private float gizmoRadius = 0.1f;
 
     /// <summary>
     /// This sensor layer mask.
@@ -163,6 +171,7 @@ public class Whiskers : MonoBehaviour
         set
         {
             layerMask = value;
+            if (_sensors == null) return;
             foreach (RaySensor raySensor in _sensors)
             {
                 raySensor.SensorLayerMask = value;
@@ -178,8 +187,9 @@ public class Whiskers : MonoBehaviour
         get => sensorResolution;
         set
         {
+            if (sensorResolution == value) return;
             sensorResolution = value;
-            _onValidationUpdatePending = true;
+            UpdateRayEnds();
         }
     }
 
@@ -191,8 +201,13 @@ public class Whiskers : MonoBehaviour
         get => semiConeDegrees;
         set
         {
+            if (sectorRange == null) return;
             semiConeDegrees = value;
-            _onValidationUpdatePending = true;
+            // Guard needed to avoid infinite calls between this component and sectorRange
+            // when changing the semiConeDegrees.
+            _parameterSetFromHere = true;
+            sectorRange.SemiConeDegrees = value;
+            UpdateRayEnds();
         }
     }
 
@@ -204,8 +219,13 @@ public class Whiskers : MonoBehaviour
         get => range; 
         set
         {
+            if (sectorRange == null) return;
             range = value;
-            _onValidationUpdatePending = true;
+            // Guard needed to avoid infinite calls between this component and sectorRange
+            // when changing the range.
+            _parameterSetFromHere = true;
+            sectorRange.Range = value;
+            UpdateRayEnds();
         }
     }
 
@@ -217,8 +237,45 @@ public class Whiskers : MonoBehaviour
         get => minimumRange;
         set
         {
+            if (sectorRange == null) return;
             minimumRange = value;
-            _onValidationUpdatePending = true;
+            // Guard needed to avoid infinite calls between this component and sectorRange
+            // when changing the minimumRange.
+            _parameterSetFromHere = true;
+            sectorRange.MinimumRange = value;
+            UpdateRayEnds();
+        }
+    }
+
+    private AnimationCurve _leftRangeSemiCone;
+    /// <summary>
+    /// <p>Range proportion for whiskers at left side.</p>
+    /// <ul>0.0 = leftmost sensor.</ul>
+    /// <ul>1.0 = center sensor.</ul>
+    /// </summary>
+    private AnimationCurve LeftRangeSemiCone
+    {
+        get => _leftRangeSemiCone;
+        set
+        {
+            _leftRangeSemiCone = value;
+            UpdateRayEnds();
+        }
+    }
+    
+    private AnimationCurve _rightRangeSemiCone;
+    /// <summary>
+    /// <p>Range proportion for whiskers at right side.</p>
+    /// <ul>0.0 = center sensor</ul>
+    /// <ul>1.0 = right sensor.</ul>
+    /// </summary>
+    private AnimationCurve RightRangeSemiCone
+    {
+        get => _rightRangeSemiCone;
+        set
+        {
+            _rightRangeSemiCone = value;
+            UpdateRayEnds();
         }
     }
 
@@ -244,16 +301,20 @@ public class Whiskers : MonoBehaviour
     }
     
     /// <summary>
-    /// Set of detected colliders.
+    /// <p>Set of detected objects.</p>
+    /// <p>It offers a tuple of (Collider2D, int) where the int is the sensor index.</p>
     /// </summary>
-    public HashSet<Collider2D> DetectedColliders
+    public HashSet<(Collider2D, int)> DetectedColliders
     {
         get
         {
-            var detectedColliders = new HashSet<Collider2D>();
+            HashSet<(Collider2D, int)> detectedColliders = new();
+            int sensorIndex = 0;
             foreach (RaySensor sensor in _sensors)
             {
-                if (sensor.IsColliderDetected) detectedColliders.Add(sensor.DetectedCollider);
+                if (sensor.IsColliderDetected) 
+                    detectedColliders.Add((sensor.DetectedCollider, sensorIndex));
+                sensorIndex++;
             }
             return detectedColliders;
         } 
@@ -271,66 +332,81 @@ public class Whiskers : MonoBehaviour
             int sensorIndex = 0;
             foreach (RaySensor sensor in _sensors)
             {
-                if (sensor.IsColliderDetected) detectedHits.Add((sensor.DetectedHit, sensorIndex));
+                if (sensor.IsColliderDetected) detectedHits.Add(
+                    (sensor.DetectedHit, sensorIndex));
                 sensorIndex++;
             }
             return detectedHits;
         }
     }
     
+    /// <summary>
+    /// <p>This sensor Forward vector.</p>
+    /// </summary>
+    public Vector2 Forward
+    {
+        get
+        {
+            if (sectorRange == null) return transform.up;
+            return sectorRange.Forward;
+        }
+    }
+    
+    private bool _parameterSetFromHere;
     private RaySensorList _sensors;
     public List<RayEnds> _rayEnds;
 
-    private bool _onValidationUpdatePending = false;
+    private bool _onValidationUpdatePending;
+    
+    private void SubscribeToSectorRangeEvents()
+    {
+        if (sectorRange == null) return;
+        sectorRange.Updated.AddListener(OnSectorRangeUpdated);
+    }
+
+    private void OnSectorRangeUpdated()
+    {
+        if (_parameterSetFromHere)
+        {
+            _parameterSetFromHere = false;
+            return;
+        }
+        UpdateRayEnds();
+    }
 
     private void Start()
     {
 #if UNITY_EDITOR
-        if (PrefabStageUtility.GetCurrentPrefabStage() != null)
-        {
-            // Script is executing in prefab mode
-            // Nothing done at the moment.
-        }
-        else
-        {
-            // Script is executing in edit mode (but not in prefab mode, so in scene mode)
-            // OR script is executing in Play mode
-            UpdateSensorsPlacement();
-            SubscribeToSensorsEvents();
-            UpdateGizmosConfiguration();
-        }
+        // If in editor then only place gizmos. And link to sector range to set up
+        // fields.
+        if (sectorRange == null) return;
+        SubscribeToSectorRangeEvents();
+        UpdateRayEnds();
 #else
-        UpdateSensorPlacement();
+        // If not in editor then create real sensors.
+        UpdateRayEnds();
+        SetupSensors();
         SubscribeToSensorsEvents();
-        UpdateGizmosConfiguration();
 #endif
     }
 
     private void OnEnable()
     {
         // OnEnable runs before Start, so first time OnEnable is called, sensors are not
-        // initialized. That's why I call to SubscribeToSensorsEvents in Start. Nevertheless
-        // I call it here too just in case object is disabled and then enabled again.
+        // initialized. That's why I call to SubscribeToSensorsEvents in Start.
+        // Nevertheless, I call it here too just in case object is disabled and then
+        // enabled again.
         SubscribeToSensorsEvents();
+    }
+    
+    private void OnDisable()
+    {
+        UnsubscribeFromSensorsEvents();
     }
 
     private void OnDestroy()
     {
         UnsubscribeFromSensorsEvents();
-    }
-    
-    /// <summary>
-    /// When a value changes on Inspector, update prefab appearance.
-    /// </summary>
-    private void LateUpdate()
-    {
-        if (_onValidationUpdatePending)
-        {
-            UpdateSensorsPlacement();
-            SubscribeToSensorsEvents();
-            UpdateGizmosConfiguration();
-            _onValidationUpdatePending = false;
-        }
     }
     
     /// <summary>
@@ -394,7 +470,12 @@ public class Whiskers : MonoBehaviour
     {
         PopulateSensors();
         PlaceSensors();
-        SetSensorsLayerMask();
+        foreach (RaySensor raySensor in _sensors)
+        {
+            raySensor.detectionLayers = SensorsLayerMask;
+            raySensor.IgnoreCollidersOverlappingStartPoint = ignoreOwnerAgent;
+            raySensor.ShowGizmos = showGizmos;
+        }
     }
 
     /// <summary>
@@ -403,11 +484,11 @@ public class Whiskers : MonoBehaviour
     private void PopulateSensors()
     {
         _sensors?.Clear();
-        ClearStraggledSensors();
         List<RaySensor> raySensors = new List<RaySensor>();
         for (int i = 0; i < SensorAmount; i++)
         {
             GameObject sensorInstance = Instantiate(sensor, transform);
+            sensorInstance.transform.SetParent(transform);
             raySensors.Add(sensorInstance.GetComponent<RaySensor>());
         }
         _sensors = new RaySensorList(raySensors);
@@ -438,36 +519,7 @@ public class Whiskers : MonoBehaviour
             raySensor.noColliderDetected.RemoveListener(OnColliderNoLongerDetected);
         }
     }
-
-    /// <summary>
-    /// Set layer mask for sensors.
-    /// </summary>
-    private void SetSensorsLayerMask()
-    {
-        SensorsLayerMask = layerMask;
-    }
-
-    /// <summary>
-    /// <p>Destroy any child rays sensor that may be left behind after clearing the
-    /// sensor list.</p>
-    /// <br/>
-    /// <p>When domain reloading the child sensor objects are not destroyed although
-    /// list is cleared. So I need to search and destroy for child sensors manually.</p>
-    /// </summary>
-    private void ClearStraggledSensors()
-    {
-        RaySensor[] childSensors = GetComponentsInChildren<RaySensor>();
-        foreach (RaySensor raySensor in childSensors)
-        {
-#if UNITY_EDITOR
-            if (raySensor != null) DestroyImmediate(raySensor.gameObject);
-#else
-            if (raySensor != null) Destroy(raySensor.gameObject);
-#endif
-        }
-    }
     
-
     /// <summary>
     /// Place sensors in the correct positions for current resolution and current range
     /// sector.
@@ -479,73 +531,46 @@ public class Whiskers : MonoBehaviour
         int i = 0;
         foreach (RayEnds rayEnd in rayEnds)
         {
-            _sensors.GetSensorFromLeft(i).StartPosition = transform.TransformPoint(
-                rayEnd.start);
-            _sensors.GetSensorFromLeft(i).EndPosition = transform.TransformPoint(
-                rayEnd.end);
+            RaySensor sensor = _sensors.GetSensorFromLeft(i);
+            sensor.StartPosition = transform.TransformPoint(rayEnd.start);
+            sensor.EndPosition = transform.TransformPoint(rayEnd.end);
             i++;
         }
     }
-
-    /// <summary>
-    /// If in prefab mode then recalculate sensor ends positions. If in scene or play mode
-    /// then it recalculates sensor ends positions and instantiate sensors in those positions.
-    /// </summary>
-    private void UpdateSensorsPlacement()
-    {
-#if UNITY_EDITOR
-        if (PrefabStageUtility.GetCurrentPrefabStage() != null)
-        {
-            // Script is executing in prefab mode
-            PopulateRayEnds();
-        }
-        else
-        {
-            // Script is executing in edit mode (but not necessarily prefab mode)
-            // OR script is executing in Play mode
-            PopulateRayEnds();
-            SetupSensors();
-        }
-#else
-        PopulateRayEnds();
-        SetupSensors();
-#endif
-    }
+    
     
     /// <summary>
-    /// Calculate local positions for sensor ends and store them to be serialized along the prefab.
+    /// <p>Refresh positions for sensor ends.</p>
+    /// <p>These positions are local to the current agent</p>
     /// </summary>
     /// <returns>New list for sensor ends local positions.</returns>
-    private List<RayEnds> GetRayEnds()
+    private void UpdateRayEnds()
     {
-        List<RayEnds> rayEnds = new List<RayEnds>();
-        
-        if (transform == null) return rayEnds;
-        
-        float totalPlacementAngle = semiConeDegrees * 2;
+        if (leftRangeSemiCone == null || 
+            rightRangeSemiCone == null) 
+            return;
+        List<RayEnds> rayEnds = new();
+
+        float totalPlacementAngle = SemiConeDegrees * 2;
         float placementAngleInterval = totalPlacementAngle / (SensorAmount - 1);
-        
-        // Remember: local forward is UP direction in local space.
-        Vector3 forwardSensorPlacement = Vector3.up * minimumRange;
 
         for (int i = 0; i < SensorAmount; i++)
         {
-            float currentAngle = semiConeDegrees - (placementAngleInterval * i);
-            Vector3 placementVector = Quaternion.AngleAxis(currentAngle, Vector3.forward) * forwardSensorPlacement;
-            // Vector3 placementVectorEnd = placementVector.normalized * range;
-            Vector3 placementVectorEnd = placementVector.normalized * 
-                                         (minimumRange + GetSensorLength(i));
+            float currentAngle = SemiConeDegrees - (placementAngleInterval * i);
+            Vector2 placementVector = Quaternion.Euler(0, 0, currentAngle) * 
+                                      Forward;
+            Vector2 placementVectorStart = placementVector * MinimumRange;
+            Vector2 placementVectorEnd =
+                placementVector * (MinimumRange + GetSensorLength(i));
             
-            Vector3 sensorStart = placementVector;
-            Vector3 sensorEnd = placementVectorEnd;
+            RayEnds rayEnd = new RayEnds(placementVectorStart, placementVectorEnd);
             
-            RayEnds newRayEnds = new RayEnds();
-            newRayEnds.start = sensorStart;
-            newRayEnds.end = sensorEnd;
-            rayEnds.Add(newRayEnds);
+            rayEnds.Add(rayEnd);
         }
-        return rayEnds;
+        
+        _rayEnds = rayEnds;
     }
+    
     
     /// <summary>
     /// Whether this index is the one of the center sensor.
@@ -599,44 +624,26 @@ public class Whiskers : MonoBehaviour
         return curvePointRange;
     }
     
-    /// <summary>
-    /// Update gizmos configuration of every sensor in the list.
-    /// </summary>
-    private void UpdateGizmosConfiguration()
-    {
-        if (_sensors == null) return;
-        foreach (RaySensor raySensor in _sensors)
-        {
-            raySensor.ShowGizmos = showGizmos;
-        }
-    }
-
-    /// <summary>
-    /// Calculate sensor ends and store them to be serialized along the prefab.
-    /// </summary>
-    private void PopulateRayEnds()
-    {
-        _rayEnds = GetRayEnds();
-    }
-    
 #if UNITY_EDITOR
-    private void OnValidate()
-    {
-        // Remember: You cannot create objects from OnValidate(). So just mark the update as pending
-        // and create those objects from LateUpdate().
-        _onValidationUpdatePending = true;
-    }
-    
     private void OnDrawGizmos()
     {
-        // Draw gizmos only if in prefab mode. If in scene or play mode the gizmos
-        // I'm interested in are those drawn from the sensors.
-        if (showGizmos && _rayEnds != null && PrefabStageUtility.GetCurrentPrefabStage() != null)
+        // Draw gizmos only if in editor. If in scene or play mode the gizmos
+        // I'm interested in are those drawn from the RaySensors.
+        if (showGizmos && _rayEnds != null)
         {
             Gizmos.color = gizmoColor;
             foreach (RayEnds rayEnds in _rayEnds)
             {
-                Gizmos.DrawLine(transform.TransformPoint(rayEnds.start), transform.TransformPoint(rayEnds.end));
+                Gizmos.color = gizmoColor;
+                Gizmos.DrawLine(
+                    transform.TransformPoint(rayEnds.start), 
+                    transform.TransformPoint(rayEnds.end));
+                Gizmos.DrawWireSphere(
+                    transform.TransformPoint(rayEnds.start),
+                    gizmoRadius);
+                Gizmos.DrawWireSphere(
+                    transform.TransformPoint(rayEnds.end),
+                    gizmoRadius);
             }
         }
     }

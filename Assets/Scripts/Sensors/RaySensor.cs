@@ -13,7 +13,7 @@ public class RaySensor : MonoBehaviour
 {
     [Header("CONFIGURATION:")] 
     [Tooltip("Layers to be detected by this sensor.")] 
-    [SerializeField] private LayerMask detectionLayers;
+    public LayerMask detectionLayers;
     [Tooltip("Whether to ignore colliders overlapping start point.")]
     [SerializeField] private bool ignoreCollidersOverlappingStartPoint = true;
     [Space]
