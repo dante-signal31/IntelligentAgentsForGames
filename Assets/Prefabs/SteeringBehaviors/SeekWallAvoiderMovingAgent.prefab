@@ -121,7 +121,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 744424e90c0b4d0da76339bc882f696d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  whiskers: {fileID: 8540951105331174200}
+  whiskersSensor: {fileID: 0}
   layerMask:
     serializedVersion: 2
     m_Bits: 64
@@ -148,6 +148,7 @@ MonoBehaviour:
   layerMask:
     serializedVersion: 2
     m_Bits: 0
+  ignoreOwnerAgent: 1
   sensorResolution: 1
   semiConeDegrees: 112.08542
   range: 3
@@ -206,8 +207,10 @@ MonoBehaviour:
   noColliderDetected:
     m_PersistentCalls:
       m_Calls: []
+  sectorRange: {fileID: 0}
   showGizmos: 0
   gizmoColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  gizmoRadius: 0.1
   _rayEnds:
   - start: {x: -0.49111015, y: -0.1992736, z: 0}
     end: {x: -1.6449208, y: -0.6674456, z: 0}

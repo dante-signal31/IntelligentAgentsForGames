@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Tools;
 using UnityEngine;
 using UnityEngine.Events;
 
-#if UNITY_EDITOR
-using UnityEditor;
-using UnityEditor.SceneManagement;
-#endif
-
+namespace Sensors
+{
 /// <summary>
 /// <p>An array of ray sensors placed over a circular sector.</p>
 ///
@@ -16,7 +14,7 @@ using UnityEditor.SceneManagement;
 /// is the local UP direction.</p>
 /// </summary>
 [ExecuteAlways]
-public class Whiskers : MonoBehaviour
+public class WhiskersSensor : MonoBehaviour
 {
     /// <summary>
     /// A class wrapping a list of ray sensors to make it easier to search for them.
@@ -30,7 +28,7 @@ public class Whiskers : MonoBehaviour
         //  * Center sensor is always at the middle index.
         //  * Top right sensor is always at the end index.
         private List<RaySensor> _raySensors;
-        
+    
         /// <summary>
         /// Current amount of sensors in this list.
         /// </summary>
@@ -40,24 +38,24 @@ public class Whiskers : MonoBehaviour
         /// Get the center sensor.
         /// </summary>
         public RaySensor CenterSensor => _raySensors[Count / 2];
-        
+    
         /// <summary>
         /// Get the leftmost sensor (assuming whiskers locally looks to UP direction).
         /// </summary>
         public RaySensor LeftMostSensor => _raySensors[0];
-        
+    
         /// <summary>
         /// Get the rightmost sensor (assuming whiskers locally looks to UP direction).
         /// </summary>
         public RaySensor RightMostSensor => _raySensors[Count - 1];
-        
+    
         /// <summary>
         /// Get the sensor at the given index counting from the leftmost sensor to center.
         /// </summary>
         /// <param name="index">0 index is the leftmost sensor</param>
         /// <returns></returns>
         public RaySensor GetSensorFromLeft(int index) => _raySensors[index];
-        
+    
         /// <summary>
         ///  Get the sensor at the given index counting from the rightmost sensor to
         /// center.
@@ -97,7 +95,7 @@ public class Whiskers : MonoBehaviour
             return GetEnumerator();
         }
     }
-    
+
     /// <summary>
     /// Struct to represent ray ends for every sensor in prefab local space.
     /// </summary>
@@ -105,14 +103,14 @@ public class Whiskers : MonoBehaviour
     {
         public Vector3 start;
         public Vector3 end;
-        
+    
         public RayEnds(Vector2 start, Vector2 end)
         {
             this.start = start;
             this.end = end;
         }
     }
-    
+
     [Header("CONFIGURATION:")]
     [Tooltip("Ray sensor to instance.")]
     [SerializeField] private GameObject sensor;
@@ -178,7 +176,7 @@ public class Whiskers : MonoBehaviour
             }
         }
     }
-    
+
     /// <summary>
     /// Number of rays for this sensor: (sensorResolution * 2) + 3
     /// </summary>
@@ -262,7 +260,7 @@ public class Whiskers : MonoBehaviour
             UpdateRayEnds();
         }
     }
-    
+
     private AnimationCurve _rightRangeSemiCone;
     /// <summary>
     /// <p>Range proportion for whiskers at right side.</p>
@@ -292,14 +290,14 @@ public class Whiskers : MonoBehaviour
         get
         {
             if (_sensors == null) return false;
-            foreach (RaySensor sensor in _sensors)
+            foreach (RaySensor currentSensor in _sensors)
             {
-                if (sensor.IsColliderDetected) return true;
+                if (currentSensor.IsColliderDetected) return true;
             }
             return false;
         }
     }
-    
+
     /// <summary>
     /// <p>Set of detected objects.</p>
     /// <p>It offers a tuple of (Collider2D, int) where the int is the sensor index.</p>
@@ -310,10 +308,10 @@ public class Whiskers : MonoBehaviour
         {
             HashSet<(Collider2D, int)> detectedColliders = new();
             int sensorIndex = 0;
-            foreach (RaySensor sensor in _sensors)
+            foreach (RaySensor currentSensor in _sensors)
             {
-                if (sensor.IsColliderDetected) 
-                    detectedColliders.Add((sensor.DetectedCollider, sensorIndex));
+                if (currentSensor.IsColliderDetected) 
+                    detectedColliders.Add((currentSensor.DetectedCollider, sensorIndex));
                 sensorIndex++;
             }
             return detectedColliders;
@@ -330,16 +328,16 @@ public class Whiskers : MonoBehaviour
         {
             var detectedHits = new List<(RaycastHit2D, int)>();
             int sensorIndex = 0;
-            foreach (RaySensor sensor in _sensors)
+            foreach (RaySensor currentSensor in _sensors)
             {
-                if (sensor.IsColliderDetected) detectedHits.Add(
-                    (sensor.DetectedHit, sensorIndex));
+                if (currentSensor.IsColliderDetected) detectedHits.Add(
+                    (currentSensor.DetectedHit, sensorIndex));
                 sensorIndex++;
             }
             return detectedHits;
         }
     }
-    
+
     /// <summary>
     /// <p>This sensor Forward vector.</p>
     /// </summary>
@@ -351,13 +349,13 @@ public class Whiskers : MonoBehaviour
             return sectorRange.Forward;
         }
     }
-    
+
     private bool _parameterSetFromHere;
     private RaySensorList _sensors;
     public List<RayEnds> _rayEnds;
 
     private bool _onValidationUpdatePending;
-    
+
     private void SubscribeToSectorRangeEvents()
     {
         if (sectorRange == null) return;
@@ -398,7 +396,7 @@ public class Whiskers : MonoBehaviour
         // enabled again.
         SubscribeToSensorsEvents();
     }
-    
+
     private void OnDisable()
     {
         UnsubscribeFromSensorsEvents();
@@ -408,7 +406,7 @@ public class Whiskers : MonoBehaviour
     {
         UnsubscribeFromSensorsEvents();
     }
-    
+
     /// <summary>
     /// Bind a listener to the colliderDetected event.
     /// </summary>
@@ -417,7 +415,7 @@ public class Whiskers : MonoBehaviour
     {
         colliderDetected.AddListener(action);
     }
-    
+
     /// <summary>
     /// Unbind a listener from the colliderDetected event.
     /// </summary>
@@ -426,7 +424,7 @@ public class Whiskers : MonoBehaviour
     {
         colliderDetected.RemoveListener(action);
     }
-    
+
     /// <summary>
     /// Bind a listener to the noColliderDetected event.
     /// </summary>
@@ -435,7 +433,7 @@ public class Whiskers : MonoBehaviour
     {
         noColliderDetected.AddListener(action);
     }
-    
+
     /// <summary>
     /// Unbind a listener from the noColliderDetected event.
     /// </summary>
@@ -452,9 +450,9 @@ public class Whiskers : MonoBehaviour
     public void OnColliderDetected(RaySensor detectionSensor)
     {
         if (colliderDetected != null) 
-            colliderDetected.Invoke(detectionSensor.DetectedCollider);;
+            colliderDetected.Invoke(detectionSensor.DetectedCollider);
     }
-    
+
     /// <summary>
     /// Called when no collider is detected.
     /// </summary>
@@ -519,7 +517,7 @@ public class Whiskers : MonoBehaviour
             raySensor.noColliderDetected.RemoveListener(OnColliderNoLongerDetected);
         }
     }
-    
+
     /// <summary>
     /// Place sensors in the correct positions for current resolution and current range
     /// sector.
@@ -531,14 +529,14 @@ public class Whiskers : MonoBehaviour
         int i = 0;
         foreach (RayEnds rayEnd in rayEnds)
         {
-            RaySensor sensor = _sensors.GetSensorFromLeft(i);
-            sensor.StartPosition = transform.TransformPoint(rayEnd.start);
-            sensor.EndPosition = transform.TransformPoint(rayEnd.end);
+            RaySensor currentSensor = _sensors.GetSensorFromLeft(i);
+            currentSensor.StartPosition = transform.TransformPoint(rayEnd.start);
+            currentSensor.EndPosition = transform.TransformPoint(rayEnd.end);
             i++;
         }
     }
-    
-    
+
+
     /// <summary>
     /// <p>Refresh positions for sensor ends.</p>
     /// <p>These positions are local to the current agent</p>
@@ -562,23 +560,23 @@ public class Whiskers : MonoBehaviour
             Vector2 placementVectorStart = placementVector * MinimumRange;
             Vector2 placementVectorEnd =
                 placementVector * (MinimumRange + GetSensorLength(i));
-            
+        
             RayEnds rayEnd = new RayEnds(placementVectorStart, placementVectorEnd);
-            
+        
             rayEnds.Add(rayEnd);
         }
-        
+    
         _rayEnds = rayEnds;
     }
-    
-    
+
+
     /// <summary>
     /// Whether this index is the one of the center sensor.
     /// </summary>
     /// <param name="index">Sensor index</param>
     /// <returns>True if the center sensor has this index.</returns>
     public bool IsCenterSensor(int index)=> index == SensorAmount / 2;
-    
+
     /// <summary>
     /// Calculates and returns the length of a sensor based on the sensor index provided.
     ///
@@ -597,8 +595,8 @@ public class Whiskers : MonoBehaviour
     }
 
     /// <summary>
-    /// Calculate the length of the left sensor based on the sensor index using left range semi cone
-    /// curve.
+    /// Calculate the length of the left sensor based on the sensor index using left
+    /// range semi cone curve.
     /// </summary>
     /// <param name="sensorIndex">Index of this sensor.</param>
     /// <param name="middleSensorIndex">Middle sensor index.</param>
@@ -606,29 +604,33 @@ public class Whiskers : MonoBehaviour
     private float GetLeftSensorLength(int sensorIndex, int middleSensorIndex)
     {
         float curvePoint = Mathf.InverseLerp(0, middleSensorIndex, sensorIndex);
-        float curvePointRange = leftRangeSemiCone.Evaluate(curvePoint) * (range-minimumRange);
+        float curvePointRange = leftRangeSemiCone.Evaluate(curvePoint) * 
+                                (range-minimumRange);
         return curvePointRange;
     }
-    
+
     /// <summary>
-    /// Calculate the length of the right sensor based on the sensor index using right range semi cone
-    /// curve.
+    /// Calculate the length of the right sensor based on the sensor index using right
+    /// range semi cone curve.
     /// </summary>
     /// <param name="sensorIndex">Index of this sensor.</param>
     /// <param name="middleSensorIndex">Middle sensor index.</param>
     /// <returns>This sensor length from minimum range.</returns>
     private float GetRightSensorLength(int sensorIndex, int middleSensorIndex)
     {
-        float curvePoint = Mathf.InverseLerp( middleSensorIndex, SensorAmount-1, sensorIndex);
-        float curvePointRange = rightRangeSemiCone.Evaluate(curvePoint) * (range-minimumRange);
+        float curvePoint = Mathf.InverseLerp(
+            middleSensorIndex, 
+            SensorAmount-1, 
+            sensorIndex);
+        float curvePointRange = rightRangeSemiCone.Evaluate(curvePoint) * 
+                                (range-minimumRange);
         return curvePointRange;
     }
-    
+
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
-        // Draw gizmos only if in editor. If in scene or play mode the gizmos
-        // I'm interested in are those drawn from the RaySensors.
+        // Draw gizmos only if in editor. 
         if (showGizmos && _rayEnds != null)
         {
             Gizmos.color = gizmoColor;
@@ -646,6 +648,9 @@ public class Whiskers : MonoBehaviour
                     gizmoRadius);
             }
         }
+        // If in play mode the gizmos I'm interested in are those drawn from the
+        // RaySensors.
     }
 #endif
+}
 }

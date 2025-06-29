@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace Tools
 {
@@ -11,9 +12,9 @@ namespace Tools
 /// for visual representation.
 /// </summary>
 [ExecuteAlways]
-public class ConeRange2D : MonoBehaviour
+public class ConeRange : MonoBehaviour
 {
-    [Header("CONFIGURATION:")]
+    [Header("CONFIGURATION OF CONE RANGE:")]
     [Tooltip("Length of this cone.")]
     [SerializeField] private float range;
     [Tooltip("If true, the range is fixed and cannot be changed with the visual handle.")]
@@ -21,11 +22,12 @@ public class ConeRange2D : MonoBehaviour
     [Tooltip("Half angular width in degrees for this cone.")]
     [Range(0, 90)]
     [SerializeField] private float semiConeDegrees;
+    [FormerlySerializedAs("coneColor")]
     [Tooltip("Color to display this cone in editor.")]
-    [SerializeField] private Color coneColor = new Color(1.0f, 0,0, 0.5f);
+    [SerializeField] private Color color = new Color(1.0f, 0,0, 0.5f);
     [Space]
     [Tooltip("Event to trigger when the cone is updated.")]
-    [SerializeField] private UnityEvent<float, float> coneUpdated;
+    public UnityEvent Updated;
 
     /// <summary>
     /// Length of this cone.
@@ -36,7 +38,7 @@ public class ConeRange2D : MonoBehaviour
         set
         {
             range = value;
-            if (coneUpdated != null) coneUpdated.Invoke(Range, SemiConeDegrees);
+            if (Updated != null) Updated.Invoke();
         }
     }
     
@@ -54,13 +56,23 @@ public class ConeRange2D : MonoBehaviour
         set
         {
             semiConeDegrees = value;
-            if (coneUpdated != null) coneUpdated.Invoke(Range, SemiConeDegrees);
+            if (Updated != null) Updated.Invoke();
         }
     }
     /// <summary>
     /// Color to display this cone in editor.
     /// </summary>
-    public Color ConeColor => coneColor;
+    public Color Color => color;
+    
+    // <summary>
+    /// <p>This node local Forward vector.</p>
+    /// </summary>
+    public Vector3 Forward => Vector3.up;
+
+    // <summary>
+    /// <p>This node local Normal vector.</p>
+    /// </summary>
+    public Vector3 Normal => Vector3.forward;
 
 
     /// <summary>
@@ -73,19 +85,19 @@ public class ConeRange2D : MonoBehaviour
     /// changed with the visual handle. Default is false.</param>
     /// <param name="coneColor">The color to display the cone in the editor. Default
     /// is Color.black.</param>
-    public void Initialize(
-        float range,
-        float semiConeDegrees,
-        bool fixedRange = false
-        )
-    {
-        this.range = range;
-        this.semiConeDegrees = semiConeDegrees;
-        this.fixedRange = fixedRange;
-    }
+    // public void Initialize(
+    //     float range,
+    //     float semiConeDegrees,
+    //     bool fixedRange = false
+    //     )
+    // {
+    //     this.range = range;
+    //     this.semiConeDegrees = semiConeDegrees;
+    //     this.fixedRange = fixedRange;
+    // }
 
 #if UNITY_EDITOR
-    private void OnValidate()
+    protected virtual void OnValidate()
     {
         // Call properties to force event emission.
         Range = range;

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Sensors;
+using UnityEngine;
 
 namespace SteeringBehaviors
 {
@@ -9,7 +10,7 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
 {
     [Header("WIRING:")]
     [Tooltip("Sensor to detect walls and obstacles.")]
-    [SerializeField] private Whiskers whiskers;
+    [SerializeField] private WhiskersSensor whiskersSensor;
     [Tooltip("Layers to avoid.")] 
     [SerializeField] private LayerMask layerMask;
 
@@ -34,7 +35,7 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
         set
         {
             layerMask = value;
-            whiskers.SensorsLayerMask = value;
+            whiskersSensor.SensorsLayerMask = value;
         }
     }
 
@@ -72,14 +73,14 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
         // not initialized. That's why I call SubscribeToSensorsEvents in Start.
         // Nevertheless, I call it here too just in case the current object is disabled
         // and then enabled again.
-        whiskers.SubscribeToColliderDetected(OnColliderDetected);
-        whiskers.SubscribeToNoColliderDetected(OnNoColliderDetected);
+        whiskersSensor.SubscribeToColliderDetected(OnColliderDetected);
+        whiskersSensor.SubscribeToNoColliderDetected(OnNoColliderDetected);
     }
 
     private void OnDisable()
     {
-        whiskers.UnsubscribeFromColliderDetected(OnColliderDetected);
-        whiskers.UnsubscribeFromNoColliderDetected(OnNoColliderDetected);
+        whiskersSensor.UnsubscribeFromColliderDetected(OnColliderDetected);
+        whiskersSensor.UnsubscribeFromNoColliderDetected(OnNoColliderDetected);
     }
 
     /// <summary>
@@ -111,7 +112,7 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
             float overShootFactor = GetOverShootFactor(sensorIndexClosestDetectedHit, 
                 closestDistance);
 
-            if (whiskers.IsCenterSensor(sensorIndexClosestDetectedHit))
+            if (whiskersSensor.IsCenterSensor(sensorIndexClosestDetectedHit))
             {
                 // Buckland uses this approach for every sensor, but I only use it for
                 // the center sensor to only brake when an obstacle is just in front of
@@ -149,8 +150,8 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
         int sensorIndexClosestDetectedHit, 
         float closestDistance)
     {
-        float sensorLength = whiskers.GetSensorLength(sensorIndexClosestDetectedHit);
-        float closestDistanceFromObjectSurface = closestDistance - whiskers.MinimumRange;
+        float sensorLength = whiskersSensor.GetSensorLength(sensorIndexClosestDetectedHit);
+        float closestDistanceFromObjectSurface = closestDistance - whiskersSensor.MinimumRange;
         float overShoot = sensorLength - closestDistanceFromObjectSurface;
         float overShootFactor = Mathf.InverseLerp(0, sensorLength, overShoot);
         return overShootFactor;
@@ -176,7 +177,7 @@ public class WallAvoidanceSteeringBehavior : SteeringBehavior
 
         Vector2 currentAgentPosition = args.CurrentAgent.transform.position;
 
-        foreach ((RaycastHit2D hit, int sensorIndex) in whiskers.DetectedHits)
+        foreach ((RaycastHit2D hit, int sensorIndex) in whiskersSensor.DetectedHits)
         {
             float hitDistance = Vector2.Distance(hit.point, currentAgentPosition);
 

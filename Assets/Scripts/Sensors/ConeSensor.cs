@@ -33,7 +33,7 @@ public class ConeSensor : MonoBehaviour
     [Header("WIRING:")]
     [SerializeField] private VolumetricSensor sensor;
     [SerializeField] private BoxRangeManager boxRangeManager;
-    [SerializeField] private ConeRange2D coneRange;
+    [SerializeField] private ConeRange coneRange;
 
     private bool _parameterSetFromHere = false;
     /// <summary>
@@ -134,10 +134,7 @@ public class ConeSensor : MonoBehaviour
     /// <p>Event handler launched when the cone range gizmo is updated.</p>
     /// <p>This way DetectionRange and DetectionSemiconeAngle are updated.</p>
     /// </summary>
-    /// <param name="range">How far we will detect other agents.</param>
-    /// <param name="semiConeDegrees">How many degrees from forward we will admit
-    /// detecting an agent.</param>
-    public void OnConeRangeUpdated(float range, float semiConeDegrees)
+    public void OnConeRangeUpdated()
     {
         // Guard needed to avoid infinite calls between this component and _coneRange
         // when changing the range or angle.
@@ -146,8 +143,8 @@ public class ConeSensor : MonoBehaviour
             _parameterSetFromHere = false;
             return;
         }
-        DetectionRange = range;
-        DetectionSemiconeAngle = semiConeDegrees;
+        DetectionRange = coneRange.Range;
+        DetectionSemiconeAngle = coneRange.SemiConeDegrees;
     }
 
     /// <summary>

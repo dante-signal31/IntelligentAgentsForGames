@@ -45,7 +45,7 @@ public static class InteractiveRanges
         // Rotate in local space.
         Vector3 rotatedVector = (Quaternion.AngleAxis(semiConeDegrees, coneNormal) * 
                                 localConeForward).normalized;
-        // Handle is placed in world space so rotated vector must be taken back to
+        // Handle is placed in world space, so the rotated vector must be taken back to
         // world space.
         Vector3 newHandlePosition = Handles.PositionHandle(
             parentTransform.TransformPoint(rotatedVector * range), 
@@ -72,8 +72,7 @@ public static class InteractiveRanges
     /// attached to.</param>
     /// <param name="semiConeDegrees">Half angular width in degrees for this
     /// cone.</param>
-    /// <param name="localConeForward">Forward direction for this cone in local
-    /// space.</param>
+    /// <param name="globalConeForward">Forward direction for this cone.</param>
     /// <param name="coneNormal">Normal vector for this cone plane.</param>
     /// <param name="coneColor">Color for this cone.</param>
     /// <param name="range">Length of this cone.</param>
@@ -82,21 +81,26 @@ public static class InteractiveRanges
     /// handle</param>
     /// <returns>Tuple of (new semiConeDegrees, new range,
     /// new minimumRange)</returns>
-    public static (float, float, float) SectorRange(Transform parentTransform,
+    public static (float, float, float) SectorRange(
+        Transform parentTransform,
         float semiConeDegrees,
-        Vector3 localConeForward, Vector3 coneNormal, Color coneColor,
-        float range = 0.5f, float minimumRange = 0.2f, bool takeNewRange = false)
+        Vector3 localConeForward, 
+        Vector3 coneNormal, 
+        Color coneColor,
+        float range = 0.5f, 
+        float minimumRange = 0.2f, 
+        bool takeNewRange = false)
     {
         Handles.color = coneColor;
         Vector3 position = parentTransform.position;
-        Vector3 globalForward = parentTransform.TransformDirection(localConeForward);
+        Vector3 globalConeForward = parentTransform.TransformDirection(localConeForward);
         // Rotate in local space.
-        // I don't know why rotated vector is only 0.5 length so I have to multiply
-        // by two to get a 1 unit length vector.
-        Vector3 rotatedVector = Quaternion.AngleAxis(semiConeDegrees, coneNormal) * 
-                                localConeForward;
-        // Handle is placed in world space so rotated vector must be taken back
-        // to world space.
+        Vector3 rotatedVector = (Quaternion.AngleAxis(semiConeDegrees, coneNormal) * 
+                                localConeForward).normalized;
+        
+        // Place handles.
+        // Handle is placed in world space, so the rotated vector must be taken back to
+        // world space.
         Vector3 handlePosition = parentTransform.TransformPoint(
             rotatedVector * range);
         Vector3 newHandlePosition = Handles.PositionHandle(
@@ -107,48 +111,50 @@ public static class InteractiveRanges
         Vector3 newMinimumRangeHandlePosition = Handles.PositionHandle(
             minimumRangeHandlePosition,
             Quaternion.identity);
+        // Process handles output.
         range = takeNewRange ? Vector3.Distance(position, newHandlePosition) : range;
         minimumRange = takeNewRange ? 
             Vector3.Distance(position, newMinimumRangeHandlePosition) : 
             minimumRange;
-        // Outer arc.
+        
+        // Draw external arc.
         Handles.DrawWireArc(
             position, 
             coneNormal, 
-            globalForward, 
+            globalConeForward, 
             semiConeDegrees, 
             range);
         Handles.DrawWireArc(
             position, 
             coneNormal,
-            globalForward, 
+            globalConeForward, 
             -1 * semiConeDegrees, 
             range);
-        // Inner arc.
+        
+        // Draw inner arc.
         Handles.DrawWireArc(
             position, 
             coneNormal, 
-            globalForward, 
+            globalConeForward, 
             semiConeDegrees, 
             minimumRange);
         Handles.DrawWireArc(
             position, 
             coneNormal,
-            globalForward, 
+            globalConeForward, 
             -1 * semiConeDegrees, 
             minimumRange);
-        // Lateral lines.
-        Handles.DrawLine(minimumRangeHandlePosition, handlePosition);
-        Vector3 lateralLineVector = handlePosition - minimumRangeHandlePosition;
-        Vector3 localLateralLineVector = parentTransform.InverseTransformDirection(
-            lateralLineVector);
-        Vector3 rotatedLateralLineVector = Quaternion.AngleAxis(
-            -2 * semiConeDegrees, 
-            coneNormal) * localLateralLineVector;
-        Vector3 rotatedLateralLineVectorNormalized = rotatedLateralLineVector.normalized;
-        Vector3 globalRotatedLateralLineVectorNormalized = parentTransform.TransformDirection(rotatedLateralLineVectorNormalized);
-        Handles.DrawLine(position + globalRotatedLateralLineVectorNormalized * minimumRange, 
-            position + globalRotatedLateralLineVectorNormalized * range);
+        
+        // Draw lateral lines.
+        Vector3 side = globalConeForward * range;
+        Vector3 minimumSide = globalConeForward * minimumRange;
+        Handles.DrawLine(
+            Quaternion.AngleAxis(-semiConeDegrees, coneNormal) * minimumSide + position,
+            Quaternion.AngleAxis(-semiConeDegrees, coneNormal) * side + position);
+        Handles.DrawLine(
+            Quaternion.AngleAxis(semiConeDegrees, coneNormal) * minimumSide + position,
+            Quaternion.AngleAxis(semiConeDegrees, coneNormal) * side + position);
+        
         // Again, we rotate in local space, so aheadSemiConePosition is taken back to
         // local space.
         float newSemiConeDegrees =  Vector2.Angle(localConeForward, 
