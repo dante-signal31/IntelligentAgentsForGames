@@ -37,7 +37,7 @@ public class DrawConeRange : UnityEditor.Editor
         return InteractiveRanges.ConeRange(
             cone.transform, 
             cone.SemiConeDegrees,
-            cone.Forward, 
+            cone.LocalForward, 
             cone.Normal, 
             cone.Color, 
             cone.Range, 

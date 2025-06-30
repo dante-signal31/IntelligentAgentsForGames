@@ -51,7 +51,7 @@ public class DrawSectorRange : UnityEditor.Editor
         return InteractiveRanges.SectorRange(
             sector.transform, 
             sector.SemiConeDegrees,
-            sector.Forward, 
+            sector.LocalForward, 
             sector.Normal, 
             sector.Color, 
             sector.Range,

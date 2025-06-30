@@ -65,9 +65,14 @@ public class ConeRange : MonoBehaviour
     public Color Color => color;
     
     // <summary>
+    /// <p>This node global Forward vector.</p>
+    /// </summary>
+    public Vector3 Forward => transform.up;
+    
+    // <summary>
     /// <p>This node local Forward vector.</p>
     /// </summary>
-    public Vector3 Forward => Vector3.up;
+    public Vector3 LocalForward => Vector3.up;  
 
     // <summary>
     /// <p>This node local Normal vector.</p>
