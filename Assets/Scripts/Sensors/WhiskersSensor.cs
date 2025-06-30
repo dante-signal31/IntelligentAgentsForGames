@@ -354,21 +354,16 @@ public class WhiskersSensor : MonoBehaviour
     private RaySensorList _sensors;
     public List<RayEnds> _rayEnds;
 
-    private bool _onValidationUpdatePending;
-
-    private void SubscribeToSectorRangeEvents()
-    {
-        if (sectorRange == null) return;
-        sectorRange.Updated.AddListener(OnSectorRangeUpdated);
-    }
-
-    private void OnSectorRangeUpdated()
+    public void OnSectorRangeUpdated()
     {
         if (_parameterSetFromHere)
         {
             _parameterSetFromHere = false;
             return;
         }
+        Range = sectorRange.Range;
+        MinimumRange = sectorRange.MinimumRange;
+        SemiConeDegrees = sectorRange.SemiConeDegrees;
         UpdateRayEnds();
     }
 
@@ -378,7 +373,6 @@ public class WhiskersSensor : MonoBehaviour
         // If in editor then only place gizmos. And link to sector range to set up
         // fields.
         if (sectorRange == null) return;
-        SubscribeToSectorRangeEvents();
         UpdateRayEnds();
 #else
         // If not in editor then create real sensors.
@@ -628,6 +622,14 @@ public class WhiskersSensor : MonoBehaviour
     }
 
 #if UNITY_EDITOR
+    private void OnValidate()
+    {
+        // Force the use of properties to make them update cone range.
+        MinimumRange = minimumRange;
+        Range = range; 
+        SemiConeDegrees = semiConeDegrees;
+    }
+
     private void OnDrawGizmos()
     {
         // Draw gizmos only if in editor. 
