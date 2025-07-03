@@ -369,17 +369,19 @@ public class WhiskersSensor : MonoBehaviour
 
     private void Start()
     {
-#if UNITY_EDITOR
-        // If in editor then only place gizmos. And link to sector range to set up
-        // fields.
-        if (sectorRange == null) return;
-        UpdateRayEnds();
-#else
-        // If not in editor then create real sensors.
-        UpdateRayEnds();
-        SetupSensors();
-        SubscribeToSensorsEvents();
-#endif
+        if (Application.isPlaying)
+        {
+            // If not in play mode then create real sensors.
+            UpdateRayEnds();
+            SetupSensors();
+            SubscribeToSensorsEvents();
+        }
+        else
+        {
+            // If in editor mode then only place gizmos. 
+            if (sectorRange == null) return;
+            UpdateRayEnds();
+        }
     }
 
     private void OnEnable()
@@ -632,8 +634,8 @@ public class WhiskersSensor : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        // Draw gizmos only if in editor. 
-        if (showGizmos && _rayEnds != null)
+        // Draw gizmos only if in editor mode. 
+        if (!Application.isPlaying && showGizmos && _rayEnds != null)
         {
             Gizmos.color = gizmoColor;
             foreach (RayEnds rayEnds in _rayEnds)

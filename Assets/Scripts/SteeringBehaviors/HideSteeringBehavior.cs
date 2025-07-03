@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Levels;
 using Pathfinding;
+using Sensors;
 using Tools;
 using UnityEngine;
 using UnityEngine.Serialization;

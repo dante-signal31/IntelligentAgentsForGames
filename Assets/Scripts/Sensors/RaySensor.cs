@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 
-
+namespace Sensors
+{
 /// <summary>
 /// <p>Generic component for ray sensors.</p>
 ///
@@ -21,7 +22,7 @@ public class RaySensor : MonoBehaviour
     public UnityEvent<RaySensor> colliderDetected;
     [Tooltip("Event to trigger when no collider is detected by this sensor.")]
     public UnityEvent noColliderDetected;
-    
+
     [Header("DEBUG:")] 
     [Tooltip("Whether to show gizmos for this sensor.")]
     [SerializeField] private bool showGizmos = true;
@@ -32,19 +33,19 @@ public class RaySensor : MonoBehaviour
     [Tooltip("Radius for the gizmos that mark the ray ends.")]
     [Range(0.01f, 1.0f)]
     [SerializeField] private float gizmoRadius;
-    
+
     [Header("WIRING:")]
     [Tooltip("Point from ray starts.")]
     public Transform startPoint;
     [Tooltip("Point ray ends to.")]
     public Transform endPoint;
-    
-    
+
+
     /// <summary>
     /// Whether this sensor has detected any collider.
     /// </summary>
     public bool IsColliderDetected => DetectedCollider != null;
-    
+
     /// <summary>
     /// This ray sensor layer mask.
     /// </summary>
@@ -72,7 +73,7 @@ public class RaySensor : MonoBehaviour
     }
 
     private Collider2D _detectedCollider;
-    
+
     /// <summary>
     /// Collider currently detected by sensor.
     /// </summary>
@@ -93,7 +94,7 @@ public class RaySensor : MonoBehaviour
             }
         }
     }
-    
+
     public RaycastHit2D DetectedHit { get; private set; }
 
     /// <summary>
@@ -108,7 +109,7 @@ public class RaySensor : MonoBehaviour
             UpdateRayData();
         }
     }
-    
+
     /// <summary>
     /// Raycast end position.
     /// </summary>
@@ -148,7 +149,7 @@ public class RaySensor : MonoBehaviour
         _rayDirection = GetRayDirection();
         _rayDistance = GetRayDistance();
     }
-    
+
     private Vector3 GetRayDirection()
     {
         return (endPoint.position - startPoint.position).normalized;
@@ -176,7 +177,7 @@ public class RaySensor : MonoBehaviour
             _rayDirection, 
             _rayDistance, 
             detectionLayers);
-        
+    
         // Nothing detected.
         if (hits.Length == 0)
         {
@@ -184,7 +185,7 @@ public class RaySensor : MonoBehaviour
             DetectedCollider = null;
             return;
         }
-        
+    
         // If we are not ignoring colliders overlapping start point,
         // then first is good.
         if (!IgnoreCollidersOverlappingStartPoint)
@@ -193,7 +194,7 @@ public class RaySensor : MonoBehaviour
             DetectedCollider = DetectedHit.collider;
             return;
         }
-        
+    
         // If we are ignoring colliders overlapping start point,
         // then we are searching for the first collider whose distance to start point
         // is greater than zero.
@@ -207,7 +208,7 @@ public class RaySensor : MonoBehaviour
             }
         }
     }
-    
+
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
@@ -223,8 +224,9 @@ public class RaySensor : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawLine(startPoint.position, endPoint.position);
         if (!IsColliderDetected) return;
-        Gizmos.color = Color.green;
+        Gizmos.color = gizmoDetectedColor;
         Gizmos.DrawLine(startPoint.position, DetectedHit.point);
     }
 #endif
+}
 }

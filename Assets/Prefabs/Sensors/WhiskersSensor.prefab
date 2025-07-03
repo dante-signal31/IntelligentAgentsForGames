@@ -48,7 +48,7 @@ MonoBehaviour:
   sensor: {fileID: 549089127641453039, guid: 9ae491d825e3b3640ad3ed1224a99004, type: 3}
   layerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   ignoreOwnerAgent: 1
   sensorResolution: 2
   semiConeDegrees: 89.36193
