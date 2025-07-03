@@ -396,11 +396,13 @@ public class WhiskersSensor : MonoBehaviour
     private void OnDisable()
     {
         UnsubscribeFromSensorsEvents();
+        RemoveSensors();
     }
 
     private void OnDestroy()
     {
         UnsubscribeFromSensorsEvents();
+        RemoveSensors();
     }
 
     /// <summary>
@@ -486,6 +488,19 @@ public class WhiskersSensor : MonoBehaviour
             raySensors.Add(sensorInstance.GetComponent<RaySensor>());
         }
         _sensors = new RaySensorList(raySensors);
+    }
+
+    /// <summary>
+    /// Clear current list of sensors.
+    /// </summary>
+    private void RemoveSensors()
+    {
+        if (_sensors == null) return;
+        foreach (RaySensor raySensor in _sensors)
+        {
+            Destroy(raySensor.gameObject);
+        }
+        _sensors.Clear();
     }
 
     /// <summary>
