@@ -55,7 +55,6 @@ public class RaySensor : MonoBehaviour
         set
         {
             detectionLayers = value;
-            UpdateRayData();
         }
     }
 
@@ -68,7 +67,6 @@ public class RaySensor : MonoBehaviour
         set
         {
             ignoreCollidersOverlappingStartPoint = value;
-            UpdateRayData();
         }
     }
 
@@ -106,7 +104,6 @@ public class RaySensor : MonoBehaviour
         set
         {
             startPoint.position = value;
-            UpdateRayData();
         }
     }
 
@@ -119,7 +116,6 @@ public class RaySensor : MonoBehaviour
         set
         {
             endPoint.position = value;
-            UpdateRayData();
         }
     }
 
@@ -130,24 +126,6 @@ public class RaySensor : MonoBehaviour
     {
         get => showGizmos;
         set => showGizmos = value;
-    }
-
-    private Vector3 _rayDirection;
-    private float _rayDistance;
-
-    private void Awake()
-    {
-        UpdateRayData();
-    }
-
-    /// <summary>
-    /// Start or target point may have changed, so ray direction and distance
-    /// need to be updated and a new raycast performed.
-    /// </summary>
-    private void UpdateRayData()
-    {
-        _rayDirection = GetRayDirection();
-        _rayDistance = GetRayDistance();
     }
 
     private Vector3 GetRayDirection()
@@ -174,8 +152,8 @@ public class RaySensor : MonoBehaviour
         // I use RaycastAll to get every collider along the ray, not only the first one.
         RaycastHit2D[] hits = Physics2D.RaycastAll(
             startPoint.position, 
-            _rayDirection, 
-            _rayDistance, 
+            GetRayDirection(), 
+            GetRayDistance(), 
             detectionLayers);
     
         // Nothing detected.

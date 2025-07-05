@@ -15,7 +15,7 @@ public class SeekWallAvoiderSmoothedMovingAgentConfiguration : MonoBehaviour
     [Header("WIRING")] 
     // [SerializeField] private SeekSteeringBehavior mainSeekSteeringBehavior;
     [SerializeField] private SeekSteeringBehavior seekSteeringBehavior;
-    [SerializeField] private WallAvoidanceSteeringBehavior wallAvoidanceSteeringBehavior;
+    [SerializeField] private WallAvoiderSteeringBehavior wallAvoidanceSteeringBehavior;
 
     [Header("CONFIGURATION:")]
     [Tooltip("Target to seek to.")]

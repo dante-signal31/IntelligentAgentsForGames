@@ -169,7 +169,7 @@ public class HideSteeringBehavior : SteeringBehavior
     // private INavigationAgent _navigationAgent;
     private SeekSteeringBehavior _seekSteeringBehavior;
     private Courtyard _currentLevel;
-    private AgentMover _parentAgentMover;
+    private AgentMover _currentAgentMover;
     private Vector2 _previousThreatPosition = Vector2.zero;
 
     private bool ThreatHasJustMoved => 
@@ -184,7 +184,7 @@ public class HideSteeringBehavior : SteeringBehavior
         if (_nextMovementTarget == null)
             _nextMovementTarget = new GameObject("NextMovementTarget");
         HidingPoint = transform.position;
-        _parentAgentMover = GetComponent<AgentMover>();
+        _currentAgentMover = GetComponent<AgentMover>();
         _seekSteeringBehavior = GetComponent<SeekSteeringBehavior>();
     }
 
@@ -242,7 +242,8 @@ public class HideSteeringBehavior : SteeringBehavior
         rayCastToThreat.EndPosition = Threat.transform.position;
         if (rayCastToThreat.IsColliderDetected)
         {
-            _threatCanSeeUs = rayCastToThreat.DetectedCollider.gameObject == Threat.gameObject;
+            _threatCanSeeUs = 
+                rayCastToThreat.DetectedCollider.gameObject == Threat.gameObject;
         }
         else
         {
@@ -256,7 +257,8 @@ public class HideSteeringBehavior : SteeringBehavior
         
         // Only query when the navigation agent has not reached the target yet.
         if (!navigationAgent.IsNavigationFinished)
-            _nextMovementTarget.transform.position = navigationAgent.GetNextPathPosition();
+            _nextMovementTarget.transform.position = 
+                navigationAgent.GetNextPathPosition();
     }
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)

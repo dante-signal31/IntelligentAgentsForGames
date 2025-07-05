@@ -121,12 +121,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 744424e90c0b4d0da76339bc882f696d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  whiskersSensor: {fileID: 0}
+  target: {fileID: 0}
   layerMask:
     serializedVersion: 2
     m_Bits: 64
-  markersVisible: 0
-  markerColor: {r: 1, g: 0, b: 0, a: 1}
+  avoidanceTimeout: 1
+  showGizmos: 0
+  gizmosColor: {r: 1, g: 0, b: 0, a: 1}
+  whiskersSensor: {fileID: 0}
 --- !u!1 &7538472519440863414 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2811785615661618459, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}

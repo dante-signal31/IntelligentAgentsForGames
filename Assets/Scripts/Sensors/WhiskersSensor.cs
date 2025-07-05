@@ -615,8 +615,7 @@ public class WhiskersSensor : MonoBehaviour
     private float GetLeftSensorLength(int sensorIndex, int middleSensorIndex)
     {
         float curvePoint = Mathf.InverseLerp(0, middleSensorIndex, sensorIndex);
-        float curvePointRange = leftRangeSemiCone.Evaluate(curvePoint) * 
-                                (range-minimumRange);
+        float curvePointRange = leftRangeSemiCone.Evaluate(curvePoint) * range;
         return curvePointRange;
     }
 
@@ -633,8 +632,7 @@ public class WhiskersSensor : MonoBehaviour
             middleSensorIndex, 
             SensorAmount-1, 
             sensorIndex);
-        float curvePointRange = rightRangeSemiCone.Evaluate(curvePoint) * 
-                                (range-minimumRange);
+        float curvePointRange = rightRangeSemiCone.Evaluate(curvePoint) * range;
         return curvePointRange;
     }
 
