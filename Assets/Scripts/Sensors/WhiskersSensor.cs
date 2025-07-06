@@ -187,7 +187,10 @@ public class WhiskersSensor : MonoBehaviour
         {
             if (sensorResolution == value) return;
             sensorResolution = value;
-            UpdateRayEnds();
+            if (Application.isPlaying) 
+                UpdateSensors();
+            else 
+                UpdateRayEnds();
         }
     }
 
@@ -205,7 +208,10 @@ public class WhiskersSensor : MonoBehaviour
             // when changing the semiConeDegrees.
             _parameterSetFromHere = true;
             sectorRange.SemiConeDegrees = value;
-            UpdateRayEnds();
+            if (Application.isPlaying)
+                UpdateSensors();
+            else
+                UpdateRayEnds();
         }
     }
 
@@ -223,7 +229,10 @@ public class WhiskersSensor : MonoBehaviour
             // when changing the range.
             _parameterSetFromHere = true;
             sectorRange.Range = value;
-            UpdateRayEnds();
+            if (Application.isPlaying)
+                UpdateSensors();
+            else
+                UpdateRayEnds();
         }
     }
 
@@ -241,7 +250,10 @@ public class WhiskersSensor : MonoBehaviour
             // when changing the minimumRange.
             _parameterSetFromHere = true;
             sectorRange.MinimumRange = value;
-            UpdateRayEnds();
+            if (Application.isPlaying)
+                UpdateSensors();
+            else
+                UpdateRayEnds();
         }
     }
 
@@ -372,9 +384,7 @@ public class WhiskersSensor : MonoBehaviour
         if (Application.isPlaying)
         {
             // If not in play mode then create real sensors.
-            UpdateRayEnds();
-            SetupSensors();
-            SubscribeToSensorsEvents();
+            UpdateSensors();
         }
         else
         {
@@ -382,6 +392,17 @@ public class WhiskersSensor : MonoBehaviour
             if (sectorRange == null) return;
             UpdateRayEnds();
         }
+    }
+
+    /// <summary>
+    /// <p>Recreate sensors with current settings.</p>
+    /// <p>It's automatically called when any of the setting properties is used.</p> 
+    /// </summary>
+    private void UpdateSensors()
+    {
+        UpdateRayEnds();
+        SetupSensors();
+        SubscribeToSensorsEvents();
     }
 
     private void OnEnable()
@@ -479,12 +500,15 @@ public class WhiskersSensor : MonoBehaviour
     /// </summary>
     private void PopulateSensors()
     {
-        _sensors?.Clear();
+        RemoveSensors();
         List<RaySensor> raySensors = new List<RaySensor>();
         for (int i = 0; i < SensorAmount; i++)
         {
-            GameObject sensorInstance = Instantiate(sensor, transform);
-            sensorInstance.transform.SetParent(transform);
+            // It's really odd but this line works right when game is normally played, but
+            // when I run automated tests, it doesn't work because sensorInstance is not
+            // parented to whiskersSensors, so sensor stays floating at the hierarchy
+            // root or even disappears from automated test scene.
+            GameObject sensorInstance = Instantiate(sensor,gameObject.transform);
             raySensors.Add(sensorInstance.GetComponent<RaySensor>());
         }
         _sensors = new RaySensorList(raySensors);

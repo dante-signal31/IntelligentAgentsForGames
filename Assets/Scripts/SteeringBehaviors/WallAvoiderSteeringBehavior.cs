@@ -28,7 +28,7 @@ public class WallAvoiderSteeringBehavior : SteeringBehavior
     [SerializeField] private LayerMask layerMask;
     [Tooltip("Timeout started, in seconds, after no further collision detected, before " +
              "resuming travel to target.")]
-    [SerializeField] private float avoidanceTimeout = 1.0f;
+    [SerializeField] private float avoidanceTimeout = 0.5f;
 
     [Header("DEBUG:")]
     [Tooltip("Show closest hit marker and evasion velocity vector.")]
@@ -77,6 +77,13 @@ public class WallAvoiderSteeringBehavior : SteeringBehavior
     private bool _waitingForAvoidanceTimeout;
     private SteeringOutput _currentSteering;
 
+    // // I need this method because of an odd error with automated tests, that
+    // // make me call this method at the beggining of the test to make it work.
+    // public void RefreshSensors()
+    // {
+    //     whiskersSensor.UpdateSensors();
+    // }
+    
     private void Awake()
     {
         _agentMover = GetComponent<AgentMover>();
