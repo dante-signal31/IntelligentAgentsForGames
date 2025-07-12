@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
@@ -25,10 +26,10 @@ public class AgentMover : MonoBehaviour
     [SerializeField] private float maximumAcceleration;
     [Tooltip("Maximum deceleration for this agent.")]
     [SerializeField] private float maximumDeceleration;
-
+    
     [Header("WIRING:")]
     [Tooltip("Steering behaviour component that will return movement vectors.")]
-    public SteeringBehavior steeringBehavior;
+    [SerializeField] private SteeringBehavior steeringBehavior;
     [Tooltip("This prefab's RigidBody to apply movement vectors over it.")]
     [SerializeField] private Rigidbody2D rigidBody;
 
@@ -98,6 +99,15 @@ public class AgentMover : MonoBehaviour
     }
 
     /// <summary>
+    /// Steering behaviour component that will return movement vectors.
+    /// </summary>
+    public SteeringBehavior SteeringBehavior
+    {
+        get => steeringBehavior;
+        set => steeringBehavior = value;
+    }
+    
+    /// <summary>
     /// This GameObject rotation is in degrees (using Z as rotation axis because
     /// this is a 2D game).
     /// </summary>
@@ -153,7 +163,7 @@ public class AgentMover : MonoBehaviour
         _behaviorArgs.DeltaTime = Time.fixedDeltaTime;
     
         // Get steering output.
-        SteeringOutput steeringOutput = steeringBehavior.GetSteering(_behaviorArgs);
+        SteeringOutput steeringOutput = SteeringBehavior.GetSteering(_behaviorArgs);
     
         // Apply new steering output to our GameObject. I don't enforce the StopSpeed
         // because I've found more flexible to do it at steering behavior level.

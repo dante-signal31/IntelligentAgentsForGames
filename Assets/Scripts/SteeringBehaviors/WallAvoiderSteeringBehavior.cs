@@ -9,7 +9,7 @@ namespace SteeringBehaviors
 /// Steering behavior to avoid walls and obstacles.
 /// </summary>
 [RequireComponent(typeof(SeekSteeringBehavior), typeof(AgentMover))]
-public class WallAvoiderSteeringBehavior : SteeringBehavior
+public class WallAvoiderSteeringBehavior : SteeringBehavior, IGizmos, ITargeter
 {
     /// <summary>
     /// Data about the closest hit.
@@ -67,6 +67,24 @@ public class WallAvoiderSteeringBehavior : SteeringBehavior
         }
     }
     
+    /// <summary>
+    /// Show closest hit marker and evasion velocity vector.
+    /// </summary>
+    public bool ShowGizmos
+    {
+        get => showGizmos;
+        set => showGizmos = value;
+    }
+
+    /// <summary>
+    /// Color for this object markers.
+    /// </summary>
+    public Color GizmosColor
+    {
+        get => gizmosColor;
+        set => gizmosColor = value;
+    }
+    
     private AgentMover _agentMover;
     private SeekSteeringBehavior _seekSteeringBehavior;
     private RaycastHit2D _closestHit;
@@ -76,6 +94,8 @@ public class WallAvoiderSteeringBehavior : SteeringBehavior
     private Timer _avoidanceTimer;
     private bool _waitingForAvoidanceTimeout;
     private SteeringOutput _currentSteering;
+    private bool showGizmos1;
+    private Color gizmosColor1;
 
     // // I need this method because of an odd error with automated tests, that
     // // make me call this method at the beggining of the test to make it work.
@@ -120,6 +140,7 @@ public class WallAvoiderSteeringBehavior : SteeringBehavior
     
     private void StartAvoidanceTimer()
     {
+        // TODO: Reimplement Timer to work the same way as Godot's version.
         _avoidanceTimer.Interval = avoidanceTimeout * 1000;
         _avoidanceTimer.Enabled = true;
     }
@@ -293,5 +314,6 @@ public class WallAvoiderSteeringBehavior : SteeringBehavior
         Gizmos.DrawLine(_closestHit.point, _closestHit.point + _avoidVector);
     }
 #endif
+
 }
 }

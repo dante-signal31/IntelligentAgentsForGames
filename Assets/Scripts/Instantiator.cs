@@ -37,8 +37,7 @@ public class Instantiator : MonoBehaviour
         /// </summary>
         [Tooltip("Initial rotation for spawned object, in degrees. Origin is up " +
                  "direction in local space.")]
-        [Range(-180, 180)]
-        public float rotation;
+        [Range(-180, 180)] public float rotation;
     }
     
     [Header("CONFIGURATION:")]
