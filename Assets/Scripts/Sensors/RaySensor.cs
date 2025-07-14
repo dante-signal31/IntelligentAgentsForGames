@@ -104,6 +104,7 @@ public class RaySensor : MonoBehaviour
         set
         {
             startPoint.position = value;
+            PerformRaycast();
         }
     }
 
@@ -116,6 +117,7 @@ public class RaySensor : MonoBehaviour
         set
         {
             endPoint.position = value;
+            PerformRaycast();
         }
     }
 
