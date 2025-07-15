@@ -56,7 +56,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   showGizmos: 1
-  gizmoColor: {r: 0, g: 1, b: 0, a: 1}
+  gizmoColor: {r: 1, g: 0, b: 0.035849094, a: 1}
   gizmoDetectedColor: {r: 0, g: 1, b: 0, a: 1}
   gizmoRadius: 0.042
   startPoint: {fileID: 4802882678125161671}

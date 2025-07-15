@@ -38,15 +38,16 @@ public class HideSteeringBehavior : SteeringBehavior
     [Tooltip("Layer where threats are.")]
     [SerializeField] private LayerMask threatLayerMask;
 
-    [Header("DEBUG:")]
-    [Tooltip("Show gizmos for debugging.")]
-    [SerializeField] private bool showGizmos = true;
-    [SerializeField] private Color gizmosColor = Color.green;
+    // [Header("DEBUG:")]
+    // [Tooltip("Show gizmos for debugging.")]
+    // [SerializeField] private bool showGizmos = true;
+    // [SerializeField] private Color gizmosColor = Color.green;
     
     [Header("WIRING:")]
     [SerializeField] private RaySensor rayCastToThreat; 
     [SerializeField] private NavigationAgent navigationAgent;
     [SerializeField] private HidingPointsDetector hidingPointsDetector;
+    [SerializeField] private SeekSteeringBehavior seekSteeringBehavior;
 
     /// <summary>
     /// Agent to hide from.
@@ -167,9 +168,8 @@ public class HideSteeringBehavior : SteeringBehavior
     public bool ThreatCanSeeUs => _threatCanSeeUs;
 
     // private INavigationAgent _navigationAgent;
-    private SeekSteeringBehavior _seekSteeringBehavior;
     private Courtyard _currentLevel;
-    private AgentMover _currentAgentMover;
+    // private AgentMover _currentAgentMover;
     private Vector2 _previousThreatPosition = Vector2.zero;
 
     private bool ThreatHasJustMoved => 
@@ -177,6 +177,7 @@ public class HideSteeringBehavior : SteeringBehavior
 
     private bool _threatCanSeeUs;
     private bool _hidingPointRecheckNeeded;
+    private bool _hidingPointReached;
     private GameObject _nextMovementTarget;
 
     private void Awake()
@@ -184,8 +185,8 @@ public class HideSteeringBehavior : SteeringBehavior
         if (_nextMovementTarget == null)
             _nextMovementTarget = new GameObject("NextMovementTarget");
         HidingPoint = transform.position;
-        _currentAgentMover = GetComponent<AgentMover>();
-        _seekSteeringBehavior = GetComponent<SeekSteeringBehavior>();
+        // _currentAgentMover = GetComponent<AgentMover>();
+        // seekSteeringBehavior = GetComponent<SeekSteeringBehavior>();
     }
 
     private void Start()
@@ -203,12 +204,13 @@ public class HideSteeringBehavior : SteeringBehavior
         if (rayCastToThreat == null) return;
         if (Threat != null) 
             rayCastToThreat.SensorLayerMask = threatLayerMask | ObstaclesLayer;
+        rayCastToThreat.IgnoreCollidersOverlappingStartPoint = true;
     }
 
     private void InitSeekSteeringBehavior()
     {
-        _seekSteeringBehavior.Target = _nextMovementTarget;
-        _seekSteeringBehavior.ArrivalDistance = ArrivalDistance;
+        seekSteeringBehavior.Target = _nextMovementTarget;
+        seekSteeringBehavior.ArrivalDistance = ArrivalDistance;
     }
 
     private void InitHidingPointDetector()
@@ -235,7 +237,7 @@ public class HideSteeringBehavior : SteeringBehavior
     }
 
     private void FixedUpdate()
-    { // TODO: Hide agent stays frozen while threat moves. Fix it.
+    { 
         if (Threat == null || rayCastToThreat == null) return;
         
         // Check if there is a line of sight with the threat.
@@ -256,16 +258,26 @@ public class HideSteeringBehavior : SteeringBehavior
         _previousThreatPosition = Threat.transform.position;
         
         // Only query when the navigation agent has not reached the target yet.
-        if (!navigationAgent.IsNavigationFinished)
+        if (navigationAgent.IsNavigationFinished)
+        {
+            _hidingPointReached = true;
+        }
+        else
+        {
             _nextMovementTarget.transform.position = 
                 navigationAgent.GetNextPathPosition();
+        }
     }
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
         // Look for a new hiding point if the threat can see us and has just moved (or
         // if it is threat first position (only once).
-        if (_threatCanSeeUs && _hidingPointRecheckNeeded) 
+        if (_threatCanSeeUs && _hidingPointRecheckNeeded ||
+            // This second condition is needed for blender steeringBehaviors, where 
+            // another steering behavior can move this agent without HideSteeringBehavior
+            // intervention.
+            _threatCanSeeUs && _hidingPointReached) 
         {   // Search for the nearest hiding point.
             List<Vector2> hidingPoints = hidingPointsDetector.HidingPoints;
             if (hidingPoints.Count > 0)
@@ -275,6 +287,7 @@ public class HideSteeringBehavior : SteeringBehavior
                 foreach (Vector2 candidatePoint in hidingPoints)
                 {
                     navigationAgent.TargetPosition = candidatePoint;
+                    _hidingPointReached = false;
                     float currentDistance = navigationAgent.DistanceToTarget();
                     if (currentDistance < minimumDistance)
                     {
@@ -286,10 +299,16 @@ public class HideSteeringBehavior : SteeringBehavior
                 _hidingPointRecheckNeeded = false;
             }
         }
+
+        if (!_hidingPointReached)
+        {
+            // Head to the next point in the path to the heading target. That next point
+            // position is updated in FixedUpdate().
+            return seekSteeringBehavior.GetSteering(args);
+        }
     
-        // Head to the next point in the path to the heading target. That next point
-        // position is updated in FixedUpdate().
-        return _seekSteeringBehavior.GetSteering(args);
+        // If we don't need to hide, then return zero.
+        return SteeringOutput.Zero;
     }
 }
 }

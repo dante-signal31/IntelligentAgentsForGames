@@ -39,6 +39,7 @@ public class WallAvoiderSteeringBehavior : SteeringBehavior, IGizmos, ITargeter
     [Header("WIRING:")] 
     [Tooltip("Sensor to detect walls and obstacles.")]
     [SerializeField] private WhiskersSensor whiskersSensor;
+    [SerializeField] private SeekSteeringBehavior seekSteeringBehavior;
     
     /// <summary>
     /// Target to go avoiding other agents.
@@ -49,8 +50,8 @@ public class WallAvoiderSteeringBehavior : SteeringBehavior, IGizmos, ITargeter
         set
         {
             target = value;
-            if (_seekSteeringBehavior == null) return;
-            _seekSteeringBehavior.Target = target;
+            if (seekSteeringBehavior == null) return;
+            seekSteeringBehavior.Target = target;
         }
     }
     
@@ -86,7 +87,6 @@ public class WallAvoiderSteeringBehavior : SteeringBehavior, IGizmos, ITargeter
     }
     
     private AgentMover _agentMover;
-    private SeekSteeringBehavior _seekSteeringBehavior;
     private RaycastHit2D _closestHit;
     private Vector2 _avoidVector;
     private bool _obstacleDetected;
@@ -94,20 +94,10 @@ public class WallAvoiderSteeringBehavior : SteeringBehavior, IGizmos, ITargeter
     private Timer _avoidanceTimer;
     private bool _waitingForAvoidanceTimeout;
     private SteeringOutput _currentSteering;
-    private bool showGizmos1;
-    private Color gizmosColor1;
-
-    // // I need this method because of an odd error with automated tests, that
-    // // make me call this method at the beggining of the test to make it work.
-    // public void RefreshSensors()
-    // {
-    //     whiskersSensor.UpdateSensors();
-    // }
     
     private void Awake()
     {
         _agentMover = GetComponent<AgentMover>();
-        _seekSteeringBehavior = GetComponent<SeekSteeringBehavior>();
     }
 
     private void Start()
@@ -171,7 +161,7 @@ public class WallAvoiderSteeringBehavior : SteeringBehavior, IGizmos, ITargeter
     {
          if (_waitingForAvoidanceTimeout) return _currentSteering;
         
-        SteeringOutput steeringToTargetVelocity = _seekSteeringBehavior.GetSteering(args);
+        SteeringOutput steeringToTargetVelocity = seekSteeringBehavior.GetSteering(args);
         _avoidVector = Vector2.zero;
         if (_obstacleDetected)
         {

@@ -78,32 +78,13 @@ public class ConeRange : MonoBehaviour
     /// <p>This node local Normal vector.</p>
     /// </summary>
     public Vector3 Normal => Vector3.forward;
-
-
-    /// <summary>
-    /// Initializes the ConeRange2D instance with specified parameters.
-    /// </summary>
-    /// <param name="range">The length of the cone.</param>
-    /// <param name="semiConeDegrees">The half angular width in degrees for the
-    /// cone.</param>
-    /// <param name="fixedRange">Specifies whether the range is fixed and cannot be
-    /// changed with the visual handle. Default is false.</param>
-    /// <param name="coneColor">The color to display the cone in the editor. Default
-    /// is Color.black.</param>
-    // public void Initialize(
-    //     float range,
-    //     float semiConeDegrees,
-    //     bool fixedRange = false
-    //     )
-    // {
-    //     this.range = range;
-    //     this.semiConeDegrees = semiConeDegrees;
-    //     this.fixedRange = fixedRange;
-    // }
+    
 
 #if UNITY_EDITOR
     protected virtual void OnValidate()
     {
+        if (Application.isPlaying) return;
+        
         // Call properties to force event emission.
         Range = range;
         SemiConeDegrees = semiConeDegrees;

@@ -663,6 +663,8 @@ public class WhiskersSensor : MonoBehaviour
 #if UNITY_EDITOR
     private void OnValidate()
     {
+        if (Application.isPlaying) return;
+        
         // Force the use of properties to make them update cone range.
         MinimumRange = minimumRange;
         Range = range; 
