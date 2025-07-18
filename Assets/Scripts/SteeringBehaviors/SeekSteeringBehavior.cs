@@ -7,7 +7,6 @@ namespace SteeringBehaviors
 /// 
 /// <p>Seek steering behaviour makes the agent move towards a target position.</p>
 /// </summary>
-[RequireComponent(typeof(AgentMover))]
 public class SeekSteeringBehavior : SteeringBehavior, ITargeter
 {
     [Header("CONFIGURATION:")]

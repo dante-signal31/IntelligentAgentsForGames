@@ -14,10 +14,8 @@ namespace SteeringBehaviors
 /// <p>The difference with an obstacle avoidance algorithm is that obstacles don't move
 /// while agents do.</p>
 /// </summary>
-[RequireComponent(typeof(AgentMover)), 
- RequireComponent(typeof(SeekSteeringBehavior)), 
- RequireComponent(typeof(AgentColor))]
-public class AgentAvoiderSteeringBehavior : SteeringBehavior, ITargeter
+[RequireComponent(typeof(SeekSteeringBehavior))]
+public class AgentAvoiderSteeringBehavior : SteeringBehavior, ITargeter, IGizmos
 {
     [Header("CONFIGURATION:")]
     [Tooltip("Target to go avoiding other agents.")]
@@ -34,7 +32,10 @@ public class AgentAvoiderSteeringBehavior : SteeringBehavior, ITargeter
     [SerializeField] private PotentialCollisionDetector potentialCollisionDetector;
     
     [Header("DEBUG:")]
+    [Tooltip("Show gizmos.")]
     [SerializeField] private bool showGizmos = true;
+    [Tooltip("Color for this component's gizmos.")]
+    [SerializeField] private Color gizmosColor;
 
     /// <summary>
     /// Target to go avoiding other agents.
@@ -80,6 +81,18 @@ public class AgentAvoiderSteeringBehavior : SteeringBehavior, ITargeter
         set => tooAlignedFactor = value;
     }
     
+    public bool ShowGizmos
+    {
+        get => showGizmos;
+        set => showGizmos = value;
+    }
+
+    public Color GizmosColor
+    {
+        get => gizmosColor;
+        set => gizmosColor = value;
+    }
+    
     private SeekSteeringBehavior _seekSteeringBehavior;
     private bool _waitingForAvoidanceTimeout;
     private AgentMover _currentAgent;
@@ -92,8 +105,8 @@ public class AgentAvoiderSteeringBehavior : SteeringBehavior, ITargeter
 
     private void Awake()
     {
-        _currentAgent = GetComponent<AgentMover>();
-        _agentColor = GetComponent<AgentColor>();
+        _currentAgent = GetComponentInParent<AgentMover>();
+        _agentColor = GetComponentInParent<AgentColor>();
         _seekSteeringBehavior = GetComponent<SeekSteeringBehavior>();
     }
 
@@ -265,7 +278,8 @@ public class AgentAvoiderSteeringBehavior : SteeringBehavior, ITargeter
             (Vector2) transform.position + _currentAgent.Velocity);
     }
 #endif
-    
+
+
 }
 }
 

@@ -1,5 +1,51 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6216986718521625279
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6162391012695041008}
+  - component: {fileID: 738825708875181121}
+  m_Layer: 7
+  m_Name: VelocityMatchingSteering
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6162391012695041008
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6216986718521625279}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3324338817715414880}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &738825708875181121
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6216986718521625279}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81c9868ffb2b40db8f2a862e4b41edd9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 0}
+  timeToMatch: 1
 --- !u!1001 &6517143625917116665
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -15,7 +61,7 @@ PrefabInstance:
     - target: {fileID: 2027878817541019284, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
       propertyPath: steeringBehavior
       value: 
-      objectReference: {fileID: 4033819087900059237}
+      objectReference: {fileID: 738825708875181121}
     - target: {fileID: 8382297402706859929, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -62,28 +108,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 8870854829495726955, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 4033819087900059237}
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 8382297402706859929, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
+      insertIndex: 0
+      addedObject: {fileID: 6162391012695041008}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
---- !u!1 &2407755567366603666 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8870854829495726955, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
+--- !u!4 &3324338817715414880 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8382297402706859929, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
   m_PrefabInstance: {fileID: 6517143625917116665}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &4033819087900059237
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2407755567366603666}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 81c9868ffb2b40db8f2a862e4b41edd9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: {fileID: 0}
-  timeToMatch: 1

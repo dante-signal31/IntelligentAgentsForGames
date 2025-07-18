@@ -69,12 +69,7 @@ public class MeshNavigationAgent: NavigationAgent
     private NavMeshPath _navMeshPath;
     private int _currentPathIndex = 0;
     private float _arrivalDistance;
-
-    private void Awake()
-    {
-        _navMeshPath = new NavMeshPath();
-    }
-
+    
     public override float DistanceToTarget()
     {
         float distance = 0;
@@ -96,6 +91,7 @@ public class MeshNavigationAgent: NavigationAgent
     
     private void RecalculatePath()
     {
+        if (_navMeshPath == null) _navMeshPath = new NavMeshPath();
         NavMesh.CalculatePath(transform.position, 
             TargetPosition, 
             NavMesh.AllAreas, 

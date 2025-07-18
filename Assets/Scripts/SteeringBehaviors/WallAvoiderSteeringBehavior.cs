@@ -8,7 +8,7 @@ namespace SteeringBehaviors
 /// <summary>
 /// Steering behavior to avoid walls and obstacles.
 /// </summary>
-[RequireComponent(typeof(SeekSteeringBehavior), typeof(AgentMover))]
+[RequireComponent(typeof(SeekSteeringBehavior))]
 public class WallAvoiderSteeringBehavior : SteeringBehavior, IGizmos, ITargeter
 {
     /// <summary>
@@ -39,7 +39,7 @@ public class WallAvoiderSteeringBehavior : SteeringBehavior, IGizmos, ITargeter
     [Header("WIRING:")] 
     [Tooltip("Sensor to detect walls and obstacles.")]
     [SerializeField] private WhiskersSensor whiskersSensor;
-    [SerializeField] private SeekSteeringBehavior seekSteeringBehavior;
+    
     
     /// <summary>
     /// Target to go avoiding other agents.
@@ -94,10 +94,14 @@ public class WallAvoiderSteeringBehavior : SteeringBehavior, IGizmos, ITargeter
     private Timer _avoidanceTimer;
     private bool _waitingForAvoidanceTimeout;
     private SteeringOutput _currentSteering;
+    private SeekSteeringBehavior seekSteeringBehavior;
     
     private void Awake()
     {
-        _agentMover = GetComponent<AgentMover>();
+        // AgentMover can be in the same gameobject or in one of its parents, so be must
+        // search there.
+        _agentMover = GetComponentInParent<AgentMover>();
+        seekSteeringBehavior = GetComponent<SeekSteeringBehavior>();
     }
 
     private void Start()

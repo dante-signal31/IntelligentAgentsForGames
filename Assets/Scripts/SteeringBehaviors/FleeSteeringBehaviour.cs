@@ -44,16 +44,19 @@ public class FleeSteeringBehavior : SteeringBehavior
     private void Awake()
     {
         _seekSteeringBehaviour = GetComponent<SeekSteeringBehavior>();
+        if (Threath == null) return;
         _seekSteeringBehaviour.Target = Threath;
     }
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
+        if (Threath == null) return new SteeringOutput();
+        
         if (Vector2.Distance(
                 args.CurrentAgent.transform.position,
                 Threath.transform.position) > PanicDistance)
         { // Out of panic distance, so we stop fleeing.
-            return new SteeringOutput(Vector2.zero, 0);
+            return new SteeringOutput();
         }
         else
         { // Threat inside panic distance, so run in the opposite direction seek

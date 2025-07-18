@@ -55,7 +55,7 @@ public class EvadeSteeringBehavior : SteeringBehavior
         _fleeSteeringBehaviour = GetComponent<FleeSteeringBehavior>();
         _fleeSteeringBehaviour.PanicDistance = PanicDistance;
         _fleeSteeringBehaviour.Threath = _predictedPositionMarker;
-        _agentColor = GetComponent<AgentColor>().Color;
+        _agentColor = GetComponentInParent<AgentColor>().Color;
     }
 
     private void Start()

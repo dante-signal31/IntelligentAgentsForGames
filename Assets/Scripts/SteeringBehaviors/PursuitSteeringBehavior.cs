@@ -37,7 +37,11 @@ public class PursuitSteeringBehavior : SteeringBehavior
     public AgentMover Target
     {
         get => target;
-        set => target = value;
+        set
+        {
+            target = value;
+            _targetColor = target.GetComponent<AgentColor>().Color;
+        }
     }
 
     /// <summary>
@@ -105,7 +109,8 @@ public class PursuitSteeringBehavior : SteeringBehavior
         _seekSteeringBehaviour.ArrivalDistance = ArrivalDistance;
         _seekSteeringBehaviour.Target = _predictedPositionMarker;
         // Configure our gizmos.
-        _agentColor = GetComponent<AgentColor>().Color;
+        _agentColor = GetComponentInParent<AgentColor>().Color;
+        if (target == null) return;
         _targetColor = target.GetComponent<AgentColor>().Color;
     }
 

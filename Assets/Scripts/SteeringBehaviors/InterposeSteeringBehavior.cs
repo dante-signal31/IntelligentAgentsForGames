@@ -23,13 +23,25 @@ public class InterposeSteeringBehavior: SteeringBehavior
     public AgentMover AgentA
     {
         get => agentA;
-        set => agentA = value;
+        set
+        {
+            agentA = value;
+            _agentAColor = agentA.GetComponent<AgentColor>().Color;
+            if (agentB == null) return;
+            UpdatePredictedPositionMarker();
+        }
     }
 
     public AgentMover AgentB
     {
         get => agentB;
-        set => agentB = value;
+        set
+        {
+            agentB = value;
+            _agentBColor = agentB.GetComponent<AgentColor>().Color;
+            if (agentA == null) return;
+            UpdatePredictedPositionMarker();
+        }
     }
 
     public float ArrivalDistance
@@ -47,19 +59,27 @@ public class InterposeSteeringBehavior: SteeringBehavior
 
     private void Awake()
     {
+        // Configure seek steering behaviour to go to that marker.
+        _seekSteeringBehavior = GetComponent<SeekSteeringBehavior>();
+        _seekSteeringBehavior.ArrivalDistance = ArrivalDistance;
+        
         // Create an invisible object as marker to place it at target predicted future
         // position. That marker will be used by seek steering behaviour as target.
         _predictedPositionMarker = new GameObject();
-        _predictedPositionMarker.transform.position = GetMidPoint(
-            agentA.transform.position, 
-            agentB.transform.position);
-        // Configure seek steering behaviour to go to that marker.
-        _seekSteeringBehavior = GetComponent<SeekSteeringBehavior>();
         _seekSteeringBehavior.Target = _predictedPositionMarker;
-        _seekSteeringBehavior.ArrivalDistance = ArrivalDistance;
+        if (agentA == null || agentB == null) return;
+        UpdatePredictedPositionMarker();
+        
         // Configure our gizmos.
         _agentAColor = agentA.GetComponent<AgentColor>().Color;
         _agentBColor = agentB.GetComponent<AgentColor>().Color;
+    }
+
+    private void UpdatePredictedPositionMarker()
+    {
+        _predictedPositionMarker.transform.position = GetMidPoint(
+            agentA.transform.position, 
+            agentB.transform.position);
     }
 
     private void OnDestroy()
@@ -81,6 +101,9 @@ public class InterposeSteeringBehavior: SteeringBehavior
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
+        if (AgentA == null || AgentB == null) 
+            return new SteeringOutput(Vector2.zero, 0);
+        
         Vector2 currentPosition = args.CurrentAgent.transform.position;
         float maximumSpeed = args.MaximumSpeed;
 
@@ -92,7 +115,7 @@ public class InterposeSteeringBehavior: SteeringBehavior
                 AgentB.transform.position);
     
             // If target agents where static, how much time we'd need to get to midPoint?
-            float TimeToReachMidPoint = (midPoint - currentPosition).magnitude / 
+            float timeToReachMidPoint = (midPoint - currentPosition).magnitude / 
                                         maximumSpeed;
     
             // But actually agents won't be static, so while we move to midPoint,
@@ -102,9 +125,9 @@ public class InterposeSteeringBehavior: SteeringBehavior
             // velocity change), so we'll extrapolate their future position using
             // their current velocity.
             Vector2 futurePositionOfAgentA = (Vector2) AgentA.transform.position + 
-                                             AgentA.Velocity * TimeToReachMidPoint;
+                                             AgentA.Velocity * timeToReachMidPoint;
             Vector2 futurePositionOfAgentB = (Vector2) AgentB.transform.position + 
-                                             AgentB.Velocity * TimeToReachMidPoint;
+                                             AgentB.Velocity * timeToReachMidPoint;
         
             // Now we have the future position of target agents, we can get the estimated
             // future midpoint position.
@@ -115,6 +138,7 @@ public class InterposeSteeringBehavior: SteeringBehavior
             // So, to not been left behind, we must go to the future midpoint.
             _predictedPositionMarker.transform.position = futureMidPoint;
 
+            // Keep track of current positions.
             _previousPositionAgentA = AgentA.transform.position;
             _previousPositionAgentB = AgentB.transform.position;
         }

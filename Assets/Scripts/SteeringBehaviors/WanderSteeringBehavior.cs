@@ -101,7 +101,7 @@ public class WanderSteeringBehavior : SteeringBehavior
     private SeekSteeringBehavior _seekSteeringBehaviour;
     private SteeringBehaviorArgs _currentSteeringBehaviorArgs;
 
-    private Color _agentColor;
+    private AgentColor _agentColor;
 
     private void Awake()
     {
@@ -110,7 +110,7 @@ public class WanderSteeringBehavior : SteeringBehavior
         _seekSteeringBehaviour.Target = _marker;
         _seekSteeringBehaviour.ArrivalDistance = arrivalDistance;
     
-        _agentColor = GetComponent<AgentColor>().Color;
+        _agentColor = GetComponentInParent<AgentColor>();
     
         // Place WanderPosition in a point constrained to the edge of a circle of
         // radius wanderRadius.
@@ -182,7 +182,7 @@ public class WanderSteeringBehavior : SteeringBehavior
         if (predictedPositionMarkerVisible && _marker != null)
         {
             Vector3 _markerPosition = _marker.transform.position;
-            Gizmos.color = _agentColor;
+            Gizmos.color = _agentColor.Color;
             Gizmos.DrawWireSphere(_markerPosition, 0.2f);
             Gizmos.DrawLine(_markerPosition, transform.position);
         }

@@ -188,7 +188,7 @@ namespace Tests.PlayTests
             // Test setup.
             _seekGameObject.transform.position = _position5.position;
             var seekSteeringBehavior =
-                _seekGameObject.GetComponent<SeekSteeringBehavior>();
+                _seekGameObject.GetComponentInChildren<SeekSteeringBehavior>();
             var agentMover = _seekGameObject.GetComponent<AgentMover>();
             agentMover.MaximumSpeed = 10.0f;
             _target.Enabled = true;
@@ -220,7 +220,7 @@ namespace Tests.PlayTests
             // Test setup.
             _arriveNLAGameObject.transform.position = _position5.position;
             var arriveSteeringBehavior =
-                _arriveNLAGameObject.GetComponent<ArriveSteeringBehaviorNLA>();
+                _arriveNLAGameObject.GetComponentInChildren<ArriveSteeringBehaviorNLA>();
             var arriveMover = _arriveNLAGameObject.GetComponent<AgentMover>();
             var arriveMoverRigidBody = _arriveNLAGameObject.GetComponent<Rigidbody2D>();
             arriveMoverRigidBody.linearVelocity = Vector2.zero;
@@ -285,7 +285,7 @@ namespace Tests.PlayTests
             // Test setup.
             _arriveLAGameObject.transform.position = _position5.position;
             var arriveSteeringBehavior =
-                _arriveLAGameObject.GetComponent<ArriveSteeringBehaviorLA>();
+                _arriveLAGameObject.GetComponentInChildren<ArriveSteeringBehaviorLA>();
             var agentMover = _arriveLAGameObject.GetComponent<AgentMover>();
             agentMover.MaximumSpeed = 6.0f;
             agentMover.StopSpeed = 0.01f;
@@ -348,7 +348,7 @@ namespace Tests.PlayTests
             // Test setup.
             _fleeGameObject.transform.position = _position8.position;
             var fleeSteeringBehavior =
-                _fleeGameObject.GetComponent<FleeSteeringBehavior>();
+                _fleeGameObject.GetComponentInChildren<FleeSteeringBehavior>();
             fleeSteeringBehavior.Threath = _target.gameObject;
             fleeSteeringBehavior.PanicDistance = 5.0f;
             var agentMover = _fleeGameObject.GetComponent<AgentMover>();
@@ -387,7 +387,7 @@ namespace Tests.PlayTests
             // Test setup.
             _seekGameObject.transform.position = _position5.position;
             var seekSteeringBehavior =
-                _seekGameObject.GetComponent<SeekSteeringBehavior>();
+                _seekGameObject.GetComponentInChildren<SeekSteeringBehavior>();
             var agentMover = _seekGameObject.GetComponent<AgentMover>();
             agentMover.MaximumSpeed = 2.0f;
             _target.Enabled = true;
@@ -398,7 +398,7 @@ namespace Tests.PlayTests
             seekColor.Color = Color.red;
             _alignGameObject.transform.position = _position6.position;
             var alignSteeringBehavior =
-                _alignGameObject.GetComponent<AlignSteeringBehavior>();
+                _alignGameObject.GetComponentInChildren<AlignSteeringBehavior>();
             alignSteeringBehavior.Target = _seekGameObject;
             _alignGameObject.SetActive(true);
             _seekGameObject.SetActive(true);
@@ -445,7 +445,7 @@ namespace Tests.PlayTests
             // Test setup.
             _seekGameObject.transform.position = _position5.position;
             var seekSteeringBehavior =
-                _seekGameObject.GetComponent<SeekSteeringBehavior>();
+                _seekGameObject.GetComponentInChildren<SeekSteeringBehavior>();
             var agentMover = _seekGameObject.GetComponent<AgentMover>();
             agentMover.MaximumSpeed = 2.0f;
             _target.Enabled = true;
@@ -456,7 +456,7 @@ namespace Tests.PlayTests
             seekColor.Color = Color.red;
             _faceGameObject.transform.position = _position7.position;
             var faceSteeringBehavior =
-                _faceGameObject.GetComponent<FaceMatchingSteeringBehavior>();
+                _faceGameObject.GetComponentInChildren<FaceMatchingSteeringBehavior>();
             faceSteeringBehavior.Target = _seekGameObject;
             _faceGameObject.SetActive(true);
             _seekGameObject.SetActive(true);
@@ -506,7 +506,7 @@ namespace Tests.PlayTests
             var targetMovingAgentColor = _seekGameObject.GetComponent<AgentColor>();
             targetMovingAgentColor.Color = Color.red;
             var seekSteeringBehavior = 
-                _seekGameObject.GetComponent<SeekSteeringBehavior>();
+                _seekGameObject.GetComponentInChildren<SeekSteeringBehavior>();
             seekSteeringBehavior.Target = _target.gameObject;
             seekSteeringBehavior.ArrivalDistance = 0.2f;
             _pursuitGameObject.transform.position = _position1.position;
@@ -519,7 +519,7 @@ namespace Tests.PlayTests
             pursueAgentMover.MaximumAcceleration = 2;
             pursueAgentMover.MaximumDeceleration = 4;
             var pursueSteeringBehavior = 
-                _pursuitGameObject.GetComponent<PursuitSteeringBehavior>();
+                _pursuitGameObject.GetComponentInChildren<PursuitSteeringBehavior>();
             pursueSteeringBehavior.Target = targetMovingAgent;
             _seekGameObject.SetActive(true);
             _pursuitGameObject.SetActive(true);
@@ -560,7 +560,7 @@ namespace Tests.PlayTests
             var targetMovingAgentColor = _seekGameObject.GetComponent<AgentColor>();
             targetMovingAgentColor.Color = Color.red;
             var seekSteeringBehavior = 
-                _seekGameObject.GetComponent<SeekSteeringBehavior>();
+                _seekGameObject.GetComponentInChildren<SeekSteeringBehavior>();
             seekSteeringBehavior.Target = _target.gameObject;
             seekSteeringBehavior.ArrivalDistance = 0.2f;
             
@@ -574,10 +574,10 @@ namespace Tests.PlayTests
             pursueAgentMover.MaximumAcceleration = 2;
             pursueAgentMover.MaximumDeceleration = 4;
             var offsetFollowBehavior = 
-                _offsetFollowGameObject.GetComponent<OffsetFollowBehavior>();
+                _offsetFollowGameObject.GetComponentInChildren<OffsetFollowBehavior>();
             offsetFollowBehavior.Target = targetMovingAgent;
             GameObject offsetFromTargetMarker = 
-                _offsetFollowGameObject.transform.Find("OffsetFromTargetMarker").gameObject;
+                offsetFollowBehavior.gameObject.transform.Find("OffsetFromTargetMarker").gameObject;
             
             Vector2 offsetFromTarget = new Vector2(1, -1);
             offsetFromTargetMarker.transform.position =
@@ -618,8 +618,8 @@ namespace Tests.PlayTests
         {
             // Test setup.
             var evadeAgentMover = _evadeGameObject.GetComponent<AgentMover>();
-            var evadeSteeringBehavior = _evadeGameObject.GetComponent<EvadeSteeringBehavior>();
-            var seekSteeringBehavior = _seekGameObject.GetComponent<SeekSteeringBehavior>();
+            var evadeSteeringBehavior = _evadeGameObject.GetComponentInChildren<EvadeSteeringBehavior>();
+            var seekSteeringBehavior = _seekGameObject.GetComponentInChildren<SeekSteeringBehavior>();
             var seekAgentMover = _seekGameObject.GetComponent<AgentMover>();
             _evadeGameObject.transform.position = _position8.position;
             evadeAgentMover.MaximumSpeed = 2.0f;
@@ -654,13 +654,13 @@ namespace Tests.PlayTests
         {
             // Get references to components.
             var velocityMatchingSteeringBehavior = _velocityMatchingGameObject
-                .GetComponent<VelocityMatchingSteeringBehavior>();
+                .GetComponentInChildren<VelocityMatchingSteeringBehavior>();
             var velocityMatchingRigidbody =
                 _velocityMatchingGameObject.GetComponent<Rigidbody2D>();
             var velocityMatchingAgentMover =
                 _velocityMatchingGameObject.GetComponent<AgentMover>();
             var arriveSteeringBehavior =
-                _arriveLAGameObject.GetComponent<ArriveSteeringBehaviorLA>();
+                _arriveLAGameObject.GetComponentInChildren<ArriveSteeringBehaviorLA>();
             var arriveAgentMover = _arriveLAGameObject.GetComponent<AgentMover>();
             var arriveRigidbody = _arriveLAGameObject.GetComponent<Rigidbody2D>();
             
@@ -722,17 +722,17 @@ namespace Tests.PlayTests
         {
             // Get references to components.
             var velocityMatchingSteeringBehavior = _velocityMatchingGameObject
-                .GetComponent<VelocityMatchingSteeringBehavior>();
+                .GetComponentInChildren<VelocityMatchingSteeringBehavior>();
             var velocityMatchingRigidbody =
                 _velocityMatchingGameObject.GetComponent<Rigidbody2D>();
             var velocityMatchingAgentMover =
                 _velocityMatchingGameObject.GetComponent<AgentMover>();
             var arriveSteeringBehavior =
-                _arriveLAGameObject.GetComponent<ArriveSteeringBehaviorLA>();
+                _arriveLAGameObject.GetComponentInChildren<ArriveSteeringBehaviorLA>();
             var arriveAgentMover = _arriveLAGameObject.GetComponent<AgentMover>();
             var arriveRigidbody = _arriveLAGameObject.GetComponent<Rigidbody2D>();
             var interposeSteeringBehavior =
-                _interposeGameObject.GetComponent<InterposeSteeringBehavior>();
+                _interposeGameObject.GetComponentInChildren<InterposeSteeringBehavior>();
             var interposeAgentMover = _interposeGameObject.GetComponent<AgentMover>();
             var interposeRigidbody = _interposeGameObject.GetComponent<Rigidbody2D>();
             
@@ -816,17 +816,17 @@ namespace Tests.PlayTests
         {
             // Get references to components.
             var velocityMatchingSteeringBehavior = _velocityMatchingGameObject
-                .GetComponent<VelocityMatchingSteeringBehavior>();
+                .GetComponentInChildren<VelocityMatchingSteeringBehavior>();
             var velocityMatchingRigidbody =
                 _velocityMatchingGameObject.GetComponent<Rigidbody2D>();
             var velocityMatchingAgentMover =
                 _velocityMatchingGameObject.GetComponent<AgentMover>();
             var arriveSteeringBehavior =
-                _arriveLAGameObject.GetComponent<ArriveSteeringBehaviorLA>();
+                _arriveLAGameObject.GetComponentInChildren<ArriveSteeringBehaviorLA>();
             var arriveAgentMover = _arriveLAGameObject.GetComponent<AgentMover>();
             var arriveRigidbody = _arriveLAGameObject.GetComponent<Rigidbody2D>();
             var separationSteeringBehavior =
-                _separationGameObject.GetComponent<SeparationSteeringBehavior>();
+                _separationGameObject.GetComponentInChildren<SeparationSteeringBehavior>();
             var separationAgentMover = _separationGameObject.GetComponent<AgentMover>();
             var separationRigidbody = _separationGameObject.GetComponent<Rigidbody2D>();
             
@@ -913,17 +913,17 @@ namespace Tests.PlayTests
         {
             // Get references to components.
             var velocityMatchingSteeringBehavior = _velocityMatchingGameObject
-                .GetComponent<VelocityMatchingSteeringBehavior>();
+                .GetComponentInChildren<VelocityMatchingSteeringBehavior>();
             var velocityMatchingRigidbody =
                 _velocityMatchingGameObject.GetComponent<Rigidbody2D>();
             var velocityMatchingAgentMover =
                 _velocityMatchingGameObject.GetComponent<AgentMover>();
             var arriveSteeringBehavior =
-                _arriveLAGameObject.GetComponent<ArriveSteeringBehaviorLA>();
+                _arriveLAGameObject.GetComponentInChildren<ArriveSteeringBehaviorLA>();
             var arriveAgentMover = _arriveLAGameObject.GetComponent<AgentMover>();
             var arriveRigidbody = _arriveLAGameObject.GetComponent<Rigidbody2D>();
             var separationSteeringBehavior =
-                _separationGameObject.GetComponent<SeparationSteeringBehavior>();
+                _separationGameObject.GetComponentInChildren<SeparationSteeringBehavior>();
             var separationAgentMover = _separationGameObject.GetComponent<AgentMover>();
             var separationRigidbody = _separationGameObject.GetComponent<Rigidbody2D>();
             
@@ -1010,17 +1010,17 @@ namespace Tests.PlayTests
         {
             // Get references to components.
             var groupAlignSteeringBehavior = _groupAlignGameObject
-                .GetComponent<GroupAlignSteeringBehavior>();
+                .GetComponentInChildren<GroupAlignSteeringBehavior>();
             var groupAlignRigidbody =
                 _groupAlignGameObject.GetComponent<Rigidbody2D>();
             var groupAlignAgentMover =
                 _groupAlignGameObject.GetComponent<AgentMover>();
             var arriveSteeringBehavior =
-                _arriveLAGameObject.GetComponent<ArriveSteeringBehaviorLA>();
+                _arriveLAGameObject.GetComponentInChildren<ArriveSteeringBehaviorLA>();
             var arriveAgentMover = _arriveLAGameObject.GetComponent<AgentMover>();
             var arriveRigidbody = _arriveLAGameObject.GetComponent<Rigidbody2D>();
             var seekSteeringBehavior =
-                _seekGameObject.GetComponent<SeekSteeringBehavior>();
+                _seekGameObject.GetComponentInChildren<SeekSteeringBehavior>();
             var seekAgentMover = _seekGameObject.GetComponent<AgentMover>();
             var seekRigidbody = _seekGameObject.GetComponent<Rigidbody2D>();
             
@@ -1092,21 +1092,21 @@ namespace Tests.PlayTests
         {
             // Get references to components.
             var velocityMatchingSteeringBehavior = _velocityMatchingGameObject
-                .GetComponent<VelocityMatchingSteeringBehavior>();
+                .GetComponentInChildren<VelocityMatchingSteeringBehavior>();
             var velocityMatchingRigidbody =
                 _velocityMatchingGameObject.GetComponent<Rigidbody2D>();
             var velocityMatchingAgentMover =
                 _velocityMatchingGameObject.GetComponent<AgentMover>();
             var arriveSteeringBehavior =
-                _arriveLAGameObject.GetComponent<ArriveSteeringBehaviorLA>();
+                _arriveLAGameObject.GetComponentInChildren<ArriveSteeringBehaviorLA>();
             var arriveAgentMover = _arriveLAGameObject.GetComponent<AgentMover>();
             var arriveRigidbody = _arriveLAGameObject.GetComponent<Rigidbody2D>();
             var seekSteeringBehavior =
-                _seekGameObject.GetComponent<SeekSteeringBehavior>();
+                _seekGameObject.GetComponentInChildren<SeekSteeringBehavior>();
             var seekAgentMover = _seekGameObject.GetComponent<AgentMover>();
             var seekRigidbody = _seekGameObject.GetComponent<Rigidbody2D>();
             var cohesionSteeringBehavior =
-                _cohesionGameObject.GetComponent<CohesionSteeringBehavior>();
+                _cohesionGameObject.GetComponentInChildren<CohesionSteeringBehavior>();
             var cohesionAgentMover = _cohesionGameObject.GetComponent<AgentMover>();
             var cohesionRigidbody = _cohesionGameObject.GetComponent<Rigidbody2D>();
             
@@ -1200,7 +1200,7 @@ namespace Tests.PlayTests
             int numberOfTestSamples = 5;
             _wanderGameObject.transform.position = _position13.position;
             var wanderSteeringBehavior =
-                _wanderGameObject.GetComponent<WanderSteeringBehavior>();
+                _wanderGameObject.GetComponentInChildren<WanderSteeringBehavior>();
             var wanderMover = _wanderGameObject.GetComponent<AgentMover>();
             var wanderRigidbody = _seekGameObject.GetComponent<Rigidbody2D>();
             wanderMover.MaximumSpeed = 1.0f;
@@ -1252,7 +1252,7 @@ namespace Tests.PlayTests
             var obstacleMovingAgentColor = _seekGameObject.GetComponent<AgentColor>();
             obstacleMovingAgentColor.Color = Color.red;
             var seekSteeringBehavior = 
-                _seekGameObject.GetComponent<SeekSteeringBehavior>();
+                _seekGameObject.GetComponentInChildren<SeekSteeringBehavior>();
             seekSteeringBehavior.ArrivalDistance = 0.2f;
             
             var agentAvoider = _agentAvoiderGameObject.GetComponent<AgentMover>();
@@ -1264,7 +1264,7 @@ namespace Tests.PlayTests
             agentAvoider.MaximumAcceleration = 2;
             agentAvoider.MaximumDeceleration = 4;
             var agentAvoiderSteeringBehavior = 
-                _agentAvoiderGameObject.GetComponent<AgentAvoiderSteeringBehavior>();
+                _agentAvoiderGameObject.GetComponentInChildren<AgentAvoiderSteeringBehavior>();
             
             // FIRST SCENARIO:
             _target.TargetPosition = _position11.position;
@@ -1313,7 +1313,7 @@ namespace Tests.PlayTests
             var obstacleMovingAgentColor = _seekGameObject.GetComponent<AgentColor>();
             obstacleMovingAgentColor.Color = Color.red;
             var seekSteeringBehavior = 
-                _seekGameObject.GetComponent<SeekSteeringBehavior>();
+                _seekGameObject.GetComponentInChildren<SeekSteeringBehavior>();
             seekSteeringBehavior.ArrivalDistance = 0.2f;
             
             var agentAvoider = _agentAvoiderGameObject.GetComponent<AgentMover>();
@@ -1325,7 +1325,7 @@ namespace Tests.PlayTests
             agentAvoider.MaximumAcceleration = 2;
             agentAvoider.MaximumDeceleration = 4;
             var agentAvoiderSteeringBehavior = 
-                _agentAvoiderGameObject.GetComponent<AgentAvoiderSteeringBehavior>();
+                _agentAvoiderGameObject.GetComponentInChildren<AgentAvoiderSteeringBehavior>();
             
             // SECOND SCENARIO:
             _target.TargetPosition = _position11.position;
@@ -1374,7 +1374,7 @@ namespace Tests.PlayTests
             var obstacleMovingAgentColor = _seekGameObject.GetComponent<AgentColor>();
             obstacleMovingAgentColor.Color = Color.red;
             var seekSteeringBehavior = 
-                _seekGameObject.GetComponent<SeekSteeringBehavior>();
+                _seekGameObject.GetComponentInChildren<SeekSteeringBehavior>();
             seekSteeringBehavior.ArrivalDistance = 0.2f;
             
             var agentAvoider = _agentAvoiderGameObject.GetComponent<AgentMover>();
@@ -1386,7 +1386,7 @@ namespace Tests.PlayTests
             agentAvoider.MaximumAcceleration = 2;
             agentAvoider.MaximumDeceleration = 4;
             var agentAvoiderSteeringBehavior = 
-                _agentAvoiderGameObject.GetComponent<AgentAvoiderSteeringBehavior>();
+                _agentAvoiderGameObject.GetComponentInChildren<AgentAvoiderSteeringBehavior>();
             
             // THIRD SCENARIO:
             _target.TargetPosition = _position14.position;
@@ -1435,7 +1435,7 @@ namespace Tests.PlayTests
             var obstacleMovingAgentColor = _seekGameObject.GetComponent<AgentColor>();
             obstacleMovingAgentColor.Color = Color.red;
             var seekSteeringBehavior = 
-                _seekGameObject.GetComponent<SeekSteeringBehavior>();
+                _seekGameObject.GetComponentInChildren<SeekSteeringBehavior>();
             seekSteeringBehavior.ArrivalDistance = 0.2f;
             
             var agentAvoider = _agentAvoiderGameObject.GetComponent<AgentMover>();
@@ -1447,7 +1447,7 @@ namespace Tests.PlayTests
             agentAvoider.MaximumAcceleration = 2;
             agentAvoider.MaximumDeceleration = 4;
             var agentAvoiderSteeringBehavior = 
-                _agentAvoiderGameObject.GetComponent<AgentAvoiderSteeringBehavior>();
+                _agentAvoiderGameObject.GetComponentInChildren<AgentAvoiderSteeringBehavior>();
             
             // FOURTH SCENARIO:
             _target.TargetPosition = _position14.position;
@@ -1496,7 +1496,7 @@ namespace Tests.PlayTests
             var obstacleMovingAgentColor = _seekGameObject.GetComponent<AgentColor>();
             obstacleMovingAgentColor.Color = Color.red;
             var seekSteeringBehavior = 
-                _seekGameObject.GetComponent<SeekSteeringBehavior>();
+                _seekGameObject.GetComponentInChildren<SeekSteeringBehavior>();
             seekSteeringBehavior.ArrivalDistance = 0.2f;
             
             var agentAvoider = _agentAvoiderGameObject.GetComponent<AgentMover>();
@@ -1508,7 +1508,7 @@ namespace Tests.PlayTests
             agentAvoider.MaximumAcceleration = 2;
             agentAvoider.MaximumDeceleration = 4;
             var agentAvoiderSteeringBehavior = 
-                _agentAvoiderGameObject.GetComponent<AgentAvoiderSteeringBehavior>();
+                _agentAvoiderGameObject.GetComponentInChildren<AgentAvoiderSteeringBehavior>();
             
             // FIFTH SCENARIO:
             _target.TargetPosition = _position12.position;

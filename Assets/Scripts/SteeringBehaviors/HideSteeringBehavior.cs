@@ -13,7 +13,7 @@ namespace SteeringBehaviors
 /// <p> Hiding makes an agent to place itself after an obstacle between him and a
 /// threat. </p>
 /// </summary>
-[RequireComponent(typeof(SeekSteeringBehavior), typeof(AgentMover))]
+[RequireComponent(typeof(SeekSteeringBehavior))]
 public class HideSteeringBehavior : SteeringBehavior
 {
     [Header("CONFIGURATION:")] 
@@ -47,8 +47,8 @@ public class HideSteeringBehavior : SteeringBehavior
     [SerializeField] private RaySensor rayCastToThreat; 
     [SerializeField] private NavigationAgent navigationAgent;
     [SerializeField] private HidingPointsDetector hidingPointsDetector;
-    [SerializeField] private SeekSteeringBehavior seekSteeringBehavior;
-
+    
+    
     /// <summary>
     /// Agent to hide from.
     /// </summary>
@@ -179,14 +179,14 @@ public class HideSteeringBehavior : SteeringBehavior
     private bool _hidingPointRecheckNeeded;
     private bool _hidingPointReached;
     private GameObject _nextMovementTarget;
+    private SeekSteeringBehavior seekSteeringBehavior;
 
     private void Awake()
     {
         if (_nextMovementTarget == null)
             _nextMovementTarget = new GameObject("NextMovementTarget");
         HidingPoint = transform.position;
-        // _currentAgentMover = GetComponent<AgentMover>();
-        // seekSteeringBehavior = GetComponent<SeekSteeringBehavior>();
+        seekSteeringBehavior = GetComponent<SeekSteeringBehavior>();
     }
 
     private void Start()
@@ -215,7 +215,7 @@ public class HideSteeringBehavior : SteeringBehavior
 
     private void InitHidingPointDetector()
     {
-        hidingPointsDetector.Threat = Threat.gameObject;
+        if (Threat != null) hidingPointsDetector.Threat = Threat.gameObject;
         hidingPointsDetector.ObstaclesPositions = _currentLevel.ObstaclePositions;
         hidingPointsDetector.ObstaclesLayer = ObstaclesLayer;
         hidingPointsDetector.SeparationFromObstacles = SeparationFromObstacles;

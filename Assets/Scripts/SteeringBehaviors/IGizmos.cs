@@ -13,7 +13,7 @@ public interface IGizmos
     public bool ShowGizmos { get; set; }
     
     /// <summary>
-    /// Colors for this agents's gizmos.
+    /// Color for this component's gizmos.
     /// </summary>
     public Color GizmosColor { get; set; }
 }

@@ -8,7 +8,7 @@ namespace SteeringBehaviors
 /// The agent anticipates the target's position based on its current position, velocity,
 /// and a look-ahead time.</p>
 /// </summary>
-[RequireComponent(typeof(ArriveSteeringBehaviorNLA), typeof(AgentMover))]
+[RequireComponent(typeof(ArriveSteeringBehaviorNLA))]
 public class OffsetFollowBehavior: SteeringBehavior
 {
     [Header("CONFIGURATION:")]
@@ -18,11 +18,19 @@ public class OffsetFollowBehavior: SteeringBehavior
 
     [Header("DEBUG:")] 
     [SerializeField] private bool showGizmos;
-    
+
     /// <summary>
     /// Target to follow.
     /// </summary>
-    public AgentMover Target { get => target; set => target = value; }
+    public AgentMover Target
+    {
+        get => target;
+        set
+        {
+            target = value;
+            UpdateOffsetFromTarget();
+        }
+    }
     
     private ArriveSteeringBehaviorNLA _followSteeringBehavior;
     private GameObject _offsetFromTargetMarker;
@@ -32,7 +40,7 @@ public class OffsetFollowBehavior: SteeringBehavior
 
     private void Awake()
     {
-        _currentAgent = GetComponent<AgentMover>();
+        _currentAgent = GetComponentInParent<AgentMover>();
         _followSteeringBehavior = GetComponent<ArriveSteeringBehaviorNLA>();
         _offsetFromTargetMarker = new GameObject("OffsetFromTargetMarker");
         _offsetFromTargetMarker.transform.parent = transform;
@@ -49,6 +57,7 @@ public class OffsetFollowBehavior: SteeringBehavior
     /// </summary>
     public void UpdateOffsetFromTarget()
     {
+        if (target == null) return;
         _offsetFromTargetMarker.transform.position = target.transform.TransformPoint(
             offsetFromTarget);
     }
@@ -72,8 +81,7 @@ public class OffsetFollowBehavior: SteeringBehavior
         //     target.transform.TransformPoint(offsetFromTarget) + 
         //     (Vector3)target.Velocity * lookAheadTime;
 
-        _offsetFromTargetMarker.transform.position =
-            target.transform.TransformPoint(offsetFromTarget);
+        UpdateOffsetFromTarget();
         
         // Let the child steering behavior get to the new marker position.
         return _followSteeringBehavior.GetSteering(args);

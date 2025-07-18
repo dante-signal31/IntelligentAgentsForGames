@@ -7,9 +7,7 @@ namespace SteeringBehaviors
 /// Steering behavior to avoid walls and obstacles using usher algorithm to smooth
 /// movements.
 /// </summary>
-[RequireComponent(typeof(AgentMover), 
-    typeof(ArriveSteeringBehaviorNLA), 
-    typeof(CustomTimer))]
+[RequireComponent(typeof(ArriveSteeringBehaviorNLA), typeof(CustomTimer))]
 public class SmoothedWallAvoiderSteeringBehavior: SteeringBehavior, ITargeter
 {
     [Header("CONFIGURATION:")]
@@ -81,7 +79,7 @@ public class SmoothedWallAvoiderSteeringBehavior: SteeringBehavior, ITargeter
 
     private void Awake()
     {
-        _currentAgent = GetComponent<AgentMover>();
+        _currentAgent = GetComponentInParent<AgentMover>();
         _advantageTimer = GetComponent<CustomTimer>();
         _chaseToUsherSteeringBehavior = GetComponent<ArriveSteeringBehaviorNLA>();
         _chaseToUsherTargeter = (ITargeter)_chaseToUsherSteeringBehavior;

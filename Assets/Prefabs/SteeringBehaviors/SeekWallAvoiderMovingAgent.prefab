@@ -93,8 +93,12 @@ MonoBehaviour:
   weightedBehaviors:
   - steeringBehavior: {fileID: 3203962867510979609}
     weight: 0.5
+    debugColor: {r: 0, g: 0, b: 0, a: 0}
   - steeringBehavior: {fileID: 8894954336859605257}
     weight: 0.5
+    debugColor: {r: 0, g: 0, b: 0, a: 0}
+  showGizmos: 0
+  gizmosColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!114 &3203962867510979609
 MonoBehaviour:
   m_ObjectHideFlags: 0

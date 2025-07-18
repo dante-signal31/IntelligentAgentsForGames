@@ -114,10 +114,10 @@ namespace Tests.PlayTests
             
             if (_seekSteeringBehavior == null)
                 _seekSteeringBehavior = 
-                    _seekGameObject.GetComponent<SeekSteeringBehavior>();
+                    _seekGameObject.GetComponentInChildren<SeekSteeringBehavior>();
             if (_hideSteeringBehavior == null)
                 _hideSteeringBehavior = 
-                    _hideGameObject.GetComponent<HideSteeringBehavior>();
+                    _hideGameObject.GetComponentInChildren<HideSteeringBehavior>();
             // if (_wallAvoiderSteeringBehavior == null)
             //     _wallAvoiderSteeringBehavior = 
             //         _wallAvoiderGameObject.GetComponent<WallAvoiderSteeringBehavior>();
@@ -199,6 +199,7 @@ namespace Tests.PlayTests
             
             // Start test.
             // Assert that seek agent can see hide agent.
+            yield return null;
             Assert.True(_hideSteeringBehavior.ThreatCanSeeUs);
             
             // Give hide agent time to hide.

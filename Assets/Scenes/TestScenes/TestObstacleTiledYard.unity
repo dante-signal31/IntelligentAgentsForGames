@@ -129,11 +129,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3374666069497621577, guid: 7039a0f10eac5e4449a3edf7e5f9edc7, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 6.6
+      value: 1.91
       objectReference: {fileID: 0}
     - target: {fileID: 3374666069497621577, guid: 7039a0f10eac5e4449a3edf7e5f9edc7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.81
+      value: -2.28
       objectReference: {fileID: 0}
     - target: {fileID: 3374666069497621577, guid: 7039a0f10eac5e4449a3edf7e5f9edc7, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1759,6 +1759,10 @@ PrefabInstance:
       propertyPath: rightRangeSemiCone.m_Curve.Array.data[1].outWeight
       value: 0.33333334
       objectReference: {fileID: 0}
+    - target: {fileID: 2188158837270767738, guid: 2d0d219662d67da4fa9019f6cb8a38f1, type: 3}
+      propertyPath: target
+      value: 
+      objectReference: {fileID: 2297233}
     - target: {fileID: 2310317688682805344, guid: 2d0d219662d67da4fa9019f6cb8a38f1, type: 3}
       propertyPath: target
       value: 
@@ -1793,7 +1797,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4692215361483410609, guid: 2d0d219662d67da4fa9019f6cb8a38f1, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5644810675524642883, guid: 2d0d219662d67da4fa9019f6cb8a38f1, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2172,7 +2176,7 @@ Transform:
   m_GameObject: {fileID: 1257508757}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.33, y: -2.12, z: 0}
+  m_LocalPosition: {x: 1.77, y: -0.68, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3155,6 +3159,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1917747424}
     m_Modifications:
+    - target: {fileID: 3764691632775117666, guid: 492129d6e4323bf47aa7900cc9bf8ca3, type: 3}
+      propertyPath: target
+      value: 
+      objectReference: {fileID: 1385354318}
     - target: {fileID: 3885876199709372428, guid: 492129d6e4323bf47aa7900cc9bf8ca3, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.93
@@ -3203,6 +3211,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5422601649838826624, guid: 492129d6e4323bf47aa7900cc9bf8ca3, type: 3}
+      propertyPath: threat
+      value: 
+      objectReference: {fileID: 1836513666}
     - target: {fileID: 6130676529372785678, guid: 492129d6e4323bf47aa7900cc9bf8ca3, type: 3}
       propertyPath: target
       value: 
@@ -3235,7 +3247,8 @@ PrefabInstance:
       propertyPath: notEmptyGroundLayers.m_Bits
       value: 64
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 8998354024103965499, guid: 492129d6e4323bf47aa7900cc9bf8ca3, type: 3}
     m_RemovedGameObjects:
     - {fileID: 1881964186034959453, guid: 492129d6e4323bf47aa7900cc9bf8ca3, type: 3}
     m_AddedGameObjects: []
@@ -3703,7 +3716,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2932987998529570452, guid: b2cf55df5f328f44ebeaea4f4f402276, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4931795218947541339, guid: b2cf55df5f328f44ebeaea4f4f402276, type: 3}
       propertyPath: target
@@ -3729,6 +3742,10 @@ PrefabInstance:
       propertyPath: secondsToWaitAfterReachingUsher
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5172748082503555127, guid: b2cf55df5f328f44ebeaea4f4f402276, type: 3}
+      propertyPath: target
+      value: 
+      objectReference: {fileID: 2297233}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3747,6 +3764,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1917747424}
     m_Modifications:
+    - target: {fileID: 1061040072369006605, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
+      propertyPath: target
+      value: 
+      objectReference: {fileID: 2297233}
     - target: {fileID: 1599485924749689140, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
       propertyPath: m_Name
       value: SeekMovingAgent
