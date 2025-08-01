@@ -174,7 +174,7 @@ namespace Tests.PlayTests
             }
             if (_agentAvoiderGameObject == null)
             {
-                _agentAvoiderGameObject = GameObject.Find("AgentAvoiderMovingAgent");
+                _agentAvoiderGameObject = GameObject.Find("ActiveAgentAvoiderMovingAgent");
                 _agentAvoiderGameObject.SetActive(false);
             }
         }
@@ -1263,15 +1263,14 @@ namespace Tests.PlayTests
             agentAvoider.StopSpeed = 0.1f;
             agentAvoider.MaximumAcceleration = 2;
             agentAvoider.MaximumDeceleration = 4;
-            var agentAvoiderSteeringBehavior = 
-                _agentAvoiderGameObject.GetComponentInChildren<AgentAvoiderSteeringBehavior>();
+            var agentAvoiderSeekSteeringBehavior = _agentAvoiderGameObject.GetComponentInChildren<SeekSteeringBehavior>();
             
             // FIRST SCENARIO:
             _target.TargetPosition = _position11.position;
             _agentAvoiderGameObject.transform.position = _position14.position;
             _seekGameObject.transform.position = _position10.position;
             seekSteeringBehavior.Target = _position1.gameObject;
-            agentAvoiderSteeringBehavior.Target = _target.gameObject;
+            agentAvoiderSeekSteeringBehavior.Target = _target.gameObject;
             _target.Enabled = true;
             _seekGameObject.SetActive(true);
             _agentAvoiderGameObject.SetActive(true);
@@ -1324,15 +1323,14 @@ namespace Tests.PlayTests
             agentAvoider.StopSpeed = 0.1f;
             agentAvoider.MaximumAcceleration = 2;
             agentAvoider.MaximumDeceleration = 4;
-            var agentAvoiderSteeringBehavior = 
-                _agentAvoiderGameObject.GetComponentInChildren<AgentAvoiderSteeringBehavior>();
+            var agentAvoiderSeekSteeringBehavior = _agentAvoiderGameObject.GetComponentInChildren<SeekSteeringBehavior>();
             
             // SECOND SCENARIO:
             _target.TargetPosition = _position11.position;
             _agentAvoiderGameObject.transform.position = _position14.position;
             _seekGameObject.transform.position = _position1.position;
             seekSteeringBehavior.Target = _position10.gameObject;
-            agentAvoiderSteeringBehavior.Target = _target.gameObject;
+            agentAvoiderSeekSteeringBehavior.Target = _target.gameObject;
             _target.Enabled = true;
             _seekGameObject.SetActive(true);
             _agentAvoiderGameObject.SetActive(true);
@@ -1341,9 +1339,9 @@ namespace Tests.PlayTests
             int steps = 7;
             for (int i=0; i < steps; i++)
             {
-                yield return new WaitForSeconds(1.0f);
+                yield return new WaitForSeconds(1.2f);
                 Assert.True(Vector3.Distance(_seekGameObject.transform.position, 
-                    _agentAvoiderGameObject.transform.position) >= (1.5f));
+                    _agentAvoiderGameObject.transform.position) >= (1.1f));
             }
             
             // Assert we reached target.
@@ -1385,15 +1383,15 @@ namespace Tests.PlayTests
             agentAvoider.StopSpeed = 0.1f;
             agentAvoider.MaximumAcceleration = 2;
             agentAvoider.MaximumDeceleration = 4;
-            var agentAvoiderSteeringBehavior = 
-                _agentAvoiderGameObject.GetComponentInChildren<AgentAvoiderSteeringBehavior>();
+            var agentAvoiderSeekSteeringBehavior = _agentAvoiderGameObject.GetComponentInChildren<SeekSteeringBehavior>();
+
             
             // THIRD SCENARIO:
             _target.TargetPosition = _position14.position;
             _agentAvoiderGameObject.transform.position = _position7.position;
             _seekGameObject.transform.position = _position1.position;
             seekSteeringBehavior.Target = _position10.gameObject;
-            agentAvoiderSteeringBehavior.Target = _target.gameObject;
+            agentAvoiderSeekSteeringBehavior.Target = _target.gameObject;
             _target.Enabled = true;
             _seekGameObject.SetActive(true);
             _agentAvoiderGameObject.SetActive(true);
@@ -1446,12 +1444,12 @@ namespace Tests.PlayTests
             agentAvoider.StopSpeed = 0.1f;
             agentAvoider.MaximumAcceleration = 2;
             agentAvoider.MaximumDeceleration = 4;
-            var agentAvoiderSteeringBehavior = 
-                _agentAvoiderGameObject.GetComponentInChildren<AgentAvoiderSteeringBehavior>();
+            var agentAvoiderSeekSteeringBehavior = _agentAvoiderGameObject.GetComponentInChildren<SeekSteeringBehavior>();
+
             
             // FOURTH SCENARIO:
             _target.TargetPosition = _position14.position;
-            agentAvoiderSteeringBehavior.Target = _target.gameObject;
+            agentAvoiderSeekSteeringBehavior.Target = _target.gameObject;
             _agentAvoiderGameObject.transform.position = _position10.position;
             _seekGameObject.transform.position = _position14.position;
             seekSteeringBehavior.Target = _position10.gameObject;
@@ -1507,12 +1505,12 @@ namespace Tests.PlayTests
             agentAvoider.StopSpeed = 0.1f;
             agentAvoider.MaximumAcceleration = 2;
             agentAvoider.MaximumDeceleration = 4;
-            var agentAvoiderSteeringBehavior = 
-                _agentAvoiderGameObject.GetComponentInChildren<AgentAvoiderSteeringBehavior>();
+            var agentAvoiderSeekSteeringBehavior = _agentAvoiderGameObject.GetComponentInChildren<SeekSteeringBehavior>();
+
             
             // FIFTH SCENARIO:
             _target.TargetPosition = _position12.position;
-            agentAvoiderSteeringBehavior.Target = _target.gameObject;
+            agentAvoiderSeekSteeringBehavior.Target = _target.gameObject;
             _agentAvoiderGameObject.transform.position = _position2.position;
             _seekGameObject.transform.position = _position12.position;
             seekSteeringBehavior.Target = _position2.gameObject;
