@@ -13,7 +13,6 @@ namespace SteeringBehaviors
 /// <p> Hiding makes an agent to place itself after an obstacle between him and a
 /// threat. </p>
 /// </summary>
-[RequireComponent(typeof(SeekSteeringBehavior))]
 public class HideSteeringBehavior : SteeringBehavior
 {
     [Header("CONFIGURATION:")] 
@@ -47,6 +46,7 @@ public class HideSteeringBehavior : SteeringBehavior
     [SerializeField] private RaySensor rayCastToThreat; 
     [SerializeField] private NavigationAgent navigationAgent;
     [SerializeField] private HidingPointsDetector hidingPointsDetector;
+    [SerializeField] private SeekSteeringBehavior seekSteeringBehavior;
     
     
     /// <summary>
@@ -179,14 +179,12 @@ public class HideSteeringBehavior : SteeringBehavior
     private bool _hidingPointRecheckNeeded;
     private bool _hidingPointReached;
     private GameObject _nextMovementTarget;
-    private SeekSteeringBehavior seekSteeringBehavior;
 
     private void Awake()
     {
         if (_nextMovementTarget == null)
             _nextMovementTarget = new GameObject("NextMovementTarget");
         HidingPoint = transform.position;
-        seekSteeringBehavior = GetComponent<SeekSteeringBehavior>();
     }
 
     private void Start()
@@ -271,8 +269,6 @@ public class HideSteeringBehavior : SteeringBehavior
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        // TODO: Hide agent seems to hide only when threat stops. Fix it.
-        
         // Look for a new hiding point if the threat can see us and has just moved (or
         // if it is threat first position (only once).
         if (_threatCanSeeUs && _hidingPointRecheckNeeded ||

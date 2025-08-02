@@ -1805,7 +1805,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4692215361483410609, guid: 2d0d219662d67da4fa9019f6cb8a38f1, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5187748683231993232, guid: 2d0d219662d67da4fa9019f6cb8a38f1, type: 3}
       propertyPath: range
@@ -3963,7 +3963,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2932987998529570452, guid: b2cf55df5f328f44ebeaea4f4f402276, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4931795218947541339, guid: b2cf55df5f328f44ebeaea4f4f402276, type: 3}
       propertyPath: target
@@ -4085,6 +4085,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 1917747424}
     m_Modifications:
     - target: {fileID: 1061040072369006605, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
+      propertyPath: target
+      value: 
+      objectReference: {fileID: 2297233}
+    - target: {fileID: 1427894083363882658, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
       propertyPath: target
       value: 
       objectReference: {fileID: 2297233}
@@ -4280,6 +4284,22 @@ PrefabInstance:
     - target: {fileID: 2929689529775559017, guid: f89ebc74ef2390046b2980f2905b4dbc, type: 3}
       propertyPath: showGizmos
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2929689529775559017, guid: f89ebc74ef2390046b2980f2905b4dbc, type: 3}
+      propertyPath: gizmoColor.g
+      value: 0.5019608
+      objectReference: {fileID: 0}
+    - target: {fileID: 5289814705463455825, guid: f89ebc74ef2390046b2980f2905b4dbc, type: 3}
+      propertyPath: threat
+      value: 
+      objectReference: {fileID: 1836513666}
+    - target: {fileID: 5289814705463455825, guid: f89ebc74ef2390046b2980f2905b4dbc, type: 3}
+      propertyPath: threatLayerMask.m_Bits
+      value: 128
+      objectReference: {fileID: 0}
+    - target: {fileID: 5289814705463455825, guid: f89ebc74ef2390046b2980f2905b4dbc, type: 3}
+      propertyPath: separationFromObstacles
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 5810333675480897971, guid: f89ebc74ef2390046b2980f2905b4dbc, type: 3}
       propertyPath: m_Name

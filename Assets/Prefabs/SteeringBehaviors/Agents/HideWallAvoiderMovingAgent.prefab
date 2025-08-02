@@ -64,6 +64,7 @@ MonoBehaviour:
   rayCastToThreat: {fileID: 549208545750500194}
   navigationAgent: {fileID: 8971434028263388295}
   hidingPointsDetector: {fileID: 2962941944409245244}
+  seekSteeringBehavior: {fileID: 0}
 --- !u!114 &6985209795322213540
 MonoBehaviour:
   m_ObjectHideFlags: 0
