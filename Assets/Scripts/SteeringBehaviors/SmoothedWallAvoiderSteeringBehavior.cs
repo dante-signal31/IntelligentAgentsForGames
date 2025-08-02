@@ -1,5 +1,6 @@
 ﻿using Tools;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace SteeringBehaviors
 {
@@ -7,7 +8,7 @@ namespace SteeringBehaviors
 /// Steering behavior to avoid walls and obstacles using usher algorithm to smooth
 /// movements.
 /// </summary>
-[RequireComponent(typeof(ArriveSteeringBehaviorNLA), typeof(CustomTimer))]
+[RequireComponent(typeof(CustomTimer))]
 public class SmoothedWallAvoiderSteeringBehavior: SteeringBehavior, ITargeter
 {
     [Header("CONFIGURATION:")]
@@ -21,6 +22,11 @@ public class SmoothedWallAvoiderSteeringBehavior: SteeringBehavior, ITargeter
     [SerializeField] private float reachingDistanceToUsher = 20.0f;
     [Tooltip("Time to wait after reaching usher to start chasing it again.")]
     [SerializeField] private float secondsToWaitAfterReachingUsher = 1.0f;
+    
+    [Header("WIRING:")]
+    // TODO: Add a property drawer to check that complies with ITargeter interface.
+    [Tooltip("Steering to chase the usher. Must comply with ITargeter interface.")]
+    [SerializeField] private SteeringBehavior chaseToUsherSteeringBehavior;
     
     [Header("DEBUG:")]
     [Tooltip("Show gizmos to debug.")]
@@ -37,8 +43,8 @@ public class SmoothedWallAvoiderSteeringBehavior: SteeringBehavior, ITargeter
         set
         {
             target = value;
-            if (_chaseToUsherTargeter == null) return;
-            _chaseToUsherTargeter.Target = value;
+            if (_usherTargeter == null) return;
+            _usherTargeter.Target = value;
         }
     }
 
@@ -67,7 +73,6 @@ public class SmoothedWallAvoiderSteeringBehavior: SteeringBehavior, ITargeter
     
     
     private ITargeter _chaseToUsherTargeter;
-    private SteeringBehavior _chaseToUsherSteeringBehavior;
     private AgentMover _currentAgent;
     private AgentMover _usherAgent;
     private IGizmos _usherAgentSteeringBehaviorGizmos;
@@ -81,8 +86,7 @@ public class SmoothedWallAvoiderSteeringBehavior: SteeringBehavior, ITargeter
     {
         _currentAgent = GetComponentInParent<AgentMover>();
         _advantageTimer = GetComponent<CustomTimer>();
-        _chaseToUsherSteeringBehavior = GetComponent<ArriveSteeringBehaviorNLA>();
-        _chaseToUsherTargeter = (ITargeter)_chaseToUsherSteeringBehavior;
+        _chaseToUsherTargeter = (ITargeter)chaseToUsherSteeringBehavior;
     }
 
     private void Start()
@@ -165,8 +169,9 @@ public class SmoothedWallAvoiderSteeringBehavior: SteeringBehavior, ITargeter
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        if (_chaseToUsherSteeringBehavior == null || _usherAgent == null) 
-            return new SteeringOutput();
+        // TODO: Agent strafes when touches an obstacle. Fix it.
+        if (chaseToUsherSteeringBehavior == null || _usherAgent == null) 
+            return SteeringOutput.Zero;
 
         float distanceToUsher = Vector2.Distance(
             _currentAgent.transform.position, 
@@ -201,7 +206,7 @@ public class SmoothedWallAvoiderSteeringBehavior: SteeringBehavior, ITargeter
         else
         {
             // If we are not giving advantage to usher, follow usher.
-            _currentSteering = _chaseToUsherSteeringBehavior.GetSteering(args);
+            _currentSteering = chaseToUsherSteeringBehavior.GetSteering(args);
         }
         
         return _currentSteering;

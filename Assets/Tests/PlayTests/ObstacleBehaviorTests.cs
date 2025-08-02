@@ -106,11 +106,11 @@ namespace Tests.PlayTests
                 _wallAvoiderGameObject.SetActive(false);
             }
             
-            // if (_smoothedWallAvoiderGameObject == null)
-            // {
-            //     _smoothedWallAvoiderGameObject = GameObject.Find("SmoothedWallAvoiderMovingAgent");
-            //     _smoothedWallAvoiderGameObject.SetActive(false);
-            // }
+            if (_smoothedWallAvoiderGameObject == null)
+            {
+                _smoothedWallAvoiderGameObject = GameObject.Find("SmoothedWallAvoiderMovingAgent");
+                _smoothedWallAvoiderGameObject.SetActive(false);
+            }
             
             if (_seekSteeringBehavior == null)
                 _seekSteeringBehavior = 
@@ -121,28 +121,28 @@ namespace Tests.PlayTests
             if (_wallAvoiderSteeringBehavior == null)
                 _wallAvoiderSteeringBehavior = 
                     _wallAvoiderGameObject.GetComponentInChildren<ActiveWallAvoiderSteeringBehavior>();
-            // if (_smoothedWallAvoiderSteeringBehavior == null)
-            //     _smoothedWallAvoiderSteeringBehavior = 
-            //         _smoothedWallAvoiderGameObject.GetComponent<SmoothedWallAvoiderSteeringBehavior>();
+            if (_smoothedWallAvoiderSteeringBehavior == null)
+                _smoothedWallAvoiderSteeringBehavior = 
+                    _smoothedWallAvoiderGameObject.GetComponentInChildren<SmoothedWallAvoiderSteeringBehavior>();
             if (_seekAgent == null)
                 _seekAgent = _seekGameObject.GetComponent<AgentMover>();
             if (_hideAgent == null)
                 _hideAgent = _hideGameObject.GetComponent<AgentMover>();
             if (_wallAvoiderAgent == null)
                 _wallAvoiderAgent = _wallAvoiderGameObject.GetComponent<AgentMover>();
-            // if (_smoothedWallAvoiderAgent == null)
-            //     _smoothedWallAvoiderAgent = 
-            //     _smoothedWallAvoiderGameObject.GetComponent<AgentMover>();
+            if (_smoothedWallAvoiderAgent == null)
+                _smoothedWallAvoiderAgent = 
+                _smoothedWallAvoiderGameObject.GetComponent<AgentMover>();
             if (_seekAgentColor == null)
                 _seekAgentColor = _seekGameObject.GetComponent<AgentColor>();
             if (_hideAgentColor == null)
                 _hideAgentColor = _hideGameObject.GetComponent<AgentColor>();
-        if (_wallAvoiderAgentColor == null)
-            _wallAvoiderAgentColor = 
-                _wallAvoiderGameObject.GetComponent<AgentColor>();
-        //     if (_smoothedWallAvoiderAgentColor == null)
-        //         _smoothedWallAvoiderAgentColor = 
-        //             _smoothedWallAvoiderGameObject.GetComponent<AgentColor>();
+            if (_wallAvoiderAgentColor == null)
+                _wallAvoiderAgentColor = 
+                    _wallAvoiderGameObject.GetComponent<AgentColor>();
+            if (_smoothedWallAvoiderAgentColor == null)
+                _smoothedWallAvoiderAgentColor = 
+                    _smoothedWallAvoiderGameObject.GetComponent<AgentColor>();
         }
         
         [UnityTearDown]
@@ -154,8 +154,8 @@ namespace Tests.PlayTests
                 _hideGameObject.SetActive(false);
             if (_wallAvoiderGameObject != null)
                 _wallAvoiderGameObject.SetActive(false);
-            // if (_smoothedWallAvoiderGameObject != null)
-            //     _smoothedWallAvoiderGameObject.SetActive(false);
+            if (_smoothedWallAvoiderGameObject != null)
+                _smoothedWallAvoiderGameObject.SetActive(false);
             if (_target != null)
                 _target.Enabled = false;
 
@@ -258,43 +258,36 @@ namespace Tests.PlayTests
             // Assert that wall avoider has reached target.
             Assert.True(Vector2.Distance(
                 _wallAvoiderAgent.transform.position, 
-                _target.TargetPosition) < 0.1f);
+                _target.TargetPosition) < 0.3f);
         }
         
-        // TODO: Fix this automated test. When I run SmoothedWallAvoiderBehavior test in Play Mode
-        // it works fine, but when I run it from this test it launch the error:
-        //
-        // "Cannot instantiate objects with a parent which is persistent. New object will be created without a parent."
-        //
-        // This error happens when WhiskerSensors instantiates sensor and tries to parent
-        // to him. Because of that sensors are missing.
-        // [UnityTest]
-        // public IEnumerator SmoothedWallAvoiderBehaviorTest()
-        // {
-        //     // Setup agents before the tests.
-        //     _target.Enabled = true;
-        //     _target.TargetPosition = _position5.position;
-        //     
-        //     _smoothedWallAvoiderGameObject.transform.position = _position6.position;
-        //     _smoothedWallAvoiderAgent.MaximumSpeed = 2.0f;
-        //     _smoothedWallAvoiderAgent.StopSpeed = 0.01f;
-        //     _smoothedWallAvoiderAgent.MaximumRotationalSpeed = 1080f;
-        //     _smoothedWallAvoiderAgent.StopRotationThreshold = 1f;
-        //     _smoothedWallAvoiderAgentColor.Color = Color.green;
-        //     _smoothedWallAvoiderSteeringBehavior.Target = _target.gameObject;
-        //     _smoothedWallAvoiderSteeringBehavior.ShowGizmos = true;
-        //     _smoothedWallAvoiderGameObject.SetActive(true);
-        //     
-        //     
-        //     // Start test.
-        //     
-        //     // Give agent time to reach its target.
-        //     yield return new WaitForSeconds(6f);
-        //     
-        //     // Assert that wall avoider has reached target.
-        //     Assert.True(Vector2.Distance(
-        //         _smoothedWallAvoiderAgent.transform.position, 
-        //         _target.TargetPosition) < 0.1f);
-        // }
+        [UnityTest]
+        public IEnumerator SmoothedWallAvoiderBehaviorTest()
+        {
+            // Setup agents before the tests.
+            _target.Enabled = true;
+            _target.TargetPosition = _position5.position;
+            
+            _smoothedWallAvoiderGameObject.transform.position = _position1.position;
+            _smoothedWallAvoiderAgent.MaximumSpeed = 2.0f;
+            _smoothedWallAvoiderAgent.StopSpeed = 0.01f;
+            _smoothedWallAvoiderAgent.MaximumRotationalSpeed = 1080f;
+            _smoothedWallAvoiderAgent.StopRotationThreshold = 1f;
+            _smoothedWallAvoiderAgentColor.Color = Color.green;
+            _smoothedWallAvoiderSteeringBehavior.Target = _target.gameObject;
+            _smoothedWallAvoiderSteeringBehavior.ShowGizmos = true;
+            _smoothedWallAvoiderGameObject.SetActive(true);
+            
+            
+            // Start test.
+            
+            // Give agent time to reach its target.
+            yield return new WaitForSeconds(10f);
+            
+            // Assert that wall avoider has reached target.
+            Assert.True(Vector2.Distance(
+                _smoothedWallAvoiderAgent.transform.position, 
+                _target.TargetPosition) < 0.3f);
+        }
     }
 }

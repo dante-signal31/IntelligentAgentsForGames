@@ -381,6 +381,8 @@ public class WhiskersSensor : MonoBehaviour, IGizmos
 
     public void OnSectorRangeUpdated()
     {
+        if (sectorRange == null) return;
+        
         if (_parameterSetFromHere)
         {
             _parameterSetFromHere = false;
