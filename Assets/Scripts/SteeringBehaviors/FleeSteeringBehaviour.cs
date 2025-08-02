@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace SteeringBehaviors
 {
@@ -8,7 +9,6 @@ namespace SteeringBehaviors
 /// <p>Flee steering behaviour makes the agent go away from another GameObject marked
 /// as threath.</p>
 /// </summary>
-[RequireComponent(typeof(SeekSteeringBehavior))]
 public class FleeSteeringBehavior : SteeringBehavior
 {
     private const float MinimumPanicDistance = 0.3f;
@@ -18,8 +18,10 @@ public class FleeSteeringBehavior : SteeringBehavior
     [Tooltip("Minimum distance to threath before fleeing.")]
     [Min(MinimumPanicDistance)]
     [SerializeField] private float panicDistance;
-
-    private SeekSteeringBehavior _seekSteeringBehaviour; 
+    
+    [Header("WIRING:")]
+    [Tooltip("Steering behavior to actually move this agent.")]
+    [SerializeField] private SeekSteeringBehavior seekSteeringBehaviour;
 
     public GameObject Threath
     {
@@ -27,8 +29,8 @@ public class FleeSteeringBehavior : SteeringBehavior
         set
         {
             threath = value;
-            if (_seekSteeringBehaviour != null) 
-                _seekSteeringBehaviour.Target = value;
+            if (seekSteeringBehaviour != null) 
+                seekSteeringBehaviour.Target = value;
         }
     }
 
@@ -43,26 +45,25 @@ public class FleeSteeringBehavior : SteeringBehavior
 
     private void Awake()
     {
-        _seekSteeringBehaviour = GetComponent<SeekSteeringBehavior>();
         if (Threath == null) return;
-        _seekSteeringBehaviour.Target = Threath;
+        seekSteeringBehaviour.Target = Threath;
     }
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        if (Threath == null) return new SteeringOutput();
+        if (Threath == null) return SteeringOutput.Zero;
         
         if (Vector2.Distance(
                 args.CurrentAgent.transform.position,
                 Threath.transform.position) > PanicDistance)
         { // Out of panic distance, so we stop fleeing.
-            return new SteeringOutput();
+            return SteeringOutput.Zero;
         }
         else
         { // Threat inside panic distance, so run in the opposite direction seek
             // would advise. 
             SteeringOutput approachSteeringOutput = 
-                _seekSteeringBehaviour.GetSteering(args);
+                seekSteeringBehaviour.GetSteering(args);
             SteeringOutput fleeSteeringOutput = new SteeringOutput(
                 -approachSteeringOutput.Linear,
                 approachSteeringOutput.Angular

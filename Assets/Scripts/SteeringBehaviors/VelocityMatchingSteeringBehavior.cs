@@ -40,7 +40,7 @@ public class VelocityMatchingSteeringBehavior : SteeringBehavior
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        if (Target == null) return new SteeringOutput(Vector2.zero, 0);
+        if (Target == null) return SteeringOutput.Zero;
     
         _currentVelocity = args.CurrentVelocity;
         float stopSpeed = args.StopSpeed;
@@ -78,7 +78,7 @@ public class VelocityMatchingSteeringBehavior : SteeringBehavior
             }
             else if (_isBraking && _currentVelocity.magnitude <= stopSpeed)
             {
-                return new SteeringOutput(Vector2.zero, 0);
+                return SteeringOutput.Zero;
             }
             else if (_isBraking && neededAcceleration.magnitude > maximumDeceleration)
             {

@@ -35,7 +35,7 @@ public class SeekSteeringBehavior : SteeringBehavior, ITargeter
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        if (target == null) return new SteeringOutput(Vector2.zero, 0);
+        if (target == null) return SteeringOutput.Zero;
     
         Vector2 targetPosition = Target.transform.position;
         Vector2 currentPosition = args.CurrentAgent.transform.position;

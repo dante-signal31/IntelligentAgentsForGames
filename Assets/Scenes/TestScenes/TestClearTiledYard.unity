@@ -2372,6 +2372,18 @@ PrefabInstance:
       propertyPath: maximumDeceleration
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 1010077227268568552, guid: 4ce633a3a84c089418b21c1249e1cbf3, type: 3}
+      propertyPath: threats.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1010077227268568552, guid: 4ce633a3a84c089418b21c1249e1cbf3, type: 3}
+      propertyPath: 'threats.Array.data[0]'
+      value: 
+      objectReference: {fileID: 1836692982}
+    - target: {fileID: 1010077227268568552, guid: 4ce633a3a84c089418b21c1249e1cbf3, type: 3}
+      propertyPath: 'threats.Array.data[1]'
+      value: 
+      objectReference: {fileID: 886081954}
     - target: {fileID: 7206943491330703259, guid: 4ce633a3a84c089418b21c1249e1cbf3, type: 3}
       propertyPath: m_Name
       value: SeparationMovingAgent

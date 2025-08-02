@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace SteeringBehaviors
 {
@@ -8,7 +9,6 @@ namespace SteeringBehaviors
 /// <p> Cohesion steering behaviour makes the agent to place himself in the center of a
 /// group of other agents. </p>
 /// </summary>
-[RequireComponent(typeof(SeekSteeringBehavior))]
 public class CohesionSteeringBehavior: SteeringBehavior
 {
     [Header("CONFIGURATION:")]
@@ -16,6 +16,11 @@ public class CohesionSteeringBehavior: SteeringBehavior
     [SerializeField] private List<GameObject> targets = new List<GameObject>();
     [Tooltip("Distance at which we give our goal as reached and we stop our agent.")]
     [SerializeField] private float arrivalDistance = 30f;
+    
+    [FormerlySerializedAs("_seekSteeringBehavior")]
+    [Header("WIRING:")]
+    [Tooltip("Steering to actually move the agent.")]
+    [SerializeField] private SeekSteeringBehavior seekSteeringBehavior;
 
     [Header("DEBUG")]
     [Tooltip("Make position gizmos visible.")]
@@ -39,8 +44,8 @@ public class CohesionSteeringBehavior: SteeringBehavior
         set
         {
             arrivalDistance = value;
-            if (_seekSteeringBehavior != null)
-                _seekSteeringBehavior.ArrivalDistance = value;
+            if (seekSteeringBehavior != null)
+                seekSteeringBehavior.ArrivalDistance = value;
         }
     }
 
@@ -50,14 +55,12 @@ public class CohesionSteeringBehavior: SteeringBehavior
     public Vector2 AveragePosition{ get; private set; }
 
     private GameObject _positionMarker;
-    private SeekSteeringBehavior _seekSteeringBehavior;
 
     private void Awake()
     {
         _positionMarker = new GameObject("OrientationMarker");
-        _seekSteeringBehavior = GetComponent<SeekSteeringBehavior>();
-        _seekSteeringBehavior.Target = _positionMarker;
-        _seekSteeringBehavior.ArrivalDistance = ArrivalDistance;
+        seekSteeringBehavior.Target = _positionMarker;
+        seekSteeringBehavior.ArrivalDistance = ArrivalDistance;
     }
 
     private void OnDestroy()
@@ -69,8 +72,8 @@ public class CohesionSteeringBehavior: SteeringBehavior
     {
         if (Targets == null || 
             Targets.Count == 0 || 
-            _seekSteeringBehavior == null) 
-            return new SteeringOutput(Vector2.zero, 0);
+            seekSteeringBehavior == null) 
+            return SteeringOutput.Zero;
 
         // Let's average position counting every agent's targets. 
         Vector2 positionSum = new();
@@ -84,7 +87,7 @@ public class CohesionSteeringBehavior: SteeringBehavior
         // _seekSteeringBehavior makes us get there.
         _positionMarker.transform.position = AveragePosition;
     
-        return _seekSteeringBehavior.GetSteering(args);
+        return seekSteeringBehavior.GetSteering(args);
     }
 
 #if UNITY_EDITOR

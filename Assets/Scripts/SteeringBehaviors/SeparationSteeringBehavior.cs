@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace SteeringBehaviors
 {
@@ -18,37 +17,36 @@ public class SeparationSteeringBehavior: SteeringBehavior
         Linear,
         InverseSquare
     }
-
+    
     [Header("CONFIGURATION")]
     [Tooltip("List of agents to separate from.")]
-    [SerializeField] private List<AgentMover> _threats = new List<AgentMover>();
+    [SerializeField] private List<AgentMover> threats = new();
     [Tooltip("Below this threshold distance, separation will be applied.")]
-    [SerializeField] private float _separationThreshold = 100f;
+    [SerializeField] private float separationThreshold = 100f;
     [Tooltip("Chosen algorithm to calculate separation acceleration.")]
-    [SerializeField] private SeparationAlgorithms _separationAlgorithm = 
+    [SerializeField] private SeparationAlgorithms separationAlgorithm = 
         SeparationAlgorithms.Linear;
-    [FormerlySerializedAs("DecayCoefficient")]
     [Tooltip("Coefficient for inverse square law separation algorithm.")]
-    [SerializeField] private float _decayCoefficient = 1f;
-
+    [SerializeField] private float decayCoefficient = 1f;
+    
     [Header("DEBUG")]
     [Tooltip("Make visible velocity marker.")]
-    [SerializeField] private bool _velocityMarkerVisible = false;
+    [SerializeField] private bool velocityMarkerVisible;
     [Tooltip("Color used for debugging gizmos.")]
-    [SerializeField] private Color _markerColor;
+    [SerializeField] private Color markerColor;
 
     /// <summary>
     /// List of agents to separate from.
     /// </summary>
-    public List<AgentMover> Threats { get => _threats; set => _threats = value; }
+    public List<AgentMover> Threats { get => threats; set => threats = value; }
 
     /// <summary>
     /// Below this threshold distance, separation will be applied.
     /// </summary>
     public float SeparationThreshold
     {
-        get => _separationThreshold; 
-        set => _separationThreshold = value;
+        get => separationThreshold; 
+        set => separationThreshold = value;
     }
 
     /// <summary>
@@ -56,8 +54,8 @@ public class SeparationSteeringBehavior: SteeringBehavior
     /// </summary>
     public SeparationAlgorithms SeparationAlgorithm
     {
-        get => _separationAlgorithm; 
-        set => _separationAlgorithm = value;
+        get => separationAlgorithm; 
+        set => separationAlgorithm = value;
     }
 
     /// <summary>
@@ -65,15 +63,15 @@ public class SeparationSteeringBehavior: SteeringBehavior
     /// </summary>
     public float DecayCoefficient
     {
-        get => _decayCoefficient; 
-        set => _decayCoefficient = value;
+        get => decayCoefficient; 
+        set => decayCoefficient = value;
     }
 
     /// <summary>
     /// <p>Color used for debugging gizmos.</p>
     /// <p>Property read by editor handle script.</p>
     /// </summary>
-    public Color MarkerColor => _markerColor;
+    public Color MarkerColor => markerColor;
 
     private Vector2 _currentVelocity;
     private float GetLinearSeparationStrength(
@@ -95,8 +93,7 @@ public class SeparationSteeringBehavior: SteeringBehavior
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        if (Threats == null || Threats.Count == 0) 
-            return new SteeringOutput(Vector2.zero, 0);
+        if (Threats == null || Threats.Count == 0) return SteeringOutput.Zero;
 
         Vector2 newVelocity = args.CurrentVelocity;
         Vector2 currentPosition = args.Position;
@@ -139,7 +136,7 @@ public class SeparationSteeringBehavior: SteeringBehavior
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
-        if (!_velocityMarkerVisible) return;
+        if (!velocityMarkerVisible) return;
     
         Gizmos.color = MarkerColor;
         Gizmos.DrawLine(

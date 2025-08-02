@@ -9,7 +9,6 @@ namespace SteeringBehaviors
 /// agent displaces then we will only follow its trail. Instead, pursuer must predict
 /// whare chased agent will be and aim to that position.</p>
 /// </summary>
-[RequireComponent(typeof(SeekSteeringBehavior))]
 public class PursuitSteeringBehavior : SteeringBehavior
 {
     [FormerlySerializedAs("targetAgent")]
@@ -26,6 +25,10 @@ public class PursuitSteeringBehavior : SteeringBehavior
              "toward us.")]
     [Range(0, 90)]
     [SerializeField] private float comingToUsSemiConeDegrees;
+    
+    [Header("WIRING:")]
+    [Tooltip("Steering behavior to actually move this agent.")]
+    [SerializeField] private SeekSteeringBehavior seekSteeringBehaviour; 
 
     [Header("DEBUG:")]
     [Tooltip("Make visible position marker.")] 
@@ -53,7 +56,7 @@ public class PursuitSteeringBehavior : SteeringBehavior
         set
         {
             arrivalDistance = Mathf.Max(0, value);
-            _seekSteeringBehaviour.ArrivalDistance = arrivalDistance;
+            seekSteeringBehaviour.ArrivalDistance = arrivalDistance;
         }
     }
 
@@ -84,8 +87,7 @@ public class PursuitSteeringBehavior : SteeringBehavior
                 Mathf.Deg2Rad);
         }
     }
-
-    private SeekSteeringBehavior _seekSteeringBehaviour; 
+    
     private float _cosAheadSemiConeRadians;
     private float _cosComingToUsSemiConeRadians;
     private GameObject _predictedPositionMarker;
@@ -105,9 +107,8 @@ public class PursuitSteeringBehavior : SteeringBehavior
         _predictedPositionMarker = new GameObject();
         if (Target != null)
             _predictedPositionMarker.transform.position = Target.transform.position;
-        _seekSteeringBehaviour = GetComponent<SeekSteeringBehavior>();
-        _seekSteeringBehaviour.ArrivalDistance = ArrivalDistance;
-        _seekSteeringBehaviour.Target = _predictedPositionMarker;
+        seekSteeringBehaviour.ArrivalDistance = ArrivalDistance;
+        seekSteeringBehaviour.Target = _predictedPositionMarker;
         // Configure our gizmos.
         _agentColor = GetComponentInParent<AgentColor>().Color;
         if (target == null) return;
@@ -144,14 +145,14 @@ public class PursuitSteeringBehavior : SteeringBehavior
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        if (Target == null) return new SteeringOutput(Vector2.zero, 0);
+        if (Target == null) return SteeringOutput.Zero;
     
         Vector2 targetPosition = Target.transform.position;
     
         if (TargetIsComingToUs(args))
         {   // Target is coming to us so just go straight to it.
             _predictedPositionMarker.transform.position = targetPosition;
-            return _seekSteeringBehaviour.GetSteering(args);
+            return seekSteeringBehaviour.GetSteering(args);
         }
         else
         {   // Target is not coming to us so we must predict where it will be.
@@ -166,8 +167,7 @@ public class PursuitSteeringBehavior : SteeringBehavior
             float lookAheadTime = distanceToTarget / (currentSpeed + targetSpeed);
 
             // Avoid divide-by-zero error when both agents are stationary.
-            if (float.IsInfinity(lookAheadTime))
-                return new SteeringOutput(Vector2.zero, 0);
+            if (float.IsInfinity(lookAheadTime)) return SteeringOutput.Zero;
         
             // Place the marker where we think the target will be at the look-ahead
             // time.
@@ -175,9 +175,9 @@ public class PursuitSteeringBehavior : SteeringBehavior
                 (targetVelocity * lookAheadTime);
         
             // Let the seek steering behavior get to the new marker position.
-            _seekSteeringBehaviour.Target = _predictedPositionMarker;
+            seekSteeringBehaviour.Target = _predictedPositionMarker;
         
-            return _seekSteeringBehaviour.GetSteering(args);
+            return seekSteeringBehaviour.GetSteering(args);
         }
     }
 

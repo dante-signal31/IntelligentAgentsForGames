@@ -5,12 +5,12 @@ using SteeringBehaviors;
 
 namespace Editor
 {
-    [CustomEditor(typeof(OffsetFollowBehavior))]
+    [CustomEditor(typeof(OffsetFollowSteeringBehavior))]
     public class DrawFollowOffsetMarker : UnityEditor.Editor
     {
         private void OnSceneGUI()
         {
-            var follower = (OffsetFollowBehavior)target;
+            var follower = (OffsetFollowSteeringBehavior)target;
             
             if (follower.Target == null) return;
         

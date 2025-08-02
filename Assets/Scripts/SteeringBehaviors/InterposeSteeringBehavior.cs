@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace SteeringBehaviors
 {
@@ -7,7 +8,6 @@ namespace SteeringBehaviors
 /// <p>Interpose make an agent to place itself between two other agents.</p>
 /// <p>It's an usual protection behavior. E.g. a bodyguard.</p>
 /// </summary>
-[RequireComponent(typeof(SeekSteeringBehavior))]
 public class InterposeSteeringBehavior: SteeringBehavior
 {
     [Header("CONFIGURATION:")] 
@@ -15,6 +15,10 @@ public class InterposeSteeringBehavior: SteeringBehavior
     [SerializeField] private AgentMover agentB;
     [Tooltip("Distance at which we give our goal as reached and we stop our agent.")]
     [SerializeField] private float arrivalDistance;
+    
+    [Header("WIRING:")]
+    [Tooltip("Steering to actually move the agent.")]
+    [SerializeField] private SeekSteeringBehavior seekSteeringBehavior;
 
     [Header("DEBUG")]
     [Tooltip("Make visible position marker.")]
@@ -49,8 +53,7 @@ public class InterposeSteeringBehavior: SteeringBehavior
         get => arrivalDistance;
         set => arrivalDistance = value;
     }
-
-    private SeekSteeringBehavior _seekSteeringBehavior;
+    
     private GameObject _predictedPositionMarker;
     private Vector2 _previousPositionAgentA;
     private Vector2 _previousPositionAgentB;
@@ -60,13 +63,12 @@ public class InterposeSteeringBehavior: SteeringBehavior
     private void Awake()
     {
         // Configure seek steering behaviour to go to that marker.
-        _seekSteeringBehavior = GetComponent<SeekSteeringBehavior>();
-        _seekSteeringBehavior.ArrivalDistance = ArrivalDistance;
+        seekSteeringBehavior.ArrivalDistance = ArrivalDistance;
         
         // Create an invisible object as marker to place it at target predicted future
         // position. That marker will be used by seek steering behaviour as target.
         _predictedPositionMarker = new GameObject();
-        _seekSteeringBehavior.Target = _predictedPositionMarker;
+        seekSteeringBehavior.Target = _predictedPositionMarker;
         if (agentA == null || agentB == null) return;
         UpdatePredictedPositionMarker();
         
@@ -101,8 +103,7 @@ public class InterposeSteeringBehavior: SteeringBehavior
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        if (AgentA == null || AgentB == null) 
-            return new SteeringOutput(Vector2.zero, 0);
+        if (AgentA == null || AgentB == null) return SteeringOutput.Zero;
         
         Vector2 currentPosition = args.CurrentAgent.transform.position;
         float maximumSpeed = args.MaximumSpeed;
@@ -143,7 +144,7 @@ public class InterposeSteeringBehavior: SteeringBehavior
             _previousPositionAgentB = AgentB.transform.position;
         }
     
-        return _seekSteeringBehavior.GetSteering(args);
+        return seekSteeringBehavior.GetSteering(args);
     }
 
 #if UNITY_EDITOR

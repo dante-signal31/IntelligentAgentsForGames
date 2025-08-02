@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace SteeringBehaviors
 {
@@ -8,13 +9,17 @@ namespace SteeringBehaviors
 /// The agent anticipates the target's position based on its current position, velocity,
 /// and a look-ahead time.</p>
 /// </summary>
-[RequireComponent(typeof(ArriveSteeringBehaviorNLA))]
-public class OffsetFollowBehavior: SteeringBehavior
+public class OffsetFollowSteeringBehavior: SteeringBehavior
 {
     [Header("CONFIGURATION:")]
     [Tooltip("Target to follow")]
     [SerializeField] public AgentMover target;
     [SerializeField] public Vector2 offsetFromTarget;
+    
+    [Header("WIRING:")]
+    // TODO: Generalize to use an SteeringBehavior ITargeter.
+    [Tooltip("Steering behavior to actually move this agent.")]
+    [SerializeField] private ArriveSteeringBehaviorNLA followSteeringBehavior;
 
     [Header("DEBUG:")] 
     [SerializeField] private bool showGizmos;
@@ -32,7 +37,6 @@ public class OffsetFollowBehavior: SteeringBehavior
         }
     }
     
-    private ArriveSteeringBehaviorNLA _followSteeringBehavior;
     private GameObject _offsetFromTargetMarker;
     private AgentMover _currentAgent;
     
@@ -41,14 +45,13 @@ public class OffsetFollowBehavior: SteeringBehavior
     private void Awake()
     {
         _currentAgent = GetComponentInParent<AgentMover>();
-        _followSteeringBehavior = GetComponent<ArriveSteeringBehaviorNLA>();
         _offsetFromTargetMarker = new GameObject("OffsetFromTargetMarker");
         _offsetFromTargetMarker.transform.parent = transform;
     }
 
     private void Start()
     {
-        _followSteeringBehavior.Target = _offsetFromTargetMarker;
+        followSteeringBehavior.Target = _offsetFromTargetMarker;
         UpdateOffsetFromTarget();
     }
 
@@ -84,7 +87,7 @@ public class OffsetFollowBehavior: SteeringBehavior
         UpdateOffsetFromTarget();
         
         // Let the child steering behavior get to the new marker position.
-        return _followSteeringBehavior.GetSteering(args);
+        return followSteeringBehavior.GetSteering(args);
     }
     
 #if UNITY_EDITOR

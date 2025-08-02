@@ -367,7 +367,7 @@ namespace Tests.PlayTests
                                                    fleeSteeringBehavior.PanicDistance);
                 // Let the agent flee from the target.
                 yield return new WaitForSeconds(1.0f);
-                // Assert fleer is now farther from the target than before.
+                // Assert the fled agent is now farther from the target than before.
                 Assert.True(Vector3.Distance(_target.TargetPosition,
                                 _fleeGameObject.transform.position) >
                             fleeSteeringBehavior.PanicDistance);
@@ -574,7 +574,7 @@ namespace Tests.PlayTests
             pursueAgentMover.MaximumAcceleration = 2;
             pursueAgentMover.MaximumDeceleration = 4;
             var offsetFollowBehavior = 
-                _offsetFollowGameObject.GetComponentInChildren<OffsetFollowBehavior>();
+                _offsetFollowGameObject.GetComponentInChildren<OffsetFollowSteeringBehavior>();
             offsetFollowBehavior.Target = targetMovingAgent;
             GameObject offsetFromTargetMarker = 
                 offsetFollowBehavior.gameObject.transform.Find("OffsetFromTargetMarker").gameObject;

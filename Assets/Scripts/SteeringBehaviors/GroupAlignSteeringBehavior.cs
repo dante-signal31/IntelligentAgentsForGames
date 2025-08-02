@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace SteeringBehaviors
 {
@@ -8,7 +9,6 @@ namespace SteeringBehaviors
 /// <p> Group align steering behaviour makes the agent look at the same direction than
 /// the average orientation of a group of target nodes. </p>
 /// </summary>
-[RequireComponent(typeof(AlignSteeringBehavior))]
 public class GroupAlignSteeringBehavior: SteeringBehavior
 {
     [Header("CONFIGURATION:")]
@@ -22,6 +22,9 @@ public class GroupAlignSteeringBehavior: SteeringBehavior
     [SerializeField] private float accelerationRadius = 30f;
     [Tooltip("Acceleration curve.")]
     [SerializeField] private AnimationCurve accelerationCurve;
+    
+    [Header("WIRING:")]
+    [SerializeField] private AlignSteeringBehavior alignSteeringBehavior;
 
     [Header("DEBUG")]
     [Tooltip("Make orientation gizmos visible.")]
@@ -49,8 +52,8 @@ public class GroupAlignSteeringBehavior: SteeringBehavior
         set
         {
             decelerationRadius = value;
-            if (_alignSteeringBehavior != null)
-                _alignSteeringBehavior.DecelerationRadius = value;
+            if (alignSteeringBehavior != null)
+                alignSteeringBehavior.DecelerationRadius = value;
         }
     }
 
@@ -63,8 +66,8 @@ public class GroupAlignSteeringBehavior: SteeringBehavior
         set
         {
             decelerationCurve = value;
-            if (_alignSteeringBehavior != null)
-                _alignSteeringBehavior.DecelerationCurve = value;
+            if (alignSteeringBehavior != null)
+                alignSteeringBehavior.DecelerationCurve = value;
         }
     }
 
@@ -77,8 +80,8 @@ public class GroupAlignSteeringBehavior: SteeringBehavior
         set
         {
             accelerationRadius = value;
-            if (_alignSteeringBehavior != null)
-                _alignSteeringBehavior.AccelerationRadius = value;
+            if (alignSteeringBehavior != null)
+                alignSteeringBehavior.AccelerationRadius = value;
         }
     }
 
@@ -91,8 +94,8 @@ public class GroupAlignSteeringBehavior: SteeringBehavior
         set
         {
             accelerationCurve = value;
-            if (_alignSteeringBehavior != null)
-                _alignSteeringBehavior.AccelerationCurve = value;
+            if (alignSteeringBehavior != null)
+                alignSteeringBehavior.AccelerationCurve = value;
         }
     }
 
@@ -102,17 +105,15 @@ public class GroupAlignSteeringBehavior: SteeringBehavior
     public float AverageOrientation{ get; private set; }
 
     private GameObject _orientationMarker;
-    private AlignSteeringBehavior _alignSteeringBehavior;
 
     private void Awake()
     {
         _orientationMarker = new GameObject("OrientationMarker");
-        _alignSteeringBehavior = GetComponent<AlignSteeringBehavior>();
-        _alignSteeringBehavior.Target = _orientationMarker;
-        _alignSteeringBehavior.AccelerationRadius = AccelerationRadius;
-        _alignSteeringBehavior.DecelerationRadius = DecelerationRadius;
-        _alignSteeringBehavior.AccelerationCurve = AccelerationCurve;
-        _alignSteeringBehavior.DecelerationCurve = DecelerationCurve;
+        alignSteeringBehavior.Target = _orientationMarker;
+        alignSteeringBehavior.AccelerationRadius = AccelerationRadius;
+        alignSteeringBehavior.DecelerationRadius = DecelerationRadius;
+        alignSteeringBehavior.AccelerationCurve = AccelerationCurve;
+        alignSteeringBehavior.DecelerationCurve = DecelerationCurve;
     }
 
     private void OnDestroy()
@@ -122,8 +123,8 @@ public class GroupAlignSteeringBehavior: SteeringBehavior
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        if (Targets == null || Targets.Count == 0 || _alignSteeringBehavior == null) 
-            return new SteeringOutput(Vector2.zero, 0);
+        if (Targets == null || Targets.Count == 0 || alignSteeringBehavior == null) 
+            return SteeringOutput.Zero;
 
         // Let's average heading counting every agent's targets. You'd better get an
         // average vector from heading vectors than average their angle rotation values.
@@ -146,7 +147,7 @@ public class GroupAlignSteeringBehavior: SteeringBehavior
         AverageOrientation =
             _orientationMarker.transform.rotation.eulerAngles.z;
     
-        return _alignSteeringBehavior.GetSteering(args);
+        return alignSteeringBehavior.GetSteering(args);
     }
 
 #if UNITY_EDITOR

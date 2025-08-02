@@ -9,7 +9,6 @@ namespace SteeringBehaviors
 ///
 /// <p>Wandering steering behaviour makes the agent move randomly around the scene.</p>
 /// </summary>
-[RequireComponent(typeof(SeekSteeringBehavior))]
 public class WanderSteeringBehavior : SteeringBehavior
 {
     [Header("CONFIGURATION:")]
@@ -26,6 +25,10 @@ public class WanderSteeringBehavior : SteeringBehavior
     [SerializeField] private float wanderJitter;
     [Tooltip("Time in seconds to recalculate the wander position.")]
     [SerializeField] private float wanderRecalculationTime;
+    
+    [Header("WIRING:")]
+    [Tooltip("Steering behavior to actually move this agent.")]
+    [SerializeField] private SeekSteeringBehavior seekSteeringBehaviour;
 
     [Header("DEBUG:")]
     [Tooltip("Make visible position marker.")] 
@@ -40,8 +43,8 @@ public class WanderSteeringBehavior : SteeringBehavior
         set
         {
             arrivalDistance = value;
-            if (_seekSteeringBehaviour != null)
-                _seekSteeringBehaviour.ArrivalDistance = value;
+            if (seekSteeringBehaviour != null)
+                seekSteeringBehaviour.ArrivalDistance = value;
         }
     }
 
@@ -51,10 +54,7 @@ public class WanderSteeringBehavior : SteeringBehavior
     public float WanderRadius
     {
         get => wanderRadius;
-        set
-        {
-            wanderRadius = value;
-        }
+        set => wanderRadius = value;
     }
 
     /// <summary>
@@ -64,10 +64,7 @@ public class WanderSteeringBehavior : SteeringBehavior
     public float WanderDistance
     {
         get => wanderDistance;
-        set
-        {
-            wanderDistance = value;
-        }
+        set => wanderDistance = value;
     }
 
     /// <summary>
@@ -77,10 +74,7 @@ public class WanderSteeringBehavior : SteeringBehavior
     public float WanderJitter
     {
         get => wanderJitter;
-        set
-        {
-            wanderJitter = value;
-        }
+        set => wanderJitter = value;
     }
 
     /// <summary>
@@ -89,16 +83,12 @@ public class WanderSteeringBehavior : SteeringBehavior
     public float WanderRecalculationTime
     {
         get => wanderRecalculationTime;
-        set
-        {
-            wanderRecalculationTime = value;
-        }
+        set => wanderRecalculationTime = value;
     }
 
     private GameObject _marker;
     private Vector2 _wanderLocalPosition;
-
-    private SeekSteeringBehavior _seekSteeringBehaviour;
+    
     private SteeringBehaviorArgs _currentSteeringBehaviorArgs;
 
     private AgentColor _agentColor;
@@ -106,9 +96,8 @@ public class WanderSteeringBehavior : SteeringBehavior
     private void Awake()
     {
         _marker = new GameObject();
-        _seekSteeringBehaviour = GetComponent<SeekSteeringBehavior>();
-        _seekSteeringBehaviour.Target = _marker;
-        _seekSteeringBehaviour.ArrivalDistance = arrivalDistance;
+        seekSteeringBehaviour.Target = _marker;
+        seekSteeringBehaviour.ArrivalDistance = arrivalDistance;
     
         _agentColor = GetComponentInParent<AgentColor>();
     
@@ -147,13 +136,12 @@ public class WanderSteeringBehavior : SteeringBehavior
     {
         _currentSteeringBehaviorArgs = args;
 
-        return _seekSteeringBehaviour.GetSteering(args);
+        return seekSteeringBehaviour.GetSteering(args);
     }
 
     /// <summary>
     /// Update the wander position based on the given steering behavior arguments.
     /// </summary>
-    /// <param name="args">Steering behavior arguments</param>
     private void WanderPositionUpdate()
     {
         if (_currentSteeringBehaviorArgs == null) return;
@@ -181,10 +169,10 @@ public class WanderSteeringBehavior : SteeringBehavior
     {
         if (predictedPositionMarkerVisible && _marker != null)
         {
-            Vector3 _markerPosition = _marker.transform.position;
+            Vector3 markerPosition = _marker.transform.position;
             Gizmos.color = _agentColor.Color;
-            Gizmos.DrawWireSphere(_markerPosition, 0.2f);
-            Gizmos.DrawLine(_markerPosition, transform.position);
+            Gizmos.DrawWireSphere(markerPosition, 0.2f);
+            Gizmos.DrawLine(markerPosition, transform.position);
         }
     }
 #endif    

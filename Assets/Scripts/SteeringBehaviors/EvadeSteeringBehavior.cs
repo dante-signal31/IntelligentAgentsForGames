@@ -8,7 +8,6 @@ namespace SteeringBehaviors
 /// <p>Evade steering behaviour makes the agent go away from another GameObject marked
 /// as threath.</p>
 /// </summary>
-[RequireComponent(typeof(FleeSteeringBehavior))]
 public class EvadeSteeringBehavior : SteeringBehavior
 {
     [FormerlySerializedAs("threathAgent")]
@@ -17,12 +16,14 @@ public class EvadeSteeringBehavior : SteeringBehavior
     [SerializeField] private AgentMover threatAgent;
     [Tooltip("Minimum distance to threath before fleeing.")]
     [SerializeField] private float panicDistance;
+    
+    [Header("WIRING:")]
+    [SerializeField] private FleeSteeringBehavior fleeSteeringBehaviour;
 
     [Header("DEBUG:")]
     [Tooltip("Make visible position marker.")] 
     [SerializeField] private bool predictedPositionMarkerVisible = true;
-
-    private FleeSteeringBehavior _fleeSteeringBehaviour;
+    
     private GameObject _predictedPositionMarker;
 
     private Color _agentColor;
@@ -44,17 +45,16 @@ public class EvadeSteeringBehavior : SteeringBehavior
         set
         {
             panicDistance = value;
-            if (_fleeSteeringBehaviour != null)
-                _fleeSteeringBehaviour.PanicDistance = panicDistance;
+            if (fleeSteeringBehaviour != null)
+                fleeSteeringBehaviour.PanicDistance = panicDistance;
         }
     }
 
     private void Awake()
     {
         _predictedPositionMarker = new GameObject();
-        _fleeSteeringBehaviour = GetComponent<FleeSteeringBehavior>();
-        _fleeSteeringBehaviour.PanicDistance = PanicDistance;
-        _fleeSteeringBehaviour.Threath = _predictedPositionMarker;
+        fleeSteeringBehaviour.PanicDistance = PanicDistance;
+        fleeSteeringBehaviour.Threath = _predictedPositionMarker;
         _agentColor = GetComponentInParent<AgentColor>().Color;
     }
 
@@ -65,7 +65,7 @@ public class EvadeSteeringBehavior : SteeringBehavior
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        if (Threat == null) return new SteeringOutput(Vector2.zero, 0);
+        if (Threat == null) return SteeringOutput.Zero;
     
         Vector2 currentPosition = args.Position;
         float maximumSpeed = args.MaximumSpeed;
@@ -85,7 +85,7 @@ public class EvadeSteeringBehavior : SteeringBehavior
                                                       Threat.Velocity * lookAheadTime;
 
         // Make the flee behavior go away from the predicted position.
-        return _fleeSteeringBehaviour.GetSteering(args);
+        return fleeSteeringBehaviour.GetSteering(args);
     }
 
     private void OnDrawGizmos()
