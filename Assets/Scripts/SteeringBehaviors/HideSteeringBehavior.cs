@@ -271,6 +271,8 @@ public class HideSteeringBehavior : SteeringBehavior
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
+        // TODO: Hide agent seems to hide only when threat stops. Fix it.
+        
         // Look for a new hiding point if the threat can see us and has just moved (or
         // if it is threat first position (only once).
         if (_threatCanSeeUs && _hidingPointRecheckNeeded ||

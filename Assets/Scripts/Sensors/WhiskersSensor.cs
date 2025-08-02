@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using SteeringBehaviors;
 using Tools;
 using UnityEngine;
 using UnityEngine.Events;
@@ -14,7 +15,7 @@ namespace Sensors
 /// is the local UP direction.</p>
 /// </summary>
 [ExecuteAlways]
-public class WhiskersSensor : MonoBehaviour
+public class WhiskersSensor : MonoBehaviour, IGizmos
 {
     /// <summary>
     /// A class wrapping a list of ray sensors to make it easier to search for them.
@@ -156,7 +157,7 @@ public class WhiskersSensor : MonoBehaviour
     [Tooltip("Whether to show gizmos for sensors.")]
     [SerializeField] private bool showGizmos = true;
     [Tooltip("Color for this script gizmos.")]
-    [SerializeField] private Color gizmoColor = Color.yellow;
+    [SerializeField] private Color gizmosColor = Color.yellow;
     [Tooltip("Radius for the sensor ends.")]
     [SerializeField] private float gizmoRadius = 0.1f;
 
@@ -361,6 +362,18 @@ public class WhiskersSensor : MonoBehaviour
             return sectorRange.Forward;
         }
     }
+    
+    public bool ShowGizmos
+    {
+        get => showGizmos;
+        set => showGizmos = value;
+    }
+
+    public Color GizmosColor
+    {
+        get => gizmosColor;
+        set => gizmosColor = value;
+    }
 
     private bool _parameterSetFromHere;
     private RaySensorList _sensors;
@@ -403,21 +416,6 @@ public class WhiskersSensor : MonoBehaviour
         UpdateRayEnds();
         SetupSensors();
         SubscribeToSensorsEvents();
-    }
-
-    private void OnEnable()
-    {
-        // OnEnable runs before Start, so first time OnEnable is called, sensors are not
-        // initialized. That's why I call to SubscribeToSensorsEvents in Start.
-        // Nevertheless, I call it here too just in case object is disabled and then
-        // enabled again.
-        SubscribeToSensorsEvents();
-    }
-
-    private void OnDisable()
-    {
-        UnsubscribeFromSensorsEvents();
-        RemoveSensors();
     }
 
     private void OnDestroy()
@@ -676,10 +674,10 @@ public class WhiskersSensor : MonoBehaviour
         // Draw gizmos only if in editor mode. 
         if (!Application.isPlaying && showGizmos && _rayEnds != null)
         {
-            Gizmos.color = gizmoColor;
+            Gizmos.color = gizmosColor;
             foreach (RayEnds rayEnds in _rayEnds)
             {
-                Gizmos.color = gizmoColor;
+                Gizmos.color = gizmosColor;
                 Gizmos.DrawLine(
                     transform.TransformPoint(rayEnds.start), 
                     transform.TransformPoint(rayEnds.end));

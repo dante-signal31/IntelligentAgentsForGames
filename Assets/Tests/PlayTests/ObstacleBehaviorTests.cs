@@ -30,7 +30,7 @@ namespace Tests.PlayTests
         
         private SeekSteeringBehavior _seekSteeringBehavior;
         private HideSteeringBehavior _hideSteeringBehavior;
-        private WallAvoiderSteeringBehavior _wallAvoiderSteeringBehavior;
+        private ActiveWallAvoiderSteeringBehavior _wallAvoiderSteeringBehavior;
         private SmoothedWallAvoiderSteeringBehavior _smoothedWallAvoiderSteeringBehavior;
         
         private AgentMover _seekAgent;
@@ -100,12 +100,12 @@ namespace Tests.PlayTests
                 _hideGameObject.SetActive(false);
             }
 
-            // if (_wallAvoiderGameObject == null)
-            // {
-            //     _wallAvoiderGameObject = GameObject.Find("WallAvoiderMovingAgent");
-            //     _wallAvoiderGameObject.SetActive(false);
-            // }
-            //
+            if (_wallAvoiderGameObject == null)
+            {
+                _wallAvoiderGameObject = GameObject.Find("WallAvoiderMovingAgent");
+                _wallAvoiderGameObject.SetActive(false);
+            }
+            
             // if (_smoothedWallAvoiderGameObject == null)
             // {
             //     _smoothedWallAvoiderGameObject = GameObject.Find("SmoothedWallAvoiderMovingAgent");
@@ -118,9 +118,9 @@ namespace Tests.PlayTests
             if (_hideSteeringBehavior == null)
                 _hideSteeringBehavior = 
                     _hideGameObject.GetComponentInChildren<HideSteeringBehavior>();
-            // if (_wallAvoiderSteeringBehavior == null)
-            //     _wallAvoiderSteeringBehavior = 
-            //         _wallAvoiderGameObject.GetComponent<WallAvoiderSteeringBehavior>();
+            if (_wallAvoiderSteeringBehavior == null)
+                _wallAvoiderSteeringBehavior = 
+                    _wallAvoiderGameObject.GetComponentInChildren<ActiveWallAvoiderSteeringBehavior>();
             // if (_smoothedWallAvoiderSteeringBehavior == null)
             //     _smoothedWallAvoiderSteeringBehavior = 
             //         _smoothedWallAvoiderGameObject.GetComponent<SmoothedWallAvoiderSteeringBehavior>();
@@ -128,8 +128,8 @@ namespace Tests.PlayTests
                 _seekAgent = _seekGameObject.GetComponent<AgentMover>();
             if (_hideAgent == null)
                 _hideAgent = _hideGameObject.GetComponent<AgentMover>();
-            // if (_wallAvoiderAgent == null)
-            //     _wallAvoiderAgent = _wallAvoiderGameObject.GetComponent<AgentMover>();
+            if (_wallAvoiderAgent == null)
+                _wallAvoiderAgent = _wallAvoiderGameObject.GetComponent<AgentMover>();
             // if (_smoothedWallAvoiderAgent == null)
             //     _smoothedWallAvoiderAgent = 
             //     _smoothedWallAvoiderGameObject.GetComponent<AgentMover>();
@@ -137,9 +137,9 @@ namespace Tests.PlayTests
                 _seekAgentColor = _seekGameObject.GetComponent<AgentColor>();
             if (_hideAgentColor == null)
                 _hideAgentColor = _hideGameObject.GetComponent<AgentColor>();
-        //     if (_wallAvoiderAgentColor == null)
-        //         _wallAvoiderAgentColor = 
-        //             _wallAvoiderGameObject.GetComponent<AgentColor>();
+        if (_wallAvoiderAgentColor == null)
+            _wallAvoiderAgentColor = 
+                _wallAvoiderGameObject.GetComponent<AgentColor>();
         //     if (_smoothedWallAvoiderAgentColor == null)
         //         _smoothedWallAvoiderAgentColor = 
         //             _smoothedWallAvoiderGameObject.GetComponent<AgentColor>();
@@ -152,8 +152,8 @@ namespace Tests.PlayTests
                 _seekGameObject.SetActive(false);
             if (_hideGameObject != null)
                 _hideGameObject.SetActive(false);
-            // if (_wallAvoiderGameObject != null)
-            //     _wallAvoiderGameObject.SetActive(false);
+            if (_wallAvoiderGameObject != null)
+                _wallAvoiderGameObject.SetActive(false);
             // if (_smoothedWallAvoiderGameObject != null)
             //     _smoothedWallAvoiderGameObject.SetActive(false);
             if (_target != null)
@@ -199,7 +199,7 @@ namespace Tests.PlayTests
             
             // Start test.
             // Assert that seek agent can see hide agent.
-            yield return null;
+            yield return new WaitForSeconds(0.1f);
             Assert.True(_hideSteeringBehavior.ThreatCanSeeUs);
             
             // Give hide agent time to hide.
@@ -227,48 +227,39 @@ namespace Tests.PlayTests
             Assert.False(_hideSteeringBehavior.ThreatCanSeeUs);
         }
 
-
-        // TODO: Fix this automated test. When I run WallAvoiderBehavior test in Play Mode
-        // it works fine, but when I run it from this test it launch the error:
-        //
-        // "Cannot instantiate objects with a parent which is persistent. New object will be created without a parent."
-        //
-        // This error happens when WhiskerSensors instantiates sensor and tries to parent
-        // to him. Because of that sensors are missing.
+        
         /// <summary>
         /// Test that WallAvoiderBehavior can move an agent from a point A to a point B
         /// avoiding obstacles.
         /// </summary>
-        // [UnityTest]
-        // public IEnumerator WallAvoiderBehaviorTest()
-        // {
-        //     // Setup agents before the tests.
-        //     _target.Enabled = true;
-        //     _target.TargetPosition = _position5.position;
-        //     
-        //     _wallAvoiderGameObject.transform.position = _position6.position;
-        //     _wallAvoiderAgent.MaximumSpeed = 2.0f;
-        //     _wallAvoiderAgent.StopSpeed = 0.01f;
-        //     _wallAvoiderAgent.MaximumRotationalSpeed = 1080f;
-        //     _wallAvoiderAgent.StopRotationThreshold = 1f;
-        //     _wallAvoiderAgentColor.Color = Color.green;
-        //     _wallAvoiderSteeringBehavior.Target = _target.gameObject;
-        //     _wallAvoiderSteeringBehavior.AvoidLayerMask = 
-        //         LayerMask.GetMask("Obstacles");
-        //     _wallAvoiderGameObject.SetActive(true);
-        //     
-        //     
-        //     // Start test.
-        //     
-        //     // Give hide agent time to hide.
-        //     yield return new WaitForSeconds(1f);
-        //     yield return new WaitForSeconds(6f);
-        //     
-        //     // Assert that wall avoider has reached target.
-        //     Assert.True(Vector2.Distance(
-        //         _wallAvoiderAgent.transform.position, 
-        //         _target.TargetPosition) < 0.1f);
-        // }
+        [UnityTest]
+        public IEnumerator WallAvoiderBehaviorTest()
+        {
+            // Setup agents before the tests.
+            _target.Enabled = true;
+            _target.TargetPosition = _position5.position;
+            
+            _wallAvoiderGameObject.transform.position = _position6.position;
+            _wallAvoiderAgent.MaximumSpeed = 2.0f;
+            _wallAvoiderAgent.StopSpeed = 0.01f;
+            _wallAvoiderAgent.MaximumRotationalSpeed = 1080f;
+            _wallAvoiderAgent.StopRotationThreshold = 1f;
+            _wallAvoiderAgentColor.Color = Color.green;
+            _wallAvoiderSteeringBehavior.Target = _target.gameObject;
+            _wallAvoiderGameObject.SetActive(true);
+            
+            
+            // Start test.
+            
+            // Give hide agent time to hide.
+            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(6f);
+            
+            // Assert that wall avoider has reached target.
+            Assert.True(Vector2.Distance(
+                _wallAvoiderAgent.transform.position, 
+                _target.TargetPosition) < 0.1f);
+        }
         
         // TODO: Fix this automated test. When I run SmoothedWallAvoiderBehavior test in Play Mode
         // it works fine, but when I run it from this test it launch the error:
