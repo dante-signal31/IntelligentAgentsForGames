@@ -169,7 +169,6 @@ public class SmoothedWallAvoiderSteeringBehavior: SteeringBehavior, ITargeter
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        // TODO: Agent strafes when touches an obstacle. Fix it.
         if (chaseToUsherSteeringBehavior == null || _usherAgent == null) 
             return SteeringOutput.Zero;
 

@@ -4447,6 +4447,10 @@ PrefabInstance:
       propertyPath: maximumDeceleration
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 7832411714323183920, guid: 2df35a25b4a338a41945ebc7ed859db7, type: 3}
+      propertyPath: target
+      value: 
+      objectReference: {fileID: 1098409788}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

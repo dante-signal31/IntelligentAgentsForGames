@@ -164,41 +164,46 @@ public class AgentMover : MonoBehaviour
     
         // Get steering output.
         SteeringOutput steeringOutput = SteeringBehavior.GetSteering(_behaviorArgs);
-    
-        // Apply new steering output to our GameObject. I don't enforce the StopSpeed
-        // because I've found more flexible to do it at steering behavior level.
-        rigidBody.linearVelocity = steeringOutput.Linear;
-
-        if (steeringOutput.Angular == 0 && rigidBody.linearVelocity == Vector2.zero)
+        
+        // Apply the needed rotation.
+        if (steeringOutput.Angular == 0 && steeringOutput.Linear == Vector2.zero)
         {
             // Sometimes, when an agent touches a surface, a residual angular velocity
             // is left behind. This is a problem because when agent stops it starts to
             // spin. The solution I found is to set angular velocity to zero.
             rigidBody.angularVelocity = 0;
         }
-        else if (steeringOutput.Angular == 0 && rigidBody.linearVelocity != Vector2.zero)
+        else if (steeringOutput.Angular == 0 && steeringOutput.Linear != Vector2.zero)
         {
             // If no explicit angular steering, we will just look at the direction we
             // are moving, but clamping our rotation by our rotational speed.
-            float totalRotationNeeded = Vector2.Angle(Forward, rigidBody.linearVelocity);
+            float totalRotationNeeded = Vector2.Angle(Forward, steeringOutput.Linear);
             if (totalRotationNeeded > stopRotationThreshold)
             {
                 Vector3 newHeading = Vector3.Slerp(
                     Forward, 
-                    rigidBody.linearVelocity, 
+                    steeringOutput.Linear, 
                     _maximumRotationSpeedRadNormalized * Time.fixedDeltaTime);
-                // Forward = newHeading.normalized * CurrentSpeed;
-                Forward = newHeading.normalized;
+                rigidBody.MoveRotation(
+                    rigidBody.rotation + 
+                    Vector2.SignedAngle(Forward, newHeading));
             }
         }
         else if (steeringOutput.Angular != 0)
         {
             // In this case, our steering wants us to face and move in different
             // directions. Steering checks that no threshold is surpassed.
+            // TODO: Recheck this. It should use rigidBody.MoveRotation instead of
+            // modifying transform. Besides, I'm afraid the focus of different agents
+            // about rotation might be incoherent. 
             transform.eulerAngles = new Vector3(transform.eulerAngles.x, 
                 transform.eulerAngles.y, 
                 transform.eulerAngles.z + steeringOutput.Angular * Time.fixedDeltaTime);
         }
+        
+        // Apply the new velocity vector to our GameObject. I don't enforce the StopSpeed
+        // because I've found it more flexible to do it at steering behavior level.
+        rigidBody.linearVelocity = steeringOutput.Linear;
     }
 }
 }
