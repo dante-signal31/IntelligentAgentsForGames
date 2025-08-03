@@ -1240,7 +1240,6 @@ namespace Tests.PlayTests
         [UnityTest]
         public IEnumerator AgentAvoiderBehaviorTestFirstScenario()
         {
-            // TODO: Fix agent drag after touching wall.
             // Test setup.
             var obstacleMovingAgent = _seekGameObject.GetComponent<AgentMover>();
             obstacleMovingAgent.MaximumSpeed = 2.0f;

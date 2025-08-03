@@ -187,7 +187,8 @@ public class AgentMover : MonoBehaviour
                     Forward, 
                     rigidBody.linearVelocity, 
                     _maximumRotationSpeedRadNormalized * Time.fixedDeltaTime);
-                Forward = newHeading.normalized * CurrentSpeed;
+                // Forward = newHeading.normalized * CurrentSpeed;
+                Forward = newHeading.normalized;
             }
         }
         else if (steeringOutput.Angular != 0)
