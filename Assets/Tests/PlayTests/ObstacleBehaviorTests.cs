@@ -269,7 +269,7 @@ namespace Tests.PlayTests
             _target.TargetPosition = _position5.position;
             
             _smoothedWallAvoiderGameObject.transform.position = _position1.position;
-            _smoothedWallAvoiderAgent.MaximumSpeed = 2.0f;
+            _smoothedWallAvoiderAgent.MaximumSpeed = 3.0f;
             _smoothedWallAvoiderAgent.StopSpeed = 0.01f;
             _smoothedWallAvoiderAgent.MaximumRotationalSpeed = 1080f;
             _smoothedWallAvoiderAgent.StopRotationThreshold = 1f;

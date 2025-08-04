@@ -3999,7 +3999,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5731942640633652075, guid: b2cf55df5f328f44ebeaea4f4f402276, type: 3}
       propertyPath: maximumSpeed
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 5731942640633652075, guid: b2cf55df5f328f44ebeaea4f4f402276, type: 3}
       propertyPath: maximumRotationalSpeed
