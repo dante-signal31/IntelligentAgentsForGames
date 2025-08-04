@@ -11,12 +11,13 @@ public class SteeringOutput
     public static SteeringOutput Zero = new SteeringOutput();
     
     /// <summary>
-    /// Linear acceleration vector.
+    /// Linear velocity vector.
     /// </summary>
     public Vector2 Linear { get; }
     
     /// <summary>
-    /// Angular rotation.
+    /// Angular rotation speed in degrees. In Unity's 2D, a positive rotation means an
+    /// anticlockwise rotation.
     /// </summary>
     public float Angular { get; }
 

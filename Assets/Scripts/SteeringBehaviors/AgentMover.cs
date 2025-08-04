@@ -193,12 +193,9 @@ public class AgentMover : MonoBehaviour
         {
             // In this case, our steering wants us to face and move in different
             // directions. Steering checks that no threshold is surpassed.
-            // TODO: Recheck this. It should use rigidBody.MoveRotation instead of
-            // modifying transform. Besides, I'm afraid the focus of different agents
-            // about rotation might be incoherent. 
-            transform.eulerAngles = new Vector3(transform.eulerAngles.x, 
-                transform.eulerAngles.y, 
-                transform.eulerAngles.z + steeringOutput.Angular * Time.fixedDeltaTime);
+            rigidBody.MoveRotation(
+                rigidBody.rotation + 
+                steeringOutput.Angular * Time.fixedDeltaTime);
         }
         
         // Apply the new velocity vector to our GameObject. I don't enforce the StopSpeed
