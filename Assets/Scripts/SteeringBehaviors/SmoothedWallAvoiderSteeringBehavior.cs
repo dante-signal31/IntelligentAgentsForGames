@@ -1,4 +1,5 @@
-﻿using Tools;
+﻿using PropertyAttribute;
+using Tools;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -24,8 +25,8 @@ public class SmoothedWallAvoiderSteeringBehavior: SteeringBehavior, ITargeter
     [SerializeField] private float secondsToWaitAfterReachingUsher = 1.0f;
     
     [Header("WIRING:")]
-    // TODO: Add a property drawer to check that complies with ITargeter interface.
     [Tooltip("Steering to chase the usher. Must comply with ITargeter interface.")]
+    [InterfaceCompliant(typeof(ITargeter))]
     [SerializeField] private SteeringBehavior chaseToUsherSteeringBehavior;
     
     [Header("DEBUG:")]
