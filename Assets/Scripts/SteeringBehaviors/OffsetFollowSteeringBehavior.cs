@@ -16,7 +16,7 @@ namespace SteeringBehaviors
     [Header("CONFIGURATION:")] 
     [Tooltip("Target to follow")] 
     [SerializeField] public GameObject target;
-
+    [Tooltip("Location, relative to target, to follow.")]
     [SerializeField] public Vector2 offsetFromTarget;
 
     [Header("WIRING:")]
