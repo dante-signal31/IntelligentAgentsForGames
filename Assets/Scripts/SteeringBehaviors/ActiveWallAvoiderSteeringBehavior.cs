@@ -1,5 +1,6 @@
 ﻿
 using System.Timers;
+using PropertyAttribute;
 using UnityEngine;
 
 namespace SteeringBehaviors
@@ -16,7 +17,7 @@ public class ActiveWallAvoiderSteeringBehavior : SteeringBehavior, ITargeter, IG
     
     [Header("WIRING:")] 
     [Tooltip("Steering to get to the target. Must comply with ITargeter interface.")]
-    // TODO: Create an attribute drawer to check for interface compliance.
+    [InterfaceCompliant(typeof(ITargeter))]
     [SerializeField] private SteeringBehavior steeringBehavior;
     [Tooltip("Steering to avoid obstacles.")]
     [SerializeField] private PassiveWallAvoiderSteeringBehavior passiveWallAvoiderSteeringBehavior;

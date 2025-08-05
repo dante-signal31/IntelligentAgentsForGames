@@ -1,12 +1,12 @@
 ﻿namespace PropertyAttribute
 {
-    public class MessageTypes
+public class MessageTypes
+{
+    public enum MessageType
     {
-        public enum MessageType
-        {
-            Info,
-            Warning,
-            Error
-        }
+        Info,
+        Warning,
+        Error
     }
+}
 }
