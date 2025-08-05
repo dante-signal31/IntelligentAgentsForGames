@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using PropertyAttribute;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace SteeringBehaviors
@@ -12,15 +13,17 @@ namespace SteeringBehaviors
     public class OffsetFollowSteeringBehavior : SteeringBehavior, ITargeter, IGizmos
 
     {
-    [Header("CONFIGURATION:")] [Tooltip("Target to follow")] [SerializeField]
-    public GameObject target;
+    [Header("CONFIGURATION:")] 
+    [Tooltip("Target to follow")] 
+    [SerializeField] public GameObject target;
 
     [SerializeField] public Vector2 offsetFromTarget;
 
     [Header("WIRING:")]
-    // TODO: Generalize to use an SteeringBehavior ITargeter.
-    [Tooltip("Steering behavior to actually move this agent.")]
-    [SerializeField] private ArriveSteeringBehaviorNLA followSteeringBehavior;
+    [Tooltip("Steering behavior to actually move this agent. Must comply with " +
+             "ITargeter interface.")]
+    [InterfaceCompliant(typeof(ITargeter))]
+    [SerializeField] private SteeringBehavior followSteeringBehavior;
 
     [Header("DEBUG:")] 
     [SerializeField] private bool showGizmos;
@@ -53,6 +56,7 @@ namespace SteeringBehaviors
 
     private GameObject _offsetFromTargetMarker;
     private AgentMover _currentAgent;
+    private ITargeter _followTargeter;
 
     private Color AgentColor => _currentAgent.GetComponent<AgentColor>().Color;
 
@@ -61,11 +65,12 @@ namespace SteeringBehaviors
         _currentAgent = GetComponentInParent<AgentMover>();
         _offsetFromTargetMarker = new GameObject("OffsetFromTargetMarker");
         _offsetFromTargetMarker.transform.parent = transform;
+        _followTargeter = (ITargeter) followSteeringBehavior;
     }
 
     private void Start()
     {
-        followSteeringBehavior.Target = _offsetFromTargetMarker;
+        _followTargeter.Target = _offsetFromTargetMarker;
         UpdateOffsetFromTarget();
     }
 
