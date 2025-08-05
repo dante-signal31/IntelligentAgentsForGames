@@ -575,7 +575,7 @@ namespace Tests.PlayTests
             pursueAgentMover.MaximumDeceleration = 4;
             var offsetFollowBehavior = 
                 _offsetFollowGameObject.GetComponentInChildren<OffsetFollowSteeringBehavior>();
-            offsetFollowBehavior.Target = targetMovingAgent;
+            offsetFollowBehavior.Target = targetMovingAgent.gameObject;
             GameObject offsetFromTargetMarker = 
                 offsetFollowBehavior.gameObject.transform.Find("OffsetFromTargetMarker").gameObject;
             

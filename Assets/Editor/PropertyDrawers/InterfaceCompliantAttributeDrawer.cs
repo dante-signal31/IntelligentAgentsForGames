@@ -18,16 +18,105 @@ public class InterfaceCompliantAttributeDrawer : PropertyDrawer
 {
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
-        // Get the object passed to the decorated field.
-        Object checkedObject = property.objectReferenceValue;
-        
         // Get the array with the interface types to check.
         var interfaceCompliantAttribute = (InterfaceCompliantAttribute) attribute;
         Type[] interfaceTypes = interfaceCompliantAttribute.InterfaceTypes;
+        
+        // Create container element.
+        var container = new VisualElement();
 
-        // Check if the object complies with any of the given interfaces. Any not
-        // complying interface will be added to the list.
+        AddErrorBoxIfNeeded(interfaceTypes, property, container);
+
+        // Get decorated property.
+        PropertyField decoratedProperty = new PropertyField(property);
+        
+        // Make container check property to refresh inspector if the value given to the
+        // property changes.
+        //
+        // My first approach was to use decoratedProperty.RegisterValueChangCallback()
+        // but it was not working. I was having some kind of recursive issue, likely 
+        // related to this reported bug:
+        // https://discussions.unity.com/t/the-registervaluechanged-problem/1556730
+        //
+        // That's why I've followed the workaround proposed in that thread, and I've used 
+        // TrackPropertyValue() instead.
+        container.TrackPropertyValue(property, _ =>
+        {
+            AddErrorBoxIfNeeded(interfaceTypes, property, container);
+            container.Add(decoratedProperty);
+        });
+        
+        // Now add decorated property to the container.
+        container.Add(decoratedProperty);
+        
+        // Return container.
+        return container;
+    }
+
+    /// <summary>
+    /// Adds an error box to the container if the inspected object does not comply with
+    /// any of the specified interface types.
+    /// </summary>
+    /// <param name="interfaceTypes">An array of interface types to check compliance
+    /// against.</param>
+    /// <param name="property">The serialized property associated with the inspected
+    /// object to be validated for interface compliance.</param>
+    /// <param name="container">The container UI element to which the error box will
+    /// be added if non-compliance is detected.</param>
+    private void AddErrorBoxIfNeeded(Type[] interfaceTypes, SerializedProperty property,
+        VisualElement container)
+    {
+        // Get the object passed to the decorated field.
+        Object checkedObject = property.objectReferenceValue;
+
+        // Check if the provided object complies with any of the given interfaces. Any not
+        // complying interface will be returned in the list.
+        List<Type> notFoundTypes = GetNotComplyingInterfaces(
+            interfaceTypes,
+            checkedObject);
+
+        // If any not complying interface was found, add an error box to the container.
+        HelpBox errorBox = GenerateErrorBox(notFoundTypes);
+        
+        // Clear existing content
+        container.Clear();
+
+        // Add an error box if needed.
+        if (errorBox != null) container.Add(errorBox);
+    }
+
+    private HelpBox GenerateErrorBox(List<Type> notFoundTypes)
+    {
+        if (notFoundTypes.Count == 0) return null;
+        
+        // Create a comma-separated string of not found interface names.
+        string interfaceNames = string.Join(
+            ", ", 
+            notFoundTypes.Select(t => t.Name));
+
+        // Get message text.
+        string alertMessage = "Provided object does not comply with " +
+                              $"required following interfaces: {interfaceNames}";
+        
+        // Build a help box and return it.
+        return new HelpBox(alertMessage, HelpBoxMessageType.Error);
+    }
+
+    /// <summary>
+    /// Identifies the interfaces that are not implemented by a given object.
+    /// </summary>
+    /// <param name="interfaceTypes">An array of interface types to check compliance
+    /// against.</param>
+    /// <param name="checkedObject">The object to be checked for interface
+    /// compliance.</param>
+    /// <returns>A list of interface types that are not implemented by the
+    /// given object. If provided object complies with every interface, then returned
+    /// list will have zero elements.</returns>
+    private List<Type> GetNotComplyingInterfaces(Type[] interfaceTypes,
+        Object checkedObject)
+    {
         List<Type> notFoundTypes = new();
+
         foreach (Type interfaceType in interfaceTypes)
         {
             if (checkedObject != null && 
@@ -35,34 +124,9 @@ public class InterfaceCompliantAttributeDrawer : PropertyDrawer
             {
                 notFoundTypes.Add(interfaceType);
             }
-            
         }
         
-        // Create container element.
-        var container = new VisualElement();
-
-        if (notFoundTypes.Count > 0)
-        {
-            // Create a comma-separated string of not found interface names.
-            string interfaceNames = string.Join(
-                ", ", 
-                notFoundTypes.Select(t => t.Name));
-
-            // Get message text.
-            string alertMessage = "Provided object does not comply with " +
-                                  $"required following interfaces: {interfaceNames}";
-            
-            // Add help bubble with given message to container.
-            HelpBox helpBox = new HelpBox(alertMessage, HelpBoxMessageType.Error);
-            container.Add(helpBox);
-        }
-        
-        // Now add decorated property to the container.
-        PropertyField decoratedProperty = new PropertyField(property);
-        container.Add(decoratedProperty);
-        
-        // Return container.
-        return container;
+        return notFoundTypes;
     }
 }
 }
