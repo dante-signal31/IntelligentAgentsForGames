@@ -193,9 +193,7 @@ public class AgentMover : MonoBehaviour
         {
             // In this case, our steering wants us to face and move in different
             // directions. Steering checks that no threshold is surpassed.
-            rigidBody.MoveRotation(
-                rigidBody.rotation + 
-                steeringOutput.Angular * Time.fixedDeltaTime);
+            rigidBody.angularVelocity = steeringOutput.Angular;
         }
         
         // Apply the new velocity vector to our GameObject. I don't enforce the StopSpeed
