@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Timers;
 using Levels;
 using Pathfinding;
 using Sensors;
@@ -36,6 +37,8 @@ public class HideSteeringBehavior : SteeringBehavior
     [SerializeField] private LayerMask notEmptyGroundLayers;
     [Tooltip("Layer where threats are.")]
     [SerializeField] private LayerMask threatLayerMask;
+    [Tooltip("Minimum time in seconds between hiding point path recalculations.")]
+    [SerializeField] private float pathRecalculationTime = 0.5f;
 
     // [Header("DEBUG:")]
     // [Tooltip("Show gizmos for debugging.")]
@@ -179,12 +182,17 @@ public class HideSteeringBehavior : SteeringBehavior
     private bool _hidingPointRecheckNeeded;
     private bool _hidingPointReached;
     private GameObject _nextMovementTarget;
+    private Timer _pathRecalculationTimer;
+    private bool _pathRecalculationCooldownActive;
 
     private void Awake()
     {
         if (_nextMovementTarget == null)
             _nextMovementTarget = new GameObject("NextMovementTarget");
         HidingPoint = transform.position;
+        _pathRecalculationTimer = new Timer(pathRecalculationTime * 1000);
+        _pathRecalculationTimer.Elapsed += OnRecalculationPathTimerTimeout;
+        _pathRecalculationTimer.AutoReset = false;
     }
 
     private void Start()
@@ -195,6 +203,18 @@ public class HideSteeringBehavior : SteeringBehavior
         InitSeekSteeringBehavior();
         InitHidingPointDetector();
         InitNavigationAgent();
+    }
+
+    private void OnRecalculationPathTimerTimeout(object sender, ElapsedEventArgs e)
+    {
+        _pathRecalculationCooldownActive = false;
+    }
+
+    private void StartPathRecalculationTimer()
+    {
+        _pathRecalculationTimer.Stop();
+        _pathRecalculationTimer.Start();
+        _pathRecalculationCooldownActive = true;
     }
 
     private void InitRayCast()
@@ -252,7 +272,14 @@ public class HideSteeringBehavior : SteeringBehavior
     
         // Starting threat position counts as ThreatHasJustMoved because
         // _previousThreatPosition is init as Vector2.Zero.
-        if (ThreatHasJustMoved) _hidingPointRecheckNeeded = true;
+        if (ThreatHasJustMoved && !_pathRecalculationCooldownActive)
+        {
+            _hidingPointRecheckNeeded = true;
+            // A path recalculation cooldown is needed, or the path will be recalculated
+            // repeatedly while the threat moves without giving a useful hiding path until
+            // the threat stops for the first time.
+            StartPathRecalculationTimer();
+        }
         _previousThreatPosition = Threat.transform.position;
         
         // Only query when the navigation agent has not reached the target yet.
@@ -271,7 +298,8 @@ public class HideSteeringBehavior : SteeringBehavior
     {
         // Look for a new hiding point if the threat can see us and has just moved (or
         // if it is threat first position (only once).
-        if (_threatCanSeeUs && _hidingPointRecheckNeeded ||
+        if (_threatCanSeeUs && _hidingPointRecheckNeeded && 
+            !_pathRecalculationCooldownActive ||
             // This second condition is needed for blender steeringBehaviors, where 
             // another steering behavior can move this agent without HideSteeringBehavior
             // intervention.
