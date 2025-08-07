@@ -10,6 +10,9 @@ namespace SteeringBehaviors
 /// </summary>
 public class WeightBlendedSteeringBehavior : SteeringBehavior, IGizmos
 {
+    /// <summary>
+    /// Steering behavior to blend with others.
+    /// </summary>
     [Serializable] 
     public struct WeightedBehavior
     {
@@ -18,6 +21,9 @@ public class WeightBlendedSteeringBehavior : SteeringBehavior, IGizmos
         public Color debugColor;
     }
 
+    /// <summary>
+    /// Resulting steering output to blend with others.
+    /// </summary>
     private struct WeightedOutput
     {
         public readonly SteeringOutput SteeringOutput;
