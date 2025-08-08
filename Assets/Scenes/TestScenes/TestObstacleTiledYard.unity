@@ -1701,7 +1701,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4225814287831094526, guid: 492129d6e4323bf47aa7900cc9bf8ca3, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7348348637094566987, guid: 492129d6e4323bf47aa7900cc9bf8ca3, type: 3}
       propertyPath: gizmosColor.b
@@ -2107,7 +2107,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4692215361483410609, guid: 2d0d219662d67da4fa9019f6cb8a38f1, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5187748683231993232, guid: 2d0d219662d67da4fa9019f6cb8a38f1, type: 3}
       propertyPath: range
@@ -4231,7 +4231,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2932987998529570452, guid: b2cf55df5f328f44ebeaea4f4f402276, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4931795218947541339, guid: b2cf55df5f328f44ebeaea4f4f402276, type: 3}
       propertyPath: target
@@ -4588,7 +4588,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5810333675480897971, guid: f89ebc74ef2390046b2980f2905b4dbc, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6911353988434918721, guid: f89ebc74ef2390046b2980f2905b4dbc, type: 3}
       propertyPath: m_LocalPosition.x
