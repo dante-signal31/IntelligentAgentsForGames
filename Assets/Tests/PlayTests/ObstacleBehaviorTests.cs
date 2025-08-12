@@ -29,6 +29,7 @@ namespace Tests.PlayTests
         private GameObject _smoothedWallAvoiderGameObject;
         private GameObject _weightBlendedHideWallAvoiderGameObject;
         private GameObject _priorityWeightBlendedHideWallAvoiderGameObject;
+        private GameObject _priorityDitheringBlendedHideWallAvoiderGameObject;
         
         private SeekSteeringBehavior _seekSteeringBehavior;
         private HideSteeringBehavior _hideSteeringBehavior;
@@ -41,6 +42,7 @@ namespace Tests.PlayTests
         private AgentMover _smoothedWallAvoiderAgent;
         private AgentMover _weightBlendedHideWallAvoiderAgent;
         private AgentMover _priorityWeightBlendedHideWallAvoiderAgent;
+        private AgentMover _priorityDitheringBlendedHideWallAvoiderAgent;
         
         private AgentColor _seekAgentColor;
         private AgentColor _hideAgentColor;
@@ -48,6 +50,8 @@ namespace Tests.PlayTests
         private AgentColor _smoothedWallAvoiderAgentColor;
         private AgentColor _weightBlendedHideWallAvoiderAgentColor;
         private AgentColor _priorityWeightBlendedHideWallAvoiderAgentColor;
+        private AgentColor _priorityDitheringBlendedHideWallAvoiderAgentColor;
+        
         
 
         [UnitySetUp]
@@ -71,6 +75,7 @@ namespace Tests.PlayTests
             _wallAvoiderAgentColor = null;
             _smoothedWallAvoiderAgentColor = null;
             _weightBlendedHideWallAvoiderAgentColor = null;
+            _priorityWeightBlendedHideWallAvoiderAgentColor = null;
             _target = null;
     
             // Load the test scene
@@ -134,6 +139,13 @@ namespace Tests.PlayTests
                     GameObject.Find("PriorityWeightBlendedHideWallAvoiderMovingAgent");
                 _priorityWeightBlendedHideWallAvoiderGameObject.SetActive(false);
             }
+
+            if (_priorityDitheringBlendedHideWallAvoiderGameObject == null)
+            {
+                _priorityDitheringBlendedHideWallAvoiderGameObject = 
+                    GameObject.Find("PriorityDitheringBlendedHideWallAvoiderMovingAgent");
+                _priorityDitheringBlendedHideWallAvoiderGameObject.SetActive(false);
+            }
             
             if (_seekSteeringBehavior == null)
                 _seekSteeringBehavior = 
@@ -163,6 +175,10 @@ namespace Tests.PlayTests
                 _priorityWeightBlendedHideWallAvoiderAgent =
                     _priorityWeightBlendedHideWallAvoiderGameObject
                         .GetComponent<AgentMover>();
+            if (_priorityDitheringBlendedHideWallAvoiderAgent == null)
+                _priorityDitheringBlendedHideWallAvoiderAgent =
+                    _priorityDitheringBlendedHideWallAvoiderGameObject
+                        .GetComponent<AgentMover>();
             
             if (_seekAgentColor == null)
                 _seekAgentColor = _seekGameObject.GetComponent<AgentColor>();
@@ -180,6 +196,9 @@ namespace Tests.PlayTests
             if (_priorityWeightBlendedHideWallAvoiderAgentColor == null)
                 _priorityWeightBlendedHideWallAvoiderAgentColor = 
                     _priorityWeightBlendedHideWallAvoiderGameObject.GetComponent<AgentColor>();
+            if (_priorityDitheringBlendedHideWallAvoiderAgentColor == null)
+                _priorityDitheringBlendedHideWallAvoiderAgentColor = 
+                    _priorityDitheringBlendedHideWallAvoiderGameObject.GetComponent<AgentColor>();
         }
         
         [UnityTearDown]
@@ -197,6 +216,8 @@ namespace Tests.PlayTests
                 _weightBlendedHideWallAvoiderGameObject.SetActive(false);
             if (_priorityWeightBlendedHideWallAvoiderGameObject != null)
                 _priorityWeightBlendedHideWallAvoiderGameObject.SetActive(false);
+            if (_priorityDitheringBlendedHideWallAvoiderGameObject != null)
+                _priorityDitheringBlendedHideWallAvoiderGameObject.SetActive(false);
             if (_target != null)
                 _target.Enabled = false;
 
@@ -490,6 +511,87 @@ namespace Tests.PlayTests
             
             // Assert we reached our target.
             Assert.True(Vector2.Distance(_priorityWeightBlendedHideWallAvoiderAgent.transform.position, 
+                _position2.position) < 1.5f);
+        }
+        
+        /// <summary>
+        /// Test that PriorityDitheringBlendedHideWallAvoiderBehavior can hide from a
+        /// moving SeekBehavior and reach its final destination.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator PriorityDitheringBlendedHideWallAvoiderBehaviorTest()
+        {
+            // Set up agents before the tests.
+            _target.Enabled = true;
+            _target.TargetPosition = _position2.position;
+            _seekGameObject.transform.position = _position1.position;
+            _seekAgent.MaximumSpeed = 2.0f;
+            _seekAgent.StopSpeed = 0.01f;
+            _seekAgent.MaximumRotationalSpeed = 1080f;
+            _seekAgent.StopRotationThreshold = 1f;
+            _seekAgentColor.Color = Color.red;
+            _seekSteeringBehavior.Target = _target.gameObject;
+            _seekSteeringBehavior.ArrivalDistance = 0.3f;
+            _seekGameObject.SetActive(true);
+            
+            _priorityDitheringBlendedHideWallAvoiderAgent.transform.position = _position3.position;
+            _priorityDitheringBlendedHideWallAvoiderAgent.MaximumSpeed = 2.0f;
+            _priorityDitheringBlendedHideWallAvoiderAgent.StopSpeed = 0.01f;
+            _priorityDitheringBlendedHideWallAvoiderAgent.MaximumRotationalSpeed = 1080f;
+            _priorityDitheringBlendedHideWallAvoiderAgent.StopRotationThreshold = 1f;
+            _priorityDitheringBlendedHideWallAvoiderAgentColor.Color = Color.green;
+            
+            HideSteeringBehavior hideSteeringBehavior = 
+                _priorityDitheringBlendedHideWallAvoiderAgent.GetComponentInChildren<HideSteeringBehavior>();
+            hideSteeringBehavior.Threat = _seekAgent;
+            hideSteeringBehavior.ArrivalDistance = 0.3f;
+            hideSteeringBehavior.ObstaclesLayer = LayerMask.GetMask("Obstacles");
+            hideSteeringBehavior.SeparationFromObstacles = 0.2f;
+            hideSteeringBehavior.AgentRadius = 0.5f;
+            hideSteeringBehavior.NotEmptyGroundLayers = LayerMask.GetMask("Obstacles");
+            hideSteeringBehavior.ThreatLayerMask = LayerMask.GetMask("Agents");
+            
+            // Set HiderWallAvoider agent its final destination.
+            SeekSteeringBehavior hideSeekSteeringBehavior = 
+                _priorityDitheringBlendedHideWallAvoiderAgent.GetComponentInChildren<SeekSteeringBehavior>();
+            hideSeekSteeringBehavior.Target = _position2.gameObject;
+            
+            _priorityDitheringBlendedHideWallAvoiderGameObject.SetActive(true);
+            
+            // Start test.
+            // Assert that seek agent can see hide agent.
+            yield return new WaitForSeconds(0.2f);
+            Assert.True(hideSteeringBehavior.ThreatCanSeeUs);
+            
+            // Give hide agent time to hide.
+            yield return new WaitForSeconds(3f);
+            
+            // Assert that seek agent can no longer see hide agent.
+            Assert.False(hideSteeringBehavior.ThreatCanSeeUs);
+            
+            // Move seek agent to another position.
+            _target.transform.position = _position3.position;
+            
+            // Give hide agent time to hide.
+            yield return new WaitForSeconds(5f);
+            
+            // Assert that seek agent can no longer see hide agent.
+            Assert.False(hideSteeringBehavior.ThreatCanSeeUs);
+            
+            // Move seek agent to another position.
+            _target.transform.position = _position4.position;
+            
+            // Give hide agent time to hide.
+            yield return new WaitForSeconds(4f);
+            
+            // Assert that seek agent can no longer see hide agent.
+            Assert.False(hideSteeringBehavior.ThreatCanSeeUs);
+            
+            // Give the agent time to reach its final destination.
+            yield return new WaitForSeconds(4f);
+            
+            // Assert we reached our target.
+            Assert.True(Vector2.Distance(_priorityDitheringBlendedHideWallAvoiderAgent.transform.position, 
                 _position2.position) < 1.5f);
         }
     }
