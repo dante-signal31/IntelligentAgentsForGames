@@ -1,3 +1,4 @@
+using Tools;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Vector2 = UnityEngine.Vector2;
@@ -26,6 +27,10 @@ public class AgentMover : MonoBehaviour
     [SerializeField] private float maximumAcceleration;
     [Tooltip("Maximum deceleration for this agent.")]
     [SerializeField] private float maximumDeceleration;
+    [Tooltip("Smooth heading averaging velocity vector.")] 
+    [SerializeField] private bool autoSmooth;
+    [Tooltip("How many samples to use to smooth heading.")]
+    [SerializeField] private int autoSmoothSamples = 10;
     
     [Header("WIRING:")]
     [Tooltip("Steering behaviour component that will return movement vectors.")]
@@ -127,6 +132,7 @@ public class AgentMover : MonoBehaviour
     private SteeringBehaviorArgs _behaviorArgs;
     private float _maximumRotationSpeedRadNormalized;
     private float _stopRotationRadThreshold;
+    private MovingWindow _lastRotations;
 
     private SteeringBehaviorArgs GetSteeringBehaviorArgs()
     {
@@ -148,6 +154,7 @@ public class AgentMover : MonoBehaviour
         _maximumRotationSpeedRadNormalized = maximumRotationalSpeed * Mathf.Deg2Rad / 
                                              (2 * Mathf.PI);
         _stopRotationRadThreshold = stopRotationThreshold * Mathf.Deg2Rad;
+        _lastRotations = new MovingWindow(autoSmoothSamples);
     }
 
     private void FixedUpdate()
@@ -175,18 +182,23 @@ public class AgentMover : MonoBehaviour
         }
         else if (steeringOutput.Angular == 0 && steeringOutput.Linear != Vector2.zero)
         {
-            // If no explicit angular steering, we will just look at the direction we
-            // are moving, but clamping our rotation by our rotational speed.
-            float totalRotationNeeded = Vector2.Angle(Forward, steeringOutput.Linear);
-            if (totalRotationNeeded > stopRotationThreshold)
+            if (autoSmooth)
             {
-                Vector3 newHeading = Vector3.Slerp(
-                    Forward, 
-                    steeringOutput.Linear, 
-                    _maximumRotationSpeedRadNormalized * Time.fixedDeltaTime);
-                rigidBody.MoveRotation(
-                    rigidBody.rotation + 
-                    Vector2.SignedAngle(Forward, newHeading));
+                // If no explicit angular steering, but autoSmoothing is desired, we will
+                // smooth the heading by averaging the last few rotations.
+                float rotationNeeded = Vector2.SignedAngle(Forward, steeringOutput.Linear);
+                _lastRotations.Add(rotationNeeded);
+                float averageRotation = _lastRotations.Average;
+                Vector2 averageHeading = Quaternion.Euler(0, 0, averageRotation) * 
+                                         Forward;
+                SetRotation(averageHeading);
+            }
+            else
+            {
+                // If no explicit angular steering, and no autoSmoothing desired, we will
+                // just look at the direction we are moving, but clamping our rotation by
+                // our rotational speed.
+                SetRotation(steeringOutput.Linear);
             }
         }
         else if (steeringOutput.Angular != 0)
@@ -199,6 +211,28 @@ public class AgentMover : MonoBehaviour
         // Apply the new velocity vector to our GameObject. I don't enforce the StopSpeed
         // because I've found it more flexible to do it at steering behavior level.
         rigidBody.linearVelocity = steeringOutput.Linear;
+    }
+
+    /// <summary>
+    /// Rotates the agent towards the given heading vector within the constraints of the
+    /// agent's maximum rotational speed and stop rotation threshold.
+    /// </summary>
+    /// <param name="heading">
+    /// The direction the agent should face, represented as a 2D vector.
+    /// </param>
+    private void SetRotation(Vector2 heading)
+    {
+        float totalRotationNeeded = Vector2.Angle(Forward, heading);
+        if (totalRotationNeeded > stopRotationThreshold)
+        {
+            Vector3 newHeading = Vector3.Slerp(
+                Forward, 
+                heading, 
+                _maximumRotationSpeedRadNormalized * Time.fixedDeltaTime);
+            rigidBody.MoveRotation(
+                rigidBody.rotation + 
+                Vector2.SignedAngle(Forward, newHeading));
+        }
     }
 }
 }

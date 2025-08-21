@@ -275,6 +275,8 @@ MonoBehaviour:
   stopRotationThreshold: 1
   maximumAcceleration: 0
   maximumDeceleration: 0
+  autoSmooth: 0
+  autoSmoothSamples: 10
   steeringBehavior: {fileID: 0}
   rigidBody: {fileID: 1790575542233831108}
 --- !u!50 &1790575542233831108

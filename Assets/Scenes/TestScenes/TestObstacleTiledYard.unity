@@ -129,11 +129,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3374666069497621577, guid: 7039a0f10eac5e4449a3edf7e5f9edc7, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.94
+      value: 6.76
       objectReference: {fileID: 0}
     - target: {fileID: 3374666069497621577, guid: 7039a0f10eac5e4449a3edf7e5f9edc7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.52
+      value: 0.43
       objectReference: {fileID: 0}
     - target: {fileID: 3374666069497621577, guid: 7039a0f10eac5e4449a3edf7e5f9edc7, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2090,8 +2090,16 @@ PrefabInstance:
       value: 64
       objectReference: {fileID: 0}
     - target: {fileID: 2747753771222001998, guid: 2d0d219662d67da4fa9019f6cb8a38f1, type: 3}
+      propertyPath: autoSmooth
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2747753771222001998, guid: 2d0d219662d67da4fa9019f6cb8a38f1, type: 3}
       propertyPath: maximumSpeed
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2747753771222001998, guid: 2d0d219662d67da4fa9019f6cb8a38f1, type: 3}
+      propertyPath: autoSmoothSamples
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 2844971176795166340, guid: 2d0d219662d67da4fa9019f6cb8a38f1, type: 3}
       propertyPath: target
@@ -4411,6 +4419,10 @@ PrefabInstance:
     - target: {fileID: 6231841275540099926, guid: 3cad9a91d2c0e514981ec4050bd84a24, type: 3}
       propertyPath: m_Name
       value: PriorityDitheringBlendedHideWallAvoiderMovingAgent
+      objectReference: {fileID: 0}
+    - target: {fileID: 6231841275540099926, guid: 3cad9a91d2c0e514981ec4050bd84a24, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6427638303772407716, guid: 3cad9a91d2c0e514981ec4050bd84a24, type: 3}
       propertyPath: m_LocalPosition.x
