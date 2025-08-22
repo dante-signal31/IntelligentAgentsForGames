@@ -8,7 +8,7 @@ namespace Tools
 /// </summary>
 public class MovingWindow
 {
-    private readonly Queue<float> _q;
+    private readonly Queue<float> _queue;
     private float _sum;
 
     /// <summary>
@@ -19,13 +19,13 @@ public class MovingWindow
     /// <summary>
     /// Returns the number of elements in the moving window.
     /// </summary>
-    public int Count => _q.Count;
+    public int Count => _queue.Count;
     
     /// <summary>
     /// Returns the average of the elements in the moving window.
     /// </summary>
     /// <returns>The average of the elements in the moving window.</returns>
-    public float Average => _q.Count == 0 ? 0f : _sum / _q.Count;
+    public float Average => _queue.Count == 0 ? 0f : _sum / _queue.Count;
 
     /// <summary>
     /// Creates a new moving window with the specified capacity.
@@ -40,7 +40,7 @@ public class MovingWindow
         Capacity = capacity > 0 ? 
             capacity : 
             throw new System.ArgumentOutOfRangeException(nameof(capacity));
-        _q = new Queue<float>(capacity);
+        _queue = new Queue<float>(capacity);
     }
 
     /// <summary>
@@ -51,10 +51,10 @@ public class MovingWindow
     /// <param name="value">The float value to add to the moving window.</param>
     public void Add(float value)
     {
-        if (_q.Count == Capacity)
-            _sum -= _q.Dequeue();
+        if (_queue.Count == Capacity)
+            _sum -= _queue.Dequeue();
 
-        _q.Enqueue(value);
+        _queue.Enqueue(value);
         _sum += value;
     }
 
