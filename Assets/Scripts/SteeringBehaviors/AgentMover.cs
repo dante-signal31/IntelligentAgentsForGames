@@ -1,3 +1,4 @@
+using System;
 using Tools;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -103,6 +104,30 @@ public class AgentMover : MonoBehaviour
         set => maximumDeceleration = value;
     }
 
+    
+    /// <summary>
+    /// Smooth heading averaging velocity vector.
+    /// </summary>
+    public bool AutoSmooth
+    {
+        get => autoSmooth;
+        set => autoSmooth = value;   
+    }
+
+    /// <summary>
+    /// How many samples to use to smooth heading.
+    /// </summary>
+    public int AutoSmoothSamples
+    {
+        get => autoSmoothSamples;
+        set
+        {
+            if (value == autoSmoothSamples) return;
+            autoSmoothSamples = value;  
+            _lastRotations = new MovingWindow(value);
+        } 
+    }
+
     /// <summary>
     /// Steering behaviour component that will return movement vectors.
     /// </summary>
@@ -172,12 +197,12 @@ public class AgentMover : MonoBehaviour
         // Get steering output.
         SteeringOutput steeringOutput = SteeringBehavior.GetSteering(_behaviorArgs);
         
-        // Apply the needed rotation.
+        // Apply the necessary rotation.
         if (steeringOutput.Angular == 0 && steeringOutput.Linear == Vector2.zero)
         {
             // Sometimes, when an agent touches a surface, a residual angular velocity
-            // is left behind. This is a problem because when agent stops it starts to
-            // spin. The solution I found is to set angular velocity to zero.
+            // is left behind. This is a problem because when the agent stops, it starts
+            // to spin. The solution I found is to set angular velocity to zero.
             rigidBody.angularVelocity = 0;
         }
         else if (steeringOutput.Angular == 0 && steeringOutput.Linear != Vector2.zero)
@@ -186,7 +211,9 @@ public class AgentMover : MonoBehaviour
             {
                 // If no explicit angular steering, but autoSmoothing is desired, we will
                 // smooth the heading by averaging the last few rotations.
-                float rotationNeeded = Vector2.SignedAngle(Forward, steeringOutput.Linear);
+                float rotationNeeded = Vector2.SignedAngle(
+                    Forward, 
+                    steeringOutput.Linear);
                 _lastRotations.Add(rotationNeeded);
                 float averageRotation = _lastRotations.Average;
                 Vector2 averageHeading = Quaternion.Euler(0, 0, averageRotation) * 
@@ -195,7 +222,7 @@ public class AgentMover : MonoBehaviour
             }
             else
             {
-                // If no explicit angular steering, and no autoSmoothing desired, we will
+                // If no explicit angular steering and no autoSmoothing desired, we will
                 // just look at the direction we are moving, but clamping our rotation by
                 // our rotational speed.
                 SetRotation(steeringOutput.Linear);
@@ -234,5 +261,21 @@ public class AgentMover : MonoBehaviour
                 Vector2.SignedAngle(Forward, newHeading));
         }
     }
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        // Auto-assign to properties to run initialization code.
+        MaximumSpeed = maximumSpeed;
+        StopSpeed = stopSpeed;
+        MaximumRotationalSpeed = maximumRotationalSpeed;
+        StopRotationThreshold = stopRotationThreshold;
+        MaximumAcceleration = maximumAcceleration;
+        MaximumDeceleration = maximumDeceleration;
+        AutoSmooth = autoSmooth;
+        AutoSmoothSamples = autoSmoothSamples;
+    }
+#endif
+
 }
 }

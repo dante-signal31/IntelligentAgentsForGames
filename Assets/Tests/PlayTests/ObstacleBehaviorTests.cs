@@ -306,6 +306,7 @@ namespace Tests.PlayTests
             _wallAvoiderAgent.StopSpeed = 0.01f;
             _wallAvoiderAgent.MaximumRotationalSpeed = 1080f;
             _wallAvoiderAgent.StopRotationThreshold = 1f;
+            _wallAvoiderAgent.AutoSmooth = false;
             _wallAvoiderAgentColor.Color = Color.green;
             _wallAvoiderSteeringBehavior.Target = _target.gameObject;
             _wallAvoiderGameObject.SetActive(true);
@@ -318,6 +319,40 @@ namespace Tests.PlayTests
             yield return new WaitForSeconds(6f);
             
             // Assert that wall avoider has reached target.
+            Assert.True(Vector2.Distance(
+                _wallAvoiderAgent.transform.position, 
+                _target.TargetPosition) < 0.3f);
+        }
+        
+        /// <summary>
+        /// Test that WallAvoiderBehavior can move an agent from a point A to a point B
+        /// avoiding obstacles and using auto-smoothed movement.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator AutoSmoothedWallAvoiderBehaviorTest()
+        {
+            // Setup agents before the tests.
+            _target.Enabled = true;
+            _target.TargetPosition = _position5.position;
+            
+            _wallAvoiderGameObject.transform.position = _position6.position;
+            _wallAvoiderAgent.MaximumSpeed = 2.0f;
+            _wallAvoiderAgent.StopSpeed = 0.01f;
+            _wallAvoiderAgent.MaximumRotationalSpeed = 1080f;
+            _wallAvoiderAgent.StopRotationThreshold = 1f;
+            _wallAvoiderAgent.AutoSmooth = true;
+            _wallAvoiderAgent.AutoSmoothSamples = 10;
+            _wallAvoiderAgentColor.Color = Color.green;
+            _wallAvoiderSteeringBehavior.Target = _target.gameObject;
+            _wallAvoiderGameObject.SetActive(true);
+            
+            
+            // Start test.
+            
+            // Give hide agent time to hide.
+            yield return new WaitForSeconds(8f);
+            
+            // Assert that wall avoider has reached the target.
             Assert.True(Vector2.Distance(
                 _wallAvoiderAgent.transform.position, 
                 _target.TargetPosition) < 0.3f);
