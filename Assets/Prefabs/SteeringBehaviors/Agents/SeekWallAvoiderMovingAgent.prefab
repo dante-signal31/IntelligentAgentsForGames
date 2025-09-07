@@ -215,7 +215,7 @@ MonoBehaviour:
       m_Calls: []
   sectorRange: {fileID: 0}
   showGizmos: 0
-  gizmoColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  gizmosColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   gizmoRadius: 0.1
   _rayEnds:
   - start: {x: -0.49111015, y: -0.1992736, z: 0}

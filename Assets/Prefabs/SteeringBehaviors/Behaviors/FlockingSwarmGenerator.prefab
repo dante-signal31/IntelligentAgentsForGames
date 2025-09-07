@@ -1,0 +1,76 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6539276505437436119
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5220858007262272025}
+  - component: {fileID: 1940556635264651056}
+  m_Layer: 7
+  m_Name: FlockingSwarmGenerator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5220858007262272025
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6539276505437436119}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 38.36297, y: -22.30017, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1940556635264651056
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6539276505437436119}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c744166e912742368747c7f953c23a42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ScriptsAssembly::SteeringBehaviors.FlockingSwarmGenerator
+  swarmSize: 3
+  boidPrefab: {fileID: 0}
+  swarmRadius: 14
+  swarmGenerationRetries: 5
+  obstaclesForGenerationLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  randomizeBoidRotation: 1
+  boidRadius: 55
+  boidColor: {r: 0, g: 1, b: 0, a: 1}
+  boidMaximumSpeed: 200
+  boidStopSpeed: 10
+  boidMaximumRotationalSpeed: 1080
+  boidStopRotationThreshold: 10
+  boidMaximumAcceleration: 4
+  boidMaximumDeceleration: 2
+  boidAutoSmooth: 0
+  boidAutoSmoothSamples: 10
+  boidSeparationThreshold: 4
+  boidSeparationAlgorithm: 1
+  boidSeparationDecayCoefficient: 2
+  boidCohesionArrivalDistance: 5
+  boidSeekTarget: {fileID: 0}
+  boidArrivalDistance: 0.1
+  boidWanderRadius: 3
+  boidWanderDistance: 6
+  boidWanderJitter: 4
+  boidWanderRecalculation: 1
+  showGizmos: 1
+  gizmosColor: {r: 0.1358285, g: 1, b: 0, a: 1}
