@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5220858007262272025}
   - component: {fileID: 1940556635264651056}
   m_Layer: 7
-  m_Name: FlockingSwarmGenerator
+  m_Name: FlockingSwarm
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

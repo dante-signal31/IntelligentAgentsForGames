@@ -31545,6 +31545,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 1940556635264651056, guid: dcd049b29aa62b548adcf38f160dd675, type: 3}
+      propertyPath: swarmSize
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 1940556635264651056, guid: dcd049b29aa62b548adcf38f160dd675, type: 3}
       propertyPath: boidPrefab
       value: 
       objectReference: {fileID: 5218259046999978924, guid: 5c6b1b1a415dbb24391a1ee14c068bb0, type: 3}
@@ -31618,7 +31622,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6539276505437436119, guid: dcd049b29aa62b548adcf38f160dd675, type: 3}
       propertyPath: m_Name
-      value: FlockingSwarmGenerator
+      value: FlockingSwarm
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
