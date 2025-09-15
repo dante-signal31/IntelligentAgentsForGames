@@ -26,7 +26,7 @@ public class InterfaceCompliantAttributeDrawer : PropertyDrawer
         var container = new VisualElement();
 
         AddErrorBoxIfNeeded(interfaceTypes, property, container);
-
+        
         // Get decorated property.
         PropertyField decoratedProperty = new PropertyField(property);
         

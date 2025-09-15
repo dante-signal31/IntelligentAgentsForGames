@@ -22,7 +22,7 @@ namespace SteeringBehaviors
     [Header("WIRING:")]
     [Tooltip("Steering behavior to actually move this agent. Must comply with " +
              "ITargeter interface.")]
-    [InterfaceCompliant(typeof(ITargeter))]
+    //[InterfaceCompliant(typeof(ITargeter))]
     [SerializeField] private SteeringBehavior followSteeringBehavior;
 
     [Header("DEBUG:")] 
@@ -117,6 +117,7 @@ namespace SteeringBehaviors
         Gizmos.color = GizmosColor;
         Gizmos.DrawLine(transform.position, _offsetFromTargetMarker.transform.position);
         Gizmos.DrawWireSphere(_offsetFromTargetMarker.transform.position, 0.3f);
+        Gizmos.color = new Color(GizmosColor.r, GizmosColor.g, GizmosColor.b, 0.5f);
         Gizmos.DrawLine(
             target.transform.position,
             _offsetFromTargetMarker.transform.position);
