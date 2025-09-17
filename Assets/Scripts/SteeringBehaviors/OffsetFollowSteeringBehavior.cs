@@ -1,6 +1,5 @@
 ﻿using PropertyAttribute;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace SteeringBehaviors
 {
@@ -22,7 +21,7 @@ namespace SteeringBehaviors
     [Header("WIRING:")]
     [Tooltip("Steering behavior to actually move this agent. Must comply with " +
              "ITargeter interface.")]
-    //[InterfaceCompliant(typeof(ITargeter))]
+    // [InterfaceCompliant(typeof(ITargeter))]
     [SerializeField] private SteeringBehavior followSteeringBehavior;
 
     [Header("DEBUG:")] 

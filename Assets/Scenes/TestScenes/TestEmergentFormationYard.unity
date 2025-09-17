@@ -466,6 +466,10 @@ PrefabInstance:
       propertyPath: agentColor.r
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7079025739968922094, guid: 77d4b54a2248ac24ca0d40f7d17032df, type: 3}
+      propertyPath: m_Mass
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 7404163619245130174, guid: 77d4b54a2248ac24ca0d40f7d17032df, type: 3}
       propertyPath: autoSmooth
       value: 1
