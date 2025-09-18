@@ -40,7 +40,7 @@ public class EmergentFormation : MonoBehaviour
     public bool SearchForSuitablePartnerGivenUp => 
         _formationAttempts >= maxFormationAttempts;
     
-    private Queue<GameObject> _groupMembers = new();
+    private List<GameObject> _groupMembers = new();
     // private OffsetFollowSteeringBehavior _offsetFollowSteeringBehavior;
     private CleanAreaChecker _cleanAreaChecker;
     private int _formationAttempts;
@@ -86,6 +86,11 @@ public class EmergentFormation : MonoBehaviour
             offsetFollowSteeringBehavior.offsetFromTarget = value;
         }
     }
+
+    /// <summary>
+    /// Gets the radius used to check for clean areas in the context of formation grouping.
+    /// </summary>
+    public float CleanAreaRadius => cleanAreaRadius;
     
     /// <summary>
     /// Whether the current partner is the leader of the formation.
@@ -142,7 +147,7 @@ public class EmergentFormation : MonoBehaviour
     private void Start()
     {
         GameObject[] groupNodes = GameObject.FindGameObjectsWithTag(formationGroupName);
-        _groupMembers = new Queue<GameObject>(groupNodes.ToArray());
+        _groupMembers = new List<GameObject>(groupNodes.ToArray());
         _cleanAreaChecker = new CleanAreaChecker(
             cleanAreaRadius, 
             notCleanLayers);
@@ -198,6 +203,9 @@ public class EmergentFormation : MonoBehaviour
         // If our current partner is the leader, then we are not in a loop.
         if (PartnerIsLeader) return false;
         
+        // If we have visited before this member, then we are in a loop.
+        if (loopMembers.Contains(_ownAgent.gameObject)) return true;
+        
         // Maximum recursion deep would be If we were in a loop composed of all group
         // members, except the leader (extremely odd situation, but theoretically
         // possible). This would end in endless recursion calls, so we break from it.
@@ -219,13 +227,16 @@ public class EmergentFormation : MonoBehaviour
 
     private void FixedUpdate()
     {
+        _loopMembers.Clear();
+        
         if (_partner != null)
         {
-            _loopMembers.Clear();
+            
             // If we have a suitable formation partner, then check we can still use the
             // selected offset position.
             Vector2 offsetGlobalPosition = 
                 Partner.transform.TransformPoint(PartnerOffset);
+            
             // If we are within the offset area, then there is no need to check anything.
             if ((Vector2.Distance(transform.position, offsetGlobalPosition) <= 
                  2 * cleanAreaRadius ||
@@ -235,6 +246,8 @@ public class EmergentFormation : MonoBehaviour
                 // If we were in a loop, then we should look for a new partner.
                 !WeAreInALoop(ref _loopMembers))
                 return;
+            
+            // If we get here, then we need to find a new partner.
             Partner = null;
             PartnerOffset = Vector2.zero;
         }
@@ -252,10 +265,18 @@ public class EmergentFormation : MonoBehaviour
         
         // If we get here, it means we have no suitable formation partner. So, we must
         // find one.
-        foreach (GameObject member in _groupMembers)
+        // From my experiments it seems that loops are solved sooner if groupMembers
+        // list is shuffled.
+        List<GameObject> shuffledGroupMembers = _groupMembers
+            .OrderBy(x => Random.value)
+            .ToList();
+        foreach (GameObject member in shuffledGroupMembers)
         {
             // Don't try to partner with our own agent.
             if (member == _ownAgent.gameObject) continue;
+            
+            // Don't try to partner with agents that are already in our loop.
+            if (_loopMembers.Contains(member)) continue;
             
             // Don't try to partner with agents that are using us as partners.
             EmergentFormation memberEmergentFormation = 
@@ -263,9 +284,6 @@ public class EmergentFormation : MonoBehaviour
             if (memberEmergentFormation != null &&
                 memberEmergentFormation.Partner == _ownAgent.gameObject)
                 continue;
-            
-            // Don't try to partner with agents that are already in our loop.
-            if (_loopMembers.Contains(member)) continue;
             
             foreach (Vector2 offset in offsets.Offsets)
             {

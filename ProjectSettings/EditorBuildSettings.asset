@@ -17,5 +17,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/TestScenes/TestObstacleTiledYard.unity
     guid: 8dbe7cecce7b3004fbaa1ca91c1b9040
+  - enabled: 1
+    path: Assets/Scenes/TestScenes/TestEmergentFormationYard.unity
+    guid: fba25c08867e4ed4fa2e4ad72ae5bd71
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

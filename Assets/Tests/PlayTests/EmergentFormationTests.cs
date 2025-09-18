@@ -1,4 +1,6 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
+using Groups;
 using NUnit.Framework;
 using SteeringBehaviors;
 using Tests.PlayTests.Common;
@@ -131,8 +133,101 @@ public class EmergentFormationTests
     [UnityTest]
     public IEnumerator EmergentFormationTest()
     {
-        // TODO: Implement test.
-        yield return null;
+        List<GameObject> wingmanList = new();
+        wingmanList.Add(_wingman1GameObject);
+        wingmanList.Add(_wingman2GameObject);
+        wingmanList.Add(_wingman3GameObject);
+        wingmanList.Add(_wingman4GameObject);
+        wingmanList.Add(_wingman5GameObject);
+        
+        // Set initial positions.
+        _target.TargetPosition = _position1.position;
+        _leaderGameObject.transform.position = _position1.position;
+        _wingman1GameObject.transform.position = _position6.position;
+        _wingman2GameObject.transform.position = _position2.position;
+        _wingman3GameObject.transform.position = _position3.position;
+        _wingman4GameObject.transform.position = _position4.position;
+        _wingman5GameObject.transform.position = _position5.position;
+        
+        // Set leader target.
+        ArriveSteeringBehaviorNLA arriveSteeringBehavior = 
+            _leaderGameObject.GetComponentInChildren<ArriveSteeringBehaviorNLA>();
+        arriveSteeringBehavior.Target = _target.gameObject;
+        
+        // Enable everything to start the test.
+        _target.Enabled = true;
+        _leaderGameObject.SetActive(true);
+        _wingman1GameObject.SetActive(true);
+        _wingman2GameObject.SetActive(true);
+        _wingman3GameObject.SetActive(true);
+        _wingman4GameObject.SetActive(true);
+        _wingman5GameObject.SetActive(true);
+        
+        // Start test.
+        
+        // Assert that every wingman has found a partner and is located at the offset.
+        yield return new WaitForSeconds(25f);
+        foreach (GameObject wingman in wingmanList)
+        {
+            EmergentFormation emergentFormation =
+                wingman.GetComponentInChildren<EmergentFormation>();
+            Assert.True(Vector2.Distance(
+                wingman.transform.position,
+                emergentFormation.Partner.transform.TransformPoint(emergentFormation.PartnerOffset)
+                )
+            <= emergentFormation.CleanAreaRadius);
+        }
+        
+        // Move leader to another position.
+        _target.TargetPosition = _position7.position;
+        
+        // Assert that every wingman keeps a partner and is located at the offset after
+        // movement.
+        yield return new WaitForSeconds(25f);
+        foreach (GameObject wingman in wingmanList)
+        {
+            EmergentFormation emergentFormation =
+                wingman.GetComponentInChildren<EmergentFormation>();
+            Assert.True(Vector2.Distance(
+                            wingman.transform.position,
+                            emergentFormation.Partner.transform.TransformPoint(emergentFormation.PartnerOffset)
+                        )
+                        <= emergentFormation.CleanAreaRadius);
+        }
+        
+        // Move leader to another position.
+        _target.TargetPosition = _position8.position;
+        
+        // Assert that every wingman keeps a partner and is located at the offset after
+        // movement.
+        yield return new WaitForSeconds(25f);
+        foreach (GameObject wingman in wingmanList)
+        {
+            EmergentFormation emergentFormation =
+                wingman.GetComponentInChildren<EmergentFormation>();
+            Assert.True(Vector2.Distance(
+                            wingman.transform.position,
+                            emergentFormation.Partner.transform.TransformPoint(emergentFormation.PartnerOffset)
+                        )
+                        <= emergentFormation.CleanAreaRadius);
+        }
+        
+        // Move leader to another position.
+        _target.TargetPosition = _position9.position;
+        
+        // Assert that every wingman keeps a partner and is located at the offset after
+        // movement.
+        yield return new WaitForSeconds(25f);
+        foreach (GameObject wingman in wingmanList)
+        {
+            EmergentFormation emergentFormation =
+                wingman.GetComponentInChildren<EmergentFormation>();
+            Assert.True(Vector2.Distance(
+                            wingman.transform.position,
+                            emergentFormation.Partner.transform.TransformPoint(emergentFormation.PartnerOffset)
+                        )
+                        <= emergentFormation.CleanAreaRadius);
+        }
     }
 
 }
