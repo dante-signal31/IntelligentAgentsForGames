@@ -10,7 +10,6 @@ namespace Groups
 [CreateAssetMenu(fileName = "OffsetList", menuName = "Scriptable Objects/OffsetList", order = 0)]
 public class OffsetList : ScriptableObject
 {
-    [Header("CONFIGURATION:")] 
     [SerializeField] private Vector2[] offsets;
     
     /// <summary>
