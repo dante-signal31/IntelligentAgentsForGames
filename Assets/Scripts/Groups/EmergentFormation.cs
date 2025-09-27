@@ -6,6 +6,10 @@ using UnityEngine;
 
 namespace Groups
 {
+/// <summary>
+/// An emergent formation is a spontaneous formation caused by specific individual
+/// behaviors of its members, with no centralized managing system.
+/// </summary>
 public class EmergentFormation : MonoBehaviour
 {
     [Header("CONFIGURATION:")]
