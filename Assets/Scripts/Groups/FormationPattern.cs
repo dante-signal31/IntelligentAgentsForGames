@@ -1,8 +1,5 @@
-﻿
-using System.Collections.Generic;
-using SteeringBehaviors;
+﻿using SteeringBehaviors;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Groups
 {

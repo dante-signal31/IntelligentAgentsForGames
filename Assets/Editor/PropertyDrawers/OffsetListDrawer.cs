@@ -1,12 +1,13 @@
-﻿using UnityEditor;
+﻿using Groups;
+using UnityEditor;
 using UnityEngine;
 
 namespace Editor.PropertyDrawers
 {
-    [CustomPropertyDrawer(typeof(Groups.OffsetList))]
-    public class OffsetListDrawer : PropertyDrawer
-    {
-        public override void OnGUI(
+[CustomPropertyDrawer(typeof(OffsetList))]
+public class OffsetListDrawer : PropertyDrawer
+{
+     public override void OnGUI(
             Rect position, 
             SerializedProperty property, 
             GUIContent label)
@@ -19,7 +20,7 @@ namespace Editor.PropertyDrawers
                 position, 
                 label, 
                 property.objectReferenceValue, 
-                typeof(Groups.OffsetList), false);
+                typeof(OffsetList), false);
 
             // If we have a valid reference, draw the array
             if (property.objectReferenceValue != null)
@@ -67,5 +68,5 @@ namespace Editor.PropertyDrawers
         
             return height;
         }
-    }
+}
 }

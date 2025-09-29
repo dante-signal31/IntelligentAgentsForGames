@@ -119,6 +119,60 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &50386706
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 50386707}
+  - component: {fileID: 50386708}
+  m_Layer: 0
+  m_Name: GameObject_1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &50386707
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 50386706}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 111798161}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &50386708
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 50386706}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76dba57192004933864307c526d14cb0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ScriptsAssembly::Groups.EmergentFormation
+  formationGroupName: EmergentFormation
+  notCleanLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  cleanAreaRadius: 0.55
+  offsets: {fileID: 0}
+  maxFormationAttempts: 30
+  newAttemptDelay: 1
+  loopDetectionCooldown: 1
+  offsetFollowSteeringBehavior: {fileID: 0}
 --- !u!1 &111798160
 GameObject:
   m_ObjectHideFlags: 0
@@ -128,6 +182,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 111798161}
+  - component: {fileID: 111798162}
   m_Layer: 0
   m_Name: FixedFormation
   m_TagString: Untagged
@@ -148,9 +203,32 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 678588857}
+  - {fileID: 50386707}
+  - {fileID: 1248512488}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &111798162
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 111798160}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3d83550b99ef26438b9b356965efa6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ScriptsAssembly::SteeringBehaviors.AgentMover
+  maximumSpeed: 0
+  stopSpeed: 0
+  maximumRotationalSpeed: 0
+  stopRotationThreshold: 0
+  maximumAcceleration: 0
+  maximumDeceleration: 0
+  autoSmooth: 0
+  autoSmoothSamples: 10
+  steeringBehavior: {fileID: 0}
+  rigidBody: {fileID: 0}
 --- !u!1 &251353492
 GameObject:
   m_ObjectHideFlags: 0
@@ -213,56 +291,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1221165485}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &678588856
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 678588857}
-  - component: {fileID: 678588858}
-  m_Layer: 0
-  m_Name: GameObject
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &678588857
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 678588856}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 7.05, y: -7.81, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 111798161}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &678588858
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 678588856}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2df63e7996654df78bdaf245f319fdf9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: ScriptsAssembly::Groups.FormationPattern
-  positions: {fileID: 11400000, guid: 740fba2196bcec646871eae23baff79e, type: 2}
-  showGizmos: 1
-  gizmosColor: {r: 0.038709044, g: 1, b: 0, a: 1}
-  originGizmoRadius: 0.1
-  positionGizmoRadius: 0.5
-  gizmoTextOffset: {x: 0.1, y: 0.1}
 --- !u!1 &1221165484
 GameObject:
   m_ObjectHideFlags: 0
@@ -298,6 +326,56 @@ Transform:
   - {fileID: 251353493}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1248512487
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1248512488}
+  - component: {fileID: 1248512489}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1248512488
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1248512487}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 111798161}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1248512489
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1248512487}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2df63e7996654df78bdaf245f319fdf9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ScriptsAssembly::Groups.FormationPattern
+  positions: {fileID: 11400000, guid: 740fba2196bcec646871eae23baff79e, type: 2}
+  showGizmos: 1
+  gizmosColor: {r: 0, g: 1, b: 0, a: 1}
+  originGizmoRadius: 0.1
+  positionGizmoRadius: 0.5
+  gizmoTextOffset: {x: 0.1, y: 0.1}
 --- !u!1 &1444829019
 GameObject:
   m_ObjectHideFlags: 0

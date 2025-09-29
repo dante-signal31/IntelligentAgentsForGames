@@ -4,6 +4,7 @@ using System.Linq;
 using PropertyAttribute;
 using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
@@ -127,6 +128,64 @@ public class InterfaceCompliantAttributeDrawer : PropertyDrawer
         }
         
         return notFoundTypes;
+    }
+    
+    // IMGUI fallback for older inspectors or when UI Toolkit is not used.
+    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+    {
+        // Retrieve attribute and interface list
+        var interfaceCompliantAttribute = (InterfaceCompliantAttribute)attribute;
+        Type[] interfaceTypes = interfaceCompliantAttribute.InterfaceTypes;
+
+        // Reserve rects
+        // First draw the property field
+        Rect propertyRect = position;
+
+        // Compute potential help box height if needed
+        List<Type> notFoundTypes = GetNotComplyingInterfaces(interfaceTypes, property.objectReferenceValue);
+        string interfaceNames = string.Join(", ", notFoundTypes.Select(t => t.Name));
+        string alertMessage = notFoundTypes.Count == 0
+            ? null
+            : $"Provided object does not comply with required following interfaces: {interfaceNames}";
+
+        // If there is a message, draw it above the property
+        if (!string.IsNullOrEmpty(alertMessage))
+        {
+            // Calculate height for HelpBox
+            float helpHeight = EditorStyles.helpBox.CalcHeight(new GUIContent(alertMessage), position.width);
+            Rect helpRect = new Rect(position.x, position.y, position.width, helpHeight);
+            EditorGUI.HelpBox(helpRect, alertMessage, MessageType.Error);
+
+            // Move property rect below the help box with a small padding
+            const float padding = 2f;
+            propertyRect = new Rect(position.x, helpRect.yMax + padding, position.width,
+                EditorGUI.GetPropertyHeight(property, label, true));
+        }
+
+        EditorGUI.PropertyField(propertyRect, property, label, true);
+    }
+
+    public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+    {
+        // Base height for the property itself
+        float height = EditorGUI.GetPropertyHeight(property, label, true);
+
+        // Add help box height if there's an error
+        var interfaceCompliantAttribute = (InterfaceCompliantAttribute)attribute;
+        Type[] interfaceTypes = interfaceCompliantAttribute.InterfaceTypes;
+        List<Type> notFoundTypes = GetNotComplyingInterfaces(interfaceTypes, property.objectReferenceValue);
+
+        if (notFoundTypes.Count > 0)
+        {
+            string interfaceNames = string.Join(", ", notFoundTypes.Select(t => t.Name));
+            string alertMessage =
+                $"Provided object does not comply with required following interfaces: {interfaceNames}";
+            float helpHeight = EditorStyles.helpBox.CalcHeight(new GUIContent(alertMessage), EditorGUIUtility.currentViewWidth);
+            const float padding = 2f;
+            height += helpHeight + padding;
+        }
+
+        return height;
     }
 }
 }
