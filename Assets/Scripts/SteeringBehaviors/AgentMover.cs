@@ -18,10 +18,10 @@ public class AgentMover : MonoBehaviour
     [SerializeField] private float stopSpeed;
     [Tooltip("Movement rotation will not surpass this maximum rotational speed " +
              "(degress).")]
-    [SerializeField] private float maximumRotationalSpeed;
+    [SerializeField] protected float maximumRotationalSpeed;
     [Tooltip("Rotation will stop when the difference in degrees between the current " +
              "rotation and current forward vector is less than this value.")]
-    [SerializeField] private float stopRotationThreshold;
+    [SerializeField] protected float stopRotationThreshold;
     [Tooltip("Maximum acceleration for this agent.")]
     [SerializeField] private float maximumAcceleration;
     [Tooltip("Maximum deceleration for this agent.")]
@@ -33,9 +33,9 @@ public class AgentMover : MonoBehaviour
     
     [Header("WIRING:")]
     [Tooltip("Steering behaviour component that will return movement vectors.")]
-    [SerializeField] private SteeringBehavior steeringBehavior;
+    [SerializeField] protected SteeringBehavior steeringBehavior;
     [Tooltip("This prefab's RigidBody to apply movement vectors over it.")]
-    [SerializeField] private Rigidbody2D rigidBody;
+    [SerializeField] protected Rigidbody2D rigidBody;
 
     /// <summary>
     /// This agent current speed
@@ -76,7 +76,7 @@ public class AgentMover : MonoBehaviour
 
     /// <summary>
     /// Rotation will stop when the difference in degrees between the current
-    /// rotation and current forward vector is less than this value.
+    /// rotation and the current forward vector is less than this value.
     /// </summary>
     public float StopRotationThreshold
     {
@@ -122,7 +122,7 @@ public class AgentMover : MonoBehaviour
         {
             if (value == autoSmoothSamples) return;
             autoSmoothSamples = value;  
-            _lastRotations = new MovingWindow(value);
+            lastRotations = new MovingWindow(value);
         } 
     }
 
@@ -152,12 +152,17 @@ public class AgentMover : MonoBehaviour
 
     public LayerMask CollisionLayer => gameObject.layer;
 
-    private SteeringBehaviorArgs _behaviorArgs;
-    private float _maximumRotationSpeedRadNormalized;
-    private float _stopRotationRadThreshold;
-    private MovingWindow _lastRotations;
+    /// <summary>
+    /// Disable this agent's autonomous movement.
+    /// <remarks>Only useful for formations.</remarks>   
+    /// </summary>
+    public bool AutonomousMovementDisabled { get; set; }
 
-    private SteeringBehaviorArgs GetSteeringBehaviorArgs()
+    protected SteeringBehaviorArgs behaviorArgs;
+    private float maximumRotationSpeedRadNormalized;
+    private MovingWindow lastRotations;
+
+    protected virtual SteeringBehaviorArgs GetSteeringBehaviorArgs()
     {
         return new SteeringBehaviorArgs(
             gameObject, 
@@ -171,29 +176,24 @@ public class AgentMover : MonoBehaviour
             0);
     }
 
-    private void Awake()
+    protected virtual void Start()
     {
-        _behaviorArgs = GetSteeringBehaviorArgs();
-        _maximumRotationSpeedRadNormalized = maximumRotationalSpeed * Mathf.Deg2Rad / 
+        if (rigidBody == null) return;
+        
+        behaviorArgs = GetSteeringBehaviorArgs();
+        maximumRotationSpeedRadNormalized = maximumRotationalSpeed * Mathf.Deg2Rad / 
                                              (2 * Mathf.PI);
-        _stopRotationRadThreshold = stopRotationThreshold * Mathf.Deg2Rad;
-        _lastRotations = new MovingWindow(autoSmoothSamples);
+        lastRotations = new MovingWindow(autoSmoothSamples);
     }
 
-    private void FixedUpdate()
+    protected virtual void FixedUpdate()
     {
-        // Update steering behavior args.
-        _behaviorArgs.MaximumSpeed = MaximumSpeed;
-        _behaviorArgs.StopSpeed = StopSpeed;
-        _behaviorArgs.CurrentVelocity = rigidBody.linearVelocity;
-        _behaviorArgs.MaximumRotationalSpeed = MaximumRotationalSpeed;
-        _behaviorArgs.StopRotationThreshold = StopRotationThreshold;
-        _behaviorArgs.MaximumAcceleration = MaximumAcceleration;
-        _behaviorArgs.MaximumDeceleration = MaximumDeceleration;
-        _behaviorArgs.DeltaTime = Time.fixedDeltaTime;
-    
+        if (AutonomousMovementDisabled || behaviorArgs == null) return;
+        
+        UpdateSteeringBehaviorArgs(Time.fixedDeltaTime);
+
         // Get steering output.
-        SteeringOutput steeringOutput = SteeringBehavior.GetSteering(_behaviorArgs);
+        SteeringOutput steeringOutput = SteeringBehavior.GetSteering(behaviorArgs);
         
         // Apply the necessary rotation.
         if (steeringOutput.Angular == 0 && steeringOutput.Linear == Vector2.zero)
@@ -212,8 +212,8 @@ public class AgentMover : MonoBehaviour
                 float rotationNeeded = Vector2.SignedAngle(
                     Forward, 
                     steeringOutput.Linear);
-                _lastRotations.Add(rotationNeeded);
-                float averageRotation = _lastRotations.Average;
+                lastRotations.Add(rotationNeeded);
+                float averageRotation = lastRotations.Average;
                 Vector2 averageHeading = Quaternion.Euler(0, 0, averageRotation) * 
                                          Forward;
                 SetRotation(averageHeading);
@@ -238,6 +238,18 @@ public class AgentMover : MonoBehaviour
         rigidBody.linearVelocity = steeringOutput.Linear;
     }
 
+    protected virtual void UpdateSteeringBehaviorArgs(float deltaTime = 0)
+    {
+        behaviorArgs.MaximumSpeed = MaximumSpeed;
+        behaviorArgs.StopSpeed = StopSpeed;
+        behaviorArgs.CurrentVelocity = rigidBody.linearVelocity;
+        behaviorArgs.MaximumRotationalSpeed = MaximumRotationalSpeed;
+        behaviorArgs.StopRotationThreshold = StopRotationThreshold;
+        behaviorArgs.MaximumAcceleration = MaximumAcceleration;
+        behaviorArgs.MaximumDeceleration = MaximumDeceleration;
+        behaviorArgs.DeltaTime = deltaTime;
+    }
+
     /// <summary>
     /// Rotates the agent towards the given heading vector within the constraints of the
     /// agent's maximum rotational speed and stop rotation threshold.
@@ -253,7 +265,7 @@ public class AgentMover : MonoBehaviour
             Vector3 newHeading = Vector3.Slerp(
                 Forward, 
                 heading, 
-                _maximumRotationSpeedRadNormalized * Time.fixedDeltaTime);
+                maximumRotationSpeedRadNormalized * Time.fixedDeltaTime);
             rigidBody.MoveRotation(
                 rigidBody.rotation + 
                 Vector2.SignedAngle(Forward, newHeading));

@@ -1,24 +1,28 @@
-﻿using SteeringBehaviors;
+﻿using PropertyAttribute;
+using SteeringBehaviors;
 using UnityEngine;
 
 namespace Groups
 {
 /// <summary>
-/// The class is used to define and manage defines the positions of the formation members
+/// The class is used to define and manage the positions of the formation members
 /// in relation with formation origin. 
 /// </summary>
 public class FormationPattern : MonoBehaviour, IGizmos
 {
     [Header("CONFIGURATION:")] 
     [Tooltip("Formation members positions relative to formation origin.")]
+    [HelpBar("Every change here will be kept at the scriptable object asset, " +
+             "so it will be replicated to every asset that makes use of this " +
+             "scriptable object.", MessageTypes.MessageType.Info)]
     [SerializeField] public OffsetList positions;
 
     [Header("DEBUG:")]
     [SerializeField] private bool showGizmos;
     [SerializeField] private Color gizmosColor;
-    [SerializeField] public float originGizmoRadius = 10;
-    [SerializeField] public float positionGizmoRadius = 50;
-    [SerializeField] public Vector2 gizmoTextOffset = new(10, 10);
+    [SerializeField] public float originGizmoRadius = 0.1f;
+    [SerializeField] public float positionGizmoRadius = 0.5f;
+    [SerializeField] public Vector2 gizmoTextOffset = new(0.1f, 0.1f);
 
     public bool ShowGizmos
     {
