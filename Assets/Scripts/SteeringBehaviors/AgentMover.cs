@@ -7,7 +7,7 @@ namespace SteeringBehaviors
 {
 /// <summary>
 /// This component moves its gameobject using the velocity vector calculated
-/// by an steering behavior component.
+/// by a steering behavior component.
 /// </summary>
 public class AgentMover : MonoBehaviour
 {
@@ -156,6 +156,7 @@ public class AgentMover : MonoBehaviour
     /// Disable this agent's autonomous movement.
     /// <remarks>Only useful for formations.</remarks>   
     /// </summary>
+    //  TODO: Remove this. Actually is not used.
     public bool AutonomousMovementDisabled { get; set; }
 
     protected SteeringBehaviorArgs behaviorArgs;
