@@ -20,5 +20,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/TestScenes/TestEmergentFormationYard.unity
     guid: fba25c08867e4ed4fa2e4ad72ae5bd71
+  - enabled: 1
+    path: Assets/Scenes/TestScenes/TestFormationYard.unity
+    guid: e76a45759f103e94cbedf3399a5dba11
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
