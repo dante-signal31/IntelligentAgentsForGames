@@ -37,7 +37,7 @@ public class ScalableFormation : MonoBehaviour, IGizmos, IFormation
     /// <ul><b>DensityAndDimensionsDefined</b>: With a given density, the formation is
     /// distributed across a given rectangular area.</ul> 
     /// </summary>
-    private enum DistributionType
+    public enum DistributionType
     {
         QuantityAndDimensionsDefined,
         DensityAndQuantityDefined,
@@ -47,16 +47,18 @@ public class ScalableFormation : MonoBehaviour, IGizmos, IFormation
     [Header("CONFIGURATION:")]
     [Tooltip("Formation member prefab to instance.")]
     [SerializeField] private GameObject memberPrefab;
-    [Tooltip("How the formation is distributed.")]
-    [SerializeField] private DistributionType distributionType;
     [Tooltip("Formation member radius.")]
     [SerializeField] private float memberRadius;
     [Tooltip("the minimum allowable distance between agents in the formation to ensure " +
              "proper spacing and avoid overlap.")]
     [SerializeField] private Vector2 minimumDistanceBetweenAgents;
-    [HelpBar("This field means different depending on the distribution type. " +
-             "For QuantityDefined and DensityDefined it is the given area to cover " +
-             "with this formation. For DensityAndQuantityDefined it is the formation " +
+    [Tooltip("How the formation is distributed.")]
+    [SerializeField] private DistributionType distributionType;
+    [HelpBar("FormationDimensions field means different depending on the " +
+             "distribution type. For QuantityAndDimensionsDefined and " +
+             "DensityAndDimensionsDefined it is " +
+             "the given area to cover with this formation. " +
+             "For DensityAndQuantityDefined it is the formation " +
              "proportions to keep.", MessageTypes.MessageType.Info)]
     [SerializeField] private Vector2 formationDimensions;
     [Tooltip("Agent density in the formation. Actually, it is the current separation " +
@@ -77,7 +79,7 @@ public class ScalableFormation : MonoBehaviour, IGizmos, IFormation
     /// <summary>
     /// Specifies the distribution configuration type for the scalable formation.
     /// </summary>
-    private DistributionType Distribution
+    public DistributionType Distribution
     {
         get => distributionType;
         set
@@ -111,7 +113,7 @@ public class ScalableFormation : MonoBehaviour, IGizmos, IFormation
     /// <p>For <b>DensityAndQuantityDefined</b> it is the formation proportions to
     /// keep.</p> 
     /// </summary>
-    private Vector2 FormationDimensions
+    public Vector2 FormationDimensions
     {
         get => formationDimensions;
         set
@@ -136,7 +138,7 @@ public class ScalableFormation : MonoBehaviour, IGizmos, IFormation
     /// <p> Only used for <b>DensityAndQuantityDefined</b> and
     /// <b>DensityAndDimensionsDefined</b> distribution types. </p>
     /// </summary>
-    private Vector2 Density
+    public Vector2 Density
     {
         get => density;
         set
@@ -160,7 +162,7 @@ public class ScalableFormation : MonoBehaviour, IGizmos, IFormation
     /// <p> Only used for <b>QuantityAndDimensionsDefined</b> and
     /// <b>DensityAndQuantityDefined</b> distribution types. </p>
     /// </summary>
-    private int Quantity
+    public int Quantity
     {
         get => quantity;
         set
@@ -209,8 +211,6 @@ public class ScalableFormation : MonoBehaviour, IGizmos, IFormation
     {
         AlignWithAgentForward();
         UpdateFormation();
-        if (Application.isEditor) return;
-        GenerateMembers();
     }
     
     /// <summary>
@@ -236,26 +236,37 @@ public class ScalableFormation : MonoBehaviour, IGizmos, IFormation
         newLocalPosition.x = -FormationDimensions.x / 2;
         transform.localPosition = newLocalPosition;
     }
-    
+                            
     /// <summary>
     /// Place hinges at the front corners members.
     /// </summary>
     private void UpdateHingesPosition()
     {
-        if (leftHinge == null || rightHinge == null) return;
+        if (leftHinge == null || 
+            rightHinge == null || 
+            MemberPositions.Count == 0) return;
         
         // Place hinges at the front corners members.
         // The left corner member is always the first one.
-        leftHinge.transform.localPosition = MemberPositions[0];
-        rightHinge.transform.localPosition = GetRightFrontCornerMemberPosition();
+        leftHinge.anchor = new Vector2(
+            MemberPositions[0].x - FormationDimensions.x / 2, 
+            MemberPositions[0].y);
+        Vector2 rightFrontCornerMemberPosition = GetRightFrontCornerMemberPosition();
+        rightHinge.anchor = new Vector2(
+            rightFrontCornerMemberPosition.x - FormationDimensions.x / 2, 
+            rightFrontCornerMemberPosition.y);
     }
     
+    /// <summary>
+    /// Get the local position of the right front corner member.
+    /// </summary>
+    /// <returns>The local position of the right front corner member.</returns>
     private Vector2 GetRightFrontCornerMemberPosition()
     {
-        // The right font corner member is the one with the highest X but lowest Y.
+        // The right font corner member is the one with the highest X and highest Y.
         return MemberPositions
             .OrderByDescending(position => position.x)
-            .ThenBy(position => position.y)
+            .ThenByDescending(position => position.y)
             .First();
     }
     
@@ -272,6 +283,9 @@ public class ScalableFormation : MonoBehaviour, IGizmos, IFormation
             new FormationDimensionsChangedArgs(
                 MemberPositions.ToArray(), 
                 MemberRadius));
+        if (!Application.isPlaying) return;
+        ClearMembers();
+        GenerateMembers();
     }
     
     /// <summary>
@@ -337,8 +351,8 @@ public class ScalableFormation : MonoBehaviour, IGizmos, IFormation
         {
             int column = i % columnsAmount;
             int row = i / columnsAmount;
-            float x = MemberRadius + column * (columnsSeparation);
-            float y = MemberRadius + row * (rowsSeparation);
+            float x = MemberRadius + column * columnsSeparation;
+            float y = -(row * rowsSeparation);
             MemberPositions.Add(new Vector2(x, y));
         }
     }
@@ -387,8 +401,8 @@ public class ScalableFormation : MonoBehaviour, IGizmos, IFormation
         {
             int column = i % columnsAmount;
             int row = i / columnsAmount;
-            float x = MemberRadius + column * (Density.x);
-            float y = MemberRadius + row * (Density.y);
+            float x = MemberRadius + column * Density.x;
+            float y = -(row * Density.y);
             MemberPositions.Add(new Vector2(x, y));
         }
         
@@ -417,10 +431,25 @@ public class ScalableFormation : MonoBehaviour, IGizmos, IFormation
         {
             int column = i % columnsAmount;
             int row = i / columnsAmount;
-            float x = MemberRadius + column * (Density.x);
-            float y = MemberRadius + row * (Density.y);
+            float x = MemberRadius + column * Density.x;
+            float y = -(row * Density.y);
             MemberPositions.Add(new Vector2(x, y));
         }
+    }
+
+
+    /// <summary>
+    /// Removes all existing members from the formation by destroying their associated
+    /// GameObjects and clearing the member list.
+    /// </summary>
+    private void ClearMembers()
+    {
+        if (Members.Count == 0) return;
+        foreach (GameObject member in Members)
+        {
+            Destroy(member);
+        }
+        Members.Clear();
     }
     
     /// <summary>
@@ -445,10 +474,20 @@ public class ScalableFormation : MonoBehaviour, IGizmos, IFormation
     /// within the formation.</param>
     private void GenerateMember(Vector2 positionOffset)
     {
+        Quaternion memberRotation = Quaternion.identity;
+        
+        if (_parentAgent != null)
+        {
+            // Parent agent marks formation forward, so created members must align with
+            // _parentAgent's forward direction.
+            float angle = Vector2.SignedAngle(Vector2.up, _parentAgent.Forward);
+            memberRotation = Quaternion.Euler(0, 0, angle);
+        }
+        
         GameObject member = Instantiate(
             memberPrefab, 
-            positionOffset,
-            Quaternion.identity);
+            transform.TransformPoint(positionOffset),
+            memberRotation);
         member.transform.parent = transform;
         Members.Add(member);
     }
@@ -461,7 +500,7 @@ public class ScalableFormation : MonoBehaviour, IGizmos, IFormation
         // Mark formation origin.
         Gizmos.color = gizmosColor;
         Gizmos.DrawSphere(transform.position, originGizmoRadius);
-        Gizmos.DrawLine(transform.position, transform.position + transform.up * 0.5f);
+        Gizmos.DrawLine(transform.position, transform.position + transform.up * 1.0f);
         
         if (MemberPositions == null) return;
         
@@ -474,14 +513,24 @@ public class ScalableFormation : MonoBehaviour, IGizmos, IFormation
         }
     }
     
-    private void OnValidate()
+    private void _OnValidate()
     {
-        // Auto-assign to properties to run initialization code.
-        Distribution= distributionType;
-        MemberRadius = memberRadius;
-        FormationDimensions = formationDimensions;
-        Density = density;
-        Quantity = quantity;
+        if (this == null) return;
+        
+        UpdateFormation();
+    }
+
+    void OnValidate()
+    {
+        // Workaround to avoid continuous warnings: "SendMessage cannot be called during
+        // Awake, CheckConsistency, or OnValidate"
+        // That warning happened because you are not supposed to use OnValidate to call
+        // methods like Instantiate. I want to use Instantiate here because I want to
+        // simulate a formation resize during playtime, changing fields through the
+        // editor. In those cases you'll need a workaround like the one I found here
+        // (Dahku reply):
+        // https://discussions.unity.com/t/sendmessage-cannot-be-called-during-awake-checkconsistency-or-onvalidate-can-we-suppress/705805/12
+        UnityEditor.EditorApplication.delayCall += _OnValidate;
     }
 #endif
 }

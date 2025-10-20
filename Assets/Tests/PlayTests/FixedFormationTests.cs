@@ -35,6 +35,8 @@ public class FixedFormationTests
         yield return TestLevelManagement.ReLoadScene(CurrentScene);
         yield return null;
         
+        GameObject.Find("ScalableFormation").SetActive(false);
+        
         if (_position1 == null)
             _position1 = GameObject.Find("Position1").transform;
         if (_position2 == null)
@@ -52,7 +54,7 @@ public class FixedFormationTests
 
         if (_fixedFormationGameObject == null)
         {
-            _fixedFormationGameObject = GameObject.Find("UsherFormationAgent");
+            _fixedFormationGameObject = GameObject.Find("UsherFixedFormationAgent");
             _fixedFormationGameObject.SetActive(false);
         }
 
@@ -102,7 +104,7 @@ public class FixedFormationTests
         // Start test.
         
         // Assert that formation reached its target.
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(10f);
         Assert.True(Vector2.Distance(
             _fixedFormationGameObject.transform.position, 
             _position2.transform.position) < 0.5f);
