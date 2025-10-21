@@ -104,7 +104,7 @@ public class FixedFormationTests
         // Start test.
         
         // Assert that formation reached its target.
-        yield return new WaitForSeconds(10f);
+        yield return new WaitForSeconds(5f);
         Assert.True(Vector2.Distance(
             _fixedFormationGameObject.transform.position, 
             _position2.transform.position) < 0.5f);
