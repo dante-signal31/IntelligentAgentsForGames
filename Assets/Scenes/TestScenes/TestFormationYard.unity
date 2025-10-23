@@ -30265,7 +30265,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3707784321135982816, guid: 53b45ceacbde94e4db162b6ee240d0d1, type: 3}
       propertyPath: m_Anchor.x
-      value: -3.9050002
+      value: -4.2
       objectReference: {fileID: 0}
     - target: {fileID: 3707784321135982816, guid: 53b45ceacbde94e4db162b6ee240d0d1, type: 3}
       propertyPath: m_Anchor.y
@@ -30273,7 +30273,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5941505625679095312, guid: 53b45ceacbde94e4db162b6ee240d0d1, type: 3}
       propertyPath: m_Anchor.x
-      value: 3.9050002
+      value: 4.2
       objectReference: {fileID: 0}
     - target: {fileID: 5941505625679095312, guid: 53b45ceacbde94e4db162b6ee240d0d1, type: 3}
       propertyPath: m_Anchor.y
@@ -30825,7 +30825,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1614417106642086684, guid: 5ff2405689351ce429ab4e7d59d613dc, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -4.405
+      value: -4.7
       objectReference: {fileID: 0}
     - target: {fileID: 1614417106642086684, guid: 5ff2405689351ce429ab4e7d59d613dc, type: 3}
       propertyPath: m_LocalPosition.y
@@ -30873,11 +30873,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8959679467519999312, guid: 5ff2405689351ce429ab4e7d59d613dc, type: 3}
       propertyPath: density.x
-      value: 1.885
+      value: 2.1
       objectReference: {fileID: 0}
     - target: {fileID: 8959679467519999312, guid: 5ff2405689351ce429ab4e7d59d613dc, type: 3}
       propertyPath: density.y
-      value: 2.18
+      value: 1.9200001
       objectReference: {fileID: 0}
     - target: {fileID: 8959679467519999312, guid: 5ff2405689351ce429ab4e7d59d613dc, type: 3}
       propertyPath: leftHinge
@@ -30897,11 +30897,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8959679467519999312, guid: 5ff2405689351ce429ab4e7d59d613dc, type: 3}
       propertyPath: formationDimensions.x
-      value: 8.81
+      value: 9.4
       objectReference: {fileID: 0}
     - target: {fileID: 8959679467519999312, guid: 5ff2405689351ce429ab4e7d59d613dc, type: 3}
       propertyPath: formationDimensions.y
-      value: 5.36
+      value: 4.76
+      objectReference: {fileID: 0}
+    - target: {fileID: 8959679467519999312, guid: 5ff2405689351ce429ab4e7d59d613dc, type: 3}
+      propertyPath: minimumDistanceBetweenMembers.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8959679467519999312, guid: 5ff2405689351ce429ab4e7d59d613dc, type: 3}
+      propertyPath: minimumDistanceBetweenMembers.y
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

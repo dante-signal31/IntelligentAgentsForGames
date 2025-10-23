@@ -51,7 +51,7 @@ public class ScalableFormation : MonoBehaviour, IGizmos, IFormation
     [SerializeField] private float memberRadius;
     [Tooltip("the minimum allowable distance between agents in the formation to ensure " +
              "proper spacing and avoid overlap.")]
-    [SerializeField] private Vector2 minimumDistanceBetweenAgents;
+    [SerializeField] private Vector2 minimumDistanceBetweenMembers;
     [Tooltip("How the formation is distributed.")]
     [SerializeField] private DistributionType distributionType;
     [HelpBar("FormationDimensions field means different depending on the " +
@@ -324,16 +324,16 @@ public class ScalableFormation : MonoBehaviour, IGizmos, IFormation
             (columnsAmount - 1);
         float rowsSeparation = (FormationDimensions.y - 2 * MemberRadius) /
             (rowsAmount - 1);
-        if ((columnsSeparation < minimumDistanceBetweenAgents.x) ||
-            (rowsSeparation < minimumDistanceBetweenAgents.y))
+        if ((columnsSeparation < minimumDistanceBetweenMembers.x) ||
+            (rowsSeparation < minimumDistanceBetweenMembers.y))
         {
             // In case of conflict with MinimumDistanceBetweenAgents, we correct the
             // quantity to place the maximum number of agents possible (without
             // going under MinimumDistanceBetweenAgents) in the current formation area.
-            columnsSeparation = columnsSeparation < minimumDistanceBetweenAgents.x ?
-                minimumDistanceBetweenAgents.x : columnsSeparation;
-            rowsSeparation = rowsSeparation < minimumDistanceBetweenAgents.y ?
-                minimumDistanceBetweenAgents.y : rowsSeparation;
+            columnsSeparation = columnsSeparation < minimumDistanceBetweenMembers.x ?
+                minimumDistanceBetweenMembers.x : columnsSeparation;
+            rowsSeparation = rowsSeparation < minimumDistanceBetweenMembers.y ?
+                minimumDistanceBetweenMembers.y : rowsSeparation;
             columnsAmount = Mathf.FloorToInt(FormationDimensions.x / columnsSeparation);
             rowsAmount = Mathf.FloorToInt(FormationDimensions.y / rowsSeparation);
             _correctingQuantity = true;
