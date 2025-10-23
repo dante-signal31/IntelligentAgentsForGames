@@ -546,6 +546,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 873026691}
+  - component: {fileID: 873026692}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -562,12 +563,33 @@ Transform:
   m_GameObject: {fileID: 873026690}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 39.15, y: -29.15, z: 0}
+  m_LocalPosition: {x: 50.6, y: -24.3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &873026692
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 873026690}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99563fd9d47447f0825e768030f707d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ScriptsAssembly::Tools.MeasureTape
+  positionA: {x: 50, y: -24}
+  positionB: {x: 60, y: 10}
+  color: {r: 1, g: 0, b: 0, a: 1}
+  thickness: 0.1
+  endWidth: 0.5
+  endAlignment: 0.01
+  textSize: 0.5
+  textDistance: 0.5
+  textAlignment: 0
 --- !u!1 &1221165484
 GameObject:
   m_ObjectHideFlags: 0
@@ -30265,7 +30287,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3707784321135982816, guid: 53b45ceacbde94e4db162b6ee240d0d1, type: 3}
       propertyPath: m_Anchor.x
-      value: -4.2
+      value: -3.435
       objectReference: {fileID: 0}
     - target: {fileID: 3707784321135982816, guid: 53b45ceacbde94e4db162b6ee240d0d1, type: 3}
       propertyPath: m_Anchor.y
@@ -30273,7 +30295,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5941505625679095312, guid: 53b45ceacbde94e4db162b6ee240d0d1, type: 3}
       propertyPath: m_Anchor.x
-      value: 4.2
+      value: 3.435
       objectReference: {fileID: 0}
     - target: {fileID: 5941505625679095312, guid: 53b45ceacbde94e4db162b6ee240d0d1, type: 3}
       propertyPath: m_Anchor.y
@@ -30825,7 +30847,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1614417106642086684, guid: 5ff2405689351ce429ab4e7d59d613dc, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -4.7
+      value: -3.935
       objectReference: {fileID: 0}
     - target: {fileID: 1614417106642086684, guid: 5ff2405689351ce429ab4e7d59d613dc, type: 3}
       propertyPath: m_LocalPosition.y
@@ -30873,11 +30895,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8959679467519999312, guid: 5ff2405689351ce429ab4e7d59d613dc, type: 3}
       propertyPath: density.x
-      value: 2.1
+      value: 1.74
       objectReference: {fileID: 0}
     - target: {fileID: 8959679467519999312, guid: 5ff2405689351ce429ab4e7d59d613dc, type: 3}
       propertyPath: density.y
-      value: 1.9200001
+      value: 1.915
       objectReference: {fileID: 0}
     - target: {fileID: 8959679467519999312, guid: 5ff2405689351ce429ab4e7d59d613dc, type: 3}
       propertyPath: leftHinge
@@ -30897,11 +30919,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8959679467519999312, guid: 5ff2405689351ce429ab4e7d59d613dc, type: 3}
       propertyPath: formationDimensions.x
-      value: 9.4
+      value: 7.87
       objectReference: {fileID: 0}
     - target: {fileID: 8959679467519999312, guid: 5ff2405689351ce429ab4e7d59d613dc, type: 3}
       propertyPath: formationDimensions.y
-      value: 4.76
+      value: 4.83
       objectReference: {fileID: 0}
     - target: {fileID: 8959679467519999312, guid: 5ff2405689351ce429ab4e7d59d613dc, type: 3}
       propertyPath: minimumDistanceBetweenMembers.x
