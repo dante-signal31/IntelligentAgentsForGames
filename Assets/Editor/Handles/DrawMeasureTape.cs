@@ -1,5 +1,4 @@
-﻿using Groups;
-using Tools;
+﻿using Tools;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -47,7 +46,7 @@ public class DrawMeasureTape : UnityEditor.Editor
             }
         };
 
-        MeasureTape tape = (MeasureTape)serializedObject.targetObject;
+        MeasureTape tape = (MeasureTape) serializedObject.targetObject;
         
         // Just add those properties we want to be shown in its default view.
         var localPositionAField = new PropertyField(_localPositionA);
@@ -129,7 +128,13 @@ public class DrawMeasureTape : UnityEditor.Editor
         
         float distance = Vector3.Distance(tape.PositionA, tape.PositionB);
         Vector3 direction = (tape.PositionB - tape.PositionA).normalized;
-        Vector3 normalVector = new Vector3(-direction.y, direction.x, direction.z);
+        // Normal vector is calculated to draw tape ends. It is perpendicular to the
+        // direction vector, but it must be perpendicular to the camera's forward vector
+        // to maximize the tape's ends visibility. So, to find a vector perpendicular to
+        // both direction and camera axis, we use the cross-product.
+        Vector3 normalVector = Vector3.Cross(
+            direction, 
+            SceneView.currentDrawingSceneView.camera.transform.forward).normalized;
         
         // Draw a label to show the distance between handles.
         Vector3 middlePosition = (tape.PositionA + tape.PositionB) / 2;
@@ -168,6 +173,7 @@ public class DrawMeasureTape : UnityEditor.Editor
         
         if (EditorGUI.EndChangeCheck())
         {
+            // Once handles have been moved. Update tape's endpoints.
             Undo.RecordObject(tape, $"Changed tape ends.");
             tape.PositionA = positionAHandle;
             tape.PositionB = positionBHandle;
