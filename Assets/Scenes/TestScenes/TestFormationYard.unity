@@ -30188,23 +30188,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5833883669815518374, guid: 9b74019895847524d8499e46ef34371e, type: 3}
       propertyPath: textDistance
-      value: 1.45
+      value: 0.94
       objectReference: {fileID: 0}
     - target: {fileID: 5833883669815518374, guid: 9b74019895847524d8499e46ef34371e, type: 3}
       propertyPath: localPositionA.x
-      value: -1.7506447
+      value: -2.0227356
       objectReference: {fileID: 0}
     - target: {fileID: 5833883669815518374, guid: 9b74019895847524d8499e46ef34371e, type: 3}
       propertyPath: localPositionA.y
-      value: 4.973337
+      value: 3.0298214
       objectReference: {fileID: 0}
     - target: {fileID: 5833883669815518374, guid: 9b74019895847524d8499e46ef34371e, type: 3}
       propertyPath: localPositionB.x
-      value: 4.3372955
+      value: 5.231312
       objectReference: {fileID: 0}
     - target: {fileID: 5833883669815518374, guid: 9b74019895847524d8499e46ef34371e, type: 3}
       propertyPath: localPositionB.y
-      value: 4.9812565
+      value: 1.9105015
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
