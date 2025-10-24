@@ -8,8 +8,8 @@ namespace Tools
 /// </summary>
 public class MeasureTape : MonoBehaviour
 {
-    public Vector2 positionA;
-    public Vector2 positionB; 
+    public Vector3 positionA;
+    public Vector3 positionB; 
     
     [Header("CONFIGURATION:")]
     [Tooltip("Color for this tool.")]
