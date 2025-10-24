@@ -30114,13 +30114,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: MeasureTape
       objectReference: {fileID: 0}
+    - target: {fileID: 274761988768069172, guid: 9b74019895847524d8499e46ef34371e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5279904402734886440, guid: 9b74019895847524d8499e46ef34371e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 48.53623
+      value: 49.82
       objectReference: {fileID: 0}
     - target: {fileID: 5279904402734886440, guid: 9b74019895847524d8499e46ef34371e, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -27.49421
+      value: -30.81
       objectReference: {fileID: 0}
     - target: {fileID: 5279904402734886440, guid: 9b74019895847524d8499e46ef34371e, type: 3}
       propertyPath: m_LocalPosition.z
@@ -30155,6 +30159,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5833883669815518374, guid: 9b74019895847524d8499e46ef34371e, type: 3}
+      propertyPath: endWidth
+      value: 0.93
+      objectReference: {fileID: 0}
+    - target: {fileID: 5833883669815518374, guid: 9b74019895847524d8499e46ef34371e, type: 3}
       propertyPath: textSize
       value: 15
       objectReference: {fileID: 0}
@@ -30168,15 +30176,35 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5833883669815518374, guid: 9b74019895847524d8499e46ef34371e, type: 3}
       propertyPath: positionB.x
-      value: 60.054577
+      value: 57.654274
       objectReference: {fileID: 0}
     - target: {fileID: 5833883669815518374, guid: 9b74019895847524d8499e46ef34371e, type: 3}
       propertyPath: positionB.y
-      value: -25.392458
+      value: -26.202105
+      objectReference: {fileID: 0}
+    - target: {fileID: 5833883669815518374, guid: 9b74019895847524d8499e46ef34371e, type: 3}
+      propertyPath: endAlignment
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5833883669815518374, guid: 9b74019895847524d8499e46ef34371e, type: 3}
       propertyPath: textDistance
       value: 1.45
+      objectReference: {fileID: 0}
+    - target: {fileID: 5833883669815518374, guid: 9b74019895847524d8499e46ef34371e, type: 3}
+      propertyPath: localPositionA.x
+      value: -1.7506447
+      objectReference: {fileID: 0}
+    - target: {fileID: 5833883669815518374, guid: 9b74019895847524d8499e46ef34371e, type: 3}
+      propertyPath: localPositionA.y
+      value: 4.973337
+      objectReference: {fileID: 0}
+    - target: {fileID: 5833883669815518374, guid: 9b74019895847524d8499e46ef34371e, type: 3}
+      propertyPath: localPositionB.x
+      value: 4.3372955
+      objectReference: {fileID: 0}
+    - target: {fileID: 5833883669815518374, guid: 9b74019895847524d8499e46ef34371e, type: 3}
+      propertyPath: localPositionB.y
+      value: 4.9812565
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

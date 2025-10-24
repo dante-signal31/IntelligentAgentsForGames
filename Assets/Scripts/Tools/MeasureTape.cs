@@ -8,8 +8,8 @@ namespace Tools
 /// </summary>
 public class MeasureTape : MonoBehaviour
 {
-    public Vector3 positionA;
-    public Vector3 positionB; 
+    public Vector3 localPositionA;
+    public Vector3 localPositionB; 
     
     [Header("CONFIGURATION:")]
     [Tooltip("Color for this tool.")]
@@ -25,6 +25,18 @@ public class MeasureTape : MonoBehaviour
     public int textSize = 12;
     [Tooltip("Distance between the text and the line.")]
     public float textDistance = 0.5f;
+
+    public Vector3 PositionA
+    {
+        get => transform.TransformPoint(localPositionA);
+        set => localPositionA = transform.InverseTransformPoint(value);
+    }
+
+    public Vector3 PositionB
+    {
+        get => transform.TransformPoint(localPositionB);
+        set => localPositionB = transform.InverseTransformPoint(value); 
+    }
 }
 }
 

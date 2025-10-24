@@ -13,26 +13,26 @@ public class DrawMeasureTape : UnityEditor.Editor
     {
         // Draw a line between handles.
         Handles.color = tape.color;
-        Handles.DrawLine(tape.positionA, tape.positionB, tape.thickness);
+        Handles.DrawLine(tape.PositionA, tape.PositionB, tape.thickness);
         
         // Draw lines to highlight handles.
         Handles.DrawWireDisc(
-            tape.positionA,  
+            tape.PositionA,  
             Vector3.forward, 
             0.1f, 
             tape.thickness);
         Handles.DrawWireDisc(
-            tape.positionB, 
+            tape.PositionB, 
             Vector3.forward, 
             0.1f, 
             tape.thickness);
         
-        float distance = Vector3.Distance(tape.positionA, tape.positionB);
-        Vector3 direction = (tape.positionB - tape.positionA).normalized;
+        float distance = Vector3.Distance(tape.PositionA, tape.PositionB);
+        Vector3 direction = (tape.PositionB - tape.PositionA).normalized;
         Vector3 normalVector = new Vector3(-direction.y, direction.x, direction.z);
         
         // Draw a label to show the distance between handles.
-        Vector3 middlePosition = (tape.positionA + tape.positionB) / 2;
+        Vector3 middlePosition = (tape.PositionA + tape.PositionB) / 2;
         GUIStyle style = new GUIStyle();
         style.normal.textColor = tape.color;
         style.fontSize = tape.textSize;
@@ -43,11 +43,11 @@ public class DrawMeasureTape : UnityEditor.Editor
         // TODO: Include endWidth.
         Vector3 semiEnd = normalVector * tape.endWidth / 2;
         Handles.DrawLine(
-            tape.positionA - (semiEnd) + (semiEnd) * tape.endAlignment, 
-            tape.positionA + (semiEnd) + (semiEnd) * tape.endAlignment);
+            tape.PositionA - (semiEnd) + (semiEnd) * tape.endAlignment, 
+            tape.PositionA + (semiEnd) + (semiEnd) * tape.endAlignment);
         Handles.DrawLine(
-            tape.positionB - (semiEnd) + (semiEnd) * tape.endAlignment,
-            tape.positionB + (semiEnd) + (semiEnd) * tape.endAlignment);
+            tape.PositionB - (semiEnd) + (semiEnd) * tape.endAlignment,
+            tape.PositionB + (semiEnd) + (semiEnd) * tape.endAlignment);
     }
     
     private void OnSceneGUI()
@@ -58,17 +58,17 @@ public class DrawMeasureTape : UnityEditor.Editor
         
         // Place handles to locate ends.
         Vector3 positionAHandle = Handles.PositionHandle(
-            tape.positionA, 
+            tape.PositionA, 
             Quaternion.identity);
         Vector3 positionBHandle = Handles.PositionHandle(
-            tape.positionB, 
+            tape.PositionB, 
             Quaternion.identity);
         
         if (EditorGUI.EndChangeCheck())
         {
             Undo.RecordObject(tape, $"Changed tape ends.");
-            tape.positionA = positionAHandle;
-            tape.positionB = positionBHandle;
+            tape.PositionA = positionAHandle;
+            tape.PositionB = positionBHandle;
         }
     }
 }
