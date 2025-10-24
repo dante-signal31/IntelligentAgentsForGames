@@ -40,7 +40,6 @@ public class DrawMeasureTape : UnityEditor.Editor
         Handles.Label(labelPosition, distance.ToString("F2"), style);
         
         // Draw tape ends.
-        // TODO: Include endWidth.
         Vector3 semiEnd = normalVector * tape.endWidth / 2;
         Handles.DrawLine(
             tape.PositionA - (semiEnd) + (semiEnd) * tape.endAlignment, 
