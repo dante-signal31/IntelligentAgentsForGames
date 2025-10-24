@@ -32,6 +32,9 @@ public class DrawMeasureTape : UnityEditor.Editor
         _textDistance = serializedObject.FindProperty("textDistance");
     }
     
+    /// <summary>
+    /// Create a custom inspector to show global positions of handles.
+    /// </summary> 
     public override VisualElement CreateInspectorGUI()
     {
         
@@ -77,6 +80,15 @@ public class DrawMeasureTape : UnityEditor.Editor
         return root;
     }
 
+
+    /// <summary>
+    /// Updates the global position fields in a UI element to display the world
+    /// coordinates of the tape's endpoints.
+    /// </summary>
+    /// <param name="panel">The UI panel where the global position fields will be
+    /// updated.</param>
+    /// <param name="tape">The MeasureTape component providing the global positions to
+    /// display.</param>
     private void UpdateGlobalPositionFields(VisualElement panel, MeasureTape tape)
     {
         panel.Clear();
@@ -137,6 +149,9 @@ public class DrawMeasureTape : UnityEditor.Editor
             tape.PositionB + (semiEnd) + (semiEnd) * tape.endAlignment);
     }
     
+    /// <summary>
+    /// Show handles to locate ends of the tape.
+    /// </summary>
     private void OnSceneGUI()
     {
         var tape = (MeasureTape)target;
