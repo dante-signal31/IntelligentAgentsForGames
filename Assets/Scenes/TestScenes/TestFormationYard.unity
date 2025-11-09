@@ -30594,12 +30594,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4661834717194613577, guid: e1a9f47483950a347925a6aca1ad38df, type: 3}
       propertyPath: realisticTurns
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4661834717194613577, guid: e1a9f47483950a347925a6aca1ad38df, type: 3}
       propertyPath: steeringBehavior
       value: 
       objectReference: {fileID: 214290603}
+    - target: {fileID: 4661834717194613577, guid: e1a9f47483950a347925a6aca1ad38df, type: 3}
+      propertyPath: deviationToleranceBeforeTurn
+      value: 0.01
+      objectReference: {fileID: 0}
     - target: {fileID: 4889064198159347038, guid: e1a9f47483950a347925a6aca1ad38df, type: 3}
       propertyPath: m_Name
       value: UsherWaiterFormationAgent

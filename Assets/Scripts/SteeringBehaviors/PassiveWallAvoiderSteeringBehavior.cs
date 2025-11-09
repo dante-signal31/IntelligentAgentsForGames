@@ -206,17 +206,17 @@ public class PassiveWallAvoiderSteeringBehavior : SteeringBehavior, IGizmos
             //
             // TIP --------------------------
             // I could have done:
-            // Vector2 rightVector = _currentAgent.Forward.Rotated(Mathf.Pi / 2).Normalized();
+            // Vector2 rightVector = Quaternion.Euler(0, 0, 90f) * _agentMover.Forward;
             // 
             // But when you are rotating exactly 90 degrees is more performant just
             // inverting the components.
-            // To rotate clockwise (In Godot):
-            // Vector2 rightVector = new Vector2(-_currentAgent.Forward.y, _currentAgent.Forward.x);
             // To rotate counterclockwise:
+            // Vector2 rightVector = new Vector2(-_currentAgent.Forward.y, _currentAgent.Forward.x);
+            // To rotate clockwise:
             // Vector2 rightVector = new Vector2(_currentAgent.Forward.y, -_currentAgent.Forward.x);
             Vector2 rightVector = new Vector2(
-                -_agentMover.Forward.y, 
-                _agentMover.Forward.x);
+                _agentMover.Forward.y, 
+                -_agentMover.Forward.x);
             
             // Calculate the push vector.
             Vector2 pushVector = rightVector * 
