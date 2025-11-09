@@ -1,6 +1,7 @@
-﻿
-using Sensors;
+﻿using Sensors;
 using UnityEngine;
+using System.Timers;
+using Random = UnityEngine.Random;
 
 namespace SteeringBehaviors
 {
@@ -11,10 +12,15 @@ public class PassiveWallAvoiderSteeringBehavior : SteeringBehavior, IGizmos
     /// </summary>
     private struct ClosestHitData
     {
-        public float Distance;
-        public RaycastHit2D Hit;
-        public int DetectionSensorIndex;
+        public float distance;
+        public RaycastHit2D hit;
+        public int detectionSensorIndex;
     }
+    
+    [Header("CONFIGURATION:")]
+    [Tooltip("The cooldown time, in seconds, used to control the interval between " +
+             "activations of the passive wall-avoidance steering behavior.")]
+    [SerializeField] private float coolDownTime = 0.5f;
     
     [Header("WIRING:")] 
     [Tooltip("Sensor to detect walls and obstacles.")]
@@ -47,14 +53,58 @@ public class PassiveWallAvoiderSteeringBehavior : SteeringBehavior, IGizmos
     private Vector2 _avoidVector;
     private AgentMover _agentMover;
     private SteeringOutput _currentSteering;
+    private Timer _calculationCooldownTimer;
+    private Vector2 _currentAvoidVector;
+    private bool _calculationCooldownActive;
     
     private void Awake()
     {
-        // AgentMover can be in the same gameobject or in one of its parents, so be must
+        // AgentMover can be in the same game object or in one of its parents, so be must
         // search there.
         _agentMover = GetComponentInParent<AgentMover>();
+        
+    }
+
+    private void OnEnable()
+    {
+        EnableCalculationCooldownTimer();
+    }
+
+    private void OnDisable()
+    {
+        DisableCalculationCooldownTimer();
+    }
+
+    private void EnableCalculationCooldownTimer()
+    {
+        _calculationCooldownTimer = new Timer(coolDownTime * 1000);
+        _calculationCooldownTimer.AutoReset = false;
+        _calculationCooldownTimer.Elapsed += OnCalculationCooldownTimerTimeout;
     }
     
+    private void DisableCalculationCooldownTimer()
+    {
+        _calculationCooldownTimer.Elapsed -= OnCalculationCooldownTimerTimeout;
+    }
+
+    private void OnCalculationCooldownTimerTimeout(object sender, ElapsedEventArgs e)
+    {
+        _calculationCooldownActive = false;
+    }
+    
+    private void StartCalculationCooldownTimer()
+    {
+        _calculationCooldownTimer.Stop();
+        _calculationCooldownTimer.Start();
+        _calculationCooldownActive = true;
+    }
+    
+    private void StopCalculationCooldownTimer()
+    {
+        _calculationCooldownTimer.Stop();
+        _calculationCooldownActive = false;
+    }
+
     private void Start()
     {
         whiskersSensor.SubscribeToColliderDetected(OnColliderDetected);
@@ -91,40 +141,45 @@ public class PassiveWallAvoiderSteeringBehavior : SteeringBehavior, IGizmos
 
     private Vector2 GetAvoidVector(SteeringBehaviorArgs args)
     {
+        // A cooldown is needed when avoiding an obstacle perpendicular to the agent
+        // heading. Without a cooldown, lateral push will not have enough time to displace
+        // the agent to avoid the obstacle.
+        if (_calculationCooldownActive) return _currentAvoidVector;
+
         Vector2 avoidVector = Vector2.zero;
         
         if (_obstacleDetected)
         {
             ClosestHitData closestHitData = GetClosestHit(args);
-            _closestHit = closestHitData.Hit;
+            _closestHit = closestHitData.hit;
             
             float overShootFactor = GetOverShootFactor(
-                closestHitData.DetectionSensorIndex, 
-                closestHitData.Distance);
+                closestHitData.detectionSensorIndex, 
+                closestHitData.distance);
 
-            // Buckland and Millington calculate avoidVector this way but I is 
-            // troublesome when center sensor detect a wall perpendicular to current
-            // heading, because then avoidVector will stop the agent not make it
+            // Buckland and Millington calculate avoidVector this way, but It is 
+            // troublesome when the center sensor detects a wall perpendicular to the
+            // current heading, because then avoidVector will stop the agent not make it
             // evade the wall. So, an additional lateral push must be added to the
-            // avoidVector. That lateral push should be at its maximum when detecting
-            // sensor is in the center and minimum when detecting sensor is in the
+            // avoidVector. That lateral push should be at its maximum when the detecting
+            // sensor is in the center and minimum when the detecting sensor is on the
             // right or left side.
             avoidVector = _closestHit.normal * (args.MaximumSpeed * overShootFactor);
             
             // Calculate relative side of detecting sensor.
-            // 0 is right side, 1 is left side, 0.5 is center.
+            // 0 is the right side, 1 is the left side, 0.5 is center.
             float indexSide = Mathf.InverseLerp(
                 0, 
                 whiskersSensor.SensorAmount-1,
-                closestHitData.DetectionSensorIndex);
+                closestHitData.detectionSensorIndex);
             
-            // Positive means the detecting sensor is in the right side of the
-            // agent. Negative means the detecting sensor is in the left side of the
+            // Positive means the detecting sensor is on the right side of the
+            // agent. Negative means the detecting sensor is on the left side of the
             // agent.
             float distanceFromCenterFactor = 0.5f - indexSide;
             
-            // Minimum when near 1 (so, when detection is near left or right side) and
-            // maximum when near 0 (so, when detection is near center).
+            // Minimum when near 1 (so, when detection is near the left or right side) and
+            // maximum when near 0 (so, when detection is near the center).
             float pushFactor = Mathf.InverseLerp(
                 1, 
                 0, 
@@ -133,21 +188,21 @@ public class PassiveWallAvoiderSteeringBehavior : SteeringBehavior, IGizmos
             float pushDirection;
             if (Mathf.Approximately(indexSide, 0.5f))
             {
-                // Random direction when sensor detects in the center
+                // Random direction when the sensor detects in the center
                 pushDirection = Random.value < 0.5f ? 1 : -1;
             } 
             else if (indexSide > 0.5)
             {
-                // Push to the right when sensor detects obstacle in the left side.
+                // Push to the right when the sensor detects an obstacle on the left side.
                 pushDirection = 1;
             } 
             else
             {
-                // Push to the left when sensor detects obstacle in the right side.
+                // Push to the left when the sensor detects an obstacle on the right side.
                 pushDirection = -1;
             }
             
-            // Calculate right vector relative to our current Forward vector.
+            // Calculate the right vector relative to our current Forward vector.
             //
             // TIP --------------------------
             // I could have done:
@@ -171,6 +226,8 @@ public class PassiveWallAvoiderSteeringBehavior : SteeringBehavior, IGizmos
             avoidVector += pushVector;
         }
         
+        _currentAvoidVector = avoidVector;
+        StartCalculationCooldownTimer();
         return avoidVector;
     }
     
@@ -199,18 +256,20 @@ public class PassiveWallAvoiderSteeringBehavior : SteeringBehavior, IGizmos
     /// <returns>Hit data.</returns>
     private ClosestHitData GetClosestHit(SteeringBehaviorArgs args)
     {
-        ClosestHitData closestHit = new();
-        closestHit.Distance = float.MaxValue;
-        closestHit.DetectionSensorIndex = -1;
+        ClosestHitData closestHit = new()
+        {
+            distance = float.MaxValue,
+            detectionSensorIndex = -1
+        };
 
         foreach ((RaycastHit2D hit, int index) in whiskersSensor.DetectedHits)
         {
             float hitDistance = Vector2.Distance(hit.point, args.Position);
-            if (hitDistance < closestHit.Distance)
+            if (hitDistance < closestHit.distance)
             {
-                closestHit.Distance = hitDistance;
-                closestHit.Hit = hit;
-                closestHit.DetectionSensorIndex= index;
+                closestHit.distance = hitDistance;
+                closestHit.hit = hit;
+                closestHit.detectionSensorIndex= index;
             }
         }
 

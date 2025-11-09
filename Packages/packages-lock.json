@@ -357,6 +357,13 @@
       },
       "url": "https://packages.unity.com"
     },
+    "ninja.dlab.unity-measuring-tape": {
+      "version": "https://github.com/dante-signal31/Unity-Measuring-Tape.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "d140f3cde11dcf8f1099e5c201478a2f1a20d6c1"
+    },
     "com.unity.modules.accessibility": {
       "version": "1.0.0",
       "depth": 0,

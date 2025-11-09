@@ -287,5 +287,21 @@ public class UsherFormationAgent: AgentMover, IGizmos
         _engagedHinge.useMotor = false;
         _engagedHinge = null;
     }
+    
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+        if (!showGizmos) return;
+        ITargeter targeter = SteeringBehavior as ITargeter;
+        if (targeter == null) return;
+
+        // Draw a line to target.
+        Gizmos.color = gizmosColor;
+        Gizmos.DrawLine(transform.position, targeter.Target.transform.position);
+        Gizmos.DrawWireSphere(
+            targeter.Target.transform.position, 
+            0.3f);
+    }
+#endif
 }
 }

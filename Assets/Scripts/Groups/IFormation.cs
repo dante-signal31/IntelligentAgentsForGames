@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Groups
 {
@@ -14,7 +13,7 @@ public interface IFormation
     /// <summary>
     /// Event raised when the dimensions of the formation change.
     /// </summary>
-    // I've used a C# event instead of an UnityEvent because UnityEvents cannot be placed
+    // I've used a C# event instead of a UnityEvent because UnityEvents cannot be placed
     // in interfaces, only in classes.
     public event EventHandler<FormationDimensionsChangedArgs> FormationDimensionsChanged;
     
@@ -28,7 +27,7 @@ public interface IFormation
     public List<GameObject> Members { get; }
     
     /// <summary>
-    /// List of formation members positions.
+    /// List of formation members local positions.
     /// <remarks> At game runtime, this field is redundant with Members one, because
     /// you can get the position of a member by calling its GetGlobalPosition() method.
     /// The point is that the Members field is only initialized when the game starts,

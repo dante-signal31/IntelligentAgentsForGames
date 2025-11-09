@@ -24,6 +24,8 @@ public class FormationPattern : MonoBehaviour, IGizmos
     [SerializeField] public float positionGizmoRadius = 0.5f;
     [SerializeField] public Vector2 gizmoTextOffset = new(0.1f, 0.1f);
 
+    public OffsetList Positions => positions;
+    
     public bool ShowGizmos
     {
         get => showGizmos;
@@ -54,10 +56,10 @@ public class FormationPattern : MonoBehaviour, IGizmos
         if (positions == null) return;
         
         // Draw formation pattern positions.
-        for (int i=0; i < positions.Offsets.Length; i++)
+        foreach (var offset in positions.Offsets)
         {
             Gizmos.DrawWireSphere(
-                transform.TransformPoint(positions.Offsets[i]), 
+                transform.TransformPoint(offset), 
                 positionGizmoRadius);
         }
     }
