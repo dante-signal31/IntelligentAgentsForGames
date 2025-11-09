@@ -21,6 +21,11 @@ public class TwoLevelFormation : MonoBehaviour, IFormation
              "SteeringBehavior!")]
     [SerializeField] private GameObject memberPrefab;
     
+    [Header("WIRING:")]
+    [Tooltip("Formation to generate ushers. It must have an IFormation compliant " +
+             "script.")]
+    [SerializeField] private MonoBehaviour usherFormation;
+    
     public List<GameObject> Members { get; } = new();
 
     public List<Vector2> MemberPositions => _usherFormation.MemberPositions;
@@ -31,18 +36,21 @@ public class TwoLevelFormation : MonoBehaviour, IFormation
     private bool _membersGenerated;
     private bool _membersUpdated;
 
-    private void Start()
+    private void Awake()
     {
         // IFormation components are supposed to be a single tree. So we got a reference
         // to the first top-most one.
-        _usherFormation = GetComponentInChildren<IFormation>();
+        _usherFormation = (IFormation) usherFormation;
         if (_usherFormation == null)
-        {
             Debug.LogError("No IFormation component found in children.");
-            return;       
-        }
-        
         GenerateMembers();
+    }
+
+    private void Start()
+    {
+        // This method cannot be called from Awake because it needs to be called after
+        // the usher formation has been generated, and that generation occurs at 
+        // FixedFormation's Awake method.
         AssignUshersToAgents();
     }
 

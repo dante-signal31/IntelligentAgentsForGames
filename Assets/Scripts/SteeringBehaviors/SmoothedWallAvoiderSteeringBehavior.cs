@@ -88,6 +88,7 @@ public class SmoothedWallAvoiderSteeringBehavior: SteeringBehavior, ITargeter
         _currentAgent = GetComponentInParent<AgentMover>();
         _advantageTimer = GetComponent<CustomTimer>();
         _chaseToUsherTargeter = (ITargeter)chaseToUsherSteeringBehavior;
+        CreateUsher();
     }
 
     private void Start()
@@ -95,7 +96,6 @@ public class SmoothedWallAvoiderSteeringBehavior: SteeringBehavior, ITargeter
         SetTimer();
         _currentSteering = new SteeringOutput();
         
-        CreateUsher();
         ConfigureUsher();
         
         // Prepare to follow the usher.
@@ -111,6 +111,7 @@ public class SmoothedWallAvoiderSteeringBehavior: SteeringBehavior, ITargeter
             Quaternion.identity, 
             null).GetComponent<AgentMover>();
         _usherAgentSteeringBehaviorGizmos = (IGizmos) _usherAgent.SteeringBehavior;
+        _usherTargeter = (ITargeter)_usherAgent.SteeringBehavior;
     }
 
     private void OnEnable()
@@ -145,7 +146,6 @@ public class SmoothedWallAvoiderSteeringBehavior: SteeringBehavior, ITargeter
         _usherAgent.MaximumRotationalSpeed = _currentAgent.MaximumRotationalSpeed;
         
         // Give usher a place to go to.
-        _usherTargeter = (ITargeter)_usherAgent.SteeringBehavior;
         _usherTargeter.Target = target;
     }
     

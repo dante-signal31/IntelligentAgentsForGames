@@ -82,7 +82,7 @@ public class FixedFormation : MonoBehaviour, IFormation
         set => memberRadius = value;
     }
 
-    private void Start()
+    private void Awake()
     {
         GenerateMembers();
     }
