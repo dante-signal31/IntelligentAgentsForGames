@@ -101,13 +101,29 @@ PrefabInstance:
       propertyPath: showGizmos
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2185574347722078304, guid: bbc64906f3bb67d47aa32f3f9b3362bc, type: 3}
+      propertyPath: coolDownTime
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2185574347722078304, guid: bbc64906f3bb67d47aa32f3f9b3362bc, type: 3}
+      propertyPath: avoidDistance
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 2185574347722078304, guid: bbc64906f3bb67d47aa32f3f9b3362bc, type: 3}
+      propertyPath: minimumPushFactor
+      value: 0.587
+      objectReference: {fileID: 0}
+    - target: {fileID: 2185574347722078304, guid: bbc64906f3bb67d47aa32f3f9b3362bc, type: 3}
+      propertyPath: longitudinalTolerance
+      value: 0.411
+      objectReference: {fileID: 0}
     - target: {fileID: 3427322213753861587, guid: bbc64906f3bb67d47aa32f3f9b3362bc, type: 3}
       propertyPath: range
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3427322213753861587, guid: bbc64906f3bb67d47aa32f3f9b3362bc, type: 3}
       propertyPath: showGizmos
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3427322213753861587, guid: bbc64906f3bb67d47aa32f3f9b3362bc, type: 3}
       propertyPath: sectorRange
@@ -358,6 +374,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6462915276087436408, guid: bbc64906f3bb67d47aa32f3f9b3362bc, type: 3}
+      propertyPath: avoidanceTimeout
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6462915276087436408, guid: bbc64906f3bb67d47aa32f3f9b3362bc, type: 3}
       propertyPath: steeringBehavior
       value: 
       objectReference: {fileID: 488243047950552444}
@@ -445,16 +465,54 @@ PrefabInstance:
       propertyPath: m_Name
       value: UsherWallAvoiderAgent
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 3329838185609725895, guid: d0ed024f3daa0dc4f830e2f4cd6eebc1, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 5062723459673179850, guid: d0ed024f3daa0dc4f830e2f4cd6eebc1, type: 3}
       insertIndex: 0
       addedObject: {fileID: 7625836020940098941}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5263041439339143736, guid: d0ed024f3daa0dc4f830e2f4cd6eebc1, type: 3}
+      insertIndex: 2
+      addedObject: {fileID: 1006994854689400210}
   m_SourcePrefab: {fileID: 100100000, guid: d0ed024f3daa0dc4f830e2f4cd6eebc1, type: 3}
+--- !u!1 &3510021288060515219 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5263041439339143736, guid: d0ed024f3daa0dc4f830e2f4cd6eebc1, type: 3}
+  m_PrefabInstance: {fileID: 8771901079242641835}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1006994854689400210
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3510021288060515219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4796784b2ba24286b89ad16a1bbea619, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ScriptsAssembly::SteeringBehaviors.UsherWaiterAgent
+  maximumSpeed: 2
+  stopSpeed: 0.1
+  maximumRotationalSpeed: 1080
+  stopRotationThreshold: 1
+  maximumAcceleration: 0
+  maximumDeceleration: 0
+  autoSmooth: 0
+  autoSmoothSamples: 10
+  steeringBehavior: {fileID: 269389913369550841}
+  rigidBody: {fileID: 6013682417659336252}
+  maximumLaggingBehindDistance: 5
+  targeter: {fileID: 269389913369550841}
 --- !u!4 &4611234838970947425 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5062723459673179850, guid: d0ed024f3daa0dc4f830e2f4cd6eebc1, type: 3}
+  m_PrefabInstance: {fileID: 8771901079242641835}
+  m_PrefabAsset: {fileID: 0}
+--- !u!50 &6013682417659336252 stripped
+Rigidbody2D:
+  m_CorrespondingSourceObject: {fileID: 3082970965735851927, guid: d0ed024f3daa0dc4f830e2f4cd6eebc1, type: 3}
   m_PrefabInstance: {fileID: 8771901079242641835}
   m_PrefabAsset: {fileID: 0}

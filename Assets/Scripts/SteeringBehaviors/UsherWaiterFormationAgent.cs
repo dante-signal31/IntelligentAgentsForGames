@@ -13,7 +13,7 @@ namespace SteeringBehaviors
 /// </summary>
 public class UsherWaiterFormationAgent : UsherFormationAgent
 {
-    [Header("USHER WAITER CONFIGURATION:")]
+    [Header("USHER WAITER FORMATION CONFIGURATION:")]
     [Tooltip("Maximum distance in pixels that the members average position can lag " +
              "behind ushers formation.")]
     [SerializeField] private float maximumLaggingBehindDistance = 5.0f;

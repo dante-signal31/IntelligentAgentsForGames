@@ -75,7 +75,7 @@ public class SmoothedWallAvoiderSteeringBehavior: SteeringBehavior, ITargeter
     
     private ITargeter _chaseToUsherTargeter;
     private AgentMover _currentAgent;
-    private AgentMover _usherAgent;
+    private UsherWaiterAgent _usherAgent;
     private IGizmos _usherAgentSteeringBehaviorGizmos;
     private ITargeter _usherTargeter;
     private CustomTimer _advantageTimer;
@@ -109,7 +109,7 @@ public class SmoothedWallAvoiderSteeringBehavior: SteeringBehavior, ITargeter
             usherPrefab, 
             transform.position, 
             Quaternion.identity, 
-            null).GetComponent<AgentMover>();
+            null).GetComponent<UsherWaiterAgent>();
         _usherAgentSteeringBehaviorGizmos = (IGizmos) _usherAgent.SteeringBehavior;
         _usherTargeter = (ITargeter)_usherAgent.SteeringBehavior;
     }
@@ -139,6 +139,7 @@ public class SmoothedWallAvoiderSteeringBehavior: SteeringBehavior, ITargeter
                                usherAdvantage * (Vector3)_currentAgent.Forward;
         
         // Configure usher.
+        _usherAgent.FollowingAgent = _currentAgent;
         _usherAgent.MaximumSpeed = _currentAgent.MaximumSpeed;
         _usherAgent.StopSpeed = _currentAgent.StopSpeed;
         _usherAgent.MaximumAcceleration = _currentAgent.MaximumAcceleration;

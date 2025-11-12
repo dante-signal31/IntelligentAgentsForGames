@@ -20,7 +20,8 @@ public class ActiveWallAvoiderSteeringBehavior : SteeringBehavior, ITargeter, IG
     [InterfaceCompliant(typeof(ITargeter))]
     [SerializeField] private SteeringBehavior steeringBehavior;
     [Tooltip("Steering to avoid obstacles.")]
-    [SerializeField] private PassiveWallAvoiderSteeringBehavior passiveWallAvoiderSteeringBehavior;
+    [SerializeField] 
+    private PassiveWallAvoiderSteeringBehavior passiveWallAvoiderSteeringBehavior;
     
     [Header("DEBUG:")]
     [Tooltip("Show closest hit marker and evasion velocity vector.")]
@@ -82,6 +83,7 @@ public class ActiveWallAvoiderSteeringBehavior : SteeringBehavior, ITargeter, IG
     private void OnTimerTimeout(object sender, ElapsedEventArgs e)
     {
         _waitingForAvoidanceTimeout = false;
+        _previousAvoidVector = Vector2.zero;
     }
     
     private void StartAvoidanceTimer()
@@ -95,11 +97,12 @@ public class ActiveWallAvoiderSteeringBehavior : SteeringBehavior, ITargeter, IG
     {
         if (_waitingForAvoidanceTimeout) return _currentSteering;
 
+        _avoidVector = Vector2.zero;
         SteeringOutput avoidingSteering =
             passiveWallAvoiderSteeringBehavior.GetSteering(args);
-
         _avoidVector = avoidingSteering.Linear;
-        if (_avoidVector == Vector2.zero && _previousAvoidVector != Vector2.zero)
+        
+        if (_avoidVector != Vector2.zero && _previousAvoidVector == Vector2.zero)
             StartAvoidanceTimer();
         _previousAvoidVector = _avoidVector;
         

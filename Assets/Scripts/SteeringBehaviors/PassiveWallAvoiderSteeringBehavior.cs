@@ -1,6 +1,5 @@
 ﻿using Sensors;
 using UnityEngine;
-using System.Timers;
 using Random = UnityEngine.Random;
 
 namespace SteeringBehaviors
@@ -18,9 +17,15 @@ public class PassiveWallAvoiderSteeringBehavior : SteeringBehavior, IGizmos
     }
     
     [Header("CONFIGURATION:")]
-    [Tooltip("The cooldown time, in seconds, used to control the interval between " +
-             "activations of the passive wall-avoidance steering behavior.")]
-    [SerializeField] private float coolDownTime = 0.5f;
+    [Tooltip("Minimum distance to try to keep from obstacles.")]
+    [SerializeField] private float avoidDistance = 0.6f;
+    [Tooltip("Maximum longitudinal deviation between avoid vector and heading " +
+             "before interpreting we are going perpendicular against obstacle")]
+    [Range(0.0f, 1.0f)]
+    [SerializeField] private float longitudinalTolerance = 0.1f;
+    [Tooltip("Minimum push when avoiding an obstacle.")]
+    [Range(0.0f, 1.0f)]
+    [SerializeField] private float minimumPushFactor = 0.5f;
     
     [Header("WIRING:")] 
     [Tooltip("Sensor to detect walls and obstacles.")]
@@ -53,8 +58,6 @@ public class PassiveWallAvoiderSteeringBehavior : SteeringBehavior, IGizmos
     private Vector2 _avoidVector;
     private AgentMover _agentMover;
     private SteeringOutput _currentSteering;
-    private Timer _calculationCooldownTimer;
-    private Vector2 _currentAvoidVector;
     private bool _calculationCooldownActive;
     
     private void Awake()
@@ -64,47 +67,7 @@ public class PassiveWallAvoiderSteeringBehavior : SteeringBehavior, IGizmos
         _agentMover = GetComponentInParent<AgentMover>();
         
     }
-
-    private void OnEnable()
-    {
-        EnableCalculationCooldownTimer();
-    }
-
-    private void OnDisable()
-    {
-        DisableCalculationCooldownTimer();
-    }
-
-    private void EnableCalculationCooldownTimer()
-    {
-        _calculationCooldownTimer = new Timer(coolDownTime * 1000);
-        _calculationCooldownTimer.AutoReset = false;
-        _calculationCooldownTimer.Elapsed += OnCalculationCooldownTimerTimeout;
-    }
     
-    private void DisableCalculationCooldownTimer()
-    {
-        _calculationCooldownTimer.Elapsed -= OnCalculationCooldownTimerTimeout;
-    }
-
-    private void OnCalculationCooldownTimerTimeout(object sender, ElapsedEventArgs e)
-    {
-        _calculationCooldownActive = false;
-    }
-    
-    private void StartCalculationCooldownTimer()
-    {
-        _calculationCooldownTimer.Stop();
-        _calculationCooldownTimer.Start();
-        _calculationCooldownActive = true;
-    }
-    
-    private void StopCalculationCooldownTimer()
-    {
-        _calculationCooldownTimer.Stop();
-        _calculationCooldownActive = false;
-    }
-
     private void Start()
     {
         whiskersSensor.SubscribeToColliderDetected(OnColliderDetected);
@@ -141,11 +104,6 @@ public class PassiveWallAvoiderSteeringBehavior : SteeringBehavior, IGizmos
 
     private Vector2 GetAvoidVector(SteeringBehaviorArgs args)
     {
-        // A cooldown is needed when avoiding an obstacle perpendicular to the agent
-        // heading. Without a cooldown, lateral push will not have enough time to displace
-        // the agent to avoid the obstacle.
-        if (_calculationCooldownActive) return _currentAvoidVector;
-
         Vector2 avoidVector = Vector2.zero;
         
         if (_obstacleDetected)
@@ -158,76 +116,102 @@ public class PassiveWallAvoiderSteeringBehavior : SteeringBehavior, IGizmos
                 closestHitData.distance);
 
             // Buckland and Millington calculate avoidVector this way, but It is 
-            // troublesome when the center sensor detects a wall perpendicular to the
+            // troublesome when the avoid-vector is longitudinal to the
             // current heading, because then avoidVector will stop the agent not make it
             // evade the wall. So, an additional lateral push must be added to the
             // avoidVector. That lateral push should be at its maximum when the detecting
             // sensor is in the center and minimum when the detecting sensor is on the
             // right or left side.
-            avoidVector = _closestHit.normal * (args.MaximumSpeed * overShootFactor);
+            avoidVector = _closestHit.normal * 
+                          (args.MaximumSpeed * overShootFactor + avoidDistance);
             
-            // Calculate relative side of detecting sensor.
-            // 0 is the right side, 1 is the left side, 0.5 is center.
-            float indexSide = Mathf.InverseLerp(
-                0, 
-                whiskersSensor.SensorAmount-1,
-                closestHitData.detectionSensorIndex);
+            Vector2 normalizedInverseAvoidVector = -avoidVector.normalized;
             
-            // Positive means the detecting sensor is on the right side of the
-            // agent. Negative means the detecting sensor is on the left side of the
-            // agent.
-            float distanceFromCenterFactor = 0.5f - indexSide;
+            Vector2 normalizedHeading = args.CurrentVelocity == Vector2.zero? 
+                _agentMover.Forward: 
+                args.CurrentVelocity.normalized;
             
-            // Minimum when near 1 (so, when detection is near the left or right side) and
-            // maximum when near 0 (so, when detection is near the center).
-            float pushFactor = Mathf.InverseLerp(
-                1, 
-                0, 
-                Mathf.Abs(distanceFromCenterFactor));
+            float longitudinalDisplacement = 1 -
+                                             Vector2.Dot(
+                                                 normalizedInverseAvoidVector,
+                                                 normalizedHeading);
 
-            float pushDirection;
-            if (Mathf.Approximately(indexSide, 0.5f))
+            // If avoidVector and CurrentVelocity are too aligned, then we must add
+            // a lateral push to avoid the obstacle.
+            if (longitudinalDisplacement < longitudinalTolerance)
             {
-                // Random direction when the sensor detects in the center
-                pushDirection = Random.value < 0.5f ? 1 : -1;
-            } 
-            else if (indexSide > 0.5)
-            {
-                // Push to the right when the sensor detects an obstacle on the left side.
-                pushDirection = 1;
-            } 
-            else
-            {
-                // Push to the left when the sensor detects an obstacle on the right side.
-                pushDirection = -1;
-            }
-            
-            // Calculate the right vector relative to our current Forward vector.
-            //
-            // TIP --------------------------
-            // I could have done:
-            // Vector2 rightVector = Quaternion.Euler(0, 0, 90f) * _agentMover.Forward;
-            // 
-            // But when you are rotating exactly 90 degrees is more performant just
-            // inverting the components.
-            // To rotate counterclockwise:
-            // Vector2 rightVector = new Vector2(-_currentAgent.Forward.y, _currentAgent.Forward.x);
-            // To rotate clockwise:
-            // Vector2 rightVector = new Vector2(_currentAgent.Forward.y, -_currentAgent.Forward.x);
-            Vector2 rightVector = new Vector2(
-                _agentMover.Forward.y, 
-                -_agentMover.Forward.x);
-            
-            // Calculate the push vector.
-            Vector2 pushVector = rightVector * 
+                // Calculate relative side of detecting sensor.
+                // 0 is the right side, 1 is the left side, 0.5 is center.
+                float indexSide = Mathf.InverseLerp(
+                    0,
+                    whiskersSensor.SensorAmount - 1,
+                    closestHitData.detectionSensorIndex);
+
+                // Positive means the detecting sensor is on the right side of the
+                // agent. Negative means the detecting sensor is on the left side of the
+                // agent.
+                float distanceFromCenterFactor = 0.5f - indexSide;
+
+                // Minimum when near 1 (so, when detection is near the left or right side) and
+                // maximum when near 0 (so, when detection is near the center).
+                float pushFactor = Mathf.Lerp(
+                    1,
+                    minimumPushFactor,
+                    Mathf.Abs(distanceFromCenterFactor));
+
+                Vector2 pushVector;
+                if (Mathf.Approximately(indexSide, 0.5f))
+                {
+                    // The usual way to decide which way to go when the obstacle is detected
+                    // at the center sensor should be this commented code. I've commented it
+                    // because I'm using a tilemap for my scene level and each tilemap has
+                    // a global collider with a single center at the level center. So I cannot
+                    // use the usual way and I have to select a random direction.
+
+                    // Vector3 toColliderCenter = 
+                    //     _closestHit.collider.bounds.center - transform.position;
+                    // Vector3 toCollisionHit = (Vector3) _closestHit.point - transform.position;
+                    // Vector3 cross = Vector3.Cross(toCollisionHit, toColliderCenter);
+                    // // In Unity, the cross-product Z value is positive when you go
+                    // // counterclockwise from lhs to rhs. So, that value will be positive
+                    // // if the collider center is on the left side of the hit point. If the
+                    // // collider center is on the left side of the hit point, then push to
+                    // // the right. 
+                    // pushDirection = cross.z > 0 ? 1 : -1;
+
+                    // Random direction when the sensor detects in the center
+                    float pushDirection = Random.value < 0.5f ? 1 : -1;
+                    
+                    // Calculate the right vector relative to our current Forward vector.
+                    //
+                    // TIP --------------------------
+                    // I could have done:
+                    // Vector2 rightVector = Quaternion.Euler(0, 0, 90f) * _agentMover.Forward;
+                    // 
+                    // But when you are rotating exactly 90 degrees is more performant just
+                    // inverting the components.
+                    // To rotate counterclockwise:
+                    // Vector2 rightVector = new Vector2(-_currentAgent.Forward.y, _currentAgent.Forward.x);
+                    // To rotate clockwise:
+                    // Vector2 rightVector = new Vector2(_currentAgent.Forward.y, -_currentAgent.Forward.x);
+                    Vector2 rightVector = new Vector2(
+                        _agentMover.Forward.y,
+                        -_agentMover.Forward.x);
+
+                    // Calculate the push vector.
+                    pushVector = rightVector *
                                  (pushDirection * pushFactor * args.MaximumSpeed);
-            
-            // Add the push vector to the avoidVector.
-            avoidVector += pushVector;
+                }
+                else {
+                    // If the wall is laterally detected, then push forward to get
+                    // the wall end.
+                    pushVector = _agentMover.Forward * (pushFactor * args.MaximumSpeed);
+                }
+                // Add the push vector to the avoidVector.
+                avoidVector += pushVector;
+            }
         }
         
-        _currentAvoidVector = avoidVector;
-        StartCalculationCooldownTimer();
         return avoidVector;
     }
     
