@@ -77,7 +77,7 @@ public class TwoLevelFormation : MonoBehaviour, IFormation
 
     private void OnEnable()
     {
-        foreach (GameObject member in Members) member.SetActive(false);
+        foreach (GameObject member in Members) member.SetActive(true);
         _usherFormation.FormationDimensionsChanged += OnFormationDimensionsChanged;
     }
 

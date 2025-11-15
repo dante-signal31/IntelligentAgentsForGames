@@ -26,7 +26,9 @@ public class UsherWaiterFormationAgent : UsherFormationAgent
     [InterfaceCompliant(typeof(ITargeter))]
     [SerializeField] private MonoBehaviour targeter;
     
-    private IFormation _formation;
+    // Formation members.
+    public IFormation Formation {get; private set;}
+    
     private ITargeter _targeter;
     private float _originalMaximumSpeed;
     // Our formation origin is not centered at the average position, so we
@@ -38,13 +40,13 @@ public class UsherWaiterFormationAgent : UsherFormationAgent
         get
         {
             Vector2 averagePosition = Vector2.zero;
-            if (_formation == null || _formation.Members.Count == 0) 
+            if (Formation == null || Formation.Members.Count == 0) 
                 return averagePosition;
-            foreach (GameObject member in _formation.Members)
+            foreach (GameObject member in Formation.Members)
             {
                 averagePosition += (Vector2) member.transform.position;
             }
-            return averagePosition / _formation.Members.Count;
+            return averagePosition / Formation.Members.Count;
         }
     }
     
@@ -66,7 +68,7 @@ public class UsherWaiterFormationAgent : UsherFormationAgent
     protected override void Start()
     {
         base.Start();
-        _formation = (IFormation) formation;
+        Formation = (IFormation) formation;
         _targeter = (ITargeter) targeter;
         _originalMaximumSpeed = MaximumSpeed;
         _originalAveragePositionDistance = Vector2.Distance(
