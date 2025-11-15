@@ -106,10 +106,15 @@ public class ActiveWallAvoiderSteeringBehavior : SteeringBehavior, ITargeter, IG
             StartAvoidanceTimer();
         _previousAvoidVector = _avoidVector;
         
-        SteeringOutput steeringToTargetVelocity = steeringBehavior.GetSteering(args);
-        _toTargetVector = steeringToTargetVelocity.Linear;
+        if (_avoidVector != Vector2.zero)
+        {
+            _currentSteering = avoidingSteering;
+        }
+        else
+        {
+            _currentSteering = steeringBehavior.GetSteering(args);
+        }
         
-        _currentSteering = avoidingSteering + steeringToTargetVelocity;
         return _currentSteering;
     }
 

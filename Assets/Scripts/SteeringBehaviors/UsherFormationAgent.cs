@@ -61,9 +61,13 @@ public class UsherFormationAgent: AgentMover, IGizmos
     public bool RealisticTurns
     {
         get => realisticTurns;
-        set => realisticTurns = value;
+        set
+        {
+            realisticTurns = value;
+            if (!realisticTurns && _engagedHinge) DisengageHinge();
+        }
     }
-    
+
     /// <summary>
     /// Maximum deviation over one to target direction before switching to
     /// straight movement.

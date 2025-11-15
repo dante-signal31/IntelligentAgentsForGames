@@ -77,11 +77,13 @@ public class TwoLevelFormation : MonoBehaviour, IFormation
 
     private void OnEnable()
     {
+        foreach (GameObject member in Members) member.SetActive(false);
         _usherFormation.FormationDimensionsChanged += OnFormationDimensionsChanged;
     }
 
     private void OnDisable()
     {
+        foreach (GameObject member in Members) member.SetActive(false);
         _usherFormation.FormationDimensionsChanged -= OnFormationDimensionsChanged;
     }
 

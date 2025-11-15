@@ -302,7 +302,7 @@ namespace Tests.PlayTests
             _target.TargetPosition = _position5.position;
             
             _wallAvoiderGameObject.transform.position = _position6.position;
-            _wallAvoiderAgent.MaximumSpeed = 2.0f;
+            _wallAvoiderAgent.MaximumSpeed = 1.0f;
             _wallAvoiderAgent.StopSpeed = 0.01f;
             _wallAvoiderAgent.MaximumRotationalSpeed = 1080f;
             _wallAvoiderAgent.StopRotationThreshold = 1f;
@@ -315,8 +315,7 @@ namespace Tests.PlayTests
             // Start test.
             
             // Give hide agent time to hide.
-            yield return new WaitForSeconds(1f);
-            yield return new WaitForSeconds(6f);
+            yield return new WaitForSeconds(19f);
             
             // Assert that wall avoider has reached target.
             Assert.True(Vector2.Distance(
@@ -366,7 +365,7 @@ namespace Tests.PlayTests
             _target.TargetPosition = _position5.position;
             
             _smoothedWallAvoiderGameObject.transform.position = _position1.position;
-            _smoothedWallAvoiderAgent.MaximumSpeed = 3.0f;
+            _smoothedWallAvoiderAgent.MaximumSpeed = 1.0f;
             _smoothedWallAvoiderAgent.StopSpeed = 0.01f;
             _smoothedWallAvoiderAgent.MaximumRotationalSpeed = 1080f;
             _smoothedWallAvoiderAgent.StopRotationThreshold = 1f;
@@ -379,7 +378,7 @@ namespace Tests.PlayTests
             // Start test.
             
             // Give agent time to reach its target.
-            yield return new WaitForSeconds(10f);
+            yield return new WaitForSeconds(18f);
             
             // Assert that wall avoider has reached target.
             Assert.True(Vector2.Distance(
@@ -461,7 +460,7 @@ namespace Tests.PlayTests
             Assert.False(hideSteeringBehavior.ThreatCanSeeUs);
             
             // Give agent time to reach its final destination.
-            yield return new WaitForSeconds(2f);
+            yield return new WaitForSeconds(3f);
             
             // Assert that seek agent can no longer see hide agent.
             Assert.True(Vector2.Distance(_weightBlendedHideWallAvoiderAgent.transform.position, 

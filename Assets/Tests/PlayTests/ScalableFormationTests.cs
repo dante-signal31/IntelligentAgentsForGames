@@ -38,7 +38,9 @@ public class ScalableFormationTests
         yield return TestLevelManagement.ReLoadScene(CurrentScene);
         yield return null;
         
-        GameObject.Find("FixedFormation").SetActive(false);
+        GameObject.Find("ScalableFormationGroup").SetActive(true);
+        GameObject.Find("TwoLevelFormationGroup").SetActive(false);
+        GameObject.Find("FixedFormationGroup").SetActive(false);
 
         if (_position1 == null)
             _position1 = GameObject.Find("Position1").transform;
@@ -115,7 +117,7 @@ public class ScalableFormationTests
         // Start test.
 
         // Assert that formation reached its target.
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(7f);
         Assert.True(Vector2.Distance(
             _scalableFormationGameObject.transform.position,
             _position2.transform.position) < 0.5f);
@@ -180,7 +182,7 @@ public class ScalableFormationTests
         _target.transform.position = _position4.transform.position;
 
         // Assert that formation reached its target.
-        yield return new WaitForSeconds(10f);
+        yield return new WaitForSeconds(12f);
         Assert.True(Vector2.Distance(
             _scalableFormationGameObject.transform.position,
             _position4.transform.position) < 0.5f);
@@ -228,7 +230,7 @@ public class ScalableFormationTests
         _target.transform.position = _position1.transform.position;
 
         // Assert that formation reached its target.
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(7f);
         Assert.True(Vector2.Distance(
             _scalableFormationGameObject.transform.position,
             _position1.transform.position) < 0.5f);
@@ -343,7 +345,7 @@ public class ScalableFormationTests
         _target.transform.position = _position4.transform.position;
 
         // Assert that formation reached its target.
-        yield return new WaitForSeconds(10f);
+        yield return new WaitForSeconds(12f);
         Assert.True(Vector2.Distance(
             _scalableFormationGameObject.transform.position,
             _position4.transform.position) < 0.5f);

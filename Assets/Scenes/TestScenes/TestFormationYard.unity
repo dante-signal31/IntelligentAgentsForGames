@@ -309,12 +309,12 @@ GameObject:
   m_Component:
   - component: {fileID: 111798161}
   m_Layer: 0
-  m_Name: FixedFormation
+  m_Name: FixedFormationGroup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &111798161
 Transform:
   m_ObjectHideFlags: 0
@@ -526,7 +526,7 @@ Transform:
   m_GameObject: {fileID: 251353492}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 21.1, y: -10.4, z: 0}
+  m_LocalPosition: {x: 29.81, y: -11.55, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -557,7 +557,7 @@ Transform:
   m_GameObject: {fileID: 548967272}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 30.5, y: -10.6, z: 0}
+  m_LocalPosition: {x: 39.47, y: -15.11, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -801,7 +801,7 @@ GameObject:
   m_Component:
   - component: {fileID: 873026691}
   m_Layer: 0
-  m_Name: TwoLevelFormation
+  m_Name: TwoLevelFormationGroup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30578,7 +30578,7 @@ PrefabInstance:
       objectReference: {fileID: 675599438}
     - target: {fileID: 4661834717194613577, guid: e1a9f47483950a347925a6aca1ad38df, type: 3}
       propertyPath: showGizmos
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4661834717194613577, guid: e1a9f47483950a347925a6aca1ad38df, type: 3}
       propertyPath: maximumSpeed
@@ -30817,14 +30817,6 @@ CompositeCollider2D:
         Y: -180000000
       - X: 50000000
         Y: -180000000
-    - - X: 140000000
-        Y: -190000000
-      - X: 130000000
-        Y: -190000000
-      - X: 130000000
-        Y: -200000000
-      - X: 140000000
-        Y: -200000000
   m_CompositePaths:
     m_Paths:
     - - {x: 8.99997, y: -10}
@@ -30855,10 +30847,6 @@ CompositeCollider2D:
       - {x: 4.999971, y: -17}
       - {x: 4, y: -17.000029}
       - {x: 4.000029, y: -18}
-    - - {x: 13.999971, y: -20}
-      - {x: 13.999971, y: -19}
-      - {x: 13, y: -19.000029}
-      - {x: 13.00003, y: -20}
   m_VertexDistance: 0.0005
   m_OffsetDistance: 0.00005
   m_UseDelaunayMesh: 0
@@ -30992,16 +30980,6 @@ Tilemap:
   m_GameObject: {fileID: 1723647823}
   m_Enabled: 1
   m_Tiles:
-  - first: {x: 13, y: -20, z: 0}
-    second:
-      serializedVersion: 2
-      m_TileIndex: 0
-      m_TileSpriteIndex: 0
-      m_TileMatrixIndex: 0
-      m_TileColorIndex: 0
-      m_TileObjectToInstantiateIndex: 0
-      dummyAlignment: 0
-      m_AllTileFlags: 1073741825
   - first: {x: 4, y: -18, z: 0}
     second:
       serializedVersion: 2
@@ -31214,13 +31192,13 @@ Tilemap:
       m_AllTileFlags: 1073741825
   m_AnimatedTiles: {}
   m_TileAssetArray:
-  - m_RefCount: 22
+  - m_RefCount: 21
     m_Data: {fileID: 11400000, guid: 0e598961b2b54ac4ba5aa30c31892e63, type: 2}
   m_TileSpriteArray:
-  - m_RefCount: 22
+  - m_RefCount: 21
     m_Data: {fileID: 7482667652216324306, guid: 1f001f401d265a7419ae775ee41180cc, type: 3}
   m_TileMatrixArray:
-  - m_RefCount: 22
+  - m_RefCount: 21
     m_Data:
       e00: 1
       e01: 0
@@ -31239,10 +31217,10 @@ Tilemap:
       e32: 0
       e33: 1
   m_TileColorArray:
-  - m_RefCount: 22
+  - m_RefCount: 21
     m_Data: {r: 0.16037738, g: 0.16037738, b: 0.16037738, a: 1}
   m_TileObjectToInstantiateArray:
-  - m_RefCount: 22
+  - m_RefCount: 21
     m_Data: {fileID: 1563740416489591775, guid: 1741a0b8c2029d546bb96dc8687ab6b2, type: 3}
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -31308,7 +31286,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 5208334577103832446, guid: 66758d5d3f1d75e40b75b84df219002a, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5208334577103832446, guid: 66758d5d3f1d75e40b75b84df219002a, type: 3}
       propertyPath: iFormation
@@ -31409,7 +31387,7 @@ Transform:
   m_GameObject: {fileID: 1935453480}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 30.1, y: -28.8, z: 0}
+  m_LocalPosition: {x: 33.14, y: -27.05, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -31440,7 +31418,7 @@ Transform:
   m_GameObject: {fileID: 2006750734}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 21.5, y: -31, z: 0}
+  m_LocalPosition: {x: 21.32, y: -32.44, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -31456,12 +31434,12 @@ GameObject:
   m_Component:
   - component: {fileID: 2047300956}
   m_Layer: 0
-  m_Name: ScalableFormation
+  m_Name: ScalableFormationGroup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2047300956
 Transform:
   m_ObjectHideFlags: 0
