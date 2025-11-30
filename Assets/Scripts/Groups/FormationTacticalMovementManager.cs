@@ -5,6 +5,7 @@ using PropertyAttribute;
 using SteeringBehaviors;
 using Tools;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Groups
 {
@@ -30,7 +31,8 @@ public class FormationTacticalMovementManager : MonoBehaviour, IGizmos
     [SerializeField] private MonoBehaviour iFormationMembers;
     [InterfaceCompliant(typeof(IFormation))]
     [SerializeField] private MonoBehaviour iFormationUshers;
-    [SerializeField] private FormationPattern formationPattern;
+    [FormerlySerializedAs("formationPattern")] 
+    [SerializeField] private GroupPattern groupPattern;
     // Make sure to configure the HidingPointsDetector node with a SeparationFromObstacles
     // value higher than the range of the WhiskerSensors of the agents in the formation.
     // Otherwise, agents sensor will touch covers when approaching hiding points, which
@@ -259,11 +261,11 @@ public class FormationTacticalMovementManager : MonoBehaviour, IGizmos
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
-        if (!showGizmos || formationPattern == null) return;
+        if (!showGizmos || groupPattern == null) return;
         Gizmos.color = gizmosColor;
         
-        // Draw range to find hiding positions for every 
-        foreach (Vector2 usherLocalPosition in formationPattern.Positions.Offsets)
+        // Draw range to find hiding positions for every member.
+        foreach (Vector2 usherLocalPosition in groupPattern.Positions.Offsets)
         {
             Gizmos.DrawWireSphere(
                 transform.TransformPoint(usherLocalPosition),

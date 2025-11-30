@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Groups
 {
@@ -23,16 +24,17 @@ public class FixedFormation : MonoBehaviour, IFormation
     [SerializeField] private GameObject memberPrefab;
     [Tooltip("Radius of the formation members.")]
     [SerializeField] private float memberRadius;
-
+    
     [Header("WIRING:")]
     [Tooltip("Members positions for this formation.")]
-    [SerializeField] private FormationPattern formationPattern;
+    [FormerlySerializedAs("formationPattern")]
+    [SerializeField] private GroupPattern groupPattern;
 
     private List<Vector2> memberPositions;
 
     public List<GameObject> Members { get; } = new();
 
-    public List<Vector2> MemberPositions => new(FormationPattern.positions.Offsets);
+    public List<Vector2> MemberPositions => new(GroupPattern.positions.Offsets);
 
     /// <summary>
     /// Gets or sets the formation pattern that specifies the positional arrangement of
@@ -45,12 +47,12 @@ public class FixedFormation : MonoBehaviour, IFormation
     /// Changes to this property also influence the member positions based on the new
     /// pattern's offsets.
     /// </remarks>
-    public FormationPattern FormationPattern
+    public GroupPattern GroupPattern
     {
-        get => formationPattern;
+        get => groupPattern;
         private set
         {
-            formationPattern = value;
+            groupPattern = value;
             if (value == null) return;
             var args = new FormationDimensionsChangedArgs(
                 value.Positions.Offsets.ToArray(),
@@ -96,11 +98,11 @@ public class FixedFormation : MonoBehaviour, IFormation
     /// </summary>
     private void GenerateMembers()
     {
-        foreach (Vector2 positionOffset in FormationPattern.positions.Offsets)
+        foreach (Vector2 positionOffset in GroupPattern.positions.Offsets)
         {
             GameObject member = Instantiate(
                 memberPrefab, 
-                FormationPattern.transform.TransformPoint(positionOffset),
+                GroupPattern.transform.TransformPoint(positionOffset),
                 Quaternion.identity);
             member.transform.parent = transform;
             Members.Add(member);

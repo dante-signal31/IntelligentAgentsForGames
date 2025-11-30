@@ -5,13 +5,13 @@ using UnityEngine;
 namespace Groups
 {
 /// <summary>
-/// The class is used to define and manage the positions of the formation members
-/// in relation with formation origin. 
+/// The class is used to define and manage the positions of the group members
+/// in relation to the group origin. 
 /// </summary>
-public class FormationPattern : MonoBehaviour, IGizmos
+public class GroupPattern : MonoBehaviour, IGizmos
 {
-    [Header("CONFIGURATION:")] 
-    [Tooltip("Formation members positions relative to formation origin.")]
+    [Header("GROUP PATTERN CONFIGURATION:")] 
+    [Tooltip("Group members positions relative to group origin.")]
     [HelpBar("Every change here will be kept at the scriptable object asset, " +
              "so it will be replicated to every asset that makes use of this " +
              "scriptable object.", MessageTypes.MessageType.Info)]

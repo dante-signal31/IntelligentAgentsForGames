@@ -6,14 +6,14 @@ using UnityEngine;
 
 namespace Editor
 { 
-[CustomEditor(typeof(FormationPattern))]
+[CustomEditor(typeof(GroupPattern))]
 public class DrawFormationPattern : UnityEditor.Editor
 {
     private List<Vector2> positionHandles = new();
     
     private void OnSceneGUI()
     {
-        var pattern = (FormationPattern)target;
+        var pattern = (GroupPattern)target;
         
         if (pattern.positions == null || pattern.positions.Offsets.Length < 1) 
             return;
@@ -37,11 +37,11 @@ public class DrawFormationPattern : UnityEditor.Editor
             Vector2 textPosition = pattern.transform.TransformPoint(
                 pattern.positions.Offsets[i] + 
                 pattern.GizmoTextPosition);
-            var greenStyle = new GUIStyle(EditorStyles.label)
+            var textStyle = new GUIStyle(EditorStyles.label)
             {
                 normal = { textColor = pattern.GizmosColor }
             };
-            Handles.Label(textPosition, $"{i}", greenStyle);
+            Handles.Label(textPosition, $"{i}", textStyle);
         }
         
         if (EditorGUI.EndChangeCheck())
