@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using Pathfinding;
 using SteeringBehaviors;
 using Tests.PlayTests.Common;
 using UnityEngine;
@@ -30,6 +31,8 @@ namespace Tests.PlayTests
         private GameObject _weightBlendedHideWallAvoiderGameObject;
         private GameObject _priorityWeightBlendedHideWallAvoiderGameObject;
         private GameObject _priorityDitheringBlendedHideWallAvoiderGameObject;
+        private GameObject _pathFollowingGameObject;
+        private GameObject _pathGameObject;
         
         private SeekSteeringBehavior _seekSteeringBehavior;
         private HideSteeringBehavior _hideSteeringBehavior;
@@ -145,6 +148,18 @@ namespace Tests.PlayTests
                 _priorityDitheringBlendedHideWallAvoiderGameObject = 
                     GameObject.Find("PriorityDitheringBlendedHideWallAvoiderMovingAgent");
                 _priorityDitheringBlendedHideWallAvoiderGameObject.SetActive(false);
+            }
+            
+            if (_pathFollowingGameObject == null)
+            {
+                _pathFollowingGameObject = GameObject.Find("PathFollowingMovingAgent");
+                _pathFollowingGameObject.SetActive(false);
+            }
+            
+            if (_pathGameObject == null)
+            {
+                _pathGameObject = GameObject.Find("Path");
+                _pathGameObject.SetActive(false);
             }
             
             if (_seekSteeringBehavior == null)

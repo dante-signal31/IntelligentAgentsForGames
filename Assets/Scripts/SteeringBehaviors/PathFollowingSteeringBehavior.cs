@@ -9,7 +9,7 @@ public class PathFollowingSteeringBehavior : SteeringBehavior
     [Header("CONFIGURATION:")]
     [SerializeField] private Path followPath;
     // TODO: I'm repeating this param in the underlying steering behavior. I must refactor this into ITargeter interface.
-    [SerializeField] private float arrivalDistance;
+    [SerializeField] public float arrivalDistance;
 
     [Header("WIRING:")]
     [Tooltip("Steering to actually move the agent.")]
