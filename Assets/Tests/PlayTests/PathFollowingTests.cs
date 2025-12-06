@@ -10,7 +10,7 @@ namespace Tests.PlayTests
 {
     public class PathFollowingTests
     {
-        private const string CurrentScene = "TestObstacleTiledYard";
+        private const string CurrentScene = "TestPathFindingTiledYard";
         
         private Transform _position7;
         private GameObject _pathFollowingGameObject;
@@ -19,14 +19,6 @@ namespace Tests.PlayTests
         private AgentColor _pathFollowingAgentColor;
         private GameObject _pathGameObject;
         private Path _path;
-        
-        private GameObject _seekGameObject;
-        private GameObject _hideGameObject;
-        private GameObject _wallAvoiderGameObject;
-        private GameObject _smoothedWallAvoiderGameObject;
-        private GameObject _weightBlendedHideWallAvoiderGameObject;
-        private GameObject _priorityWeightBlendedHideWallAvoiderGameObject;
-        private GameObject _priorityDitheringBlendedHideWallAvoiderGameObject;
         
         
         [UnitySetUp]
@@ -40,10 +32,7 @@ namespace Tests.PlayTests
             _pathGameObject = null;
             _path = null;
             
-            // Clean up any existing objects first
-            _seekGameObject = null;
-            _hideGameObject = null;
-            _wallAvoiderGameObject = null;
+            // Clean up any existing objects first.
     
             // Load the test scene
             yield return TestLevelManagement.ReLoadScene(CurrentScene);
@@ -76,52 +65,6 @@ namespace Tests.PlayTests
             
             if (_path == null)
                 _path = _pathGameObject.GetComponent<Path>();
-            
-            if (_seekGameObject == null)
-            {
-                _seekGameObject = GameObject.Find("SeekMovingAgent");
-                _seekGameObject.SetActive(false);
-            }
-
-            if (_hideGameObject == null)
-            {
-                _hideGameObject = GameObject.Find("HideMovingAgent");
-                _hideGameObject.SetActive(false);
-            }
-
-            if (_wallAvoiderGameObject == null)
-            {
-                _wallAvoiderGameObject = GameObject.Find("WallAvoiderMovingAgent");
-                _wallAvoiderGameObject.SetActive(false);
-            }
-            
-            if (_smoothedWallAvoiderGameObject == null)
-            {
-                _smoothedWallAvoiderGameObject = 
-                    GameObject.Find("SmoothedWallAvoiderMovingAgent");
-                _smoothedWallAvoiderGameObject.SetActive(false);
-            }
-
-            if (_weightBlendedHideWallAvoiderGameObject == null)
-            {
-                _weightBlendedHideWallAvoiderGameObject = 
-                    GameObject.Find("WeightBlendedHideWallAvoiderMovingAgent");
-                _weightBlendedHideWallAvoiderGameObject.SetActive(false);
-            }
-
-            if (_priorityWeightBlendedHideWallAvoiderGameObject == null)
-            {
-                _priorityWeightBlendedHideWallAvoiderGameObject = 
-                    GameObject.Find("PriorityWeightBlendedHideWallAvoiderMovingAgent");
-                _priorityWeightBlendedHideWallAvoiderGameObject.SetActive(false);
-            }
-
-            if (_priorityDitheringBlendedHideWallAvoiderGameObject == null)
-            {
-                _priorityDitheringBlendedHideWallAvoiderGameObject = 
-                    GameObject.Find("PriorityDitheringBlendedHideWallAvoiderMovingAgent");
-                _priorityDitheringBlendedHideWallAvoiderGameObject.SetActive(false);
-            }
         }
         
         
