@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Tools
 {
-public class CleanAreaChecker
+public class CleanAreaChecker : IDisposable
 {
     /// <summary>
     /// Gets the radius of the clean area checker.
@@ -50,6 +51,14 @@ public class CleanAreaChecker
             Radius,
             DetectionLayers);
         return DetectedCollider == null;
+    }
+    
+    /// <summary>
+    /// Disposes of the CleanAreaChecker resources.
+    /// </summary>
+    public void Dispose()
+    {
+        DetectedCollider = null;
     }
 }
 }

@@ -1,9 +1,12 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using OdinSerializer;
 using Tools;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using UnityEngine;
+
 
 namespace Pathfinding
 {
@@ -12,9 +15,12 @@ namespace Pathfinding
 /// used to generate a graph structure based on a grid, which can be analyzed for
 /// pathfinding operations. It supports dynamic configuration of map dimensions,
 /// resolution, and collision layers.
+/// <remarks>For this component to work properly, it's transform must be placed at
+/// global coordinates origin. Besides, the scene to map must spread from the global
+/// coordinates origin <b>and only towards the positive side of the axis</b>.</remarks>
 /// </summary>
 [ExecuteAlways]
-public class MapGraph : SerializedMonoBehaviour
+public class MapGraph : MonoBehaviour
 {
     [Header("CONFIGURATION:")]
     [Tooltip("Size of the map to analyze in physical units.")]
@@ -23,8 +29,8 @@ public class MapGraph : SerializedMonoBehaviour
     public Vector2Int cellResolution = new(18, 10);
     [Tooltip("Layers to consider as not walkable.")]
     public LayerMask obstaclesLayers;
-
-    [NonSerialized, OdinSerialize] private MapGraphResource _graphResource;
+    
+    [SerializeField, HideInInspector] private MapGraphResource graphResource;
     
     [Header("DEBUG:")]
     [SerializeField] private bool showGizmos = true;
@@ -117,7 +123,8 @@ public class MapGraph : SerializedMonoBehaviour
     /// </summary>
     public void GenerateGraph()
     {
-        _graphResource.nodes.Clear();
+        // if (graphResource == null) graphResource = new();
+        graphResource.nodes.Clear();
         for (int x = 0; x < cellResolution.x; x++)
         {
             for (int y = 0; y < cellResolution.y; y++)
@@ -140,30 +147,44 @@ public class MapGraph : SerializedMonoBehaviour
                     Vector2Int neighborArrayPosition =
                         GetNeighborRelativeArrayPosition(orientation) + 
                         nodeArrayPosition;
-                    if (!_graphResource.nodes.ContainsKey(neighborArrayPosition)) 
+                    if (!graphResource.nodes.ContainsKey(neighborArrayPosition)) 
                         continue;
                     node.AddEdge(
-                        _graphResource.nodes[neighborArrayPosition], 
+                        graphResource.nodes[neighborArrayPosition], 
                         1, 
                         orientation);
                 }
                 // Once the node is created and configures, we add it to the graph.
-                _graphResource.nodes.Add(nodeArrayPosition, node);
+                graphResource.nodes.Add(nodeArrayPosition, node);
             }
         }
+#if UNITY_EDITOR
+        // Mark scene as dirty to serialize changes.
+        EditorUtility.SetDirty(this);
+#endif
     }
 
     private void Awake()
+    {
+        if (graphResource == null) graphResource = new();
+        if (graphResource.nodes == null) graphResource.nodes = new();
+    }
+
+    private void OnEnable()
     {
         _cleanAreaChecker = new CleanAreaChecker(
             // If you make the radius exactly half the cell size, _cleanAreaChecker
             // will touch the adjacent wall. Thas why we subtract 0.1f.
             (Mathf.Min(CellSize.x, CellSize.y)/2)-0.1f, 
             obstaclesLayers);
-        if (_graphResource == null) _graphResource = new();
     }
-    
-    
+
+    private void OnDisable()
+    {
+        _cleanAreaChecker?.Dispose();
+    }
+
+
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
@@ -188,11 +209,13 @@ public class MapGraph : SerializedMonoBehaviour
                 transform.TransformPoint(new Vector2(mapSize.x, y)));
         }
 
-        if (_graphResource.nodes.Count == 0) return;
+        if (graphResource == null) return;
+        if (graphResource.nodes == null) return;
+        if (graphResource.nodes.Count == 0) return;
         
         // Draw nodes and their edges.
         Gizmos.color = nodeColor;
-        foreach (KeyValuePair<Vector2Int, GraphNode> nodeEntry in _graphResource.nodes)
+        foreach (KeyValuePair<Vector2Int, GraphNode> nodeEntry in graphResource.nodes)
         {
             Vector2 cellPosition = NodeGlobalPosition(nodeEntry.Key);
             GraphNode node = nodeEntry.Value;

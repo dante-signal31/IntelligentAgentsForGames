@@ -1,5 +1,6 @@
-﻿using System;
-using OdinSerializer;
+﻿
+using System;
+using Sirenix.Serialization;
 
 namespace Pathfinding
 {
@@ -14,8 +15,8 @@ namespace Pathfinding
 [Serializable]
 public class GraphEdge
 {
-    public float Cost;
-    [OdinSerialize] public GraphNode EndNode;
+    public float cost;
+    public GraphNode endNode;
 }
 }
 

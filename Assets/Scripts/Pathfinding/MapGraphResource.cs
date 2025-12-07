@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using OdinSerializer;
+using Sirenix.Serialization;
+using Tools;
 using UnityEngine;
 
 namespace Pathfinding
@@ -13,6 +14,6 @@ namespace Pathfinding
 [Serializable]
 public class MapGraphResource
 {
-    [OdinSerialize] public Dictionary<Vector2Int, GraphNode> nodes = new();
+    public CustomUnityDictionaries.Vector2IntGraphNodeDictionary nodes;
 }
 }

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using OdinSerializer;
+using Sirenix.Serialization;
+using Tools;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Pathfinding
 {
@@ -18,7 +18,7 @@ namespace Pathfinding
 public class GraphNode
 {
     public Vector2 position;
-    [OdinSerialize] public readonly Dictionary<Orientation, GraphEdge> edges = new();
+    public CustomUnityDictionaries.OrientationGraphEdgeDictionary edges;
 
     /// <summary>
     /// Adds an edge between the current node and a specified destination node with a
@@ -37,9 +37,10 @@ public class GraphNode
         Orientation orientation, 
         bool bidirectional = true)
     {
+        if (edges == null) edges = new ();
         GraphEdge edge = new();
-        edge.EndNode = endNode;
-        edge.Cost = cost;
+        edge.endNode = endNode;
+        edge.cost = cost;
         edges[orientation] = edge;
 
         if (!bidirectional) return;
@@ -52,16 +53,16 @@ public class GraphNode
             // bidirectional argument must be false in this call to avoid infinite
             // recursion.
             case Orientation.North: 
-                edge.EndNode.AddEdge(this, cost, Orientation.South, false); 
+                edge.endNode.AddEdge(this, cost, Orientation.South, false); 
                 break;
             case Orientation.East:
-                edge.EndNode.AddEdge(this, cost, Orientation.West, false); 
+                edge.endNode.AddEdge(this, cost, Orientation.West, false); 
                 break;
             case Orientation.South:
-                edge.EndNode.AddEdge(this, cost, Orientation.North, false);
+                edge.endNode.AddEdge(this, cost, Orientation.North, false);
                 break;
             case Orientation.West:
-                edge.EndNode.AddEdge(this, cost, Orientation.East, false);
+                edge.endNode.AddEdge(this, cost, Orientation.East, false);
                 break;
         }
     }
