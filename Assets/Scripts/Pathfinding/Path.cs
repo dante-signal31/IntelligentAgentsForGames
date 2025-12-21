@@ -95,9 +95,6 @@ public class Path : MonoBehaviour, IGizmos
         // Draw path positions
         for (int i=0; i < positions.Count; i++)
         {
-            // Vector2 gizmoBorder = new Vector2(positionGizmoRadius, positionGizmoRadius);
-            // Vector2 textPosition = Positions.Offsets[i] - gizmoBorder - gizmoTextOffset;
-            // DrawString(ThemeDB.FallbackFont, textPosition, $"{Name}-{i}");
             Gizmos.DrawWireSphere(positions[i], positionGizmoRadius);
             if (i >= 1)
             {

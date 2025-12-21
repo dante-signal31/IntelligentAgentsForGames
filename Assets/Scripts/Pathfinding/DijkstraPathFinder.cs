@@ -167,11 +167,6 @@ public class DijkstraPathFinder : MonoBehaviour, IPathFinder
     
     private PathData _foundPath;
 
-    // private void Awake()
-    // {
-    //     _closedDict = new Dictionary<GraphNode, NodeRecord>();
-    // }
-
     /// <summary>
     /// Finds a path from the current position to the specified target position
     /// within the provided graph using Dijkstra's algorithm.

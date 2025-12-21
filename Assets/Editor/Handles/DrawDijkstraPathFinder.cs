@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace Editor
 {
+/// <summary>
+/// Draw costs to reach every node explored by the Dijkstra algorithm.
+/// </summary>
 [CustomEditor(typeof(DijkstraPathFinder))]
 public class DrawDijkstraPathFinder : UnityEditor.Editor
 {

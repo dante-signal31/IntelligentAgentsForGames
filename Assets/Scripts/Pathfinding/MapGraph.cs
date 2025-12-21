@@ -91,6 +91,17 @@ public class MapGraph : MonoBehaviour
         return groundRoundedArrayPosition;
     }
 
+    /// <summary>
+    /// Retrieves the GraphNode located at the given global world position.
+    /// </summary>
+    /// <param name="globalPosition">
+    /// The global world position represented as a Vector2, specifying where to search
+    /// for the node in the graph.
+    /// </param>
+    /// <returns>
+    /// The GraphNode instance at the specified global position if it exists;
+    /// otherwise, null.
+    /// </returns>
     public GraphNode GetNodeAtPosition(Vector2 globalPosition)
     {
         Vector2Int arrayPosition = GlobalToArrayPosition(globalPosition);

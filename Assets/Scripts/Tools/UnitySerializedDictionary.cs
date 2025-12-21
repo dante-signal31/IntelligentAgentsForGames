@@ -21,6 +21,8 @@ namespace Tools
 public abstract class UnitySerializedDictionary<TKey, TValue> : 
     Dictionary<TKey, TValue>, ISerializationCallbackReceiver
 {
+    // Don't remove [SerializeField] attribute or Unity will not serialize the dictionary.
+    // I've tried it and it didn't work.
     [SerializeField, HideInInspector]
     private List<TKey> keyData = new();
 
