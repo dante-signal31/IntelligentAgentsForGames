@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using SteeringBehaviors;
 using Tests.PlayTests.Common;
+using Tools;
 using UnityEngine;
 using UnityEngine.TestTools;
 

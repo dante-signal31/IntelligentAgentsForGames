@@ -5,12 +5,15 @@ using UnityEngine;
 
 namespace Pathfinding
 {
+/// <summary>
+/// Component to show and manipulate a path in the editor.
+/// </summary>
 public class Path : MonoBehaviour, IGizmos
 {
     [Header("PATH CONFIGURATION:")] 
     [SerializeField] public bool loop;
     [Tooltip("Target global positions of the path")] 
-    [SerializeField] public List<Vector2> positions;
+    [SerializeField] public List<Vector2> positions = new();
     
     [Header("DEBUG:")]
     [SerializeField] private bool showGizmos;
@@ -33,24 +36,24 @@ public class Path : MonoBehaviour, IGizmos
     /// <summary>
     /// How many positions this path has.
     /// </summary>
-    public int PathLength => positions.Count;
+    public int PathLength => _pathData.PathLength;
 
     /// <summary>
     /// Current index of the position we are going to.
     /// </summary>
-    public int CurrentTargetPositionIndex { get; private set; }
+    public int CurrentTargetPositionIndex => _pathData.CurrentTargetPositionIndex;
     
     /// <summary>
     /// Position at the current position index.
     /// </summary>
-    public Vector2 CurrentTargetPosition => positions[CurrentTargetPositionIndex];
+    public Vector2 CurrentTargetPosition => _pathData.CurrentTargetPosition;
     
     /// <summary>
     /// Where to place strings with the number of positions.
     /// </summary>
     public Vector2 GizmoTextPosition => 
         new Vector2(positionGizmoRadius, positionGizmoRadius) + gizmoTextOffset;
-
+    
     /// <summary>
     /// <p>Get the next position target in Path.</p>
     /// </summary>
@@ -59,20 +62,28 @@ public class Path : MonoBehaviour, IGizmos
     /// <p>If we are at the end and Loop is false, then the last target position is
     /// returned; whereas if the loop is true, then the index is reset to 0 and the
     /// first target position is returned.</p></returns>
-    public Vector2 GetNextPositionTarget()
+    public Vector2 GetNextPositionTarget() => _pathData.GetNextPositionTarget();
+    
+    private PathData _pathData = new();
+
+    private void Start()
     {
-        if (CurrentTargetPositionIndex == positions.Count - 1)
-        {
-            if (loop) CurrentTargetPositionIndex = 0;
-        }
-        else
-        {
-            CurrentTargetPositionIndex++;
-        }
-        return positions[CurrentTargetPositionIndex];
+        _pathData.loop = loop;
+        _pathData.positions = positions;
+    }
+
+    public void UpdatePathData(PathData newData)
+    {
+        _pathData = newData;
     }
     
 #if UNITY_EDITOR
+    private void OnValidate()
+    {
+        _pathData.loop = loop;
+        _pathData.positions = positions;
+    }
+
     private void OnDrawGizmos()
     {
         if (!ShowGizmos) return;

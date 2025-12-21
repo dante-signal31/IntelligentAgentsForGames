@@ -44,6 +44,8 @@ public class PathFollowingSteeringBehavior : SteeringBehavior
     
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
+        if (FollowPath == null) return SteeringOutput.Zero;
+        
         if (!_pathStarted)
         {
             _target.transform.position = FollowPath.CurrentTargetPosition;

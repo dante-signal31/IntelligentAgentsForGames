@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Tools;
 #if UNITY_EDITOR
@@ -7,14 +6,18 @@ using UnityEditor;
 #endif
 using UnityEngine;
 
-
 namespace Pathfinding
 {
 /// <summary>
-/// Represents a map-based graph system designed for pathfinding purposes. This class is
-/// used to generate a graph structure based on a grid, which can be analyzed for
+/// <p>Represents a map-based graph system designed for pathfinding purposes. This class
+/// is used to generate a graph structure based on a grid, which can be analyzed for
 /// pathfinding operations. It supports dynamic configuration of map dimensions,
-/// resolution, and collision layers.
+/// resolution, and collision layers.</p>
+/// <p>Ideally, a graph does not need to have any spatial structure, but if you are
+/// going to use the graph for pathfinding purposes, it is recommended to use a spatial
+/// structure to improve performance. Otherwise, you will be forced to iterate over all
+/// nodes in the graph every time you want to find the nearest node to a given position.
+/// </p>
 /// <remarks>For this component to work properly, it's transform must be placed at
 /// global coordinates origin. Besides, the scene to map must spread from the global
 /// coordinates origin <b>and only towards the positive side of the axis</b>.</remarks>
@@ -30,7 +33,10 @@ public class MapGraph : MonoBehaviour
     [Tooltip("Layers to consider as not walkable.")]
     public LayerMask obstaclesLayers;
     
-    [SerializeField, HideInInspector] private MapGraphResource graphResource;
+    /// <summary>
+    /// MapGraph serialized backend.
+    /// </summary>
+    [SerializeField, HideInInspector] private MapGraphResource graphResource = new();
     
     [Header("DEBUG:")]
     [SerializeField] private bool showGizmos = true;
@@ -69,16 +75,33 @@ public class MapGraph : MonoBehaviour
     /// Converts a global world position of a node into its corresponding array position
     /// within the grid.
     /// </summary>
-    /// <param name="nodeGlobalPosition">
-    /// The global position of the node in world space, represented as a Vector2.
-    /// This is the physical location of the node.
-    /// </param>
+    /// <param name="globalPosition"> The global position of the node in world space,
+    /// represented as a Vector2. This is the physical location of the node.</param>
     /// <returns>
     /// A Vector2Int representing the position of the node within the grid array.
     /// This corresponds to the node's indices in the grid.
     /// </returns>
-    private Vector2Int NodeArrayPosition(Vector2 nodeGlobalPosition) =>
-        Vector2Int.RoundToInt((nodeGlobalPosition - CellSize / 2) / CellSize);
+    private Vector2Int GlobalToArrayPosition(Vector2 globalPosition)
+    {
+        Vector2 arrayPosition = globalPosition / CellSize;
+        Vector2Int groundRoundedArrayPosition = new Vector2Int(
+            Mathf.FloorToInt(arrayPosition.x),
+            Mathf.FloorToInt(arrayPosition.y)
+        );
+        return groundRoundedArrayPosition;
+    }
+
+    public GraphNode GetNodeAtPosition(Vector2 globalPosition)
+    {
+        Vector2Int arrayPosition = GlobalToArrayPosition(globalPosition);
+        if (!graphResource.nodes.ContainsKey(arrayPosition)) return null;
+        return graphResource.nodes[arrayPosition];
+    }
+
+    /// <summary>
+    /// Just a shortcut to the graph nodes dictionary inside GraphResource.
+    /// </summary>
+    public Dictionary<Vector2Int, GraphNode> Nodes => graphResource.nodes;
     
     private CleanAreaChecker _cleanAreaChecker;
 
@@ -123,7 +146,6 @@ public class MapGraph : MonoBehaviour
     /// </summary>
     public void GenerateGraph()
     {
-        // if (graphResource == null) graphResource = new();
         graphResource.nodes.Clear();
         for (int x = 0; x < cellResolution.x; x++)
         {
@@ -131,43 +153,62 @@ public class MapGraph : MonoBehaviour
             {
                 Vector2Int nodeArrayPosition = new(x, y);
                 Vector2 nodeGlobalPosition = NodeGlobalPosition(nodeArrayPosition);
+                
                 // If there is any obstacle at that position, we don't create any node.
                 if (!_cleanAreaChecker.IsCleanArea(nodeGlobalPosition))
                     continue;
                 
                 // If the position is clean, create a node.
-                GraphNode node = new()
-                {
-                    position = nodeGlobalPosition
-                };
+                GraphNode node = new(nodeGlobalPosition);
+                
+                // Populate new node's connections.
                 foreach (Orientation orientation in Enum.GetValues(typeof(Orientation)))
                 {
                     // If the newly created node is adjacent to an existing node, we
-                    // create an edge between them.
+                    // create a connection between them.
                     Vector2Int neighborArrayPosition =
                         GetNeighborRelativeArrayPosition(orientation) + 
                         nodeArrayPosition;
                     if (!graphResource.nodes.ContainsKey(neighborArrayPosition)) 
                         continue;
-                    node.AddEdge(
-                        graphResource.nodes[neighborArrayPosition], 
-                        1, 
+                    node.AddConnection(
+                        nodeArrayPosition,
+                        neighborArrayPosition,
+                        1,
                         orientation);
+                    // Conversely, as our connections are bidirectional, we must set up
+                    // also the reciprocal connection from the neighbor to this node. 
+                    GraphNode neighborNode = graphResource.nodes[neighborArrayPosition];
+                    Orientation reciprocalOrientation = Orientation.North;
+                    switch (orientation)
+                    {
+                        case Orientation.North: 
+                            reciprocalOrientation = Orientation.South; 
+                            break;
+                        case Orientation.East:
+                            reciprocalOrientation = Orientation.West; 
+                            break;
+                        case Orientation.South:
+                            reciprocalOrientation = Orientation.North;
+                            break;
+                        case Orientation.West:
+                            reciprocalOrientation = Orientation.East;
+                            break;
+                    }
+                    neighborNode.AddConnection(
+                        neighborArrayPosition, 
+                        nodeArrayPosition, 
+                        1, 
+                        reciprocalOrientation);
                 }
-                // Once the node is created and configures, we add it to the graph.
+                // Once the node is created and configured, we add it to the graph.
                 graphResource.nodes.Add(nodeArrayPosition, node);
             }
         }
 #if UNITY_EDITOR
-        // Mark scene as dirty to serialize changes.
+        // Mark the scene as dirty to serialize changes.
         EditorUtility.SetDirty(this);
 #endif
-    }
-
-    private void Awake()
-    {
-        if (graphResource == null) graphResource = new();
-        if (graphResource.nodes == null) graphResource.nodes = new();
     }
 
     private void OnEnable()
@@ -213,7 +254,7 @@ public class MapGraph : MonoBehaviour
         if (graphResource.nodes == null) return;
         if (graphResource.nodes.Count == 0) return;
         
-        // Draw nodes and their edges.
+        // Draw nodes and their connections.
         Gizmos.color = nodeColor;
         foreach (KeyValuePair<Vector2Int, GraphNode> nodeEntry in graphResource.nodes)
         {
@@ -222,7 +263,7 @@ public class MapGraph : MonoBehaviour
             Gizmos.DrawWireSphere(cellPosition, nodeRadius);
             foreach (Orientation orientation in Enum.GetValues(typeof(Orientation)))
             {
-                if (node.edges.ContainsKey(orientation))
+                if (node.connections.ContainsKey(orientation))
                 {
                     Vector2 otherNodeRelativePosition = 
                         GetNeighborRelativeArrayPosition(orientation);

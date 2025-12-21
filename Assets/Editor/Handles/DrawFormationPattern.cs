@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Groups;
-using SteeringBehaviors;
 using UnityEditor;
 using UnityEngine;
 
@@ -9,7 +8,7 @@ namespace Editor
 [CustomEditor(typeof(GroupPattern))]
 public class DrawFormationPattern : UnityEditor.Editor
 {
-    private List<Vector2> positionHandles = new();
+    private readonly List<Vector2> positionHandles = new();
     
     private void OnSceneGUI()
     {

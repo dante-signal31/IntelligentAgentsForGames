@@ -2,8 +2,7 @@
     "name": "ScriptsAssembly",
     "rootNamespace": "",
     "references": [
-        "GUID:75469ad4d38634e559750d17036d5f7c",
-        "GUID:cdd696eb5de78f4ffdfa396e06298117"
+        "GUID:75469ad4d38634e559750d17036d5f7c"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

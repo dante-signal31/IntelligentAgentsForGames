@@ -13,7 +13,7 @@ public static class CustomUnityDictionaries
 {
     [Serializable]
     public class OrientationGraphEdgeDictionary : 
-        UnitySerializedDictionary<Orientation, GraphEdge>
+        UnitySerializedDictionary<Orientation, GraphConnection>
     { }
 
     [Serializable]

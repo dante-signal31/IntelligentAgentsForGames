@@ -5,9 +5,8 @@ namespace Tools
 {
 /// <summary>
 /// <p>Unity does not support Dictionary serialization out of the box, but by
-/// exploiting Unity's serialization protocol it can be done (See On Unitys Serialization Procotol:
-/// https://odininspector.com/tutorials/serialize-anything/on-unitys-serialization-procotol#odin-serializer).
-/// By making a new class that inherits both Dictionary
+/// exploiting Unity's serialization protocol, it can be done.</p>
+/// <p>By making a new class that inherits both Dictionary
 /// and Unity's ISerializationCallbackReceiver interface, we can convert the
 /// Dictionary data to a format that Unity can serialize.</p>
 /// <p>This class is abstract because Unity does not serialize generic types, it is
@@ -23,29 +22,29 @@ public abstract class UnitySerializedDictionary<TKey, TValue> :
     Dictionary<TKey, TValue>, ISerializationCallbackReceiver
 {
     [SerializeField, HideInInspector]
-    private List<TKey> keyData = new List<TKey>();
+    private List<TKey> keyData = new();
 
     [SerializeField, HideInInspector]
-    private List<TValue> valueData = new List<TValue>();
+    private List<TValue> valueData = new();
 
     void ISerializationCallbackReceiver.OnAfterDeserialize()
     {
-        this.Clear();
-        for (int i = 0; i < this.keyData.Count && i < this.valueData.Count; i++)
+        Clear();
+        for (int i = 0; i < keyData.Count && i < valueData.Count; i++)
         {
-            this[this.keyData[i]] = this.valueData[i];
+            this[keyData[i]] = valueData[i];
         }
     }
 
     void ISerializationCallbackReceiver.OnBeforeSerialize()
     {
-        this.keyData.Clear();
-        this.valueData.Clear();
+        keyData.Clear();
+        valueData.Clear();
 
         foreach (var item in this)
         {
-            this.keyData.Add(item.Key);
-            this.valueData.Add(item.Value);
+            keyData.Add(item.Key);
+            valueData.Add(item.Value);
         }
     }
 }
