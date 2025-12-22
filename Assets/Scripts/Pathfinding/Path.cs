@@ -75,6 +75,8 @@ public class Path : MonoBehaviour, IGizmos
     public void UpdatePathData(PathData newData)
     {
         _pathData = newData;
+        positions.Clear();
+        positions.AddRange(_pathData.positions);
     }
     
 #if UNITY_EDITOR
