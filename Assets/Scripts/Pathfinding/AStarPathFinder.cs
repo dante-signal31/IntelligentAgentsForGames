@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using PropertyAttribute;
 using UnityEngine;
 
@@ -9,10 +8,10 @@ public class AStarPathFinder: PathFinder<AStarNodeRecord>, IPathFinder
 {
     private static readonly AStarNodeRecord NodeRecordNull = new AStarNodeRecord
     {
-        Node = null,
-        Connection = null,
-        CostSoFar = 0,
-        TotalEstimatedCostToTarget = float.MaxValue
+        node = null,
+        connection = null,
+        costSoFar = 0,
+        totalEstimatedCostToTarget = float.MaxValue
     };
     
     protected class AStarPrioritizedNodeSet: PrioritizedNodeSet
@@ -22,11 +21,11 @@ public class AStarPathFinder: PathFinder<AStarNodeRecord>, IPathFinder
         {
             public int Compare(AStarNodeRecord x, AStarNodeRecord y)
             {
-                int result = x.TotalEstimatedCostToTarget.CompareTo(
-                    y.TotalEstimatedCostToTarget);
+                int result = x.totalEstimatedCostToTarget.CompareTo(
+                    y.totalEstimatedCostToTarget);
                 // If costs are equal, we must not return 0, otherwise SortedSet 
                 // thinks they are the same element and won't add the new one.
-                if (result == 0 && x.Node != y.Node)
+                if (result == 0 && x.node != y.node)
                     return x.GetHashCode().CompareTo(y.GetHashCode());
                 return result;
             }
@@ -64,10 +63,10 @@ public class AStarPathFinder: PathFinder<AStarNodeRecord>, IPathFinder
         // You get to the start node from nowhere (null) and at no cost (0).
         AStarNodeRecord startNodeRecord = new()
         {
-            Node = CurrentStartNode,
-            Connection = null,
-            CostSoFar = 0,
-            TotalEstimatedCostToTarget = _heuristic.EstimateCostToTarget(
+            node = CurrentStartNode,
+            connection = null,
+            costSoFar = 0,
+            totalEstimatedCostToTarget = _heuristic.EstimateCostToTarget(
                 CurrentStartNode.position,
                 targetPosition)
         };
@@ -83,20 +82,20 @@ public class AStarPathFinder: PathFinder<AStarNodeRecord>, IPathFinder
             if (current == null) break;
 
             // If we reached the end node, then our exploration is complete.
-            if (current.Node == targetNode)
+            if (current.node == targetNode)
             {
-                closedDict[current.Node] = current;
+                closedDict[current.node] = current;
                 break;
             }
 
             // Get all the connections of the current node and take note of the nodes
             // those connections lead to into the openSet to explore those nodes later.
-            foreach (GraphConnection graphConnection in current.Node.connections.Values)
+            foreach (GraphConnection graphConnection in current.node.connections.Values)
             {
                 // Where does that connection lead us?
                 GraphNode endNode = Graph.Nodes[graphConnection.endNodeKey];
                 // Calculate the cost to reach the end node from the current node.
-                float endNodeCost = current.CostSoFar + graphConnection.cost;
+                float endNodeCost = current.costSoFar + graphConnection.cost;
 
                 AStarNodeRecord endNodeRecord;
                 // In Dijkstra If that connection leaded to a node fully explored, we
@@ -109,7 +108,7 @@ public class AStarPathFinder: PathFinder<AStarNodeRecord>, IPathFinder
                     endNodeRecord = closedDict[endNode];
 
                     // No better path to this node, so skip it.
-                    if (endNodeRecord.CostSoFar <= endNodeCost) continue;
+                    if (endNodeRecord.costSoFar <= endNodeCost) continue;
 
                     // Otherwise, we must asses this node again to check if it's more 
                     // promising than the previous time. So, we must remove it from 
@@ -120,10 +119,10 @@ public class AStarPathFinder: PathFinder<AStarNodeRecord>, IPathFinder
                     // value as the last time. What has changed is the CostSoFar part,
                     // so we remove the old CostSoFar from the total to add the new value.
                     float estimatedCostToTarget =
-                        endNodeRecord.TotalEstimatedCostToTarget -
-                        endNodeRecord.CostSoFar;
-                    endNodeRecord.CostSoFar = endNodeCost;
-                    endNodeRecord.TotalEstimatedCostToTarget =
+                        endNodeRecord.totalEstimatedCostToTarget -
+                        endNodeRecord.costSoFar;
+                    endNodeRecord.costSoFar = endNodeCost;
+                    endNodeRecord.totalEstimatedCostToTarget =
                         estimatedCostToTarget + endNodeCost;
 
                     // Add the node to the openSet to assess it fully again.
@@ -137,7 +136,7 @@ public class AStarPathFinder: PathFinder<AStarNodeRecord>, IPathFinder
                     // If the end node is already in the open set, but with a lower cost,
                     // it means that we are NOT found a better path to get to it. So skip
                     // it.
-                    if (endNodeRecord.CostSoFar <= endNodeCost) continue;
+                    if (endNodeRecord.costSoFar <= endNodeCost) continue;
                     // Otherwise, update the record with the lower cost and the connection
                     // to get there with that lower cost.
                     //
@@ -145,12 +144,12 @@ public class AStarPathFinder: PathFinder<AStarNodeRecord>, IPathFinder
                     // value as the last time. What has changed is the CostSoFar part,
                     // so we remove the old CostSoFar from the total to add the new value.
                     float estimatedCostToTarget =
-                        endNodeRecord.TotalEstimatedCostToTarget -
-                        endNodeRecord.CostSoFar;
-                    endNodeRecord.TotalEstimatedCostToTarget = estimatedCostToTarget +
+                        endNodeRecord.totalEstimatedCostToTarget -
+                        endNodeRecord.costSoFar;
+                    endNodeRecord.totalEstimatedCostToTarget = estimatedCostToTarget +
                         endNodeCost;
-                    endNodeRecord.CostSoFar = endNodeCost;
-                    endNodeRecord.Connection = graphConnection;
+                    endNodeRecord.costSoFar = endNodeCost;
+                    endNodeRecord.connection = graphConnection;
                 }
                 else
                 {
@@ -159,10 +158,10 @@ public class AStarPathFinder: PathFinder<AStarNodeRecord>, IPathFinder
                     // further later.
                     endNodeRecord = new AStarNodeRecord
                     {
-                        Node = endNode,
-                        Connection = graphConnection,
-                        CostSoFar = endNodeCost,
-                        TotalEstimatedCostToTarget =
+                        node = endNode,
+                        connection = graphConnection,
+                        costSoFar = endNodeCost,
+                        totalEstimatedCostToTarget =
                             _heuristic.EstimateCostToTarget(
                                 endNode.position, 
                                 targetPosition)
@@ -172,17 +171,17 @@ public class AStarPathFinder: PathFinder<AStarNodeRecord>, IPathFinder
             }
             // As we've finished looking at the connections of the current node, mark it
             // as fully explored, including it in the closed list.
-            closedDict[current.Node] = current;
+            closedDict[current.node] = current;
         }
     
         // If we get here and the current record does not point to the targetNode, then
         // we've fully explored the graph without finding a valid path to get the target.
-        if (current == null || current.Node != targetNode) return null;
+        if (current == null || current.node != targetNode) return null;
     
         // As we've got the target node, analyze the closedDict to follow back connections
         // from the target node to start node to build the path.
-        PathData foundPath = BuildPath(CurrentStartNode, targetNode);
-        return foundPath;
+        PathData calculatedPath = BuildPath(CurrentStartNode, targetNode);
+        return calculatedPath;
     }
 }
 }

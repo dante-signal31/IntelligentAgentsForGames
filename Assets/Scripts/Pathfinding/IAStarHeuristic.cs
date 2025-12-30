@@ -2,10 +2,14 @@
 
 namespace Pathfinding
 {
+/// <summary>
+/// Interface that must comply with every class to be used to estimate costs to reach
+/// targets in the A* algorithm.
+/// </summary>
 public interface IAStarHeuristic
 {
     /// <summary>
-    /// Heuristic to get an estimated cost to get to the target from a given position.
+    /// Get estimate cost to reach targets in the A* algorithm.
     /// </summary>
     /// <param name="startPosition">Start position.</param>
     /// <param name="targetPosition">Current position to get to.</param>

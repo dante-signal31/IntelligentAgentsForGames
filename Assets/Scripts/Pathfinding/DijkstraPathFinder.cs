@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Pathfinding
@@ -8,9 +7,9 @@ public class DijkstraPathFinder : PathFinder<NodeRecord>, IPathFinder
 {
     private static readonly NodeRecord NodeRecordNull = new NodeRecord
     {
-        Node = null,
-        Connection = null,
-        CostSoFar = 0
+        node = null,
+        connection = null,
+        costSoFar = 0
     };
     
     protected class DijkstraPrioritizedNodeSet: PrioritizedNodeSet
@@ -20,10 +19,10 @@ public class DijkstraPathFinder : PathFinder<NodeRecord>, IPathFinder
         {
             public int Compare(NodeRecord x, NodeRecord y)
             {
-                int result = x.CostSoFar.CompareTo(y.CostSoFar);
+                int result = x.costSoFar.CompareTo(y.costSoFar);
                 // If costs are equal, we must not return 0, otherwise SortedSet 
                 // thinks they are the same element and won't add the new one.
-                if (result == 0 && x.Node != y.Node)
+                if (result == 0 && x.node != y.node)
                     return x.GetHashCode().CompareTo(y.GetHashCode());
                 return result;
             }
@@ -60,9 +59,9 @@ public class DijkstraPathFinder : PathFinder<NodeRecord>, IPathFinder
         // You get to the start node from nowhere (null) and at no cost (0).
         NodeRecord startNodeRecord = new()
         {
-            Node = CurrentStartNode,
-            Connection = null,
-            CostSoFar = 0,
+            node = CurrentStartNode,
+            connection = null,
+            costSoFar = 0,
         };
         openSet.Add(startNodeRecord);
 
@@ -75,22 +74,22 @@ public class DijkstraPathFinder : PathFinder<NodeRecord>, IPathFinder
             if (current == null) break;
 
             // If we reached the end node, then our exploration is complete.
-            if (current.Node == targetNode)
+            if (current.node == targetNode)
             {
-                closedDict[current.Node] = current;
+                closedDict[current.node] = current;
                 break;
             }
 
             // Get all the connections of the current node and take note of the nodes
             // those connections lead to into the openSet to explore those nodes later.
-            foreach (GraphConnection graphConnection in current.Node.connections.Values)
+            foreach (GraphConnection graphConnection in current.node.connections.Values)
             {
                 // Where does that connection lead us?
                 GraphNode endNode = Graph.Nodes[graphConnection.endNodeKey];
                 // If that connection leads to a node fully explored, skip it.
                 if (closedDict.ContainsKey(endNode)) continue;
                 // Calculate the cost to reach the end node from the current node.
-                float endNodeCost = current.CostSoFar + graphConnection.cost;
+                float endNodeCost = current.costSoFar + graphConnection.cost;
 
                 NodeRecord endNodeRecord;
                 if (openSet.Contains(endNode))
@@ -99,11 +98,11 @@ public class DijkstraPathFinder : PathFinder<NodeRecord>, IPathFinder
                     // If the end node is already in the open set, but with a lower cost,
                     // it means that we are NOT found a better path to get to it. So skip
                     // it.
-                    if (endNodeRecord.CostSoFar <= endNodeCost) continue;
+                    if (endNodeRecord.costSoFar <= endNodeCost) continue;
                     // Otherwise, update the record with the lower cost and the connection
                     // to get there with that lower cost.
-                    endNodeRecord.CostSoFar = endNodeCost;
-                    endNodeRecord.Connection = graphConnection;
+                    endNodeRecord.costSoFar = endNodeCost;
+                    endNodeRecord.connection = graphConnection;
                 }
                 else
                 {
@@ -112,26 +111,26 @@ public class DijkstraPathFinder : PathFinder<NodeRecord>, IPathFinder
                     // further later.
                     endNodeRecord = new NodeRecord
                     {
-                        Node = endNode,
-                        Connection = graphConnection,
-                        CostSoFar = endNodeCost,
+                        node = endNode,
+                        connection = graphConnection,
+                        costSoFar = endNodeCost,
                     };
                     openSet.Add(endNodeRecord);
                 }
             }
             // As we've finished looking at the connections of the current node, mark it
             // as fully explored, including it in the closed list.
-            closedDict[current.Node] = current;
+            closedDict[current.node] = current;
         }
     
         // If we get here and the current record does not point to the targetNode, then
         // we've fully explored the graph without finding a valid path to get the target.
-        if (current == null || current.Node != targetNode) return null;
+        if (current == null || current.node != targetNode) return null;
     
         // As we've got the target node, analyze the closedDict to follow back connections
         // from the target node to start node to build the path.
-        PathData foundPath = BuildPath(CurrentStartNode, targetNode);
-        return foundPath;
+        PathData calculatedPath = BuildPath(CurrentStartNode, targetNode);
+        return calculatedPath;
     }
 }
 }

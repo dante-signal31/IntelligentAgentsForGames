@@ -39,7 +39,7 @@ public class DrawDijkstraPathFinder : UnityEditor.Editor
             else
             {
                 Vector2Int fromNodeKey =
-                    pathFinder.closedDict[exploredNode].Connection.startNodeKey;
+                    pathFinder.closedDict[exploredNode].connection.startNodeKey;
                 GraphNode fromNode = pathFinder.Graph.Nodes[fromNodeKey];
                 Vector2 relativePosition = exploredNode.position - fromNode.position;
                 // Connection orientation from the receiving node perspective (the
@@ -56,7 +56,7 @@ public class DrawDijkstraPathFinder : UnityEditor.Editor
 
                 string nodeInfoText =
                     $"{connectionOrientation}" +
-                    $"{pathFinder.closedDict[exploredNode].CostSoFar}";
+                    $"{pathFinder.closedDict[exploredNode].costSoFar}";
                 Handles.Label(textPosition, nodeInfoText, textStyle);
             }
         }

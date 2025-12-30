@@ -25,17 +25,17 @@ public abstract class PathFinder<T>: MonoBehaviour where T: NodeRecord, new()
         // Initially, I planned to use a PriorityQueue<GraphNode, float>, but I found that
         // the Unity .NET API doesn't support it, because that collection was added in
         // .NET 6, while my Unity version is .NET Framework 4.7.1.
-        protected readonly SortedSet<T> _prioritySet;
+        private readonly SortedSet<T> prioritySet;
         // Needed to keep track of the nodes still pending to be explored and to quickly
         // get their respective records.
-        protected readonly Dictionary<GraphNode, T> _nodeRecordDict = new ();
+        private readonly Dictionary<GraphNode, T> nodeRecordDict = new ();
     
-        public int Count => _nodeRecordDict.Count;
-        public bool Contains(GraphNode node) => _nodeRecordDict.ContainsKey(node);
+        public int Count => nodeRecordDict.Count;
+        public bool Contains(GraphNode node) => nodeRecordDict.ContainsKey(node);
 
-        public PrioritizedNodeSet(IComparer<T> comparer)
+        protected PrioritizedNodeSet(IComparer<T> comparer)
         {
-            _prioritySet = new SortedSet<T>(comparer);
+            prioritySet = new SortedSet<T>(comparer);
         }
 
         public void Add(T record)
@@ -43,28 +43,28 @@ public abstract class PathFinder<T>: MonoBehaviour where T: NodeRecord, new()
             // If the node already exists, we must remove it first because SortedSet
             // doesn't update positions automatically if an existing node costSoFar
             // value changes.
-            if (_nodeRecordDict.ContainsKey(record.Node))
+            if (nodeRecordDict.TryGetValue(record.node, out var value))
             {
-                _prioritySet.Remove(_nodeRecordDict[record.Node]);
+                prioritySet.Remove(value);
             }
             
-            _prioritySet.Add(record);
-            _nodeRecordDict[record.Node] = record;
+            prioritySet.Add(record);
+            nodeRecordDict[record.node] = record;
         }
         
         public void Remove(T record)
         {
-            if (_nodeRecordDict.ContainsKey(record.Node))
+            if (nodeRecordDict.ContainsKey(record.node))
             {
-                _prioritySet.Remove(_nodeRecordDict[record.Node]);
-                _nodeRecordDict.Remove(record.Node);
+                prioritySet.Remove(nodeRecordDict[record.node]);
+                nodeRecordDict.Remove(record.node);
             }
         }
     
         public T this[GraphNode node]
         {
-            get => _nodeRecordDict[node];
-            set => _nodeRecordDict[node] = value;
+            get => nodeRecordDict[node];
+            set => nodeRecordDict[node] = value;
         }
 
         /// <summary>
@@ -77,12 +77,12 @@ public abstract class PathFinder<T>: MonoBehaviour where T: NodeRecord, new()
         /// </returns>
         public T ExtractLowestCostNodeRecord()
         {
-            if (_prioritySet.Count == 0) return null;
+            if (prioritySet.Count == 0) return null;
 
             // In SortedSet, Min is the element with the lowest priority/cost.
-            T lowest = _prioritySet.Min;
-            _prioritySet.Remove(lowest);
-            _nodeRecordDict.Remove(lowest.Node);
+            T lowest = prioritySet.Min;
+            prioritySet.Remove(lowest);
+            nodeRecordDict.Remove(lowest.node);
         
             return lowest;
         }
@@ -102,7 +102,7 @@ public abstract class PathFinder<T>: MonoBehaviour where T: NodeRecord, new()
     // draw gizmos.
     public readonly Dictionary<GraphNode, T> closedDict = new();
     public GraphNode CurrentStartNode { get; protected set; }
-    protected PathData _foundPath;
+    protected PathData foundPath;
     
     /// <summary>
     /// Finds a path from the current position to the specified target position
@@ -137,10 +137,10 @@ public abstract class PathFinder<T>: MonoBehaviour where T: NodeRecord, new()
         T pointer = closedDict[targetNode];
 
         // Traverse the closedDict backwards to build the path from target to start.
-        while (pointer.Node != startNode)
+        while (pointer.node != startNode)
         {
-            path.Add(pointer.Connection);
-            GraphNode endA = Graph.Nodes[pointer.Connection.startNodeKey];
+            path.Add(pointer.connection);
+            GraphNode endA = Graph.Nodes[pointer.connection.startNodeKey];
             pointer = closedDict[endA];
         }
 
@@ -150,17 +150,17 @@ public abstract class PathFinder<T>: MonoBehaviour where T: NodeRecord, new()
     
         // Now that the Connection list is in correct order, we can build the Path
         // following Connections and taking note of their EndNode positions.
-        _foundPath = new PathData
+        foundPath = new PathData
         {
             loop = false
         };
         foreach (GraphConnection connection in path)
         {
             GraphNode endB = Graph.Nodes[connection.endNodeKey];
-            _foundPath.positions.Add(endB.position);
+            foundPath.positions.Add(endB.position);
         }
     
-        return _foundPath;
+        return foundPath;
     }
     
 #if UNITY_EDITOR
@@ -175,10 +175,10 @@ public abstract class PathFinder<T>: MonoBehaviour where T: NodeRecord, new()
             Gizmos.DrawSphere(exploredNode.position, exploredNodeGizmoRadius);
         }
     
-        if (_foundPath == null) return;
+        if (foundPath == null) return;
     
         // Draw found path.
-        foreach (Vector2 position in _foundPath.positions)
+        foreach (Vector2 position in foundPath.positions)
         {
             Gizmos.color = pathNodeColor;
             Gizmos.DrawSphere(position, pathNodeGizmoRadius);

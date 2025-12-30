@@ -6,8 +6,19 @@
 /// </summary>
 public class NodeRecord
 {
-    public GraphNode Node;
-    public GraphConnection Connection;
-    public float CostSoFar;
+    /// <summary>
+    /// Node this record refers to.
+    /// </summary>
+    public GraphNode node;
+    
+    /// <summary>
+    /// Best local connection so far to reach this node.
+    /// </summary>
+    public GraphConnection connection;
+    
+    /// <summary>
+    /// Best cost so far to reach this node.
+    /// </summary>
+    public float costSoFar;
 }
 }
