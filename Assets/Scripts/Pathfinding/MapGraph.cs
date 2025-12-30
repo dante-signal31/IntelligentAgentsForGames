@@ -72,14 +72,14 @@ public class MapGraph : MonoBehaviour
 
 
     /// <summary>
-    /// Converts a global world position of a node into its corresponding array position
+    /// Converts a global world position into its nearest corresponding array position
     /// within the grid.
     /// </summary>
-    /// <param name="globalPosition"> The global position of the node in world space,
-    /// represented as a Vector2. This is the physical location of the node.</param>
+    /// <param name="globalPosition"> The global position, represented as a Vector2.
+    /// </param>
     /// <returns>
-    /// A Vector2Int representing the position of the node within the grid array.
-    /// This corresponds to the node's indices in the grid.
+    /// A Vector2Int representing the position within the grid array. If the global
+    /// position was from a node, then this corresponds to the node's indices in the grid.
     /// </returns>
     private Vector2Int GlobalToArrayPosition(Vector2 globalPosition)
     {
