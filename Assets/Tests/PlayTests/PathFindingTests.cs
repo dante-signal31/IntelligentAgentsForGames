@@ -18,14 +18,20 @@ public class PathFindingTests
     private GameObject _pathFollowingGameObject;
     private GameObject _dijkstraPathFindingGameObject;
     private GameObject _aStarPathFindingGameObject;
+    private GameObject _smoothedAStarPathFindingGameObject;
     private GameObject _target;
     private PathFollowingSteeringBehavior _pathFollowingSteeringBehavior;
     private PathFinderSteeringBehavior _dijkstraPathFinderSteeringBehavior;
     private PathFinderSteeringBehavior _aStarPathFinderSteeringBehavior;
+    private PathFinderSteeringBehavior _smoothedAStarPathFinderSteeringBehavior;
     private AgentMover _pathFollowingAgent;
+    private AgentMover _dijkstraPathFinderAgent;
+    private AgentMover _aStarPathFinderAgent;
+    private AgentMover _smoothedAStarPathFinderAgent;
     private AgentColor _pathFollowingAgentColor;
     private AgentColor _dijkstraPathFinderAgentColor;
     private AgentColor _aStarPathFinderAgentColor;
+    private AgentColor _smoothedAStarPathFinderAgentColor;
     private GameObject _pathGameObject;
     private GameObject _path2GameObject;
     private Path _path;
@@ -37,7 +43,13 @@ public class PathFindingTests
     {
         // Clean up any existing objects first
         _pathFollowingGameObject = null;
+        _dijkstraPathFindingGameObject = null;
+        _aStarPathFindingGameObject = null;
+        _smoothedAStarPathFindingGameObject = null;
         _pathFollowingSteeringBehavior = null;
+        _dijkstraPathFinderSteeringBehavior = null;
+        _aStarPathFinderSteeringBehavior = null;
+        _smoothedAStarPathFinderSteeringBehavior = null;
         _pathFollowingAgent = null;
         _pathFollowingAgentColor = null;
         _pathGameObject = null;
@@ -73,6 +85,13 @@ public class PathFindingTests
             _aStarPathFindingGameObject = GameObject.Find("AStarPathFinderMovingAgent");
             _aStarPathFindingGameObject.SetActive(false);
         }
+
+        if (_smoothedAStarPathFindingGameObject == null)
+        {
+            _smoothedAStarPathFindingGameObject =
+                GameObject.Find("SmoothedAStarPathFinderMovingAgent");
+            _smoothedAStarPathFindingGameObject.SetActive(false);
+        }
         
         if (_target == null)
             _target = GameObject.Find("Target");
@@ -92,6 +111,15 @@ public class PathFindingTests
         if (_pathFollowingAgent == null)
             _pathFollowingAgent = _pathFollowingGameObject.GetComponent<AgentMover>();
         
+        if (_dijkstraPathFinderAgent == null)
+            _dijkstraPathFinderAgent = _dijkstraPathFindingGameObject.GetComponent<AgentMover>();
+        
+        if (_aStarPathFinderAgent == null)
+            _aStarPathFinderAgent = _aStarPathFindingGameObject.GetComponent<AgentMover>();
+        
+        if (_smoothedAStarPathFinderAgent == null)
+            _smoothedAStarPathFinderAgent = _smoothedAStarPathFindingGameObject.GetComponent<AgentMover>();
+        
         if (_pathFollowingSteeringBehavior == null)
             _pathFollowingSteeringBehavior = 
                 _pathFollowingGameObject.GetComponentInChildren<PathFollowingSteeringBehavior>();
@@ -104,6 +132,9 @@ public class PathFindingTests
             _aStarPathFinderSteeringBehavior = 
                 _aStarPathFindingGameObject.GetComponentInChildren<PathFinderSteeringBehavior>();
         
+        if (_smoothedAStarPathFinderSteeringBehavior == null)
+            _smoothedAStarPathFinderSteeringBehavior = _smoothedAStarPathFindingGameObject.GetComponentInChildren<PathFinderSteeringBehavior>();
+            
         if (_pathFollowingAgentColor == null)
             _pathFollowingAgentColor = _pathFollowingGameObject.GetComponent<AgentColor>();
         
@@ -112,6 +143,9 @@ public class PathFindingTests
         
         if (_aStarPathFinderAgentColor == null)
             _aStarPathFinderAgentColor = _aStarPathFindingGameObject.GetComponent<AgentColor>();
+        
+        if (_smoothedAStarPathFinderAgentColor == null)
+            _smoothedAStarPathFinderAgentColor = _smoothedAStarPathFindingGameObject.GetComponent<AgentColor>();
         
         if (_path == null)
             _path = _pathGameObject.GetComponent<Path>();
@@ -132,7 +166,9 @@ public class PathFindingTests
             _dijkstraPathFindingGameObject.SetActive(false);
         if (_aStarPathFindingGameObject != null)
             _aStarPathFindingGameObject.SetActive(false);
-
+        if (_smoothedAStarPathFindingGameObject != null)
+            _smoothedAStarPathFindingGameObject.SetActive(false);
+        
         yield return null;
     }
 
@@ -244,24 +280,22 @@ public class PathFindingTests
     {
         // Set up agents before the tests.
         _dijkstraPathFindingGameObject.transform.position = _position1.position;
-        _pathFollowingAgent.MaximumSpeed = 4.0f;
-        _pathFollowingAgent.StopSpeed = 0.01f;
-        _pathFollowingAgent.MaximumRotationalSpeed = 1080f;
-        _pathFollowingAgent.StopRotationThreshold = 1f;
-        _pathFollowingAgentColor.Color = Color.green;
-        _pathFollowingSteeringBehavior.FollowPath = _path;
-        _pathFollowingSteeringBehavior.arrivalDistance = 0.3f;
+        _dijkstraPathFinderAgent.MaximumSpeed = 6.0f;
+        _dijkstraPathFinderAgent.StopSpeed = 0.01f;
+        _dijkstraPathFinderAgent.MaximumRotationalSpeed = 1080f;
+        _dijkstraPathFinderAgent.StopRotationThreshold = 1f;
+        _dijkstraPathFinderAgentColor.Color = Color.green;
         _dijkstraPathFindingGameObject.SetActive(true);
 
         // Start test.
         // Assert that the pathfinder agent can reach the first target.
         _target.transform.position = _position2.position;
-        yield return new WaitForSeconds(12);
+        yield return new WaitForSeconds(4);
         Assert.True(Vector2.Distance(_dijkstraPathFindingGameObject.transform.position, _position2.position) < 0.3f);
         
         // Assert that the pathfinder agent can reach the second target.
         _target.transform.position = _position3.position;
-        yield return new WaitForSeconds(12);
+        yield return new WaitForSeconds(4);
         Assert.True(Vector2.Distance(_dijkstraPathFindingGameObject.transform.position, _position3.position) < 0.3f);
     }
     
@@ -273,25 +307,62 @@ public class PathFindingTests
     {
         // Set up agents before the tests.
         _aStarPathFindingGameObject.transform.position = _position1.position;
-        _pathFollowingAgent.MaximumSpeed = 4.0f;
-        _pathFollowingAgent.StopSpeed = 0.01f;
-        _pathFollowingAgent.MaximumRotationalSpeed = 1080f;
-        _pathFollowingAgent.StopRotationThreshold = 1f;
-        _pathFollowingAgentColor.Color = Color.green;
-        _pathFollowingSteeringBehavior.FollowPath = _path;
-        _pathFollowingSteeringBehavior.arrivalDistance = 0.3f;
+        _aStarPathFinderAgent.MaximumSpeed = 6.0f;
+        _aStarPathFinderAgent.StopSpeed = 0.01f;
+        _aStarPathFinderAgent.MaximumRotationalSpeed = 1080f;
+        _aStarPathFinderAgent.StopRotationThreshold = 1f;
+        _aStarPathFinderAgentColor.Color = Color.green;
         _aStarPathFindingGameObject.SetActive(true);
 
         // Start test.
         // Assert that the pathfinder agent can reach the first target.
         _target.transform.position = _position2.position;
-        yield return new WaitForSeconds(12);
+        yield return new WaitForSeconds(4);
         Assert.True(Vector2.Distance(_aStarPathFindingGameObject.transform.position, _position2.position) < 0.3f);
         
         // Assert that the pathfinder agent can reach the second target.
         _target.transform.position = _position3.position;
-        yield return new WaitForSeconds(12);
+        yield return new WaitForSeconds(4);
         Assert.True(Vector2.Distance(_aStarPathFindingGameObject.transform.position, _position3.position) < 0.3f);
+    }
+    
+    /// <summary>
+    /// Test the Smoothed AStar pathfinder behavior.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator SmoothedAStarPathFindingBehaviorTest()
+    {
+        // Set up agents before the tests.
+        _smoothedAStarPathFindingGameObject.transform.position = _position1.position;
+        _smoothedAStarPathFinderAgent.MaximumSpeed = 6.0f;
+        _smoothedAStarPathFinderAgent.StopSpeed = 0.01f;
+        _smoothedAStarPathFinderAgent.MaximumRotationalSpeed = 1080f;
+        _smoothedAStarPathFinderAgent.StopRotationThreshold = 1f;
+        _smoothedAStarPathFinderAgentColor.Color = Color.green;
+        _smoothedAStarPathFindingGameObject.SetActive(true);
+        
+        // Get reference to the path smoother.
+        PathSmoother pathSmoother = _smoothedAStarPathFindingGameObject.GetComponentInChildren<PathSmoother>();
+
+        // Start test.
+        // Assert that the pathfinder agent can reach the first target.
+        _target.transform.position = _position2.position;
+        yield return new WaitForSeconds(4);
+        Assert.True(Vector2.Distance(_smoothedAStarPathFindingGameObject.transform.position, _position2.position) < 0.3f);
+        // Assert that the smoothed test is shorter than the former one.
+        PathData rawPathData = AccessPrivateHelper.GetPrivateField<PathData>(pathSmoother, "_rawPathData");
+        PathData smoothedPath = AccessPrivateHelper.GetPrivateField<PathData>(pathSmoother, "_smoothedPathData");
+        Assert.True(rawPathData.positions.Count > smoothedPath.positions.Count);
+
+        
+        // Assert that the pathfinder agent can reach the second target.
+        _target.transform.position = _position3.position;
+        yield return new WaitForSeconds(4);
+        Assert.True(Vector2.Distance(_smoothedAStarPathFindingGameObject.transform.position, _position3.position) < 0.3f);
+        // Assert that the smoothed test is shorter than the former one.
+        rawPathData = AccessPrivateHelper.GetPrivateField<PathData>(pathSmoother, "_rawPathData");
+        smoothedPath = AccessPrivateHelper.GetPrivateField<PathData>(pathSmoother, "_smoothedPathData");
+        Assert.True(rawPathData.positions.Count > smoothedPath.positions.Count);
     }
 }
 }

@@ -9,7 +9,7 @@ namespace Pathfinding
 public class PathData
 {
     public bool loop;
-    public List<Vector2> positions = new();
+    public readonly List<Vector2> positions = new();
     
     /// <summary>
     /// How many positions this path has.
@@ -25,6 +25,20 @@ public class PathData
     /// Position at the current position index.
     /// </summary>
     public Vector2 CurrentTargetPosition => positions[CurrentTargetPositionIndex];
+
+    /// <summary>
+    /// Clears the current path data and loads a new set of positions into the path.
+    /// </summary>
+    /// <param name="path">
+    /// The list of positions to be added to the path. Each position represents a point
+    /// in the path.
+    /// </param>
+    public void LoadPathData(List<Vector2> path)
+    {
+        positions.Clear();
+        positions.AddRange(path);
+        CurrentTargetPositionIndex = 0;
+    }
     
     /// <summary>
     /// <p>Get the next position target in Path.</p>

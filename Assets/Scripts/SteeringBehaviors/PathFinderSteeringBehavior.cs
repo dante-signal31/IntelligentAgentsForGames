@@ -31,12 +31,12 @@ public class PathFinderSteeringBehavior: SteeringBehavior
     private void Awake()
     {
         _pathFinder = (IPathFinder) pathFinderBehaviour;
+        _pathFinder.Graph = graph;
         _currentPath = new GameObject("CurrentPath").AddComponent<Path>();
     }
 
     private void Start()
     {
-        _pathFinder.Graph = graph;
         target.positionChanged.AddListener(OnPathTargetPositionChanged);
     }
 

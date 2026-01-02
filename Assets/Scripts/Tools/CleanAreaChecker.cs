@@ -54,6 +54,34 @@ public class CleanAreaChecker : IDisposable
     }
     
     /// <summary>
+    /// Determines whether a straight path between two points is clear of any collisions
+    /// with objects in the specified detection layers.
+    /// </summary>
+    /// <param name="start">The starting global position of the path to check.</param>
+    /// <param name="end">The ending global position of the path to check.</param>
+    /// <returns>
+    /// True if the path between the specified start and end positions is clear (not
+    /// colliding with any objects in the detection layers), otherwise false.
+    /// </returns>
+    public bool IsCleanPath(Vector2 start, Vector2 end)
+    {
+        Vector2 direction = end - start;
+        float distance = direction.magnitude;
+
+        RaycastHit2D hit = Physics2D.CircleCast(
+            start,
+            Radius,
+            direction.normalized,
+            distance,
+            DetectionLayers);
+
+        DetectedCollider = hit.collider;
+        bool isClean = hit.collider == null;
+
+        return isClean;
+    }
+    
+    /// <summary>
     /// Disposes of the CleanAreaChecker resources.
     /// </summary>
     public void Dispose()

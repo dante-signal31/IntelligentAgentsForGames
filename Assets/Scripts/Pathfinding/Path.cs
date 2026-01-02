@@ -69,7 +69,7 @@ public class Path : MonoBehaviour, IGizmos
     private void Start()
     {
         _pathData.loop = loop;
-        _pathData.positions = positions;
+        _pathData.LoadPathData(positions);
     }
 
     public void UpdatePathData(PathData newData)
@@ -83,7 +83,7 @@ public class Path : MonoBehaviour, IGizmos
     private void OnValidate()
     {
         _pathData.loop = loop;
-        _pathData.positions = positions;
+        _pathData.LoadPathData(positions);
     }
 
     private void OnDrawGizmos()

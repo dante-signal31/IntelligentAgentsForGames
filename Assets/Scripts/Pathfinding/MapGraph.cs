@@ -54,7 +54,7 @@ public class MapGraph : MonoBehaviour
     /// grid cell in world units and is used for converting between global positions
     /// and grid array indices.
     /// </remarks>
-    private Vector2 CellSize => mapSize / (Vector2) cellResolution;
+    public Vector2 CellSize => mapSize / (Vector2) cellResolution;
 
     /// <summary>
     /// Calculates the global world position of a node based on its array position 
