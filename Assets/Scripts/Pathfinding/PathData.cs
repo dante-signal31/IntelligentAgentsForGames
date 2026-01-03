@@ -15,7 +15,7 @@ public class PathData
     /// How many positions this path has.
     /// </summary>
     public int PathLength => positions.Count;
-    
+
     /// <summary>
     /// Current index of the position we are going to.
     /// </summary>

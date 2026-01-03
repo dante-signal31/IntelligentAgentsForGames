@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Pathfinding
 {
-public class DijkstraPathFinder : PathFinder<NodeRecord>, IPathFinder
+public class DijkstraPathFinder : HeuristicPathFinder<NodeRecord>
 {
     private static readonly NodeRecord NodeRecordNull = new NodeRecord
     {

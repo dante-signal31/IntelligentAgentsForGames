@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Pathfinding
 {
-public class AStarPathFinder: PathFinder<AStarNodeRecord>, IPathFinder
+public class AStarPathFinder: HeuristicPathFinder<AStarNodeRecord>
 {
     private static readonly AStarNodeRecord NodeRecordNull = new AStarNodeRecord
     {
