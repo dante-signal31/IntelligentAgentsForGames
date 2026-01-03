@@ -12,7 +12,8 @@ namespace Pathfinding
 /// explored first.
 /// </remarks> 
 /// </summary>
-public abstract class HeuristicPathFinder<T>: MonoBehaviour, IPathFinder where T: NodeRecord, new()
+public abstract class HeuristicPathFinder<T>: MonoBehaviour, IPathFinder 
+    where T: NodeRecord, new()
 {
      /// <summary>
     /// A collection of nodes with priority-based access for use in pathfinding
