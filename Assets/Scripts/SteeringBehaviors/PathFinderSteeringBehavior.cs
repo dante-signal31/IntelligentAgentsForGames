@@ -35,9 +35,15 @@ public class PathFinderSteeringBehavior: SteeringBehavior
         _currentPath = new GameObject("CurrentPath").AddComponent<Path>();
     }
 
-    private void Start()
+    private void OnEnable()
     {
         target.positionChanged.AddListener(OnPathTargetPositionChanged);
+    }
+
+    private void OnDisable()
+    {
+        // We don't want to calculate paths while the game object is not active.
+        target.positionChanged.RemoveListener(OnPathTargetPositionChanged);
     }
 
     private void OnPathTargetPositionChanged(Vector2 newTargetPosition)

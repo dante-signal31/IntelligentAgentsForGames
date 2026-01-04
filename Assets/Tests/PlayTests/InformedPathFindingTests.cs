@@ -8,7 +8,7 @@ using UnityEngine.TestTools;
 
 namespace Tests.PlayTests
 {
-public class PathFindingTests
+public class InformedPathFindingTests
 {
     private const string CurrentScene = "TestPathFindingTiledYard";
     
@@ -19,19 +19,27 @@ public class PathFindingTests
     private GameObject _dijkstraPathFindingGameObject;
     private GameObject _aStarPathFindingGameObject;
     private GameObject _smoothedAStarPathFindingGameObject;
+    private GameObject _breathFirstPathFindingGameObject;
+    private GameObject _depthFirstPathFindingGameObject;
     private GameObject _target;
     private PathFollowingSteeringBehavior _pathFollowingSteeringBehavior;
     private PathFinderSteeringBehavior _dijkstraPathFinderSteeringBehavior;
     private PathFinderSteeringBehavior _aStarPathFinderSteeringBehavior;
     private PathFinderSteeringBehavior _smoothedAStarPathFinderSteeringBehavior;
+    private PathFinderSteeringBehavior _breathFirstPathFinderSteeringBehavior;
+    private PathFinderSteeringBehavior _depthFirstPathFinderSteeringBehavior;
     private AgentMover _pathFollowingAgent;
     private AgentMover _dijkstraPathFinderAgent;
     private AgentMover _aStarPathFinderAgent;
     private AgentMover _smoothedAStarPathFinderAgent;
+    private AgentMover _breathFirstPathFinderAgent;
+    private AgentMover _depthFirstPathFinderAgent;
     private AgentColor _pathFollowingAgentColor;
     private AgentColor _dijkstraPathFinderAgentColor;
     private AgentColor _aStarPathFinderAgentColor;
     private AgentColor _smoothedAStarPathFinderAgentColor;
+    private AgentColor _breathFirstPathFinderAgentColor;
+    private AgentColor _depthFirstPathFinderAgentColor;
     private GameObject _pathGameObject;
     private GameObject _path2GameObject;
     private Path _path;
@@ -50,6 +58,9 @@ public class PathFindingTests
         _dijkstraPathFinderSteeringBehavior = null;
         _aStarPathFinderSteeringBehavior = null;
         _smoothedAStarPathFinderSteeringBehavior = null;
+        _breathFirstPathFindingGameObject = null;
+        _depthFirstPathFindingGameObject = null;
+        _path2GameObject = null;
         _pathFollowingAgent = null;
         _pathFollowingAgentColor = null;
         _pathGameObject = null;
@@ -92,6 +103,18 @@ public class PathFindingTests
                 GameObject.Find("SmoothedAStarPathFinderMovingAgent");
             _smoothedAStarPathFindingGameObject.SetActive(false);
         }
+
+        if (_breathFirstPathFindingGameObject == null)
+        {
+            _breathFirstPathFindingGameObject = GameObject.Find("BreathFirstPathFinderMovingAgent");
+            _breathFirstPathFindingGameObject.SetActive(false);
+        }
+        
+        if (_depthFirstPathFindingGameObject == null)
+        {
+            _depthFirstPathFindingGameObject = GameObject.Find("DepthFirstPathFinderMovingAgent");
+            _depthFirstPathFindingGameObject.SetActive(false);
+        }
         
         if (_target == null)
             _target = GameObject.Find("Target");
@@ -120,6 +143,12 @@ public class PathFindingTests
         if (_smoothedAStarPathFinderAgent == null)
             _smoothedAStarPathFinderAgent = _smoothedAStarPathFindingGameObject.GetComponent<AgentMover>();
         
+        if (_breathFirstPathFinderAgent == null)
+            _breathFirstPathFinderAgent = _breathFirstPathFindingGameObject.GetComponent<AgentMover>();
+        
+        if (_depthFirstPathFinderAgent == null)
+            _depthFirstPathFinderAgent = _depthFirstPathFindingGameObject.GetComponent<AgentMover>();
+        
         if (_pathFollowingSteeringBehavior == null)
             _pathFollowingSteeringBehavior = 
                 _pathFollowingGameObject.GetComponentInChildren<PathFollowingSteeringBehavior>();
@@ -134,6 +163,12 @@ public class PathFindingTests
         
         if (_smoothedAStarPathFinderSteeringBehavior == null)
             _smoothedAStarPathFinderSteeringBehavior = _smoothedAStarPathFindingGameObject.GetComponentInChildren<PathFinderSteeringBehavior>();
+        
+        if (_breathFirstPathFinderSteeringBehavior == null)
+            _breathFirstPathFinderSteeringBehavior = _breathFirstPathFindingGameObject.GetComponentInChildren<PathFinderSteeringBehavior>();
+        
+        if (_depthFirstPathFinderSteeringBehavior == null)
+            _depthFirstPathFinderSteeringBehavior = _depthFirstPathFindingGameObject.GetComponentInChildren<PathFinderSteeringBehavior>();
             
         if (_pathFollowingAgentColor == null)
             _pathFollowingAgentColor = _pathFollowingGameObject.GetComponent<AgentColor>();
@@ -146,6 +181,12 @@ public class PathFindingTests
         
         if (_smoothedAStarPathFinderAgentColor == null)
             _smoothedAStarPathFinderAgentColor = _smoothedAStarPathFindingGameObject.GetComponent<AgentColor>();
+        
+        if (_breathFirstPathFinderAgentColor == null)
+            _breathFirstPathFinderAgentColor = _breathFirstPathFindingGameObject.GetComponent<AgentColor>();
+        
+        if (_depthFirstPathFinderAgentColor == null)
+            _depthFirstPathFinderAgentColor = _depthFirstPathFindingGameObject.GetComponent<AgentColor>();
         
         if (_path == null)
             _path = _pathGameObject.GetComponent<Path>();
@@ -168,6 +209,10 @@ public class PathFindingTests
             _aStarPathFindingGameObject.SetActive(false);
         if (_smoothedAStarPathFindingGameObject != null)
             _smoothedAStarPathFindingGameObject.SetActive(false);
+        if (_breathFirstPathFindingGameObject != null)
+            _breathFirstPathFindingGameObject.SetActive(false);
+        if (_depthFirstPathFindingGameObject != null)
+            _depthFirstPathFindingGameObject.SetActive(false);
         
         yield return null;
     }
