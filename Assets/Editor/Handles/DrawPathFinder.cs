@@ -1,18 +1,18 @@
 ﻿using Pathfinding;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Editor
 {
 /// <summary>
-/// Draw costs to reach every node explored by the Dijkstra algorithm.
+/// Draw costs to reach every node explored by a pathfinder algorithm.
 /// </summary>
-[CustomEditor(typeof(DijkstraPathFinder))]
-public class DrawDijkstraPathFinder : UnityEditor.Editor
+public class DrawPathFinder<T> : UnityEditor.Editor where T: NodeRecord, new()
 {
-    private void OnSceneGUI()
+    protected void OnSceneGUI()
     {
-        var pathFinder = (DijkstraPathFinder)target;
+        var pathFinder = (PathFinder<T>)target;
 
         if (!pathFinder.showGizmos) return;
 
