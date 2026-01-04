@@ -20,5 +20,12 @@ public class NodeRecord
     /// Best cost so far to reach this node.
     /// </summary>
     public float costSoFar;
+    
+    public static readonly NodeRecord nodeRecordNull = new()
+    {
+        node = null,
+        connection = null,
+        costSoFar = 0
+    };
 }
 }

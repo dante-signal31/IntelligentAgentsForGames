@@ -13,5 +13,13 @@
 public class AStarNodeRecord : NodeRecord
 {
     public float totalEstimatedCostToTarget;
+    
+    public static readonly AStarNodeRecord aStarNodeRecordNull = new ()
+    {
+        node = null,
+        connection = null,
+        costSoFar = 0,
+        totalEstimatedCostToTarget = float.MaxValue
+    };
 }
 }
