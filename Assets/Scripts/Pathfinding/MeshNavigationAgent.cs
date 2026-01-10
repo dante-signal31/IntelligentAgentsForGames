@@ -1,17 +1,19 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Events;
 
 namespace Pathfinding
 {
 /// <summary>
-/// Navigation agent using Unity's NavMesh as pathfinding algorithm.
+/// Navigation agent using Unity's NavMesh as a pathfinding algorithm.
 /// </summary>
 public class MeshNavigationAgent: NavigationAgent
 {
     [Header("CONFIGURATION:")]
     [Tooltip("Distance at which we give our goal as reached.")]
     [SerializeField] private float arrivalDistance = 0.1f;
+    [Tooltip("Event invoked when the path changes.")]
+    public UnityEvent pathChanged = new();
     
     private Vector2 _targetPosition;
     private float _radius;
@@ -67,7 +69,7 @@ public class MeshNavigationAgent: NavigationAgent
     public override Vector2 PathFinalPosition => _pathToTarget[^1];
     
     private NavMeshPath _navMeshPath;
-    private int _currentPathIndex = 0;
+    private int _currentPathIndex;
     private float _arrivalDistance;
     
     public override float DistanceToTarget()
@@ -91,13 +93,14 @@ public class MeshNavigationAgent: NavigationAgent
     
     private void RecalculatePath()
     {
-        if (_navMeshPath == null) _navMeshPath = new NavMeshPath();
+        _navMeshPath ??= new NavMeshPath();
         NavMesh.CalculatePath(transform.position, 
             TargetPosition, 
             NavMesh.AllAreas, 
             _navMeshPath);
         UpdatePathToTarget();
         _currentPathIndex = 0;
+        pathChanged?.Invoke();
     }
 
     private void UpdatePathToTarget()

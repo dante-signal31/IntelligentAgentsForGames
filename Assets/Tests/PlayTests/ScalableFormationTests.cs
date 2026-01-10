@@ -18,7 +18,7 @@ public class ScalableFormationTests
     private Transform _position3;
     private Transform _position4;
 
-    private TargetPlacement _target;
+    private Target _target;
 
     private GameObject _scalableFormationGameObject;
     private UsherFormationAgent _usherScalableFormationAgent;
@@ -53,7 +53,7 @@ public class ScalableFormationTests
             _position4 = GameObject.Find("Position4").transform;
         if (_target == null)
         {
-            _target = GameObject.Find("Target").GetComponent<TargetPlacement>();
+            _target = GameObject.Find("Target").GetComponent<Target>();
             _target.TargetPosition = _position1.position;
             _target.Enabled = false;
         }

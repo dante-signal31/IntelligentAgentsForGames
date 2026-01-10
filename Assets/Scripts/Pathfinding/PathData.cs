@@ -20,11 +20,14 @@ public class PathData
     /// Current index of the position we are going to.
     /// </summary>
     public int CurrentTargetPositionIndex { get; private set; }
-    
+
     /// <summary>
     /// Position at the current position index.
     /// </summary>
-    public Vector2 CurrentTargetPosition => positions[CurrentTargetPositionIndex];
+    public Vector2 CurrentTargetPosition =>
+        CurrentTargetPositionIndex >= positions.Count ? 
+            Vector2.zero : 
+            positions[CurrentTargetPositionIndex];
 
     /// <summary>
     /// Clears the current path data and loads a new set of positions into the path.

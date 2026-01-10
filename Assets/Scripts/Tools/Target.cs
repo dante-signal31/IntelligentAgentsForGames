@@ -7,7 +7,7 @@ namespace Tools
 /// <summary>
 /// Listen for mouse clicks and updates target position to position clicked.
 /// </summary>
-public class TargetPlacement : MonoBehaviour
+public class Target : MonoBehaviour
 {
     [Header("CONFIGURATION:")] 
     public UnityEvent<Vector2> positionChanged;
@@ -57,8 +57,7 @@ public class TargetPlacement : MonoBehaviour
     {
         if (_currentPosition != targetTransform.position)
         {
-            if (positionChanged != null)
-                positionChanged.Invoke(targetTransform.position);
+            positionChanged?.Invoke(targetTransform.position);
             _currentPosition = targetTransform.position;
         }
     }

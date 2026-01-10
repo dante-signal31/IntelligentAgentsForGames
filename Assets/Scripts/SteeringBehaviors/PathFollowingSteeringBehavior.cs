@@ -4,6 +4,10 @@ using UnityEngine;
 
 namespace SteeringBehaviors
 {
+/// <summary>
+/// Represents a steering behavior that allows an agent to follow a predefined path
+/// while steering towards each successive target along the path.
+/// </summary>
 public class PathFollowingSteeringBehavior : SteeringBehavior
 {
     [Header("CONFIGURATION:")]
@@ -44,7 +48,8 @@ public class PathFollowingSteeringBehavior : SteeringBehavior
     
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        if (FollowPath == null) return SteeringOutput.Zero;
+        if (FollowPath == null || FollowPath.PathLength == 0) 
+            return SteeringOutput.Zero;
         
         if (!_pathStarted)
         {

@@ -25,7 +25,7 @@ public class EmergentFormationTests
     private Transform _position8;
     private Transform _position9;
     
-    private TargetPlacement _target;
+    private Target _target;
 
     private GameObject _leaderGameObject;
     private GameObject _wingman1GameObject;
@@ -70,7 +70,7 @@ public class EmergentFormationTests
             _position9 = GameObject.Find("Position9").transform;
         if (_target == null)
         {
-            _target = GameObject.Find("Target").GetComponent<TargetPlacement>();
+            _target = GameObject.Find("Target").GetComponent<Target>();
             _target.TargetPosition = _position1.position;
             _target.Enabled = false;
         }

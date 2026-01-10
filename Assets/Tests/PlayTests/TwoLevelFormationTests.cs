@@ -19,7 +19,7 @@ public class TwoLevelFormationTests
     private Transform _position5;
     private Transform _position6;
 
-    private TargetPlacement _target;
+    private Target _target;
     
     private GameObject _twoLevelFormationGameObject;
     private UsherWaiterFormationAgent _usherWaiterFormationAgent;
@@ -57,7 +57,7 @@ public class TwoLevelFormationTests
         
         if (_target == null)
         {
-            _target = GameObject.Find("Target").GetComponent<TargetPlacement>();
+            _target = GameObject.Find("Target").GetComponent<Target>();
             _target.TargetPosition = _position1.position;
             _target.Enabled = false;
         }

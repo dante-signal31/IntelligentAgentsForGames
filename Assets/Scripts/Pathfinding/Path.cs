@@ -10,7 +10,9 @@ namespace Pathfinding
 /// </summary>
 public class Path : MonoBehaviour, IGizmos
 {
-    [Header("PATH CONFIGURATION:")] 
+    [Header("PATH CONFIGURATION:")]
+    [Tooltip("Whether the path should loop back to the beginning once the end is " +
+             "reached.")]
     [SerializeField] public bool loop;
     [Tooltip("Target global positions of the path")] 
     [SerializeField] public List<Vector2> positions = new();
@@ -36,17 +38,17 @@ public class Path : MonoBehaviour, IGizmos
     /// <summary>
     /// How many positions this path has.
     /// </summary>
-    public int PathLength => _pathData.PathLength;
+    public int PathLength => Data.PathLength;
 
     /// <summary>
     /// Current index of the position we are going to.
     /// </summary>
-    public int CurrentTargetPositionIndex => _pathData.CurrentTargetPositionIndex;
+    public int CurrentTargetPositionIndex => Data.CurrentTargetPositionIndex;
     
     /// <summary>
     /// Position at the current position index.
     /// </summary>
-    public Vector2 CurrentTargetPosition => _pathData.CurrentTargetPosition;
+    public Vector2 CurrentTargetPosition => Data.CurrentTargetPosition;
     
     /// <summary>
     /// Where to place strings with the number of positions.
@@ -62,48 +64,54 @@ public class Path : MonoBehaviour, IGizmos
     /// <p>If we are at the end and Loop is false, then the last target position is
     /// returned; whereas if the loop is true, then the index is reset to 0 and the
     /// first target position is returned.</p></returns>
-    public Vector2 GetNextPositionTarget() => _pathData.GetNextPositionTarget();
-    
-    private PathData _pathData = new();
+    public Vector2 GetNextPositionTarget() => Data.GetNextPositionTarget();
 
-    private void Start()
+    /// <summary>
+    /// Encapsulates path-related data used for pathfinding, including positions,
+    /// looping configuration, and current target position tracking.
+    /// </summary>
+    public PathData Data { get; private set; }= new();
+
+    private void Awake()
     {
-        _pathData.loop = loop;
-        _pathData.LoadPathData(positions);
+        // Leave any internal initialization here to let external path users make their
+        // initial path configuration at the Start phase.
+        Data.loop = loop;
+        Data.LoadPathData(positions);
     }
 
     public void UpdatePathData(PathData newData)
     {
-        _pathData = newData;
+        Data = newData;
         positions.Clear();
-        positions.AddRange(_pathData.positions);
+        positions.AddRange(Data.positions);
     }
     
 #if UNITY_EDITOR
     private void OnValidate()
     {
-        _pathData.loop = loop;
-        _pathData.LoadPathData(positions);
+        Data.loop = loop;
+        Data.LoadPathData(positions);
     }
 
     private void OnDrawGizmos()
     {
         if (!ShowGizmos) return;
         
-        if (positions.Count < 1) return;
+        if (Data.PathLength < 1) return;
 
         Vector2 previousPosition = Vector2.zero;
         Gizmos.color = GizmosColor;
         // Draw path positions
-        for (int i=0; i < positions.Count; i++)
+        for (int i=0; i < Data.PathLength; i++)
         {
-            Gizmos.DrawWireSphere(positions[i], positionGizmoRadius);
+            Gizmos.DrawWireSphere(Data.positions[i], positionGizmoRadius);
             if (i >= 1)
             {
                 // Draw edges between positions.
-                Gizmos.DrawLine(previousPosition, positions[i]);
+                Gizmos.DrawLine(previousPosition, Data.positions[i]);
             }
-            previousPosition = positions[i];
+            previousPosition = Data.positions[i];
         }
     }
 #endif

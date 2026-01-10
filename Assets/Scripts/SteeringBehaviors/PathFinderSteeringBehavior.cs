@@ -14,7 +14,7 @@ public class PathFinderSteeringBehavior: SteeringBehavior
 {
     [Header("CONFIGURATION:")]
     [Tooltip("Target to go to using found path.")]
-    public TargetPlacement target;
+    public Target target;
     [Tooltip("Graph to use for path finding.")]
     public MapGraph graph;
     
@@ -32,6 +32,8 @@ public class PathFinderSteeringBehavior: SteeringBehavior
     {
         _pathFinder = (IPathFinder) pathFinderBehaviour;
         _pathFinder.Graph = graph;
+        // Create a GameObject at the scene root to include the new path instance in
+        // Unity life cycle.
         _currentPath = new GameObject("CurrentPath").AddComponent<Path>();
     }
 

@@ -20,7 +20,7 @@ namespace Tests.PlayTests
         private Transform _position5;
         private Transform _position6;
 
-        private TargetPlacement _target;
+        private Target _target;
         
         private GameObject _seekGameObject;
         private GameObject _hideGameObject;
@@ -97,7 +97,7 @@ namespace Tests.PlayTests
                 _position6 = GameObject.Find("Position6").transform;
             if (_target == null)
             {
-                _target = GameObject.Find("Target").GetComponent<TargetPlacement>();
+                _target = GameObject.Find("Target").GetComponent<Target>();
                 _target.TargetPosition = _position1.position;
                 _target.Enabled = false;
             }
