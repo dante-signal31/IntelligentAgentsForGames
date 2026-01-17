@@ -17,7 +17,7 @@ public class DijkstraPathFinder : HeuristicPathFinder<NodeRecord>
     /// based on their accumulated path cost, ensuring that the lowest-cost nodes
     /// are processed first.
     /// </summary>
-    protected class DijkstraPrioritizedNodeSet: PrioritizedNodeSet
+    protected class DijkstraPrioritizedNodeRecordSet: PrioritizedNodeRecordSet
     {
         // Comparer to keep the SortedSet ordered by CostSoFar
         private class NodeRecordComparer : IComparer<NodeRecord>
@@ -33,9 +33,11 @@ public class DijkstraPathFinder : HeuristicPathFinder<NodeRecord>
             }
         }
         
-        public DijkstraPrioritizedNodeSet() : base(new NodeRecordComparer()) {}
+        public DijkstraPrioritizedNodeRecordSet() : base(new NodeRecordComparer()) {}
     }
 
+    private readonly DijkstraPrioritizedNodeRecordSet _openRecordSet = new ();
+    
     /// <summary>
     /// Finds a path from the current position to the specified target position
     /// within the provided graph using Dijkstra's algorithm.
@@ -51,7 +53,8 @@ public class DijkstraPathFinder : HeuristicPathFinder<NodeRecord>
     {
         // Nodes not fully explored yet, ordered by the cost to get them from the
         // start node.
-        DijkstraPrioritizedNodeSet openSet = new ();
+        _openRecordSet.Clear();
+        
         // Nodes already fully explored. We use a dictionary to keep track of the
         // information gathered from each node, including the connection to get there,
         // while exploring the graph.
@@ -59,7 +62,7 @@ public class DijkstraPathFinder : HeuristicPathFinder<NodeRecord>
     
         // Get graph nodes associated with the start and target positions. 
         CurrentStartNode = Graph.GetNodeAtPosition(transform.position);
-        GraphNode targetNode = Graph.GetNodeAtPosition(targetPosition);
+        PositionNode targetNode = Graph.GetNodeAtPosition(targetPosition);
     
         // You get to the start node from nowhere (null) and at no cost (0).
         NodeRecord startNodeRecord = new()
@@ -68,14 +71,14 @@ public class DijkstraPathFinder : HeuristicPathFinder<NodeRecord>
             connection = null,
             costSoFar = 0,
         };
-        openSet.Add(startNodeRecord);
+        _openRecordSet.Add(startNodeRecord);
 
         // Loop until we reach the target node or no more nodes are available to explore.
         NodeRecord current = NodeRecord.nodeRecordNull;
-        while (openSet.Count > 0)
+        while (_openRecordSet.Count > 0)
         {
             // Explore prioritizing the node with the lowest cost to be reached.
-            current = openSet.Get();
+            current = _openRecordSet.Get();
             if (current == null) break;
 
             // If we reached the end node, then our exploration is complete.
@@ -86,20 +89,26 @@ public class DijkstraPathFinder : HeuristicPathFinder<NodeRecord>
             }
 
             // Get all the connections of the current node and take note of the nodes
-            // those connections lead to into the openSet to explore those nodes later.
+            // those connections lead to into the _openRecordSet to explore those nodes later.
             foreach (GraphConnection graphConnection in current.node.connections.Values)
             {
                 // Where does that connection lead us?
-                GraphNode endNode = Graph.Nodes[graphConnection.endNodeKey];
+                PositionNode endNode = Graph.GetNodeById(graphConnection.endNodeId);
                 // If that connection leads to a node fully explored, skip it.
                 if (closedDict.ContainsKey(endNode)) continue;
                 // Calculate the cost to reach the end node from the current node.
                 float endNodeCost = current.costSoFar + graphConnection.cost;
+                
+                // If that connection leads to a node fully explored at a lower cost,
+                // skip it because we are not going to improve the path already discovered
+                // to get that node.
+                if (closedDict.ContainsKey(endNode) && 
+                    closedDict[endNode].costSoFar <= endNodeCost) continue;
 
                 NodeRecord endNodeRecord;
-                if (openSet.Contains(endNode))
+                if (_openRecordSet.Contains(endNode))
                 {
-                    endNodeRecord = openSet[endNode];
+                    endNodeRecord = _openRecordSet[endNode];
                     // If the end node is already in the open set, but with a lower cost,
                     // it means that we are NOT found a better path to get to it. So skip
                     // it.
@@ -120,8 +129,9 @@ public class DijkstraPathFinder : HeuristicPathFinder<NodeRecord>
                         connection = graphConnection,
                         costSoFar = endNodeCost,
                     };
-                    openSet.Add(endNodeRecord);
                 }
+                // Add the node to the openSet to assess it fully again.
+                _openRecordSet.Add(endNodeRecord);
             }
             // As we've finished looking at the connections of the current node, mark it
             // as fully explored, including it in the closed list.

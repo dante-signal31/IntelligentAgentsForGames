@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: DarkGreySquare
   m_EditorClassIdentifier: 
   m_Sprite: {fileID: 7482667652216324306, guid: 1f001f401d265a7419ae775ee41180cc, type: 3}
-  m_Color: {r: 0.4528302, g: 0.4528302, b: 0.4528302, a: 1}
+  m_Color: {r: 0.49803925, g: 0.49803925, b: 0.49803925, a: 1}
   m_Transform:
     e00: 1
     e01: 0

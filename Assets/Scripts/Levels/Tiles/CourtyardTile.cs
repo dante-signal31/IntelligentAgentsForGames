@@ -3,10 +3,18 @@ using UnityEngine.Tilemaps;
 
 namespace Levels.Tiles
 {
-[CreateAssetMenu(fileName = "CourtyardTile", menuName = "Scriptable Objects/CourtyardTile")]
+[CreateAssetMenu(
+    fileName = "CourtyardTile", 
+    menuName = "Scriptable Objects/CourtyardTile")]
 public class CourtyardTile : Tile
 {
     [Header("CONFIGURATION:")]
-    [SerializeField] private bool isObstacle;
+    [Tooltip("Navigation cost of this tile.")]
+    [SerializeField] private float cost;
+    
+    /// <summary>
+    /// Navigation cost of this tile.
+    /// </summary>
+    public float Cost => cost;
 }
 }

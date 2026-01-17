@@ -6,23 +6,25 @@ namespace Pathfinding
 /// Represents a base implementation for pathfinding algorithms
 /// that do not rely on heuristic information to guide the search.
 /// </summary>
-public abstract class NotInformedPathFinder: PathFinder<NodeRecord>
+public abstract class NotInformedPathFinder<TN>: PathFinder<NodeRecord> 
+    where TN: INodeRecordCollection<NodeRecord>, new()
 {
+    private readonly TN _openQueue = new();
+    
     /// <summary>
     /// Finds and returns a path to the specified target position.
     /// Depending on the implementation, this uses a specific node collection
     /// type to determine the sequence of nodes to explore during pathfinding.
     /// </summary>
     /// <typeparam name="TN">The type of node collection to use for pathfinding.
-    /// Must implement INodeCollection.</typeparam>
+    /// Must implement INodeRecordCollection.</typeparam>
     /// <param name="targetPosition">The target position to find a path to.</param>
     /// <returns>A Path object representing the found path from the start position
     /// to the target position, or null if no valid path exists.</returns>
-    protected PathData FindPath<TN>(Vector2 targetPosition) 
-        where TN: INodeCollection<NodeRecord>, new()
+    public override PathData FindPath(Vector2 targetPosition) 
     {
         // Nodes not fully explored yet, ordered as they were found.
-        TN openQueue = new();
+        _openQueue.Clear();
         
         // Nodes already fully explored. We use a dictionary to keep track of the
         // information gathered from each node, including the connection to get there,
@@ -31,7 +33,7 @@ public abstract class NotInformedPathFinder: PathFinder<NodeRecord>
         
         // Get graph nodes associated with the start and target positions. 
         CurrentStartNode = Graph.GetNodeAtPosition(transform.position);
-        GraphNode targetNode = Graph.GetNodeAtPosition(targetPosition);
+        PositionNode targetNode = Graph.GetNodeAtPosition(targetPosition);
         
         // You get to the start node from nowhere (null) and at no cost (0).
         var startRecord = new NodeRecord
@@ -40,14 +42,14 @@ public abstract class NotInformedPathFinder: PathFinder<NodeRecord>
             connection = null,
             costSoFar = 0,
         };
-        openQueue.Add(startRecord);
+        _openQueue.Add(startRecord);
         
         // Loop until we reach the target node or no more nodes are available to explore.
         NodeRecord current = NodeRecord.nodeRecordNull;
-        while (openQueue.Count > 0)
+        while (_openQueue.Count > 0)
         {
             // Explore the pending node that was first discovered.
-            current = openQueue.Get();
+            current = _openQueue.Get();
             if (current == null) break;
 
             // If we reached the end node, then our exploration is complete.
@@ -62,38 +64,22 @@ public abstract class NotInformedPathFinder: PathFinder<NodeRecord>
             foreach (GraphConnection graphConnection in current.node.connections.Values)
             {
                 // Where does that connection lead us?
-                GraphNode endNode = Graph.Nodes[graphConnection.endNodeKey];
-                // If that connection leads to a node fully explored, skip it.
+                PositionNode endNode = Graph.GetNodeById(graphConnection.endNodeId);
+                // If that connection leads to an already explored node, skip it.
                 if (closedDict.ContainsKey(endNode)) continue;
-                // Calculate the cost to reach the end node from the current node.
-                float endNodeCost = current.costSoFar + graphConnection.cost;
-
-                NodeRecord endNodeRecord;
-                if (openQueue.Contains(endNode))
+                
+                // Otherwise, calculate the cost to reach the end node from the current
+                // node.
+                float endNodeCost = current.costSoFar + 1;
+                // Include the discovered node in the open set to explore it further
+                // later.
+                NodeRecord endNodeRecord = new() 
                 {
-                    endNodeRecord = openQueue[endNode];
-                    // If the end node is already in the open set, but with a lower cost,
-                    // it means that we are NOT found a better path to get to it. So skip
-                    // it.
-                    if (endNodeRecord.costSoFar <= endNodeCost) continue;
-                    // Otherwise, update the record with the lower cost and the connection
-                    // to get there with that lower cost.
-                    endNodeRecord.costSoFar = endNodeCost;
-                    endNodeRecord.connection = graphConnection;
-                }
-                else
-                {
-                    // If the open set does not contain that node, it means we have
-                    // discovered a new node. So include it in the open set to explore it 
-                    // further later.
-                    endNodeRecord = new NodeRecord
-                    {
-                        node = endNode,
-                        connection = graphConnection,
-                        costSoFar = endNodeCost,
-                    };
-                    openQueue.Add(endNodeRecord);
-                }
+                    node = endNode,
+                    connection = graphConnection,
+                    costSoFar = endNodeCost,
+                };
+                _openQueue.Add(endNodeRecord);
             }
             
             // As we've finished looking at the connections of the current node, mark it
@@ -108,7 +94,7 @@ public abstract class NotInformedPathFinder: PathFinder<NodeRecord>
         
         // As we've got the target node, analyze the closedDict to follow back connections
         // from the target node to start node to build the path.
-        foundPath = BuildPath(CurrentStartNode, targetNode);
+        PathData foundPath = BuildPath(CurrentStartNode, targetNode);
         return foundPath;
     }
 }

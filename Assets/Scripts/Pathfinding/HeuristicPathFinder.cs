@@ -23,22 +23,30 @@ public abstract class HeuristicPathFinder<T>: PathFinder<T>
     /// traversing a graph. It provides functionality to add and remove nodes, check for
     /// node existence, and retrieve the node with the lowest cost value.
     /// </remarks>
-    protected abstract class PrioritizedNodeSet: INodeCollection<T>
+    protected abstract class PrioritizedNodeRecordSet: INodeRecordCollection<T>
     {
         // Needed to keep ordered by cost the NodeRecords of the node pending to be
         // explored.
         // Initially, I planned to use a PriorityQueue<GraphNode, float>, but I found that
         // the Unity .NET API doesn't support it, because that collection was added in
         // .NET 6, while my Unity version is .NET Framework 4.7.1.
-        private readonly SortedSet<T> prioritySet;
+        private readonly SortedSet<T> prioritySet = new();
+        
         // Needed to keep track of the nodes still pending to be explored and to quickly
         // get their respective records.
-        private readonly Dictionary<GraphNode, T> nodeRecordDict = new ();
+        private readonly Dictionary<PositionNode, T> nodeRecordDict = new ();
     
         public int Count => nodeRecordDict.Count;
-        public bool Contains(GraphNode node) => nodeRecordDict.ContainsKey(node);
+        
+        public void Clear()
+        {
+            prioritySet.Clear();
+            nodeRecordDict.Clear();
+        }
+        
+        public bool Contains(PositionNode node) => nodeRecordDict.ContainsKey(node);
 
-        protected PrioritizedNodeSet(IComparer<T> comparer)
+        protected PrioritizedNodeRecordSet(IComparer<T> comparer)
         {
             prioritySet = new SortedSet<T>(comparer);
         }
@@ -57,6 +65,7 @@ public abstract class HeuristicPathFinder<T>: PathFinder<T>
             nodeRecordDict[record.node] = record;
         }
         
+        // TODO: If this method is not going to be used, just remove it.
         public void Remove(T record)
         {
             if (nodeRecordDict.ContainsKey(record.node))
@@ -69,7 +78,7 @@ public abstract class HeuristicPathFinder<T>: PathFinder<T>
         /// <summary>
         /// Provides indexed access to the node records using a GraphNode as the key.
         /// </summary>
-        public T this[GraphNode node]
+        public T this[PositionNode node]
         {
             get => nodeRecordDict[node];
             set => nodeRecordDict[node] = value;
@@ -89,6 +98,7 @@ public abstract class HeuristicPathFinder<T>: PathFinder<T>
 
             // In SortedSet, Min is the element with the lowest priority/cost.
             T lowest = prioritySet.Min;
+            
             prioritySet.Remove(lowest);
             nodeRecordDict.Remove(lowest.node);
         

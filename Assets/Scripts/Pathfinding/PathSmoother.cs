@@ -66,8 +66,7 @@ public class PathSmoother : MonoBehaviour, IPathFinder
         // With paths of length 2 or less, there's nothing to smooth.
         if (rawPath.PathLength <= 2) return rawPath;
 
-        List<Vector2> smoothedPositions = new();
-        smoothedPositions.Add(rawPath.positions[0]);
+        List<Vector2> smoothedPositions = new() { rawPath.positions[0] };
         int startIndex = 0;
         int endIndex = 2;
     
@@ -86,16 +85,27 @@ public class PathSmoother : MonoBehaviour, IPathFinder
                 // If there was a clear path to the end of the path, then add that end to
                 // the smoothed path before leaving the loop. That will complete the
                 // smoothed path.
-                if (endIndex >= rawPath.PathLength) 
-                    smoothedPositions.Add(rawPath.positions[endIndex-1]);
+                if (endIndex >= rawPath.PathLength - 1) 
+                    smoothedPositions.Add(rawPath.positions[endIndex]);
+                endIndex++;
+                // If there was a clear path from the starIndex position to the endIndex
+                // position, and the endIndex was not the end of the path, then we can
+                // omit the positions between them from the smoothed path.
                 continue;
+            }
+            if (endIndex == rawPath.PathLength - 1)
+            {
+                // If we were at the end of the path, then add the last position to the
+                // smoothed path and smooth no more.
+                smoothedPositions.Add(rawPath.positions[endIndex]);
+                break;
             }
             // Otherwise, add the previous position to the occluded one to the smoothed
             // path because it was the last we could get directly.
             smoothedPositions.Add(rawPath.positions[endIndex-1]);
             // Now we will ray trace from that position to find out if we can omit any of
             // the remaining positions.
-            startIndex = endIndex;
+            startIndex = endIndex - 1;
             endIndex++;
         } while (endIndex < rawPath.PathLength);
     

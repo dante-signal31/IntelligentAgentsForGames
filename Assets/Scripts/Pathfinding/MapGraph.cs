@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using Levels.Tiles;
 using Tools;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 namespace Pathfinding
 {
@@ -32,6 +34,8 @@ public class MapGraph : MonoBehaviour
     public Vector2Int cellResolution = new(18, 10);
     [Tooltip("Layers to consider as not walkable.")]
     public LayerMask obstaclesLayers;
+    [Tooltip("Walkable tilemap")]
+    public Tilemap walkableTilemap;
     
     /// <summary>
     /// MapGraph serialized backend.
@@ -44,6 +48,9 @@ public class MapGraph : MonoBehaviour
     [SerializeField] private float nodeRadius = 0.1f;
     [SerializeField] private Color nodeColor = Color.orange;
 
+    // Used to draw connection cost when debugging.
+    public Color GridColor => gridColor;
+    
     /// <summary>
     /// Represents the physical size of each cell in the grid based on the map dimensions
     /// and the resolution of the grid.
@@ -67,7 +74,7 @@ public class MapGraph : MonoBehaviour
     /// <returns>
     /// A Vector2 representing the global world position of the node in physical space.
     /// </returns>
-    private Vector2 NodeGlobalPosition(Vector2Int nodeArrayPosition) => 
+    public Vector2 NodeGlobalPosition(Vector2Int nodeArrayPosition) => 
         nodeArrayPosition * CellSize + CellSize / 2;
 
 
@@ -92,6 +99,32 @@ public class MapGraph : MonoBehaviour
     }
 
     /// <summary>
+    /// Retrieves the array position of a node based on its unique identifier.
+    /// </summary>
+    /// <param name="nodeId">
+    /// The unique identifier of the node, represented as an unsigned integer.
+    /// This ID is used to map the node to its corresponding array position.
+    /// </param>
+    /// <returns>
+    /// A Vector2Int representing the position of the node within the grid's array
+    /// structure.
+    /// </returns>
+    private Vector2Int GetArrayPositionById(uint nodeId) => 
+        graphResource.nodeArrayPositionsById[nodeId];
+
+    /// <summary>
+    /// Retrieves a node from the graph using its unique identifier.
+    /// </summary>
+    /// <param name="nodeId">
+    /// The unique identifier of the node to retrieve.
+    /// </param>
+    /// <returns>
+    /// The <see cref="PositionNode"/> associated with the specified ID.
+    /// </returns>
+    public PositionNode GetNodeById(uint nodeId) => 
+        graphResource.nodes[GetArrayPositionById(nodeId)];
+    
+    /// <summary>
     /// Retrieves the GraphNode located at the given global world position.
     /// </summary>
     /// <param name="globalPosition">
@@ -102,7 +135,7 @@ public class MapGraph : MonoBehaviour
     /// The GraphNode instance at the specified global position if it exists;
     /// otherwise, null.
     /// </returns>
-    public GraphNode GetNodeAtPosition(Vector2 globalPosition)
+    public PositionNode GetNodeAtPosition(Vector2 globalPosition)
     {
         Vector2Int arrayPosition = GlobalToArrayPosition(globalPosition);
         if (!graphResource.nodes.ContainsKey(arrayPosition)) return null;
@@ -112,7 +145,7 @@ public class MapGraph : MonoBehaviour
     /// <summary>
     /// Just a shortcut to the graph nodes dictionary inside GraphResource.
     /// </summary>
-    public Dictionary<Vector2Int, GraphNode> Nodes => graphResource.nodes;
+    public Dictionary<Vector2Int, PositionNode> Nodes => graphResource.nodes;
     
     private CleanAreaChecker _cleanAreaChecker;
 
@@ -128,7 +161,7 @@ public class MapGraph : MonoBehaviour
     /// A Vector2Int representing the relative array position of the neighboring node
     /// based on the given orientation.
     /// </returns>
-    private Vector2Int GetNeighborRelativeArrayPosition(Orientation orientation)
+    public Vector2Int GetNeighborRelativeArrayPosition(Orientation orientation)
     {
         Vector2 relativePosition = Vector2.zero;
         switch (orientation)
@@ -157,7 +190,7 @@ public class MapGraph : MonoBehaviour
     /// </summary>
     public void GenerateGraph()
     {
-        graphResource.nodes.Clear();
+        ClearGraph();
         for (int x = 0; x < cellResolution.x; x++)
         {
             for (int y = 0; y < cellResolution.y; y++)
@@ -170,7 +203,13 @@ public class MapGraph : MonoBehaviour
                     continue;
                 
                 // If the position is clean, create a node.
-                GraphNode node = new(nodeGlobalPosition);
+                PositionNode node = new(nodeGlobalPosition);
+                
+                float nodeCost = GetPositionCost(nodeGlobalPosition);
+                // Node cost is the cost to go through the node. So, its connection cost
+                // is the half of the node cost. One half to enter the node and the other
+                // half to exit it.
+                float connectionCost = nodeCost / 2;
                 
                 // Populate new node's connections.
                 foreach (Orientation orientation in Enum.GetValues(typeof(Orientation)))
@@ -182,14 +221,22 @@ public class MapGraph : MonoBehaviour
                         nodeArrayPosition;
                     if (!graphResource.nodes.ContainsKey(neighborArrayPosition)) 
                         continue;
+                    // Get the cost to enter the neighbor node.
+                    Vector2 neighborGlobalPosition = 
+                        NodeGlobalPosition(neighborArrayPosition);
+                    float neighbourCost = GetPositionCost(neighborGlobalPosition);
+                    float neighborConnectionCost = neighbourCost / 2;
+                    // Direct connection between this node and the neighbor.
+                    PositionNode neighborNode = 
+                        graphResource.nodes[neighborArrayPosition];
                     node.AddConnection(
-                        nodeArrayPosition,
-                        neighborArrayPosition,
-                        1,
+                        neighborNode.Id,
+                        // The half cost to leave the current node, and the half cost to
+                        // enter the neighbor node.
+                        connectionCost + neighborConnectionCost,
                         orientation);
                     // Conversely, as our connections are bidirectional, we must set up
                     // also the reciprocal connection from the neighbor to this node. 
-                    GraphNode neighborNode = graphResource.nodes[neighborArrayPosition];
                     Orientation reciprocalOrientation = Orientation.North;
                     switch (orientation)
                     {
@@ -207,13 +254,12 @@ public class MapGraph : MonoBehaviour
                             break;
                     }
                     neighborNode.AddConnection(
-                        neighborArrayPosition, 
-                        nodeArrayPosition, 
-                        1, 
+                        node.Id, 
+                        connectionCost + neighborConnectionCost, 
                         reciprocalOrientation);
                 }
                 // Once the node is created and configured, we add it to the graph.
-                graphResource.nodes.Add(nodeArrayPosition, node);
+                AddNodeToGraph(nodeArrayPosition, node);
             }
         }
 #if UNITY_EDITOR
@@ -234,6 +280,50 @@ public class MapGraph : MonoBehaviour
     private void OnDisable()
     {
         _cleanAreaChecker?.Dispose();
+    }
+
+    /// <summary>
+    /// Clears the existing graph by removing all nodes and their associated data
+    /// from the internal data structures.
+    /// </summary>
+    private void ClearGraph()
+    {
+        graphResource.nodes.Clear();
+        graphResource.nodeArrayPositionsById.Clear();
+    }
+
+    /// <summary>
+    /// Adds a new node to the graph at a specified array position and updates the
+    /// internal mappings of node positions and IDs.
+    /// </summary>
+    /// <param name="nodeArrayPosition">
+    /// The array position of the node within the grid, represented as a Vector2Int.
+    /// This denotes the node's location in the grid structure.
+    /// </param>
+    /// <param name="node">
+    /// The node to be added to the graph. It contains information about its unique ID
+    /// and additional properties required for graph traversal.
+    /// </param>
+    private void AddNodeToGraph(Vector2Int nodeArrayPosition, PositionNode node)
+    {
+        graphResource.nodes.Add(nodeArrayPosition, node);
+        graphResource.nodeArrayPositionsById.Add(node.Id, nodeArrayPosition);
+    }
+
+    /// <summary>
+    /// Calculates the movement cost associated with a specific global position on the
+    /// map. This cost represents the effort required to traverse the tile at the given
+    /// position.
+    /// </summary>
+    /// <param name="neighborGlobalPosition">The global position of the tile
+    /// to be evaluated.</param>
+    /// <return>The movement cost as a float, derived from the custom data associated
+    /// with the tile.</return>
+    private float GetPositionCost(Vector2 neighborGlobalPosition)
+    {
+        Vector3Int cellPosition = walkableTilemap.WorldToCell(neighborGlobalPosition);
+        CourtyardTile tile = walkableTilemap.GetTile<CourtyardTile>(cellPosition);
+        return tile.Cost;
     }
 
 
@@ -267,11 +357,12 @@ public class MapGraph : MonoBehaviour
         
         // Draw nodes and their connections.
         Gizmos.color = nodeColor;
-        foreach (KeyValuePair<Vector2Int, GraphNode> nodeEntry in graphResource.nodes)
+        foreach (KeyValuePair<Vector2Int, PositionNode> nodeEntry in graphResource.nodes)
         {
             Vector2 cellPosition = NodeGlobalPosition(nodeEntry.Key);
-            GraphNode node = nodeEntry.Value;
+            PositionNode node = nodeEntry.Value;
             Gizmos.DrawWireSphere(cellPosition, nodeRadius);
+            if (node.connections == null) continue;
             foreach (Orientation orientation in Enum.GetValues(typeof(Orientation)))
             {
                 if (node.connections.ContainsKey(orientation))

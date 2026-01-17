@@ -12,13 +12,18 @@ namespace Tools
 public static class CustomUnityDictionaries
 {
     [Serializable]
-    public class OrientationGraphEdgeDictionary : 
+    public class OrientationGraphConnectionDictionary : 
         UnitySerializedDictionary<Orientation, GraphConnection>
     { }
 
     [Serializable]
     public class Vector2IntGraphNodeDictionary : 
-        UnitySerializedDictionary<Vector2Int, GraphNode>
+        UnitySerializedDictionary<Vector2Int, PositionNode>
+    { }
+    
+    [Serializable]
+    public class UintVector2IntDictionary : 
+        UnitySerializedDictionary<uint, Vector2Int>
     { }
 }
 }

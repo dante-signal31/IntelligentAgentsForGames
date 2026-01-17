@@ -26,19 +26,18 @@ public abstract class PathFinder<T> : MonoBehaviour, IPathFinder
     /// exploration process.
     /// </summary>
     // closedDict and CurrentStartMode must be made public to allow DrawDijkstraPathFinder
-    // draw gizmos.
-    // TODO: Try another visibility qualifier to avoid public.
-    public readonly Dictionary<GraphNode, T> closedDict = new();
+    // draw gizmos. --> TODO: Try another visibility qualifier to avoid public.
+    public readonly Dictionary<PositionNode, T> closedDict = new();
     
     /// <summary>
     /// Agent starting node.
     /// </summary>
-    public GraphNode CurrentStartNode { get; protected set; }
+    public PositionNode CurrentStartNode { get; protected set; }
     
     /// <summary>
     /// The currently found path across the graph to the target node.
     /// </summary>
-    protected PathData foundPath;
+    private PathData foundPath;
     
     /// <summary>
     /// Finds a path from the current position to the specified target position
@@ -67,7 +66,7 @@ public abstract class PathFinder<T> : MonoBehaviour, IPathFinder
     /// A Path object representing the ordered sequence of positions
     /// from the start node to the target node.
     /// </returns>
-    protected PathData BuildPath(GraphNode startNode, GraphNode targetNode)
+    protected PathData BuildPath(PositionNode startNode, PositionNode targetNode)
     {
         List<GraphConnection> path = new();
         T pointer = closedDict[targetNode];
@@ -76,7 +75,7 @@ public abstract class PathFinder<T> : MonoBehaviour, IPathFinder
         while (pointer.node != startNode)
         {
             path.Add(pointer.connection);
-            GraphNode endA = Graph.Nodes[pointer.connection.startNodeKey];
+            PositionNode endA = Graph.GetNodeById(pointer.connection.startNodeId);
             pointer = closedDict[endA];
         }
 
@@ -88,11 +87,11 @@ public abstract class PathFinder<T> : MonoBehaviour, IPathFinder
         // following Connections and taking note of their EndNode positions.
         foundPath = new PathData
         {
-            loop = false
+            loop = false,
         };
         foreach (GraphConnection connection in path)
         {
-            GraphNode endB = Graph.Nodes[connection.endNodeKey];
+            PositionNode endB = Graph.GetNodeById(connection.endNodeId);
             foundPath.positions.Add(endB.position);
         }
     
@@ -105,7 +104,7 @@ public abstract class PathFinder<T> : MonoBehaviour, IPathFinder
         if (!showGizmos) return;
     
         // Draw explored nodes.
-        foreach (GraphNode exploredNode in closedDict.Keys)  
+        foreach (PositionNode exploredNode in closedDict.Keys)  
         {
             Gizmos.color = exploredNodeColor;
             Gizmos.DrawSphere(exploredNode.position, exploredNodeGizmoRadius);

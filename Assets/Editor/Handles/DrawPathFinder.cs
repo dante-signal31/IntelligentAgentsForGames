@@ -21,7 +21,7 @@ public class DrawPathFinder<T> : UnityEditor.Editor where T: NodeRecord, new()
             normal = { textColor = pathFinder.textColor }
         };
 
-        foreach (GraphNode exploredNode in pathFinder.closedDict.Keys)
+        foreach (PositionNode exploredNode in pathFinder.closedDict.Keys)
         {
             // Mark every node with the smallest cost to get there from the start node
             // and the local orientation of the connection to get there.
@@ -38,9 +38,9 @@ public class DrawPathFinder<T> : UnityEditor.Editor where T: NodeRecord, new()
             }
             else
             {
-                Vector2Int fromNodeKey =
-                    pathFinder.closedDict[exploredNode].connection.startNodeKey;
-                GraphNode fromNode = pathFinder.Graph.Nodes[fromNodeKey];
+                uint fromNodeId =
+                    pathFinder.closedDict[exploredNode].connection.startNodeId;
+                PositionNode fromNode = pathFinder.Graph.GetNodeById(fromNodeId);
                 Vector2 relativePosition = exploredNode.position - fromNode.position;
                 // Connection orientation from the receiving node perspective (the
                 // explored node).

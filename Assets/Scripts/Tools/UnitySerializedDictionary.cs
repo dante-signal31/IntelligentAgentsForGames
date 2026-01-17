@@ -23,6 +23,7 @@ public abstract class UnitySerializedDictionary<TKey, TValue> :
 {
     // Don't remove [SerializeField] attribute or Unity will not serialize the dictionary.
     // I've tried it and it didn't work.
+    // Don't work either making any of these fields readonly.
     [SerializeField, HideInInspector]
     private List<TKey> keyData = new();
 

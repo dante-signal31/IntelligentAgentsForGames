@@ -1,5 +1,4 @@
 ﻿using System;
-using UnityEngine;
 
 namespace Pathfinding
 {
@@ -16,15 +15,15 @@ public class GraphConnection
     // serialization algorithms don't like cyclic graphs. My graph implemented cycles:
     // MapGraphResource -> GraphNode A -> GraphConnection -> EndNode (GraphNode B) ->
     // Connections -> ... -> Return to GraphNode A. So I had to break cycles. That's why
-    // now I used Vector2I keys to serialize GraphConnections and not direct references
+    // now I use uint id keys to serialize GraphConnections and not direct references
     // instead.
-    public Vector2Int startNodeKey;
-    public Vector2Int endNodeKey;
+    public uint startNodeId;
+    public uint endNodeId;
     
-    public GraphConnection(Vector2Int startNodeKey, Vector2Int endNodeKey, float cost)
+    public GraphConnection(uint startNodeId, uint endNodeId, float cost)
     {
-        this.startNodeKey = startNodeKey;
-        this.endNodeKey = endNodeKey;
+        this.startNodeId = startNodeId;
+        this.endNodeId = endNodeId;
         this.cost = cost;
     }
 }
