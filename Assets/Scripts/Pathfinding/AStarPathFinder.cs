@@ -17,7 +17,7 @@ public class AStarPathFinder: HeuristicPathFinder<AStarNodeRecord>
     /// This class manages open nodes, ordering them based on their total estimated cost
     /// to reach the target, enabling efficient retrieval of the next node to explore.
     /// </summary>
-    protected class AStarPrioritizedNodeSet: PrioritizedNodeSet
+    protected class AStarPrioritizedNodeRecordSet: PrioritizedNodeRecordSet
     {
         // Comparer to keep the SortedSet ordered by TotalEstimatedCostToTarget
         private class NodeRecordComparer : IComparer<AStarNodeRecord>
@@ -34,7 +34,7 @@ public class AStarPathFinder: HeuristicPathFinder<AStarNodeRecord>
             }
         }
         
-        public AStarPrioritizedNodeSet() : base(new NodeRecordComparer()) {}
+        public AStarPrioritizedNodeRecordSet() : base(new NodeRecordComparer()) {}
     }
 
     [Header("WIRING")]
@@ -43,6 +43,7 @@ public class AStarPathFinder: HeuristicPathFinder<AStarNodeRecord>
     [SerializeField] private MonoBehaviour heuristic;
     
     private IAStarHeuristic _heuristic;
+    private readonly AStarPrioritizedNodeRecordSet _openRecordSet = new ();
 
     private void Start()
     {
@@ -53,7 +54,8 @@ public class AStarPathFinder: HeuristicPathFinder<AStarNodeRecord>
     {
         // Nodes not fully explored yet, ordered by the estimated cost to get the target
         // through them.
-        AStarPrioritizedNodeSet openSet = new ();
+        _openRecordSet.Clear();
+        
         // Nodes already fully explored. We use a dictionary to keep track of the
         // information gathered from each node, including the connection to get there,
         // while exploring the graph.
@@ -61,7 +63,7 @@ public class AStarPathFinder: HeuristicPathFinder<AStarNodeRecord>
     
         // Get graph nodes associated with the start and target positions. 
         CurrentStartNode = Graph.GetNodeAtPosition(transform.position);
-        GraphNode targetNode = Graph.GetNodeAtPosition(targetPosition);
+        PositionNode targetNode = Graph.GetNodeAtPosition(targetPosition);
     
         // You get to the start node from nowhere (null) and at no cost (0).
         AStarNodeRecord startNodeRecord = new()
@@ -69,19 +71,32 @@ public class AStarPathFinder: HeuristicPathFinder<AStarNodeRecord>
             node = CurrentStartNode,
             connection = null,
             costSoFar = 0,
+            // For A* to guarantee the shortest path, the heuristic must never
+            // overestimate the actual cost (it must be "admissible"). E.g., the heuristic
+            // to the target should not be higher than the actual cost to get there.
+            //
+            // For instance, If you are using Euclidean Distance as a heuristic while your
+            // connection costs (graphConnection.Cost) are significantly lower (e.g.,
+            // smaller than the pixel distance), the heuristic becomes too "aggressive."
+            // Consequence: The algorithm relies so heavily on the direct distance to
+            // the target (h) that it ignores terrain costs (g), because the h-value
+            // outweighs the accumulated cost.
+            //
+            // Solution: Ensure graph connection costs are on the same scale as the
+            // used heuristic (Euclidean distance in the example).
             totalEstimatedCostToTarget = _heuristic.EstimateCostToTarget(
                 CurrentStartNode.position,
-                targetPosition)
+                targetNode.position)
         };
-        openSet.Add(startNodeRecord);
+        _openRecordSet.Add(startNodeRecord);
 
         // Loop until we reach the target node or no more nodes are available to explore.
         AStarNodeRecord current = AStarNodeRecord.aStarNodeRecordNull;
-        while (openSet.Count > 0)
+        while (_openRecordSet.Count > 0)
         {
             // Explore prioritizing the node with the lowest total estimated cost to get
             // the target.
-            current = openSet.Get();
+            current = _openRecordSet.Get();
             if (current == null) break;
 
             // If we reached the end node, then our exploration is complete.
@@ -92,26 +107,23 @@ public class AStarPathFinder: HeuristicPathFinder<AStarNodeRecord>
             }
 
             // Get all the connections of the current node and take note of the nodes
-            // those connections lead to into the openSet to explore those nodes later.
+            // those connections lead to into the _openRecordSet to explore those nodes later.
             foreach (GraphConnection graphConnection in current.node.connections.Values)
             {
                 // Where does that connection lead us?
-                GraphNode endNode = Graph.Nodes[graphConnection.endNodeKey];
+                PositionNode endNode = Graph.GetNodeById(graphConnection.endNodeId);
                 // Calculate the cost to reach the end node from the current node.
                 float endNodeCost = current.costSoFar + graphConnection.cost;
 
-                AStarNodeRecord endNodeRecord;
                 // In Dijkstra If that connection leaded to a node fully explored, we
                 // skipped it because no better path could be found to any closed node.
                 // Whereas in A* you can have closed a node under a wrong estimation.
                 // That's why, in A*, you must check if you've just found a better path to
                 // an already closed node.
-                if (closedDict.ContainsKey(endNode))
+                if (closedDict.TryGetValue(endNode, out AStarNodeRecord endNodeRecord))
                 {
-                    endNodeRecord = closedDict[endNode];
-
                     // No better path to this node, so skip it.
-                    if (endNodeRecord.costSoFar <= endNodeCost) continue;
+                    if (endNodeCost >= endNodeRecord.costSoFar) continue;
 
                     // Otherwise, we must asses this node again to check if it's more 
                     // promising than the previous time. So, we must remove it from 
@@ -127,19 +139,18 @@ public class AStarPathFinder: HeuristicPathFinder<AStarNodeRecord>
                     endNodeRecord.costSoFar = endNodeCost;
                     endNodeRecord.totalEstimatedCostToTarget =
                         estimatedCostToTarget + endNodeCost;
-
-                    // Add the node to the openSet to assess it fully again.
-                    openSet.Add(endNodeRecord);
+                    endNodeRecord.connection = graphConnection;
                 }
                 // OK, we've just found a node that is still being assessed in the open
                 // list.
-                else if (openSet.Contains(endNode))
+                else if (_openRecordSet.Contains(endNode))
                 {
-                    endNodeRecord = openSet[endNode];
+                    endNodeRecord = _openRecordSet[endNode];
                     // If the end node is already in the open set, but with a lower cost,
-                    // it means that we are NOT found a better path to get to it. So skip
+                    // it means that we have NOT found a better path to get to it. So skip
                     // it.
-                    if (endNodeRecord.costSoFar <= endNodeCost) continue;
+                    if (endNodeCost >= endNodeRecord.costSoFar) continue;
+                    
                     // Otherwise, update the record with the lower cost and the connection
                     // to get there with that lower cost.
                     //
@@ -165,12 +176,13 @@ public class AStarPathFinder: HeuristicPathFinder<AStarNodeRecord>
                         connection = graphConnection,
                         costSoFar = endNodeCost,
                         totalEstimatedCostToTarget =
-                            _heuristic.EstimateCostToTarget(
+                            endNodeCost + _heuristic.EstimateCostToTarget(
                                 endNode.position, 
                                 targetPosition)
                     };
-                    openSet.Add(endNodeRecord);
                 }
+                // Add the node to the _openRecordSet to assess it fully again.
+                _openRecordSet.Add(endNodeRecord);
             }
             // As we've finished looking at the connections of the current node, mark it
             // as fully explored, including it in the closed list.
