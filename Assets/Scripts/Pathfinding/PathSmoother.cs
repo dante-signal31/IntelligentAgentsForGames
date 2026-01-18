@@ -78,10 +78,6 @@ public class PathSmoother : MonoBehaviour, IPathFinder
                     rawPath.positions[startIndex],
                     rawPath.positions[endIndex]))
             {
-                // If there is a clear path from the starIndex position to the endIndex
-                // position, then we can omit the positions between them from the smoothed
-                // path.
-                endIndex++;
                 // If there was a clear path to the end of the path, then add that end to
                 // the smoothed path before leaving the loop. That will complete the
                 // smoothed path.

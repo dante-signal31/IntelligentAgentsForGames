@@ -31,13 +31,23 @@ public class MeshPathFinderSteeringBehavior : SteeringBehavior, IGizmos
     public bool ShowGizmos
     {
         get => showGizmos;
-        set => showGizmos = value;
+        set
+        {
+            showGizmos = value;
+            if (_currentPath == null) return;
+            _currentPath.ShowGizmos = value;
+        }
     }
 
     public Color GizmosColor
     {
         get => gizmosColor;
-        set => gizmosColor = value;
+        set
+        {
+            gizmosColor = value;
+            if (_currentPath == null) return;
+            _currentPath.GizmosColor = value;
+        }
     }
     
     public Target PathTarget
@@ -101,6 +111,8 @@ public class MeshPathFinderSteeringBehavior : SteeringBehavior, IGizmos
         _currentPath = 
             new GameObject("MeshPathFinderSteeringBehavior - CurrentPath")
                 .AddComponent<Path>();
+        _currentPath.ShowGizmos = ShowGizmos;
+        _currentPath.GizmosColor = GizmosColor;
     }
 
     private void Start()

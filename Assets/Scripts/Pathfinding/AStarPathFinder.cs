@@ -115,7 +115,7 @@ public class AStarPathFinder: HeuristicPathFinder<AStarNodeRecord>
                 // Calculate the cost to reach the end node from the current node.
                 float endNodeCost = current.costSoFar + graphConnection.cost;
 
-                // In Dijkstra If that connection leaded to a node fully explored, we
+                // If that connection leaded to a node fully explored, in Dijkstra we
                 // skipped it because no better path could be found to any closed node.
                 // Whereas in A* you can have closed a node under a wrong estimation.
                 // That's why, in A*, you must check if you've just found a better path to
@@ -154,6 +154,10 @@ public class AStarPathFinder: HeuristicPathFinder<AStarNodeRecord>
                     // Otherwise, update the record with the lower cost and the connection
                     // to get there with that lower cost.
                     //
+                    // First, remove the record from the existing set to avoid
+                    // corrupting it by editing its values.
+                    _openRecordSet.Remove(endNodeRecord);
+                    
                     // We could call the heuristic again, but it will return the same
                     // value as the last time. What has changed is the CostSoFar part,
                     // so we remove the old CostSoFar from the total to add the new value.
@@ -165,11 +169,11 @@ public class AStarPathFinder: HeuristicPathFinder<AStarNodeRecord>
                     endNodeRecord.costSoFar = endNodeCost;
                     endNodeRecord.connection = graphConnection;
                 }
+                // If the open set does not contain that node, it means we have
+                // discovered a new node. So include it in the open set to explore it 
+                // further later.
                 else
                 {
-                    // If the open set does not contain that node, it means we have
-                    // discovered a new node. So include it in the open set to explore it 
-                    // further later.
                     endNodeRecord = new AStarNodeRecord
                     {
                         node = endNode,

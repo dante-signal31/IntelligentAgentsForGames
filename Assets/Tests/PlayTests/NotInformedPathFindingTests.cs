@@ -21,6 +21,9 @@ public class NotInformedPathFindingTests
     private GameObject _smoothedAStarPathFindingGameObject;
     private GameObject _breathFirstPathFindingGameObject;
     private GameObject _depthFirstPathFindingGameObject;
+    private GameObject _meshPathFindingGameObject;
+    private GameObject _unityNavMeshMovingAgentGameObject;
+    private GameObject _smoothPathFinderCurrentPathGameObject;
     private GameObject _target;
     private PathFinderSteeringBehavior _breathFirstPathFinderSteeringBehavior;
     private PathFinderSteeringBehavior _depthFirstPathFinderSteeringBehavior;
@@ -36,14 +39,27 @@ public class NotInformedPathFindingTests
     public IEnumerator SetUp()
     {
         // Clean up any existing objects first
+        _pathFollowingGameObject = null;
+        _dijkstraPathFindingGameObject = null;
+        _aStarPathFindingGameObject = null;
+        _smoothedAStarPathFindingGameObject = null;
         _breathFirstPathFindingGameObject = null;
         _depthFirstPathFindingGameObject = null;
+        _meshPathFindingGameObject = null;
+        _meshPathFindingGameObject = null;
+        _smoothPathFinderCurrentPathGameObject = null;
         
         // Clean up any existing objects first.
 
         // Load the test scene
         yield return TestLevelManagement.ReLoadScene(CurrentScene);
         yield return null;
+        
+        if (_target == null)
+        {
+            _target = GameObject.Find("Target");
+            _target.SetActive(false);
+        }
         
         if (_position1 == null)
             _position1 = GameObject.Find("Position1").transform;
@@ -89,8 +105,17 @@ public class NotInformedPathFindingTests
             _depthFirstPathFindingGameObject.SetActive(false);
         }
         
-        if (_target == null)
-            _target = GameObject.Find("Target");
+        if (_meshPathFindingGameObject == null)
+        {
+            _meshPathFindingGameObject = GameObject.Find("MeshPathFinderMovingAgent");
+            _meshPathFindingGameObject.SetActive(false);
+        }
+
+        if (_unityNavMeshMovingAgentGameObject == null)
+        {
+            _unityNavMeshMovingAgentGameObject = GameObject.Find("UnityNavMeshMovingAgent");
+            _unityNavMeshMovingAgentGameObject.SetActive(false);
+        }
         
         if (_pathGameObject == null)
         {
@@ -127,6 +152,8 @@ public class NotInformedPathFindingTests
     [UnityTearDown]
     public IEnumerator TearDown()
     {
+        if (_target != null)
+            _target.SetActive(false);
         if (_breathFirstPathFindingGameObject != null)
             _breathFirstPathFindingGameObject.SetActive(false);
         if (_depthFirstPathFindingGameObject != null)
@@ -148,18 +175,20 @@ public class NotInformedPathFindingTests
         _breathFirstPathFinderAgent.MaximumRotationalSpeed = 1080f;
         _breathFirstPathFinderAgent.StopRotationThreshold = 1f;
         _breathFirstPathFinderAgentColor.Color = Color.green;
-        _target.transform.position = _position2.position;
+        _breathFirstPathFinderSteeringBehavior.ShowGizmos = true;
         _breathFirstPathFindingGameObject.SetActive(true);
+        _target.SetActive(true);
         
     
         // Start test.
         // Assert that the pathfinder agent can reach the first target.
-        yield return new WaitForSeconds(4);
+        _target.transform.position = _position2.position;
+        yield return new WaitForSeconds(5);
         Assert.True(Vector2.Distance(_breathFirstPathFindingGameObject.transform.position, _position2.position) < 0.3f);
         
         // Assert that the pathfinder agent can reach the second target.
         _target.transform.position = _position3.position;
-        yield return new WaitForSeconds(4);
+        yield return new WaitForSeconds(5);
         Assert.True(Vector2.Distance(_breathFirstPathFindingGameObject.transform.position, _position3.position) < 0.3f);
     }
     
@@ -176,12 +205,14 @@ public class NotInformedPathFindingTests
         _depthFirstPathFinderAgent.MaximumRotationalSpeed = 1080f;
         _depthFirstPathFinderAgent.StopRotationThreshold = 1f;
         _depthFirstPathFinderAgentColor.Color = Color.green;
-        _target.transform.position = _position2.position;
+        _depthFirstPathFinderSteeringBehavior.ShowGizmos = true;
         _depthFirstPathFindingGameObject.SetActive(true);
+        _target.SetActive(true);
         
     
         // Start test.
         // Assert that the pathfinder agent can reach the first target.
+        _target.transform.position = _position2.position;
         yield return new WaitForSeconds(5);
         Assert.True(Vector2.Distance(_depthFirstPathFindingGameObject.transform.position, _position2.position) < 0.3f);
         

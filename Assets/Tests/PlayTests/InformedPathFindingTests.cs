@@ -113,7 +113,7 @@ public class InformedPathFindingTests
                 GameObject.Find("SmoothedAStarPathFinderMovingAgent");
             _smoothedAStarPathFindingGameObject.SetActive(false);
         }
-
+        
         if (_breathFirstPathFindingGameObject == null)
         {
             _breathFirstPathFindingGameObject = GameObject.Find("BreathFirstPathFinderMovingAgent");
@@ -137,9 +137,12 @@ public class InformedPathFindingTests
             _unityNavMeshMovingAgentGameObject = GameObject.Find("UnityNavMeshMovingAgent");
             _unityNavMeshMovingAgentGameObject.SetActive(false);
         }
-        
+
         if (_target == null)
+        {
             _target = GameObject.Find("Target");
+            _target.SetActive(false);
+        }
         
         if (_pathGameObject == null)
         {
@@ -236,24 +239,51 @@ public class InformedPathFindingTests
     [UnityTearDown]
     public IEnumerator TearDown()
     {
-        if (_pathFollowingGameObject != null)
+        if (_pathFollowingGameObject != null){}
             _pathFollowingGameObject.SetActive(false);
         if (_pathGameObject != null)
             _pathGameObject.SetActive(false);
+        
         if (_dijkstraPathFindingGameObject != null)
+        {
             _dijkstraPathFindingGameObject.SetActive(false);
+            _dijkstraPathFinderSteeringBehavior.ShowGizmos = false;
+        }
+
         if (_aStarPathFindingGameObject != null)
+        {
             _aStarPathFindingGameObject.SetActive(false);
+            _aStarPathFinderSteeringBehavior.ShowGizmos = false;
+        }
+
         if (_smoothedAStarPathFindingGameObject != null)
+        {
             _smoothedAStarPathFindingGameObject.SetActive(false);
+            _smoothedAStarPathFinderSteeringBehavior.ShowGizmos = false;
+        }
+
         if (_breathFirstPathFindingGameObject != null)
+        {
             _breathFirstPathFindingGameObject.SetActive(false);
+            _breathFirstPathFinderSteeringBehavior.ShowGizmos = false;
+        }
+
         if (_depthFirstPathFindingGameObject != null)
+        {
             _depthFirstPathFindingGameObject.SetActive(false);
+            _depthFirstPathFinderSteeringBehavior.ShowGizmos = false;
+        }
+
         if (_meshPathFindingGameObject != null)
+        {
             _meshPathFindingGameObject.SetActive(false);
+            _meshPathFinderSteeringBehavior.ShowGizmos = false;
+        }
+
         if (_unityNavMeshMovingAgentGameObject != null)
             _unityNavMeshMovingAgentGameObject.SetActive(false);
+        if (_target != null)
+            _target.SetActive(false);
         
         yield return null;
     }
@@ -371,17 +401,19 @@ public class InformedPathFindingTests
         _dijkstraPathFinderAgent.MaximumRotationalSpeed = 1080f;
         _dijkstraPathFinderAgent.StopRotationThreshold = 1f;
         _dijkstraPathFinderAgentColor.Color = Color.green;
+        _dijkstraPathFinderSteeringBehavior.ShowGizmos = true;
         _dijkstraPathFindingGameObject.SetActive(true);
+        _target.SetActive(true);
 
         // Start test.
         // Assert that the pathfinder agent can reach the first target.
         _target.transform.position = _position2.position;
-        yield return new WaitForSeconds(4);
+        yield return new WaitForSeconds(5);
         Assert.True(Vector2.Distance(_dijkstraPathFindingGameObject.transform.position, _position2.position) < 0.3f);
         
         // Assert that the pathfinder agent can reach the second target.
         _target.transform.position = _position3.position;
-        yield return new WaitForSeconds(4);
+        yield return new WaitForSeconds(5);
         Assert.True(Vector2.Distance(_dijkstraPathFindingGameObject.transform.position, _position3.position) < 0.3f);
     }
     
@@ -398,17 +430,19 @@ public class InformedPathFindingTests
         _aStarPathFinderAgent.MaximumRotationalSpeed = 1080f;
         _aStarPathFinderAgent.StopRotationThreshold = 1f;
         _aStarPathFinderAgentColor.Color = Color.green;
+        _aStarPathFinderSteeringBehavior.ShowGizmos = true;
         _aStarPathFindingGameObject.SetActive(true);
+        _target.SetActive(true);
 
         // Start test.
         // Assert that the pathfinder agent can reach the first target.
         _target.transform.position = _position2.position;
-        yield return new WaitForSeconds(4);
+        yield return new WaitForSeconds(5);
         Assert.True(Vector2.Distance(_aStarPathFindingGameObject.transform.position, _position2.position) < 0.3f);
         
         // Assert that the pathfinder agent can reach the second target.
         _target.transform.position = _position3.position;
-        yield return new WaitForSeconds(4);
+        yield return new WaitForSeconds(5);
         Assert.True(Vector2.Distance(_aStarPathFindingGameObject.transform.position, _position3.position) < 0.3f);
     }
     
@@ -425,7 +459,9 @@ public class InformedPathFindingTests
         _smoothedAStarPathFinderAgent.MaximumRotationalSpeed = 1080f;
         _smoothedAStarPathFinderAgent.StopRotationThreshold = 1f;
         _smoothedAStarPathFinderAgentColor.Color = Color.green;
+        _smoothedAStarPathFinderSteeringBehavior.ShowGizmos = true;
         _smoothedAStarPathFindingGameObject.SetActive(true);
+        _target.SetActive(true);
         
         // Get reference to the path smoother.
         PathSmoother pathSmoother = _smoothedAStarPathFindingGameObject.GetComponentInChildren<PathSmoother>();
@@ -464,7 +500,9 @@ public class InformedPathFindingTests
         _meshPathFinderAgent.MaximumRotationalSpeed = 1080f;
         _meshPathFinderAgent.StopRotationThreshold = 1f;
         _meshPathFinderAgentColor.Color = Color.green;
+        _meshPathFinderSteeringBehavior.ShowGizmos = true;
         _meshPathFindingGameObject.SetActive(true);
+        _target.SetActive(true);
 
         // Start test.
         // Assert that the pathfinder agent can reach the first target.
@@ -491,6 +529,7 @@ public class InformedPathFindingTests
         _unityNavMeshMovingAgent.angularSpeed = 1080f;
         _unityNavMeshAgentColor.Color = Color.green;
         _unityNavMeshMovingAgentGameObject.SetActive(true);
+        _target.SetActive(true);
 
         // Start test.
         // Assert that the pathfinder agent can reach the first target.

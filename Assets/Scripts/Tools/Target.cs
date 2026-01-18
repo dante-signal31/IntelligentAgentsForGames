@@ -51,6 +51,7 @@ public class Target : MonoBehaviour
     private void Awake()
     {
         _mainCamera = Camera.main;
+        _currentPosition = targetTransform.position;
     }
 
     private void Update()
