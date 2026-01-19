@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Pathfinding
 {
-public abstract class PathFinder<T> : MonoBehaviour, IPathFinder 
+public abstract class GraphPathFinder<T> : MonoBehaviour, IGraphPathFinder 
     where T: NodeRecord, new()
 {
     [Header("DEBUG:")]

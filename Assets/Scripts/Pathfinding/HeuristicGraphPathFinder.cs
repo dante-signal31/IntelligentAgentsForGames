@@ -11,7 +11,7 @@ namespace Pathfinding
 /// explored first.
 /// </remarks> 
 /// </summary>
-public abstract class HeuristicPathFinder<T>: PathFinder<T>
+public abstract class HeuristicGraphPathFinder<T>: GraphPathFinder<T>
     where T: NodeRecord, new()
 {
     /// <summary>

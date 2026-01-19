@@ -5,15 +5,15 @@ using UnityEngine;
 
 namespace Pathfinding
 {
-public class PathSmoother : MonoBehaviour, IPathFinder
+public class GraphPathSmoother : MonoBehaviour, IGraphPathFinder
 {
     [Header("CONFIGURATION:")]
     [Tooltip("Graph modeling the environment.")]
     [SerializeField] private MapGraph graph;
 
     [Header("WIRING:")]
-    [InterfaceCompliant(typeof(IPathFinder))]
-    [Tooltip("IPathFinder component whose returning path needs to be smoothed.")]
+    [InterfaceCompliant(typeof(IGraphPathFinder))]
+    [Tooltip("IGraphPathFinder component whose returning path needs to be smoothed.")]
     [SerializeField] private MonoBehaviour smoothedPathFinder;
 
     [Header("DEBUG:")]
@@ -27,19 +27,19 @@ public class PathSmoother : MonoBehaviour, IPathFinder
         set
         {
             graph = value;
-            if (_smoothedPathFinder != null) _smoothedPathFinder.Graph = value;
+            if (smoothedGraphPathFinder != null) smoothedGraphPathFinder.Graph = value;
         }
     }
 
-    private IPathFinder _smoothedPathFinder;
+    private IGraphPathFinder smoothedGraphPathFinder;
     private CleanAreaChecker _cleanAreaChecker;
     private PathData _smoothedPathData = new();
     private PathData _rawPathData = new();
 
     private void Start()
     {
-        _smoothedPathFinder = (IPathFinder) smoothedPathFinder;
-        _smoothedPathFinder.Graph = graph;
+        smoothedGraphPathFinder = (IGraphPathFinder) smoothedPathFinder;
+        smoothedGraphPathFinder.Graph = graph;
         _cleanAreaChecker = new CleanAreaChecker(
             (Mathf.Min(Graph.CellSize.x, Graph.CellSize.y)/2), 
             Graph.obstaclesLayers);
@@ -47,7 +47,7 @@ public class PathSmoother : MonoBehaviour, IPathFinder
 
     public PathData FindPath(Vector2 targetPosition)
     {
-        _rawPathData = _smoothedPathFinder.FindPath(targetPosition);
+        _rawPathData = smoothedGraphPathFinder.FindPath(targetPosition);
         if (_rawPathData == null) return null;
         _smoothedPathData = SmoothPath(_rawPathData);
         return _smoothedPathData;
@@ -64,7 +64,7 @@ public class PathSmoother : MonoBehaviour, IPathFinder
     private PathData SmoothPath(PathData rawPath)
     {
         // With paths of length 2 or less, there's nothing to smooth.
-        if (rawPath.PathLength <= 2) return rawPath;
+        if (rawPath.PathPositionsLength <= 2) return rawPath;
 
         List<Vector2> smoothedPositions = new() { rawPath.positions[0] };
         int startIndex = 0;
@@ -81,7 +81,7 @@ public class PathSmoother : MonoBehaviour, IPathFinder
                 // If there was a clear path to the end of the path, then add that end to
                 // the smoothed path before leaving the loop. That will complete the
                 // smoothed path.
-                if (endIndex >= rawPath.PathLength - 1) 
+                if (endIndex >= rawPath.PathPositionsLength - 1) 
                     smoothedPositions.Add(rawPath.positions[endIndex]);
                 endIndex++;
                 // If there was a clear path from the starIndex position to the endIndex
@@ -89,7 +89,7 @@ public class PathSmoother : MonoBehaviour, IPathFinder
                 // omit the positions between them from the smoothed path.
                 continue;
             }
-            if (endIndex == rawPath.PathLength - 1)
+            if (endIndex == rawPath.PathPositionsLength - 1)
             {
                 // If we were at the end of the path, then add the last position to the
                 // smoothed path and smooth no more.
@@ -103,7 +103,7 @@ public class PathSmoother : MonoBehaviour, IPathFinder
             // the remaining positions.
             startIndex = endIndex - 1;
             endIndex++;
-        } while (endIndex < rawPath.PathLength);
+        } while (endIndex < rawPath.PathPositionsLength);
     
         _smoothedPathData.LoadPathData(smoothedPositions);
         return _smoothedPathData;

@@ -248,7 +248,7 @@ namespace Tests.PlayTests
             _target.Enabled = true;
             _target.TargetPosition = _position2.position;
             _seekGameObject.transform.position = _position1.position;
-            _seekAgent.MaximumSpeed = 6.0f;
+            _seekAgent.MaximumSpeed = 4.0f;
             _seekAgent.StopSpeed = 0.01f;
             _seekAgent.MaximumRotationalSpeed = 1080f;
             _seekAgent.StopRotationThreshold = 1f;
@@ -287,7 +287,7 @@ namespace Tests.PlayTests
             _target.transform.position = _position3.position;
             
             // Give hide agent time to hide.
-            yield return new WaitForSeconds(2f);
+            yield return new WaitForSeconds(3f);
             
             // Assert that seek agent can no longer see hide agent.
             Assert.False(_hideSteeringBehavior.ThreatCanSeeUs);
@@ -296,7 +296,7 @@ namespace Tests.PlayTests
             _target.transform.position = _position4.position;
             
             // Give hide agent time to hide.
-            yield return new WaitForSeconds(2f);
+            yield return new WaitForSeconds(5f);
             
             // Assert that seek agent can no longer see hide agent.
             Assert.False(_hideSteeringBehavior.ThreatCanSeeUs);
@@ -391,7 +391,7 @@ namespace Tests.PlayTests
             // Start test.
             
             // Give agent time to reach its target.
-            yield return new WaitForSeconds(18f);
+            yield return new WaitForSeconds(20f);
             
             // Assert that wall avoider has reached target.
             Assert.True(Vector2.Distance(

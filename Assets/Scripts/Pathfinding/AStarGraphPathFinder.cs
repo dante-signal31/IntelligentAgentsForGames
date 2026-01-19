@@ -10,7 +10,7 @@ namespace Pathfinding
 /// least-cost path from a starting position to a target position by exploring nodes
 /// systematically based on their estimated cost to get the goal from them.
 /// </summary>
-public class AStarPathFinder: HeuristicPathFinder<AStarNodeRecord>
+public class AStarGraphPathFinder: HeuristicGraphPathFinder<AStarNodeRecord>
 {
     /// <summary>
     /// Represents a prioritized set of nodes for the A* pathfinding algorithm.

@@ -14,7 +14,13 @@ public class PathData
     /// <summary>
     /// How many positions this path has.
     /// </summary>
-    public int PathLength => positions.Count;
+    public int PathPositionsLength => positions.Count;
+
+    /// <summary>
+    /// Represents the total length of the path, calculated as the sum of distances
+    /// between consecutive positions in the path.
+    /// </summary>
+    public float PathLength { get; private set; }
 
     /// <summary>
     /// Current index of the position we are going to.
@@ -40,7 +46,29 @@ public class PathData
     {
         positions.Clear();
         positions.AddRange(path);
+        PathLength = GetPathLength();
         CurrentTargetPositionIndex = 0;
+    }
+
+    /// <summary>
+    /// Calculates the total length of the path by summing the distances between
+    /// consecutive positions.
+    /// </summary>
+    /// <returns>
+    /// The total length of the path. If the path contains fewer than two positions,
+    /// the result is 0.
+    /// </returns>
+    private float GetPathLength()
+    {
+        if (positions.Count < 2) return 0;
+        
+        float distance = 0;
+        for (int i = 1; i < positions.Count; i++)
+        {
+            distance += Vector2.Distance(positions[i-1], positions[i]);
+        }
+        
+        return distance;
     }
     
     /// <summary>

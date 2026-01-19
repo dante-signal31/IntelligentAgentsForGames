@@ -464,7 +464,7 @@ public class InformedPathFindingTests
         _target.SetActive(true);
         
         // Get reference to the path smoother.
-        PathSmoother pathSmoother = _smoothedAStarPathFindingGameObject.GetComponentInChildren<PathSmoother>();
+        GraphPathSmoother graphPathSmoother = _smoothedAStarPathFindingGameObject.GetComponentInChildren<GraphPathSmoother>();
 
         // Start test.
         // Assert that the pathfinder agent can reach the first target.
@@ -472,8 +472,8 @@ public class InformedPathFindingTests
         yield return new WaitForSeconds(4);
         Assert.True(Vector2.Distance(_smoothedAStarPathFindingGameObject.transform.position, _position2.position) < 0.3f);
         // Assert that the smoothed test is shorter than the former one.
-        PathData rawPathData = AccessPrivateHelper.GetPrivateField<PathData>(pathSmoother, "_rawPathData");
-        PathData smoothedPath = AccessPrivateHelper.GetPrivateField<PathData>(pathSmoother, "_smoothedPathData");
+        PathData rawPathData = AccessPrivateHelper.GetPrivateField<PathData>(graphPathSmoother, "_rawPathData");
+        PathData smoothedPath = AccessPrivateHelper.GetPrivateField<PathData>(graphPathSmoother, "_smoothedPathData");
         Assert.True(rawPathData.positions.Count > smoothedPath.positions.Count);
 
         
@@ -482,8 +482,8 @@ public class InformedPathFindingTests
         yield return new WaitForSeconds(4);
         Assert.True(Vector2.Distance(_smoothedAStarPathFindingGameObject.transform.position, _position3.position) < 0.3f);
         // Assert that the smoothed test is shorter than the former one.
-        rawPathData = AccessPrivateHelper.GetPrivateField<PathData>(pathSmoother, "_rawPathData");
-        smoothedPath = AccessPrivateHelper.GetPrivateField<PathData>(pathSmoother, "_smoothedPathData");
+        rawPathData = AccessPrivateHelper.GetPrivateField<PathData>(graphPathSmoother, "_rawPathData");
+        smoothedPath = AccessPrivateHelper.GetPrivateField<PathData>(graphPathSmoother, "_smoothedPathData");
         Assert.True(rawPathData.positions.Count > smoothedPath.positions.Count);
     }
     

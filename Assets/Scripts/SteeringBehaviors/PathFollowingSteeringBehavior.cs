@@ -33,6 +33,14 @@ public class PathFollowingSteeringBehavior : SteeringBehavior
             _pathStarted = false;
         }
     }
+    
+    // /// <summary>
+    // /// Whether we have got the path end.
+    // /// </summary>
+    // public bool IsPathEnded => 
+    //     Vector2.Distance(
+    //         transform.position, 
+    //         FollowPath.Data.positions[^1]) < arrivalDistance;
 
     private void Awake()
     {

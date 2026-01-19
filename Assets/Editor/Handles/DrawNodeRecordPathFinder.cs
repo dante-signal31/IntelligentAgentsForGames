@@ -7,7 +7,7 @@ namespace Editor
 /// Draw costs to reach every node explored by a pathfinder algorithm based on
 /// NodeRecords.
 /// </summary>
-[CustomEditor(typeof(PathFinder<NodeRecord>), true)]
+[CustomEditor(typeof(GraphPathFinder<NodeRecord>), true)]
 public class DrawNodeRecordPathFinder : DrawPathFinder<NodeRecord> { }
 }
 

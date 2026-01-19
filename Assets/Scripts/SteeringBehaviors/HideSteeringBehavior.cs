@@ -5,13 +5,12 @@ using Pathfinding;
 using Sensors;
 using Tools;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace SteeringBehaviors
 {
 /// <summary>
-/// <p> Monobehaviour to offer a hiding steering behaviour. </p>
-/// <p> Hiding makes an agent to place itself after an obstacle between him and a
+/// <p> MonoBehaviour to offer a hiding steering behavior. </p>
+/// <p> Hiding makes an agent place itself after an obstacle between him and a
 /// threat. </p>
 /// </summary>
 public class HideSteeringBehavior : SteeringBehavior
@@ -20,7 +19,7 @@ public class HideSteeringBehavior : SteeringBehavior
     [Tooltip("Agent to hide from.")]
     [SerializeField] private AgentMover threat;
     [Tooltip("Distance at which we give our goal as reached and we stop our agent.")]
-    [SerializeField] private float arrivalDistance;
+    [SerializeField] private float arrivalDistance = 0.1f;
     [Tooltip("At which physics layers the obstacles belong to?")]
     [SerializeField] private LayerMask obstaclesLayer;
     [Tooltip("Maximum scene obstacles inner distance.")]
@@ -39,17 +38,11 @@ public class HideSteeringBehavior : SteeringBehavior
     [SerializeField] private LayerMask threatLayerMask;
     [Tooltip("Minimum time in seconds between hiding point path recalculations.")]
     [SerializeField] private float pathRecalculationTime = 0.5f;
-
-    // [Header("DEBUG:")]
-    // [Tooltip("Show gizmos for debugging.")]
-    // [SerializeField] private bool showGizmos = true;
-    // [SerializeField] private Color gizmosColor = Color.green;
     
     [Header("WIRING:")]
     [SerializeField] private RaySensor rayCastToThreat; 
-    [SerializeField] private NavigationAgent navigationAgent;
     [SerializeField] private HidingPointsDetector hidingPointsDetector;
-    [SerializeField] private SeekSteeringBehavior seekSteeringBehavior;
+    [SerializeField] private MeshPathFinderSteeringBehavior meshPathFinderSteeringBehavior;
     
     
     /// <summary>
@@ -70,7 +63,7 @@ public class HideSteeringBehavior : SteeringBehavior
     }
 
     /// <summary>
-    /// Distance at which we give our goal as reached and we stop our agent.
+    /// Distance at which we give our goal as reached, and we stop our agent.
     /// </summary>
     public float ArrivalDistance
     {
@@ -79,7 +72,7 @@ public class HideSteeringBehavior : SteeringBehavior
     }
 
     /// <summary>
-    /// At which physics layers the obstacles belong to?
+    /// At which physics layers do the obstacles belong to?
     /// </summary>
     public LayerMask ObstaclesLayer
     {
@@ -94,7 +87,7 @@ public class HideSteeringBehavior : SteeringBehavior
     }
 
     /// <summary>
-    /// How much separation our hiding point must show from obstacles?
+    /// How much separation must our hiding point show from obstacles?
     /// </summary>
     public float SeparationFromObstacles
     {
@@ -122,7 +115,7 @@ public class HideSteeringBehavior : SteeringBehavior
     }
 
     /// <summary>
-    /// A position with any of this physic layers objects is not empty ground to be a
+    /// A position with any of these physic layers objects is not empty ground to be a
     /// valid hiding point.
     /// </summary>
     public LayerMask NotEmptyGroundLayers
@@ -154,14 +147,13 @@ public class HideSteeringBehavior : SteeringBehavior
     /// <summary>
     /// Current hiding point position selected by this behavior.
     /// </summary>
-    public Vector2 HidingPoint
+    private Vector2 HidingPoint
     {
         get => _hidingPoint;
-        private set
+        set
         {
             _hidingPoint = value;
-            if (navigationAgent != null)
-                navigationAgent.TargetPosition = value;
+            meshPathFinderSteeringBehavior.TargetPosition = value;
         }
     }
 
@@ -169,26 +161,23 @@ public class HideSteeringBehavior : SteeringBehavior
     /// Indicates whether the threat currently has a clear line of sight to the agent.
     /// </summary>
     public bool ThreatCanSeeUs => _threatCanSeeUs;
-
-    // private INavigationAgent _navigationAgent;
+    
     private Courtyard _currentLevel;
-    // private AgentMover _currentAgentMover;
     private Vector2 _previousThreatPosition = Vector2.zero;
 
     private bool ThreatHasJustMoved => 
         (Vector2)Threat.transform.position != _previousThreatPosition;
 
+    // private bool HidingPointReached => meshPathFinderSteeringBehavior.IsPathEnded;
+    
     private bool _threatCanSeeUs;
     private bool _hidingPointRecheckNeeded;
     private bool _hidingPointReached;
-    private GameObject _nextMovementTarget;
     private Timer _pathRecalculationTimer;
     private bool _pathRecalculationCooldownActive;
 
     private void Awake()
     {
-        if (_nextMovementTarget == null)
-            _nextMovementTarget = new GameObject("NextMovementTarget");
         HidingPoint = transform.position;
         _pathRecalculationTimer = new Timer(pathRecalculationTime * 1000);
         _pathRecalculationTimer.Elapsed += OnRecalculationPathTimerTimeout;
@@ -200,7 +189,6 @@ public class HideSteeringBehavior : SteeringBehavior
         _currentLevel = FindAnyObjectByType<Courtyard>();
         if (_currentLevel == null) return;
         InitRayCast();
-        InitSeekSteeringBehavior();
         InitHidingPointDetector();
         InitNavigationAgent();
     }
@@ -225,12 +213,6 @@ public class HideSteeringBehavior : SteeringBehavior
         rayCastToThreat.IgnoreCollidersOverlappingStartPoint = true;
     }
 
-    private void InitSeekSteeringBehavior()
-    {
-        seekSteeringBehavior.Target = _nextMovementTarget;
-        seekSteeringBehavior.ArrivalDistance = ArrivalDistance;
-    }
-
     private void InitHidingPointDetector()
     {
         if (Threat != null) hidingPointsDetector.Threat = Threat.gameObject;
@@ -245,20 +227,71 @@ public class HideSteeringBehavior : SteeringBehavior
 
     private void InitNavigationAgent()
     {
-        navigationAgent.TargetPosition = HidingPoint;
-        navigationAgent.Radius = AgentRadius;
+        meshPathFinderSteeringBehavior.TargetPosition = HidingPoint;
+        meshPathFinderSteeringBehavior.agentRadius = AgentRadius;
     }
 
-    private void OnDestroy()
+    public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        if (_nextMovementTarget != null) Destroy(_nextMovementTarget);
-    }
-
-    private void FixedUpdate()
-    { 
-        if (Threat == null || rayCastToThreat == null) return;
+        if (Threat == null || rayCastToThreat == null) return SteeringOutput.Zero;
         
         // Check if there is a line of sight with the threat.
+        CheckThreatVisibility();
+
+        // Starting threat position counts as ThreatHasJustMoved because
+        // _previousThreatPosition is init as Vector2.Zero.
+        if ((ThreatHasJustMoved && !_pathRecalculationCooldownActive) ||
+            (ThreatCanSeeUs && _hidingPointReached))
+        {
+            _hidingPointRecheckNeeded = true;
+        }
+        _previousThreatPosition = Threat.transform.position;
+        
+        // Look for a new hiding point if the threat can see us and has just moved, or
+        // if it is threat-first position (only once).
+        if (_threatCanSeeUs && _hidingPointRecheckNeeded && 
+            !_pathRecalculationCooldownActive) 
+        {   // Search for the nearest hiding point.
+            List<Vector2> hidingPoints = hidingPointsDetector.HidingPoints;
+            if (hidingPoints.Count > 0)
+            {
+                float minimumDistance = float.MaxValue;
+                Vector2 nearestHidingPoint = Vector2.zero;
+                foreach (Vector2 candidatePoint in hidingPoints)
+                {
+                    PathData pathToCandidatePoint = 
+                        meshPathFinderSteeringBehavior.
+                            CurrentPathFinder.FindPath(candidatePoint);
+                    float currentDistance = pathToCandidatePoint.PathLength;
+                    if (currentDistance < minimumDistance)
+                    {
+                        minimumDistance = currentDistance;
+                        nearestHidingPoint = candidatePoint;
+                    }
+                }
+                HidingPoint = nearestHidingPoint;
+                _hidingPointReached = false;
+                _hidingPointRecheckNeeded = false;
+            }
+            // A path recalculation cooldown is needed, or the path will be recalculated
+            // repeatedly while the threat moves without giving a useful hiding path until
+            // the threat stops for the first time.
+            StartPathRecalculationTimer();
+        }
+        
+        if (Vector2.Distance(HidingPoint, transform.position) < arrivalDistance)
+            _hidingPointReached = true;
+
+        if (_hidingPointReached)
+        {
+            // If we don't need to hide, then return zero.
+            return SteeringOutput.Zero;
+        }
+        return meshPathFinderSteeringBehavior.GetSteering(args);
+    }
+
+    private void CheckThreatVisibility()
+    {
         rayCastToThreat.EndPosition = Threat.transform.position;
         if (rayCastToThreat.IsColliderDetected)
         {
@@ -269,72 +302,6 @@ public class HideSteeringBehavior : SteeringBehavior
         {
             _threatCanSeeUs = false;
         }
-    
-        // Starting threat position counts as ThreatHasJustMoved because
-        // _previousThreatPosition is init as Vector2.Zero.
-        if (ThreatHasJustMoved && !_pathRecalculationCooldownActive)
-        {
-            _hidingPointRecheckNeeded = true;
-            // A path recalculation cooldown is needed, or the path will be recalculated
-            // repeatedly while the threat moves without giving a useful hiding path until
-            // the threat stops for the first time.
-            StartPathRecalculationTimer();
-        }
-        _previousThreatPosition = Threat.transform.position;
-        
-        // Only query when the navigation agent has not reached the target yet.
-        if (navigationAgent.IsNavigationFinished)
-        {
-            _hidingPointReached = true;
-        }
-        else
-        {
-            _nextMovementTarget.transform.position = 
-                navigationAgent.GetNextPathPosition();
-        }
-    }
-
-    public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
-    {
-        // Look for a new hiding point if the threat can see us and has just moved (or
-        // if it is threat first position (only once).
-        if (_threatCanSeeUs && _hidingPointRecheckNeeded && 
-            !_pathRecalculationCooldownActive ||
-            // This second condition is needed for blender steeringBehaviors, where 
-            // another steering behavior can move this agent without HideSteeringBehavior
-            // intervention.
-            _threatCanSeeUs && _hidingPointReached) 
-        {   // Search for the nearest hiding point.
-            List<Vector2> hidingPoints = hidingPointsDetector.HidingPoints;
-            if (hidingPoints.Count > 0)
-            {
-                float minimumDistance = float.MaxValue;
-                Vector2 nearestHidingPoint = Vector2.zero;
-                foreach (Vector2 candidatePoint in hidingPoints)
-                {
-                    navigationAgent.TargetPosition = candidatePoint;
-                    _hidingPointReached = false;
-                    float currentDistance = navigationAgent.DistanceToTarget();
-                    if (currentDistance < minimumDistance)
-                    {
-                        minimumDistance = currentDistance;
-                        nearestHidingPoint = candidatePoint;
-                    }
-                }
-                HidingPoint = nearestHidingPoint;
-                _hidingPointRecheckNeeded = false;
-            }
-        }
-
-        if (!_hidingPointReached)
-        {
-            // Head to the next point in the path to the heading target. That next point
-            // position is updated in FixedUpdate().
-            return seekSteeringBehavior.GetSteering(args);
-        }
-    
-        // If we don't need to hide, then return zero.
-        return SteeringOutput.Zero;
     }
 }
 }

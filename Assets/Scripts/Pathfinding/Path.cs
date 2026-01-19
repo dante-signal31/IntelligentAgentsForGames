@@ -38,7 +38,7 @@ public class Path : MonoBehaviour, IGizmos
     /// <summary>
     /// How many positions this path has.
     /// </summary>
-    public int PathLength => Data.PathLength;
+    public int PathLength => Data.PathPositionsLength;
 
     /// <summary>
     /// Current index of the position we are going to.
@@ -98,12 +98,12 @@ public class Path : MonoBehaviour, IGizmos
     {
         if (!ShowGizmos) return;
         
-        if (Data.PathLength < 1) return;
+        if (Data.PathPositionsLength < 1) return;
 
         Vector2 previousPosition = Vector2.zero;
         Gizmos.color = GizmosColor;
         // Draw path positions
-        for (int i=0; i < Data.PathLength; i++)
+        for (int i=0; i < Data.PathPositionsLength; i++)
         {
             Gizmos.DrawWireSphere(Data.positions[i], positionGizmoRadius);
             if (i >= 1)

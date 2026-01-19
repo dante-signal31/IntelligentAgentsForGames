@@ -12,7 +12,7 @@ public class DrawPathFinder<T> : UnityEditor.Editor where T: NodeRecord, new()
 {
     protected void OnSceneGUI()
     {
-        var pathFinder = (PathFinder<T>)target;
+        var pathFinder = (GraphPathFinder<T>)target;
 
         if (!pathFinder.showGizmos) return;
 

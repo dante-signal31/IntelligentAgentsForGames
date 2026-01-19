@@ -6,7 +6,7 @@ namespace Pathfinding
 /// Represents a base implementation for pathfinding algorithms
 /// that do not rely on heuristic information to guide the search.
 /// </summary>
-public abstract class NotInformedPathFinder<TN>: PathFinder<NodeRecord> 
+public abstract class NotInformedGraphPathFinder<TN>: GraphPathFinder<NodeRecord> 
     where TN: INodeRecordCollection<NodeRecord>, new()
 {
     private readonly TN _openQueue = new();

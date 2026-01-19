@@ -9,7 +9,7 @@ namespace Pathfinding
 /// position to a target position by exploring nodes systematically based on their cost
 /// to be reached from the starting position.
 /// </summary>
-public class DijkstraPathFinder : HeuristicPathFinder<NodeRecord>
+public class DijkstraGraphPathFinder : HeuristicGraphPathFinder<NodeRecord>
 {
     /// <summary>
     /// A specialized collection of node records used in the Dijkstra pathfinding

@@ -12,5 +12,5 @@ namespace Pathfinding
     /// Depth-first search does NOT guarantee to find the shortest path. Actually, when
     /// it finds a path, it's likely to be suboptimal.
     /// </remarks>
-    public class DepthFirstPathFinder : NotInformedPathFinder<NodeRecordStack> { }
+    public class DepthFirstGraphPathFinder : NotInformedGraphPathFinder<NodeRecordStack> { }
 }

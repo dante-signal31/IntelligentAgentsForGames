@@ -14,5 +14,5 @@ namespace Pathfinding
     /// Breath-First pathfinder will always find the path with fewer nodes, not the
     /// cost-cheaper one.
     /// </remarks>
-    public class BreathFirstPathFinder : NotInformedPathFinder<NodeRecordQueue> { }
+    public class BreathFirstGraphPathFinder : NotInformedGraphPathFinder<NodeRecordQueue> { }
 }

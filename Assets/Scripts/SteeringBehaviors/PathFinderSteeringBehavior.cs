@@ -7,7 +7,7 @@ namespace SteeringBehaviors
 {
 /// <summary>
 /// <p>Steering behavior to find and follow a path to a given target.</p>
-/// <p>The pathfinder algorithm used depends on the IPathFinder instance referenced
+/// <p>The pathfinder algorithm used depends on the IGraphPathFinder instance referenced
 /// from the pathFinderBehaviour field.</p> 
 /// </summary>
 public class PathFinderSteeringBehavior: SteeringBehavior, IGizmos
@@ -21,8 +21,8 @@ public class PathFinderSteeringBehavior: SteeringBehavior, IGizmos
     [Header("WIRING:")]
     [Tooltip("Steering Behavior to move using found path.")]
     [SerializeField] private PathFollowingSteeringBehavior pathFollowingSteeringBehavior;
-    [Tooltip("Path finder to use. Must comply with IPathFinder interface.")]
-    [InterfaceCompliant(typeof(IPathFinder))]
+    [Tooltip("Path finder to use. Must comply with IGraphPathFinder interface.")]
+    [InterfaceCompliant(typeof(IGraphPathFinder))]
     [SerializeField] private MonoBehaviour pathFinderBehaviour;
     
     [Header("DEBUG:")] 
@@ -50,13 +50,13 @@ public class PathFinderSteeringBehavior: SteeringBehavior, IGizmos
         }
     }
     
-    private IPathFinder _pathFinder;
+    private IGraphPathFinder graphPathFinder;
     private Path _currentPath;
     
     private void Awake()
     {
-        _pathFinder = (IPathFinder) pathFinderBehaviour;
-        _pathFinder.Graph = graph;
+        graphPathFinder = (IGraphPathFinder) pathFinderBehaviour;
+        graphPathFinder.Graph = graph;
         // Create a GameObject at the scene root to include the new path instance in
         // Unity life cycle.
         _currentPath = new GameObject($"{name} - CurrentPath").AddComponent<Path>();
@@ -79,7 +79,7 @@ public class PathFinderSteeringBehavior: SteeringBehavior, IGizmos
 
     private void OnPathTargetPositionChanged(Vector2 newTargetPosition)
     {
-        PathData newPath = _pathFinder.FindPath(newTargetPosition);
+        PathData newPath = graphPathFinder.FindPath(newTargetPosition);
         if (newPath == null) return;
         _currentPath.UpdatePathData(newPath);
         pathFollowingSteeringBehavior.FollowPath = _currentPath;
