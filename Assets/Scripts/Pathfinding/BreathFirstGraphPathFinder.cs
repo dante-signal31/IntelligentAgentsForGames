@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-
-namespace Pathfinding
+﻿namespace Pathfinding
 {
     /// <summary>
     /// Implements the Breadth-First Search (BFS) algorithm for pathfinding.

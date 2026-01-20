@@ -11,7 +11,7 @@ public class NodeRecordQueue : INodeRecordCollection<NodeRecord>
     // Needed to keep track of the nodes already discovered.
     private readonly Dictionary<PositionNode, NodeRecord> _nodeRecordDict = new();
 
-    public int Count => _nodeRecordDict.Count;
+    public int Count => _queue.Count;
 
     public void Clear()
     {
@@ -42,6 +42,8 @@ public class NodeRecordQueue : INodeRecordCollection<NodeRecord>
     {
         if (_queue.Count == 0) return null;
         NodeRecord recoveredNodeRecord = _queue.Dequeue();
+        // Do not remove the node from the dictionary. That dictionary is used to keep
+        // track of the nodes already discovered, to avoid loops.
         return recoveredNodeRecord;
     }
 }
