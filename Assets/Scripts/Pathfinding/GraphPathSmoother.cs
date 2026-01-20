@@ -5,6 +5,10 @@ using UnityEngine;
 
 namespace Pathfinding
 {
+/// <summary>
+/// The GraphPathSmoother class provides functionality for smoothing
+/// paths within a graph structure.
+/// </summary>
 public class GraphPathSmoother : MonoBehaviour, IGraphPathFinder
 {
     [Header("CONFIGURATION:")]
