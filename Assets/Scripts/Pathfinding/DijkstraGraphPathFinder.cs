@@ -28,7 +28,7 @@ public class DijkstraGraphPathFinder : HeuristicGraphPathFinder<NodeRecord>
                 // If costs are equal, we must not return 0, otherwise SortedSet 
                 // thinks they are the same element and won't add the new one.
                 if (result == 0 && x.node != y.node)
-                    return x.GetHashCode().CompareTo(y.GetHashCode());
+                    return x.node.Id.CompareTo(y.node.Id);
                 return result;
             }
         }
@@ -98,12 +98,6 @@ public class DijkstraGraphPathFinder : HeuristicGraphPathFinder<NodeRecord>
                 if (closedDict.ContainsKey(endNode)) continue;
                 // Calculate the cost to reach the end node from the current node.
                 float endNodeCost = current.costSoFar + graphConnection.cost;
-                
-                // If that connection leads to a node fully explored at a lower cost,
-                // skip it because we are not going to improve the path already discovered
-                // to get that node.
-                if (closedDict.ContainsKey(endNode) && 
-                    closedDict[endNode].costSoFar <= endNodeCost) continue;
 
                 NodeRecord endNodeRecord;
                 if (_openRecordSet.Contains(endNode))
@@ -115,6 +109,11 @@ public class DijkstraGraphPathFinder : HeuristicGraphPathFinder<NodeRecord>
                     if (endNodeRecord.costSoFar <= endNodeCost) continue;
                     // Otherwise, update the record with the lower cost and the connection
                     // to get there with that lower cost.
+                    //
+                    // First, remove the record from the existing set to avoid
+                    // corrupting it by editing its values.
+                    _openRecordSet.Remove(endNodeRecord);
+                    // Now, you can safely edit the record values.
                     endNodeRecord.costSoFar = endNodeCost;
                     endNodeRecord.connection = graphConnection;
                 }

@@ -1,7 +1,6 @@
 ﻿using Pathfinding;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace Editor
 {
@@ -21,7 +20,7 @@ public class DrawPathFinder<T> : UnityEditor.Editor where T: NodeRecord, new()
             normal = { textColor = pathFinder.textColor }
         };
 
-        foreach (PositionNode exploredNode in pathFinder.closedDict.Keys)
+        foreach (PositionNode exploredNode in pathFinder.ExploredNodes.Keys)
         {
             // Mark every node with the smallest cost to get there from the start node
             // and the local orientation of the connection to get there.
@@ -39,7 +38,7 @@ public class DrawPathFinder<T> : UnityEditor.Editor where T: NodeRecord, new()
             else
             {
                 uint fromNodeId =
-                    pathFinder.closedDict[exploredNode].connection.startNodeId;
+                    pathFinder.ExploredNodes[exploredNode].connection.startNodeId;
                 PositionNode fromNode = pathFinder.Graph.GetNodeById(fromNodeId);
                 Vector2 relativePosition = exploredNode.position - fromNode.position;
                 // Connection orientation from the receiving node perspective (the
@@ -56,7 +55,7 @@ public class DrawPathFinder<T> : UnityEditor.Editor where T: NodeRecord, new()
 
                 string nodeInfoText =
                     $"{connectionOrientation}" +
-                    $"{pathFinder.closedDict[exploredNode].costSoFar}";
+                    $"{pathFinder.ExploredNodes[exploredNode].costSoFar}";
                 Handles.Label(textPosition, nodeInfoText, textStyle);
             }
         }

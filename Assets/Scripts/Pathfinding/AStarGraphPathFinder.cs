@@ -29,7 +29,7 @@ public class AStarGraphPathFinder: HeuristicGraphPathFinder<AStarNodeRecord>
                 // If costs are equal, we must not return 0, otherwise SortedSet 
                 // thinks they are the same element and won't add the new one.
                 if (result == 0 && x.node != y.node)
-                    return x.GetHashCode().CompareTo(y.GetHashCode());
+                    return x.costSoFar.CompareTo(y.costSoFar);
                 return result;
             }
         }
@@ -157,7 +157,7 @@ public class AStarGraphPathFinder: HeuristicGraphPathFinder<AStarNodeRecord>
                     // First, remove the record from the existing set to avoid
                     // corrupting it by editing its values.
                     _openRecordSet.Remove(endNodeRecord);
-                    
+                    // Now, you can safely edit the record values.
                     // We could call the heuristic again, but it will return the same
                     // value as the last time. What has changed is the CostSoFar part,
                     // so we remove the old CostSoFar from the total to add the new value.
@@ -182,7 +182,7 @@ public class AStarGraphPathFinder: HeuristicGraphPathFinder<AStarNodeRecord>
                         totalEstimatedCostToTarget =
                             endNodeCost + _heuristic.EstimateCostToTarget(
                                 endNode.position, 
-                                targetPosition)
+                                targetNode.position)
                     };
                 }
                 // Add the node to the _openRecordSet to assess it fully again.

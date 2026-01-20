@@ -25,9 +25,13 @@ public abstract class GraphPathFinder<T> : MonoBehaviour, IGraphPathFinder
     /// Dictionary containing nodes and their corresponding recorded data after the
     /// exploration process.
     /// </summary>
-    // closedDict and CurrentStartMode must be made public to allow DrawDijkstraPathFinder
-    // draw gizmos. --> TODO: Try another visibility qualifier to avoid public.
-    public readonly Dictionary<PositionNode, T> closedDict = new();
+    protected readonly Dictionary<PositionNode, T> closedDict = new();
+    
+    /// <summary>
+    /// Exposes the explored nodes for debugging purposes (e.g., Editor handles) but
+    /// avoids modifications of the dictionary from editor code.
+    /// </summary>
+    public IReadOnlyDictionary<PositionNode, T> ExploredNodes => closedDict;
     
     /// <summary>
     /// Agent starting node.

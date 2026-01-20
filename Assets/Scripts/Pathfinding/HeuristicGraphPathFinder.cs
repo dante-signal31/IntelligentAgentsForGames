@@ -30,7 +30,7 @@ public abstract class HeuristicGraphPathFinder<T>: GraphPathFinder<T>
         // Initially, I planned to use a PriorityQueue<GraphNode, float>, but I found that
         // the Unity .NET API doesn't support it, because that collection was added in
         // .NET 6, while my Unity version is .NET Framework 4.7.1.
-        private readonly SortedSet<T> prioritySet = new();
+        private readonly SortedSet<T> prioritySet;
         
         // Needed to keep track of the nodes still pending to be explored and to quickly
         // get their respective records.
@@ -65,7 +65,6 @@ public abstract class HeuristicGraphPathFinder<T>: GraphPathFinder<T>
             nodeRecordDict[record.node] = record;
         }
         
-        // TODO: If this method is not going to be used, just remove it.
         public void Remove(T record)
         {
             if (nodeRecordDict.ContainsKey(record.node))
