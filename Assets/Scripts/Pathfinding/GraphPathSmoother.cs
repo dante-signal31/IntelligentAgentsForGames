@@ -72,43 +72,36 @@ public class GraphPathSmoother : MonoBehaviour, IGraphPathFinder
 
         List<Vector2> smoothedPositions = new() { rawPath.positions[0] };
         int startIndex = 0;
-        int endIndex = 2;
     
-        do
+        while (startIndex < rawPath.PathPositionsLength - 1)
         {
-            // We do a ShapeCast instead of a RayCast because we want to avoid hitting
-            // corners and partial obstacles.
-            if (_cleanAreaChecker.IsCleanPath(
-                    rawPath.positions[startIndex],
-                    rawPath.positions[endIndex]))
+            bool cleanPathFound = false;
+            // We try to get the farthest position from the current one that is clean.
+            for (int testIndex = rawPath.PathPositionsLength - 1; 
+                 testIndex > startIndex + 1; 
+                 testIndex--)
             {
-                // If there was a clear path to the end of the path, then add that end to
-                // the smoothed path before leaving the loop. That will complete the
-                // smoothed path.
-                if (endIndex >= rawPath.PathPositionsLength - 1) 
-                    smoothedPositions.Add(rawPath.positions[endIndex]);
-                endIndex++;
-                // If there was a clear path from the starIndex position to the endIndex
-                // position, and the endIndex was not the end of the path, then we can
-                // omit the positions between them from the smoothed path.
-                continue;
+                // We do a ShapeCast instead of a RayCast because we want to avoid hitting
+                // corners and partial obstacles.
+                if (_cleanAreaChecker.IsCleanPath(
+                        rawPath.positions[startIndex], 
+                        rawPath.positions[testIndex]))
+                {
+                    smoothedPositions.Add(rawPath.positions[testIndex]);
+                    startIndex = testIndex;
+                    cleanPathFound = true;
+                    break;
+                }
             }
-            if (endIndex == rawPath.PathPositionsLength - 1)
+            
+            // If we weren't able to skip any nodes, add the next one directly.
+            if (!cleanPathFound)
             {
-                // If we were at the end of the path, then add the last position to the
-                // smoothed path and smooth no more.
-                smoothedPositions.Add(rawPath.positions[endIndex]);
-                break;
+                startIndex++;
+                smoothedPositions.Add(rawPath.positions[startIndex]);
             }
-            // Otherwise, add the previous position to the occluded one to the smoothed
-            // path because it was the last we could get directly.
-            smoothedPositions.Add(rawPath.positions[endIndex-1]);
-            // Now we will ray trace from that position to find out if we can omit any of
-            // the remaining positions.
-            startIndex = endIndex - 1;
-            endIndex++;
-        } while (endIndex < rawPath.PathPositionsLength);
-    
+        }
+        
         _smoothedPathData.LoadPathData(smoothedPositions);
         return _smoothedPathData;
     }
