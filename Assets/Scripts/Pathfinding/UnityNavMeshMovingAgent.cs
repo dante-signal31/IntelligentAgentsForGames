@@ -1,5 +1,4 @@
-﻿using System;
-using Tools;
+﻿using Tools;
 using UnityEngine;
 using UnityEngine.AI;
 
