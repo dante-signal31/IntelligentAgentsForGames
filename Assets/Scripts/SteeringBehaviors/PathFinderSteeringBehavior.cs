@@ -14,9 +14,7 @@ public class PathFinderSteeringBehavior: SteeringBehavior, IGizmos
 {
     [Header("CONFIGURATION:")]
     [Tooltip("Target to go to using found path.")]
-    public Target target;
-    [Tooltip("Graph to use for path finding.")]
-    public MapGraph graph;
+    [SerializeField] public Target target;
     
     [Header("WIRING:")]
     [Tooltip("Steering Behavior to move using found path.")]
@@ -56,7 +54,6 @@ public class PathFinderSteeringBehavior: SteeringBehavior, IGizmos
     private void Awake()
     {
         graphPathFinder = (IGraphPathFinder) pathFinderBehaviour;
-        graphPathFinder.Graph = graph;
         // Create a GameObject at the scene root to include the new path instance in
         // Unity life cycle.
         _currentPath = new GameObject($"{name} - CurrentPath").AddComponent<Path>();

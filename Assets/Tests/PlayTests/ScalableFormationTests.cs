@@ -2,7 +2,7 @@
 using Groups;
 using NUnit.Framework;
 using SteeringBehaviors;
-using Tests.PlayTests.Common;
+using ninja.dlab.Commontesttools;
 using Tools;
 using UnityEngine;
 using UnityEngine.TestTools;

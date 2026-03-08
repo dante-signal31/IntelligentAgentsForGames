@@ -45,9 +45,18 @@ public class PathData
     public void LoadPathData(List<Vector2> path)
     {
         positions.Clear();
-        positions.AddRange(path);
-        PathLength = GetPathLength();
+        AddPositionsToPath(path);
         CurrentTargetPositionIndex = 0;
+    }
+
+    /// <summary>
+    /// Append given positions to the path.
+    /// </summary>
+    /// <param name="addedPositions">Positions to append.</param>
+    public void AddPositionsToPath(List<Vector2> addedPositions)
+    {
+        positions.AddRange(addedPositions);
+        PathLength = GetPathLength();
     }
 
     /// <summary>

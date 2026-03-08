@@ -10,7 +10,7 @@ public abstract class NotInformedGraphPathFinder<TN>: GraphPathFinder<NodeRecord
     where TN: INodeRecordCollection<NodeRecord>, new()
 {
     private readonly TN _openQueue = new();
-    
+
     /// <summary>
     /// Finds and returns a path to the specified target position.
     /// Depending on the implementation, this uses a specific node collection
@@ -19,9 +19,12 @@ public abstract class NotInformedGraphPathFinder<TN>: GraphPathFinder<NodeRecord
     /// <typeparam name="TN">The type of node collection to use for pathfinding.
     /// Must implement INodeRecordCollection.</typeparam>
     /// <param name="targetPosition">The target position to find a path to.</param>
+    /// <param name="fromPosition">The source position to find a path from.</param>
     /// <returns>A Path object representing the found path from the start position
     /// to the target position, or null if no valid path exists.</returns>
-    public override PathData FindPath(Vector2 targetPosition) 
+    public override PathData FindPath(
+        Vector2 targetPosition, 
+        Vector2 fromPosition=default) 
     {
         // Nodes not fully explored yet, ordered as they were found.
         _openQueue.Clear();
@@ -32,8 +35,10 @@ public abstract class NotInformedGraphPathFinder<TN>: GraphPathFinder<NodeRecord
         closedDict.Clear();
         
         // Get graph nodes associated with the start and target positions. 
-        CurrentStartNode = Graph.GetNodeAtPosition(transform.position);
-        PositionNode targetNode = Graph.GetNodeAtPosition(targetPosition);
+        CurrentStartNode = fromPosition==default?
+            Graph.GetNodeAtPosition(transform.position):
+            Graph.GetNodeAtPosition(fromPosition);
+        IPositionNode targetNode = Graph.GetNodeAtPosition(targetPosition);
         
         // You get to the start node from nowhere (null) and at no cost (0).
         var startRecord = new NodeRecord
@@ -61,10 +66,10 @@ public abstract class NotInformedGraphPathFinder<TN>: GraphPathFinder<NodeRecord
 
             // Get all the connections of the current node and take note of the nodes
             // those connections lead to into the openSet to explore those nodes later.
-            foreach (GraphConnection graphConnection in current.node.connections.Values)
+            foreach (GraphConnection graphConnection in current.node.Connections.Values)
             {
                 // Where does that connection lead us?
-                PositionNode endNode = Graph.GetNodeById(graphConnection.endNodeId);
+                IPositionNode endNode = Graph.GetNodeById(graphConnection.endNodeId);
                 // If that connection leads to an already explored node, skip it.
                 if (closedDict.ContainsKey(endNode)) continue;
                 
@@ -94,7 +99,7 @@ public abstract class NotInformedGraphPathFinder<TN>: GraphPathFinder<NodeRecord
         
         // As we've got the target node, analyze the closedDict to follow back connections
         // from the target node to start node to build the path.
-        PathData foundPath = BuildPath(CurrentStartNode, targetNode);
+        PathData foundPath = BuildPath(closedDict, CurrentStartNode, targetNode);
         return foundPath;
     }
 }

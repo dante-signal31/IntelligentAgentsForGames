@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using Groups;
 using NUnit.Framework;
 using SteeringBehaviors;
-using Tests.PlayTests.Common;
+using ninja.dlab.Commontesttools;
 using Tools;
 using UnityEngine;
-using UnityEngine.Android;
 using UnityEngine.TestTools;
 
 namespace Tests.PlayTests

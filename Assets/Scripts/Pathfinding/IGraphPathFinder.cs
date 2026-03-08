@@ -10,6 +10,6 @@ public interface IGraphPathFinder: IPathFinder
     /// <summary>
     /// Graph modeling the environment.
     /// </summary>
-    public MapGraph Graph { get; set; }
+    public IPositionGraph Graph { get; set; }
 }
 }

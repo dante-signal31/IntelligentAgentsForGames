@@ -25,7 +25,7 @@ namespace Pathfinding
 /// coordinates origin <b>and only towards the positive side of the axis</b>.</remarks>
 /// </summary>
 [ExecuteAlways]
-public class MapGraph : MonoBehaviour
+public class MapGraph : MonoBehaviour, IPositionGraph
 {
     [Header("CONFIGURATION:")]
     [Tooltip("Size of the map to analyze in physical units.")]
@@ -44,7 +44,7 @@ public class MapGraph : MonoBehaviour
     
     [Header("DEBUG:")]
     [SerializeField] private bool showGizmos = true;
-    [SerializeField] private Color gridColor = Color.yellow;
+    public Color gridColor = Color.yellow;
     [SerializeField] private float nodeRadius = 0.1f;
     [SerializeField] private Color nodeColor = Color.orange;
 
@@ -110,7 +110,7 @@ public class MapGraph : MonoBehaviour
     /// structure.
     /// </returns>
     private Vector2Int GetArrayPositionById(uint nodeId) => 
-        graphResource.nodeArrayPositionsById[nodeId];
+        graphResource.nodeIdsToArrayPositions[nodeId];
 
     /// <summary>
     /// Retrieves a node from the graph using its unique identifier.
@@ -121,8 +121,8 @@ public class MapGraph : MonoBehaviour
     /// <returns>
     /// The <see cref="PositionNode"/> associated with the specified ID.
     /// </returns>
-    public PositionNode GetNodeById(uint nodeId) => 
-        graphResource.nodes[GetArrayPositionById(nodeId)];
+    public IPositionNode GetNodeById(uint nodeId) => 
+        graphResource.arrayPositionsToNodes[GetArrayPositionById(nodeId)];
     
     /// <summary>
     /// Retrieves the GraphNode located at the given global world position.
@@ -135,17 +135,64 @@ public class MapGraph : MonoBehaviour
     /// The GraphNode instance at the specified global position if it exists;
     /// otherwise, null.
     /// </returns>
-    public PositionNode GetNodeAtPosition(Vector2 globalPosition)
+    public IPositionNode GetNodeAtPosition(Vector2 globalPosition)
     {
         Vector2Int arrayPosition = GlobalToArrayPosition(globalPosition);
-        if (!graphResource.nodes.ContainsKey(arrayPosition)) return null;
-        return graphResource.nodes[arrayPosition];
+        return GetNodeAtArrayPosition(arrayPosition);
+    }
+    
+    /// <summary>
+    /// Retrieves the nearest node to the specified global position.
+    /// <remarks>
+    /// While GetNodeAtPosition returns null if the position is inside an obstacle, with
+    /// this method you can retrieve the nearest node to that position in case that that
+    /// position is inside an obstacle. So, this method always returns a node, but it may
+    /// be one that is not exactly at the given position.
+    /// </remarks>
+    /// </summary>
+    /// <param name="globalPosition">The global position for which to find the closest
+    /// node.</param>
+    /// <returns>The nearest node to the given position.</returns>
+    public PositionNode GetNodeAtNearestPosition(Vector2 globalPosition)
+    {
+        Vector2Int arrayPosition = GlobalToArrayPosition(globalPosition);
+        PositionNode nearestNode = GetNodeAtArrayPosition(arrayPosition);
+        if (nearestNode == null)
+        {
+            Vector2Int nearestKey = FindNearestArrayPosition(arrayPosition);
+            nearestNode = GetNodeAtArrayPosition(nearestKey);
+        }
+        return nearestNode;
+    }
+
+    private Vector2Int FindNearestArrayPosition(Vector2Int targetPosition)
+    {
+        Vector2Int nearestPosition = Vector2Int.zero;
+        float minDistance = float.MaxValue;
+
+        foreach (Vector2Int key in graphResource.arrayPositionsToNodes.Keys)
+        {
+            float distance = Vector2.Distance(targetPosition, key);
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+                nearestPosition = key;
+            }
+        }
+        return nearestPosition;
+    }
+
+    public PositionNode GetNodeAtArrayPosition(Vector2Int arrayPosition)
+    {
+        if (!graphResource.arrayPositionsToNodes.ContainsKey(arrayPosition)) return null;
+        return graphResource.arrayPositionsToNodes[arrayPosition];
     }
 
     /// <summary>
     /// Just a shortcut to the graph nodes dictionary inside GraphResource.
     /// </summary>
-    public Dictionary<Vector2Int, PositionNode> Nodes => graphResource.nodes;
+    public Dictionary<Vector2Int, PositionNode> ArrayPositionsToNodes => 
+        graphResource.arrayPositionsToNodes;
     
     private CleanAreaChecker _cleanAreaChecker;
 
@@ -219,7 +266,7 @@ public class MapGraph : MonoBehaviour
                     Vector2Int neighborArrayPosition =
                         GetNeighborRelativeArrayPosition(orientation) + 
                         nodeArrayPosition;
-                    if (!graphResource.nodes.ContainsKey(neighborArrayPosition)) 
+                    if (!graphResource.arrayPositionsToNodes.ContainsKey(neighborArrayPosition)) 
                         continue;
                     // Get the cost to enter the neighbor node.
                     Vector2 neighborGlobalPosition = 
@@ -228,7 +275,7 @@ public class MapGraph : MonoBehaviour
                     float neighborConnectionCost = neighbourCost / 2;
                     // Direct connection between this node and the neighbor.
                     PositionNode neighborNode = 
-                        graphResource.nodes[neighborArrayPosition];
+                        graphResource.arrayPositionsToNodes[neighborArrayPosition];
                     node.AddConnection(
                         neighborNode.Id,
                         // The half cost to leave the current node, and the half cost to
@@ -288,8 +335,8 @@ public class MapGraph : MonoBehaviour
     /// </summary>
     private void ClearGraph()
     {
-        graphResource.nodes.Clear();
-        graphResource.nodeArrayPositionsById.Clear();
+        graphResource.arrayPositionsToNodes.Clear();
+        graphResource.nodeIdsToArrayPositions.Clear();
     }
 
     /// <summary>
@@ -306,8 +353,8 @@ public class MapGraph : MonoBehaviour
     /// </param>
     private void AddNodeToGraph(Vector2Int nodeArrayPosition, PositionNode node)
     {
-        graphResource.nodes.Add(nodeArrayPosition, node);
-        graphResource.nodeArrayPositionsById.Add(node.Id, nodeArrayPosition);
+        graphResource.arrayPositionsToNodes.Add(nodeArrayPosition, node);
+        graphResource.nodeIdsToArrayPositions.Add(node.Id, nodeArrayPosition);
     }
 
     /// <summary>
@@ -352,20 +399,20 @@ public class MapGraph : MonoBehaviour
         }
 
         if (graphResource == null) return;
-        if (graphResource.nodes == null) return;
-        if (graphResource.nodes.Count == 0) return;
+        if (graphResource.arrayPositionsToNodes == null) return;
+        if (graphResource.arrayPositionsToNodes.Count == 0) return;
         
         // Draw nodes and their connections.
         Gizmos.color = nodeColor;
-        foreach (KeyValuePair<Vector2Int, PositionNode> nodeEntry in graphResource.nodes)
+        foreach (KeyValuePair<Vector2Int, PositionNode> nodeEntry in graphResource.arrayPositionsToNodes)
         {
             Vector2 cellPosition = NodeGlobalPosition(nodeEntry.Key);
             PositionNode node = nodeEntry.Value;
             Gizmos.DrawWireSphere(cellPosition, nodeRadius);
-            if (node.connections == null) continue;
+            if (node.Connections == null) continue;
             foreach (Orientation orientation in Enum.GetValues(typeof(Orientation)))
             {
-                if (node.connections.ContainsKey(orientation))
+                if (node.Connections.ContainsKey((uint)orientation))
                 {
                     Vector2 otherNodeRelativePosition = 
                         GetNeighborRelativeArrayPosition(orientation);

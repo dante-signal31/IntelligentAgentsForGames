@@ -26,11 +26,33 @@ public class GraphNode
     /// <summary>
     /// This node unique identifier.
     /// </summary>
-    public uint Id => id;
+    public uint Id {
+        get => id;
+        set => id = value; 
+    }
     
     // Don't make this field readonly, or it will break serialization.
-    public CustomUnityDictionaries.OrientationGraphConnectionDictionary connections = 
+    [SerializeField] 
+    private CustomUnityDictionaries.UintGraphConnectionDictionary connections = 
         new ();
+    
+    /// <summary>
+    /// This node connections to other graph nodes.
+    /// <remarks>
+    /// <ul><b>Key:</b> An integer that can map to any enum you need.
+    /// E.g. <see cref="Orientation"/> enum.</ul>
+    /// <ul><b>Value:</b> A <see cref="GraphConnection"/> object that represents the
+    /// connection between the current node and the target node.</ul>
+    /// </remarks>
+    /// </summary>
+    public CustomUnityDictionaries.UintGraphConnectionDictionary Connections 
+    { 
+        get => connections;
+        private set
+        {
+            connections = value;
+        }
+    }
 
     /// <summary>
     /// Generates a unique identifier for a node by creating a random 32-bit unsigned
@@ -65,10 +87,10 @@ public class GraphNode
     public void AddConnection(
         uint endNodeKey,
         float cost, 
-        Orientation orientation)
+        uint orientation)
     {
         GraphConnection graphConnection = new(Id, endNodeKey, cost);
-        connections[orientation] = graphConnection;
+        Connections[orientation] = graphConnection;
     }
 }    
 }

@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using Pathfinding;
 using SteeringBehaviors;
-using Tests.PlayTests.Common;
+using ninja.dlab.Commontesttools;
 using UnityEngine;
 using UnityEngine.TestTools;
 

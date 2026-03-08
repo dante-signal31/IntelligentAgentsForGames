@@ -25,12 +25,12 @@ public class GraphPathSmoother : MonoBehaviour, IGraphPathFinder
     [SerializeField] private Color gizmosColor = Color.greenYellow;
     [SerializeField] public float positionGizmoRadius = 0.5f;
 
-    public MapGraph Graph
+    public IPositionGraph Graph
     {
         get => graph;
         set
         {
-            graph = value;
+            graph = (MapGraph) value;
             if (smoothedGraphPathFinder != null) smoothedGraphPathFinder.Graph = value;
         }
     }
@@ -45,13 +45,13 @@ public class GraphPathSmoother : MonoBehaviour, IGraphPathFinder
         smoothedGraphPathFinder = (IGraphPathFinder) smoothedPathFinder;
         smoothedGraphPathFinder.Graph = graph;
         _cleanAreaChecker = new CleanAreaChecker(
-            (Mathf.Min(Graph.CellSize.x, Graph.CellSize.y)/2), 
-            Graph.obstaclesLayers);
+            (Mathf.Min(graph.CellSize.x, graph.CellSize.y)/2), 
+            graph.obstaclesLayers);
     }
 
-    public PathData FindPath(Vector2 targetPosition)
+    public PathData FindPath(Vector2 targetPosition, Vector2 fromPosition=default)
     {
-        _rawPathData = smoothedGraphPathFinder.FindPath(targetPosition);
+        _rawPathData = smoothedGraphPathFinder.FindPath(targetPosition, fromPosition);
         if (_rawPathData == null) return null;
         _smoothedPathData = SmoothPath(_rawPathData);
         return _smoothedPathData;

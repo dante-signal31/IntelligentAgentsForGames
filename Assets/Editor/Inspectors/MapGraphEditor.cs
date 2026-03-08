@@ -17,11 +17,11 @@ public partial class MapGraphEditor : UnityEditor.Editor
         // Add some space before the button
         EditorGUILayout.Space(10);
 
-        // Get the MapGraph component reference
+        // Get the component reference
         MapGraph mapGraph = (MapGraph)target;
 
         // Create and handle the reset button
-        if (GUILayout.Button("Generate Graph", GUILayout.Height(30)))
+        if (GUILayout.Button("Bake Graph", GUILayout.Height(30)))
         {
             mapGraph.GenerateGraph();
             EditorUtility.SetDirty(target);
@@ -37,14 +37,14 @@ public partial class MapGraphEditor : UnityEditor.Editor
             normal = { textColor = graph.GridColor }
         };
        
-        foreach (KeyValuePair<Vector2Int, PositionNode> nodeEntry in graph.Nodes)
+        foreach (KeyValuePair<Vector2Int, PositionNode> nodeEntry in graph.ArrayPositionsToNodes)
         {
             Vector2 cellPosition = graph.NodeGlobalPosition(nodeEntry.Key);
             PositionNode node = nodeEntry.Value;
-            if (node.connections == null) continue;
+            if (node.Connections == null) continue;
             foreach (Orientation orientation in Enum.GetValues(typeof(Orientation)))
             {
-                if (node.connections.TryGetValue(orientation, out var connection))
+                if (node.Connections.TryGetValue((uint)orientation, out var connection))
                 {
                     Vector2 otherNodeRelativePosition = 
                         graph.GetNeighborRelativeArrayPosition(orientation);

@@ -1,7 +1,23 @@
 {
     "name": "PlayTests",
-    "optionalUnityReferences": [
-        "TestAssemblies"
+    "rootNamespace": "",
+    "references": [
+        "ScriptsAssembly",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "ninja.dlab.Commontesttools"
     ],
-    "references":[ "GUID:9f0216e768b2f364ba92b740e272381d" ]
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

@@ -50,7 +50,9 @@ public class AStarGraphPathFinder: HeuristicGraphPathFinder<AStarNodeRecord>
         _heuristic = heuristic.GetComponent<IAStarHeuristic>();
     }
 
-    public override PathData FindPath(Vector2 targetPosition)
+    public override PathData FindPath(
+        Vector2 targetPosition, 
+        Vector2 fromPosition=default)
     {
         // Nodes not fully explored yet, ordered by the estimated cost to get the target
         // through them.
@@ -62,8 +64,10 @@ public class AStarGraphPathFinder: HeuristicGraphPathFinder<AStarNodeRecord>
         closedDict.Clear();
     
         // Get graph nodes associated with the start and target positions. 
-        CurrentStartNode = Graph.GetNodeAtPosition(transform.position);
-        PositionNode targetNode = Graph.GetNodeAtPosition(targetPosition);
+        CurrentStartNode = fromPosition==default?
+            Graph.GetNodeAtPosition(transform.position):
+            Graph.GetNodeAtPosition(fromPosition);
+        IPositionNode targetNode = Graph.GetNodeAtPosition(targetPosition);
     
         // You get to the start node from nowhere (null) and at no cost (0).
         AStarNodeRecord startNodeRecord = new()
@@ -85,8 +89,8 @@ public class AStarGraphPathFinder: HeuristicGraphPathFinder<AStarNodeRecord>
             // Solution: Ensure graph connection costs are on the same scale as the
             // used heuristic (Euclidean distance in the example).
             totalEstimatedCostToTarget = _heuristic.EstimateCostToTarget(
-                CurrentStartNode.position,
-                targetNode.position)
+                CurrentStartNode.Position,
+                targetNode.Position)
         };
         _openRecordSet.Add(startNodeRecord);
 
@@ -108,10 +112,10 @@ public class AStarGraphPathFinder: HeuristicGraphPathFinder<AStarNodeRecord>
 
             // Get all the connections of the current node and take note of the nodes
             // those connections lead to into the _openRecordSet to explore those nodes later.
-            foreach (GraphConnection graphConnection in current.node.connections.Values)
+            foreach (GraphConnection graphConnection in current.node.Connections.Values)
             {
                 // Where does that connection lead us?
-                PositionNode endNode = Graph.GetNodeById(graphConnection.endNodeId);
+                IPositionNode endNode = Graph.GetNodeById(graphConnection.endNodeId);
                 // Calculate the cost to reach the end node from the current node.
                 float endNodeCost = current.costSoFar + graphConnection.cost;
 
@@ -181,8 +185,8 @@ public class AStarGraphPathFinder: HeuristicGraphPathFinder<AStarNodeRecord>
                         costSoFar = endNodeCost,
                         totalEstimatedCostToTarget =
                             endNodeCost + _heuristic.EstimateCostToTarget(
-                                endNode.position, 
-                                targetNode.position)
+                                endNode.Position, 
+                                targetNode.Position)
                     };
                 }
                 // Add the node to the _openRecordSet to assess it fully again.
@@ -199,7 +203,7 @@ public class AStarGraphPathFinder: HeuristicGraphPathFinder<AStarNodeRecord>
     
         // As we've got the target node, analyze the closedDict to follow back connections
         // from the target node to start node to build the path.
-        PathData calculatedPath = BuildPath(CurrentStartNode, targetNode);
+        PathData calculatedPath = BuildPath(closedDict, CurrentStartNode, targetNode);
         return calculatedPath;
     }
 }

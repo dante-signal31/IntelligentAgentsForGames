@@ -9,7 +9,7 @@ public class NodeRecord
     /// <summary>
     /// Node this record refers to.
     /// </summary>
-    public PositionNode node;
+    public IPositionNode node;
     
     /// <summary>
     /// Best local connection so far to reach this node.

@@ -27,7 +27,7 @@ public class DrawPathFinder<T> : UnityEditor.Editor where T: NodeRecord, new()
             Vector2 gizmoBorder = new Vector2(
                 pathFinder.exploredNodeGizmoRadius,
                 pathFinder.exploredNodeGizmoRadius);
-            Vector2 textPosition = exploredNode.position - gizmoBorder -
+            Vector2 textPosition = exploredNode.Position - gizmoBorder -
                                    pathFinder.gizmoTextOffset;
             if (exploredNode == pathFinder.CurrentStartNode)
             {
@@ -39,8 +39,8 @@ public class DrawPathFinder<T> : UnityEditor.Editor where T: NodeRecord, new()
             {
                 uint fromNodeId =
                     pathFinder.ExploredNodes[exploredNode].connection.startNodeId;
-                PositionNode fromNode = pathFinder.Graph.GetNodeById(fromNodeId);
-                Vector2 relativePosition = exploredNode.position - fromNode.position;
+                IPositionNode fromNode = pathFinder.Graph.GetNodeById(fromNodeId);
+                Vector2 relativePosition = exploredNode.Position - fromNode.Position;
                 // Connection orientation from the receiving node perspective (the
                 // explored node).
                 string connectionOrientation;

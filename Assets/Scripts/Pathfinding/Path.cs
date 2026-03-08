@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using SteeringBehaviors;
 using UnityEngine;
+using UnityEngine.Events;
 
 
 namespace Pathfinding
@@ -16,6 +17,7 @@ public class Path : MonoBehaviour, IGizmos
     [SerializeField] public bool loop;
     [Tooltip("Target global positions of the path")] 
     [SerializeField] public List<Vector2> positions = new();
+    [SerializeField] public UnityEvent pathUpdated;
     
     [Header("DEBUG:")]
     [SerializeField] private bool showGizmos;
@@ -80,11 +82,37 @@ public class Path : MonoBehaviour, IGizmos
         Data.LoadPathData(positions);
     }
 
+    /// <summary>
+    /// Update the path data with new positions.
+    /// </summary>
+    /// <param name="newData">New positions in a PathData instance.</param>
     public void UpdatePathData(PathData newData)
     {
         Data = newData;
         positions.Clear();
         positions.AddRange(Data.positions);
+    }
+
+    /// <summary>
+    /// Update the path data with new positions.
+    /// </summary>
+    /// <param name="newData">New positions in a a list.</param>
+    public void UpdatePathData(List<Vector2> newPositions)
+    {
+        Data.LoadPathData(newPositions);
+        positions.Clear();
+        positions.AddRange(Data.positions);
+    }
+    
+    /// <summary>
+    /// Adds given path positions to the end of this path.
+    /// </summary>
+    /// <param name="path">Path to append</param>
+    public void AppendPath(Path path)
+    {
+        positions.AddRange(path.positions);
+        Data.AddPositionsToPath(path.positions);
+        pathUpdated?.Invoke();
     }
     
 #if UNITY_EDITOR

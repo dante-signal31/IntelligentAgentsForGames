@@ -23,7 +23,7 @@ public abstract class HeuristicGraphPathFinder<T>: GraphPathFinder<T>
     /// traversing a graph. It provides functionality to add and remove nodes, check for
     /// node existence, and retrieve the node with the lowest cost value.
     /// </remarks>
-    protected abstract class PrioritizedNodeRecordSet: INodeRecordCollection<T>
+    public abstract class PrioritizedNodeRecordSet: INodeRecordCollection<T>
     {
         // Needed to keep ordered by cost the NodeRecords of the node pending to be
         // explored.
@@ -34,7 +34,7 @@ public abstract class HeuristicGraphPathFinder<T>: GraphPathFinder<T>
         
         // Needed to keep track of the nodes still pending to be explored and to quickly
         // get their respective records.
-        private readonly Dictionary<PositionNode, T> nodeRecordDict = new ();
+        protected readonly Dictionary<IPositionNode, T> nodeRecordDict = new ();
     
         public int Count => nodeRecordDict.Count;
         
@@ -44,7 +44,7 @@ public abstract class HeuristicGraphPathFinder<T>: GraphPathFinder<T>
             nodeRecordDict.Clear();
         }
         
-        public bool Contains(PositionNode node) => nodeRecordDict.ContainsKey(node);
+        public bool Contains(IPositionNode node) => nodeRecordDict.ContainsKey(node);
 
         protected PrioritizedNodeRecordSet(IComparer<T> comparer)
         {
@@ -77,7 +77,7 @@ public abstract class HeuristicGraphPathFinder<T>: GraphPathFinder<T>
         /// <summary>
         /// Provides indexed access to the node records using a GraphNode as the key.
         /// </summary>
-        public T this[PositionNode node]
+        public T this[IPositionNode node]
         {
             get => nodeRecordDict[node];
             set => nodeRecordDict[node] = value;

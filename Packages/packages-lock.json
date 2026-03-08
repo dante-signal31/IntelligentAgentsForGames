@@ -333,6 +333,14 @@
       },
       "url": "https://packages.unity.com"
     },
+    "ninja.dlab.commontesttools": {
+      "version": "file:com.unity_qpf41c9t8c-p-q.commontesttools",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.unity.test-framework": "1.6.0"
+      }
+    },
     "ninja.dlab.unity-measuring-tape": {
       "version": "https://github.com/dante-signal31/Unity-Measuring-Tape.git",
       "depth": 0,
