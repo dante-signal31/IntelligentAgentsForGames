@@ -8,11 +8,6 @@ namespace Pathfinding
 public interface IPathFinder
 {
     /// <summary>
-    /// Graph modeling the environment this pathfinder goes through.
-    /// </summary>
-    public IPositionGraph Graph { get; set; }
-    
-    /// <summary>
     /// Find a path to the target position.
     /// </summary>
     /// <param name="targetPosition">Position to get to.</param>

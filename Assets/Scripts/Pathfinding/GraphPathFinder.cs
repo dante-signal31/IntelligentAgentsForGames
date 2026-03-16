@@ -98,7 +98,7 @@ public abstract class GraphPathFinder<T> : MonoBehaviour, IGraphPathFinder
         T pointer = currentClosedDict[targetNode];
 
         // Traverse the closedDict backwards to build the path from target to start.
-        while (pointer.node != startNode)
+        while (pointer.node.Id != startNode.Id)
         {
             path.Add(pointer.connection);
             IPositionNode endA = Graph.GetNodeById(pointer.connection.startNodeId);

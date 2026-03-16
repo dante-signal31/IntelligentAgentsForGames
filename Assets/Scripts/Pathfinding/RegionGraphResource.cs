@@ -1,4 +1,5 @@
-﻿using Tools;
+﻿using System;
+using Tools;
 
 namespace Pathfinding
 {
@@ -7,6 +8,7 @@ namespace Pathfinding
 /// system. This class serves as a lightweight storage mechanism, holding a dictionary
 /// of nodes that can be used in pathfinding algorithms or graph analyses.
 /// </summary>
+[Serializable]
 public class RegionGraphResource
 {
     /// <summary>

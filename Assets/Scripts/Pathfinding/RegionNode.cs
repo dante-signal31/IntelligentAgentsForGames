@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using Tools;
 using UnityEngine;
@@ -8,6 +9,7 @@ namespace Pathfinding
 /// <summary>
 /// Node representing a region. A region is a group of position nodes.
 /// </summary>
+[Serializable]
 public class RegionNode: GraphNode, IPositionNode
 {
     [SerializeField] private Vector2 position;

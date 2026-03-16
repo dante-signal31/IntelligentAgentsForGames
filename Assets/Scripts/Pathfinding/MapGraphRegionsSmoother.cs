@@ -11,14 +11,14 @@ public class MapGraphRegionsSmoother : MonoBehaviour
     [Tooltip("Whether to use random seeds for the regions generation. If true, only " +
              "seeds set at MapGraphRegions will be used; whereas if false, then " +
              "random seeds will be generated from this class with the same influence.")]
-    public bool randomSeeds = true;
+    [SerializeField] public bool randomSeeds = true;
     [Tooltip("Numbers of regions to generate.")]
-    public uint randomSeedsAmount = 3;
+    [SerializeField] public uint randomSeedsAmount = 3;
     [Tooltip("Number of iterations for the Lloyd relaxation algorithm.")]
-    public uint relaxationIterations = 3;
+    [SerializeField] public uint relaxationIterations = 3;
 
     [Header("WIRING:")] 
-    public MapGraphRegions mapGraphRegions;
+    [SerializeField] public MapGraphRegions mapGraphRegions;
     
     /// <summary>
     /// Smooths regions in the map graph using iterative relaxation. Optionally,
@@ -54,7 +54,7 @@ public class MapGraphRegionsSmoother : MonoBehaviour
         foreach (RegionSeed seed in mapGraphRegions.seeds)
         {
             uint regionId = mapGraphRegions.GetRegionByPosition(seed.position);
-            HashSet<uint> nodesInRegion = mapGraphRegions.NodesByRegion[regionId];
+            HashSet<uint> nodesInRegion = mapGraphRegions.nodesByRegion[regionId];
             Vector2 averagePosition = GetAveragePosition(nodesInRegion);
             // Average position can be inside an obstacle. So we must search for the
             // nearest node.

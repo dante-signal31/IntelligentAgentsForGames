@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Pathfinding
@@ -7,6 +6,7 @@ namespace Pathfinding
 /// <summary>
 /// This class divides a MapGraph in regions, based on defined seeds.
 /// </summary>
+[ExecuteAlways]
 public class MapGraphRegions: MonoBehaviour
 
 {
@@ -27,7 +27,7 @@ public class MapGraphRegions: MonoBehaviour
                 // If costs are equal, we must not return 0, otherwise SortedSet 
                 // thinks they are the same element and won't add the new one.
                 if (result == 0 && x.node != y.node)
-                    return x.regionId.CompareTo(y.regionId);
+                    return x.node.Id.CompareTo(y.node.Id);
                 return result;
             }
         }
@@ -39,29 +39,31 @@ public class MapGraphRegions: MonoBehaviour
 
     [Header("CONFIGURATION:")]
     [Tooltip("Take connection cost into account when calculating the regions.")]
-    public bool costAware = true;
+    [SerializeField] public bool costAware = true;
 
     [Tooltip("Default cost for a region.")]
-    public float defaultCost = 100;
+    [SerializeField] public float defaultCost = 100;
 
     [Tooltip("List of seeds to create regions.")]
-    public List<RegionSeed> seeds = new();
+    [SerializeField] public List<RegionSeed> seeds = new();
 
     [Header("WIRING:")]
     [Tooltip("MapGraph this component is going to divide into regions.")]
-    public MapGraph mapGraph;
+    [SerializeField] public MapGraph mapGraph;
 
     [Tooltip("MapGraphRegions serialized backend.")] 
-    [SerializeField] private MapGraphRegionsResource graphRegionsResource = new();
+    [SerializeField, HideInInspector] 
+    private MapGraphRegionsResource graphRegionsResource = new();
 
     [Header("DEBUG:")] public bool showGizmos;
-    public Color gizmosColor = Color.blanchedAlmond;
-    public float seedRadius = 10;
-    [Range(0.0f, 1.0f)] public float gizmoAlpha = 0.5f;
+    [SerializeField] public Color gizmosColor = Color.blanchedAlmond;
+    [SerializeField] public float seedRadius = 10;
+    [Range(0.0f, 1.0f)] 
+    [SerializeField] public float gizmoAlpha = 0.5f;
 
     public MapGraphRegionsResource GraphRegionsResource => graphRegionsResource;
 
-    private uint _seedsCount;
+    // private uint _seedsCount;
     private readonly NodeRegionsRecordSet _nodeRegionsOpenSet = new();
 
     /// <summary>
@@ -73,12 +75,7 @@ public class MapGraphRegions: MonoBehaviour
     /// A dictionary that maps region IDs to their corresponding influence values.
     /// </summary>
     private readonly Dictionary<uint, float> _regionsInfluence = new();
-
-    /// <summary>
-    /// Colors to show the regions in debugging mode.
-    /// </summary>
-    public readonly Dictionary<uint, Color> regionColors = new();
-
+    
     /// <summary>
     /// IDs of regions present in the map graph.
     /// </summary>
@@ -87,25 +84,51 @@ public class MapGraphRegions: MonoBehaviour
     /// <summary>
     /// IDs of nodes present in each region.
     /// </summary>
-    public readonly System.Collections.Generic.Dictionary<uint, HashSet<uint>>
-        NodesByRegion
-            = new();
+    public readonly Dictionary<uint, HashSet<uint>> nodesByRegion = new();
+    
+    /// <summary>
+    /// Colors to show the regions in debugging mode.
+    /// </summary>
+    public readonly Dictionary<uint, Color> regionColors = new();
 
+    /// <summary>
+    /// Retrieves the region ID associated with a specific position within the map.
+    /// </summary>
+    /// <param name="position">The global 2D position for which the region ID
+    /// is requested.</param>
+    /// <returns>The region ID as a <see cref="uint"/> that corresponds to the
+    /// region containing the specified position.</returns>
     public uint GetRegionByPosition(Vector2 position)
     {
         uint nearestNodeId = mapGraph.GetNodeAtPosition(position).Id;
         return graphRegionsResource.nodesIdToRegionsId[nearestNodeId];
     }
 
+    /// <summary>
+    /// Retrieves the region ID associated with a specific graph node, identified by
+    /// its node ID.
+    /// </summary>
+    /// <param name="nodeId">The unique identifier of the graph node whose associated
+    /// region ID is requested.</param>
+    /// <returns>The region ID as a <see cref="uint"/> that corresponds to the specified
+    /// node ID.</returns>
     public uint GetRegionByNodeId(uint nodeId) =>
         graphRegionsResource.nodesIdToRegionsId[nodeId];
 
+    /// <summary>
+    /// Retrieves the center position of a specific region, identified by its region ID.
+    /// </summary>
+    /// <param name="regionId">The unique identifier of the region for which the center
+    /// is requested.</param>
+    /// <returns>A <see cref="Vector2"/> representing the center position of the
+    /// specified region.</returns>
     public Vector2 GetRegionCenter(uint regionId)
     {
         return seeds[(int)regionId].position;
     }
 
-    public void Ready()
+    
+    public void Start()
     {
         UpdateRegionsColors();
         UpdateRegionsArray();
@@ -168,6 +191,7 @@ public class MapGraphRegions: MonoBehaviour
         UpdateRegionsResource(_exploredNodes);
         UpdateRegionsArray();
         UpdateNodesByRegion();
+        UpdateRegionsColors();
     }
     
     /// <summary>
@@ -212,7 +236,7 @@ public class MapGraphRegions: MonoBehaviour
                 if (nodeIdTopRegionId.Value == regionId) 
                     nodesInRegion.Add(nodeIdTopRegionId.Key);
             }
-            NodesByRegion[regionId] = nodesInRegion;
+            nodesByRegion[regionId] = nodesInRegion;
         }
     }
     
@@ -246,25 +270,15 @@ public class MapGraphRegions: MonoBehaviour
     
     /// <summary>
     /// Updates the colors of the defined regions in the map based on the
-    /// <see cref="RegionSeed.GizmoColor"/> property of each seed.
+    /// <see cref="RegionSeed.gizmoColor"/> property of each seed.
     /// </summary>
-    private void UpdateRegionsColors()
+    public void UpdateRegionsColors()
     {
         regionColors.Clear();
         for (uint i = 0; i < seeds.Count; i++)
         {
             RegionSeed regionSeed = seeds[(int)i];
             regionColors[i] = regionSeed.gizmoColor;
-        }
-    }
-
-    private void Update()
-    {
-        // Any update to the seeds array elements?
-        if (seeds.Count != _seedsCount)
-        {
-            UpdateRegionsColors();
-            _seedsCount = (uint)seeds.Count;
         }
     }
 }

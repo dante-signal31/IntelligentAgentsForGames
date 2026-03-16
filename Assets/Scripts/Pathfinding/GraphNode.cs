@@ -16,7 +16,7 @@ namespace Pathfinding
 /// directional and associated with a specific orientation and cost.
 /// </remarks>
 [Serializable]
-public class GraphNode
+public class GraphNode: IEquatable<GraphNode>
 {
     private static readonly HashSet<uint> assignedIds = new();
     private static readonly Random random = new();
@@ -91,6 +91,22 @@ public class GraphNode
     {
         GraphConnection graphConnection = new(Id, endNodeKey, cost);
         Connections[orientation] = graphConnection;
+    }
+    
+    public bool Equals(GraphNode other)
+    {
+        if (other is null) return false;
+        return Id == other.Id;
+    }
+
+    public override bool Equals(object obj)
+    {
+        return obj is GraphNode other && Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
     }
 }    
 }

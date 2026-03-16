@@ -2,11 +2,10 @@
 using Pathfinding;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace Editor.Inspectors
 {
-[CustomEditor(typeof(RegionGraphEditor))]
+[CustomEditor(typeof(RegionGraph))]
 public class RegionGraphEditor : UnityEditor.Editor
 {
     public override void OnInspectorGUI()
@@ -71,7 +70,7 @@ public class RegionGraphEditor : UnityEditor.Editor
                     regionNode.Position + 
                     (endRegionNode.Position - regionNode.Position) / 2 + 
                     regionGraph.gizmoTextOffset, 
-                    connection.cost.ToString("G"),
+                    connection.cost.ToString("F2"),
                     textStyle);
             }
         }

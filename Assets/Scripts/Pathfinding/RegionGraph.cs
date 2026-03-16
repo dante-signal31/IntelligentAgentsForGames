@@ -1,5 +1,6 @@
 ﻿
 using System.Collections.Generic;
+using Tools;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -16,7 +17,8 @@ public class RegionGraph : MonoBehaviour, IPositionGraph
     [Tooltip("MapGraphRegions this component is going to abstract into a graph.")]
     [SerializeField] public MapGraphRegions graphRegions;
     [Tooltip("RegionGraph serialized backend.")] 
-    [SerializeField] public RegionGraphResource regionGraphResource = new();
+    [SerializeField, HideInInspector] 
+    public RegionGraphResource regionGraphResource = new();
     [Tooltip("Component to find the shortest path between an origin boundary node " +
              "and the nearest node of a target neighbor region.")]
     [SerializeField] private DijkstraGraphPathFinder dijkstraPathFinder;
@@ -75,7 +77,7 @@ public class RegionGraph : MonoBehaviour, IPositionGraph
         InterRegionPath interRegionPath =
             regionGraphResource.fromNodeToRegionPaths[nodeToRegion];
         List<Vector2> pathPositions = interRegionPath.pathPositions;
-        Path returnedPath = new ();
+        Path returnedPath = new GameObject().AddComponent<Path>();
         returnedPath.UpdatePathData(pathPositions);
         return returnedPath;
     }
@@ -145,14 +147,11 @@ public class RegionGraph : MonoBehaviour, IPositionGraph
         }
         return nearestPosition;
     }
-
-    public void Start()
-    {
-        if (graphRegions != null) dijkstraPathFinder.Graph = graphRegions.mapGraph;
-    }
     
     public void GenerateRegionGraph()
     {
+        if (dijkstraPathFinder.Graph == null) 
+            dijkstraPathFinder.Graph = graphRegions.mapGraph;
         GenerateRegionNodes();
         CalculateRegionTraversalPaths();
         CalculateRegionTraversalCosts();
@@ -240,12 +239,12 @@ public class RegionGraph : MonoBehaviour, IPositionGraph
             
             // For every boundary node get a path to the nearest boundary node of 
             // every neighbor region.
-            foreach (KeyValuePair<uint, List<uint>> neighborRegionToBoundaryNodes in 
+            foreach (KeyValuePair<uint, UintList> neighborRegionToBoundaryNodes in 
                      regionNode.boundaryNodes)
             {
                 // Boundary nodes are going to be our starting points for the paths.
                 List<uint> boundaryNodesTowardsNeighborRegion = 
-                    neighborRegionToBoundaryNodes.Value;
+                    neighborRegionToBoundaryNodes.Value.items;
 
                 // Now calculate the shortest path from every boundary node of the current
                 // region towards the nearest boundary node of every neighbor region.
@@ -266,7 +265,7 @@ public class RegionGraph : MonoBehaviour, IPositionGraph
                             // the current region.
                             List<uint> neighborBoundaryNodesIds = regionGraphResource
                                 .regionIdToRegionNode[neighborRegionId]
-                                .boundaryNodes[regionId];
+                                .boundaryNodes[regionId].items;
                             foreach (uint neighborBoundaryNodeId in neighborBoundaryNodesIds)
                             {
                                 PositionNode neighborBoundaryNode = (PositionNode)
@@ -287,7 +286,7 @@ public class RegionGraph : MonoBehaviour, IPositionGraph
                             // region.
                             List<uint> neighborBoundaryNodesIds = regionGraphResource
                                 .regionIdToRegionNode[neighborRegionId]
-                                .boundaryNodes[regionId];
+                                .boundaryNodes[regionId].items;
                             
                             long nodeToRegionKey = 
                                 RegionGraphResource.GetFromNodeToRegionKey(
@@ -346,7 +345,7 @@ public class RegionGraph : MonoBehaviour, IPositionGraph
             uint regionId = regionIdToRegionNode.Key;
             RegionNode regionNode = regionIdToRegionNode.Value;
             // Create a connection with every region this one has boundary nodes with.
-            foreach (KeyValuePair<uint, List<uint>> neighborRegionIdBoundaryNodes in 
+            foreach (KeyValuePair<uint, UintList> neighborRegionIdBoundaryNodes in 
                      regionNode.boundaryNodes)
             {
                 uint neighborRegionId = neighborRegionIdBoundaryNodes.Key;
@@ -376,7 +375,7 @@ public class RegionGraph : MonoBehaviour, IPositionGraph
         
         // Traverse every region to generate their region nodes.
         foreach (KeyValuePair<uint, HashSet<uint>> regionIdToNodesIdsByRegion in 
-                 graphRegions.NodesByRegion)
+                 graphRegions.nodesByRegion)
         {
             uint regionId = regionIdToNodesIdsByRegion.Key;
             // Create a new region node to represent that region in the graph.
@@ -404,7 +403,7 @@ public class RegionGraph : MonoBehaviour, IPositionGraph
                     {
                         if (!regionNode.boundaryNodes.ContainsKey(otherNodeRegionId))
                             regionNode.boundaryNodes[otherNodeRegionId] = new();
-                        regionNode.boundaryNodes[otherNodeRegionId].Add(nodeId);
+                        regionNode.boundaryNodes[otherNodeRegionId].items.Add(nodeId);
                     }
                 }
             }

@@ -23,7 +23,7 @@ public class MapGraphRegionsSmootherEditor : UnityEditor.Editor
         if (GUILayout.Button("Bake Smoothed Regions", GUILayout.Height(30)))
         {
             mapGraphRegionsSmoother.SmoothRegions();
-            EditorUtility.SetDirty(target);
+            EditorUtility.SetDirty(mapGraphRegionsSmoother.mapGraphRegions);
         }
     }
 }

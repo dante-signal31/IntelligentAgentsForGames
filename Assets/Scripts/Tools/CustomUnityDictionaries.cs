@@ -49,7 +49,7 @@ public static class CustomUnityDictionaries
     
     [Serializable]
     public class UintListUintDictionary : 
-        UnitySerializedDictionary<uint, List<uint>>
+        UnitySerializedDictionary<uint, UintList>
     { }
 }
 }

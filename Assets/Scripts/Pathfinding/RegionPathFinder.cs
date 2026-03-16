@@ -11,25 +11,25 @@ namespace Pathfinding
 /// suitable for large graph traversals where higher-level abstractions of the graph
 /// are necessary for efficiency.
 /// </summary>
-public class RegionPathFinder : MonoBehaviour, IPathFinder
+public class RegionPathFinder : MonoBehaviour, IGraphPathFinder
 {
     [Header("CONFIGURATION:")]
     [Tooltip("Graph modeling the regions to traverse.")]
     [SerializeField] public RegionGraph regionGraph;
 
-    [Export("WIRING:")]
+    [Header("WIRING:")]
     [Tooltip("Dijkstra path finder used for first mile.")]
     [SerializeField] private DijkstraGraphPathFinder firstMilePathFinder;
     [Tooltip("Region path finder used for region-level pathfinding.")]
-    [InterfaceCompliant(typeof(IPathFinder))]
+    [InterfaceCompliant(typeof(IGraphPathFinder))]
     [SerializeField] private MonoBehaviour regionLevelPathFinder;
     [Tooltip("Path finder used for last mile. It can be either Dijkstra or A*.")]
     [InterfaceCompliant(typeof(IPathFinder))]
     [SerializeField] private MonoBehaviour lastMilePathFinder;
 
     private MapGraph MapGraph => regionGraph.graphRegions.mapGraph;
-    private IPathFinder _regionLevelPathFinder;
-    private IPathFinder _lastMilePathFinder;
+    private IGraphPathFinder _regionLevelPathFinder;
+    private IGraphPathFinder _lastMilePathFinder;
 
     public IPositionGraph Graph
     {
@@ -49,14 +49,14 @@ public class RegionPathFinder : MonoBehaviour, IPathFinder
         // At region level you can use both Dijkstra and A*.
         if (regionLevelPathFinder != null)
         {
-            _regionLevelPathFinder = (IPathFinder) regionLevelPathFinder;
+            _regionLevelPathFinder = (IGraphPathFinder) regionLevelPathFinder;
             _regionLevelPathFinder.Graph = regionGraph;
         }
     
         // At region level you can use both Dijkstra and A*.
         if (lastMilePathFinder != null)
         {
-            _lastMilePathFinder = (IPathFinder) lastMilePathFinder;
+            _lastMilePathFinder = (IGraphPathFinder) lastMilePathFinder;
             _lastMilePathFinder.Graph = MapGraph;
         }
     }
@@ -98,13 +98,21 @@ public class RegionPathFinder : MonoBehaviour, IPathFinder
                 regionGraph.graphRegions.GetRegionByPosition(regionPathPosition);
             index++;
         }
+        
+        // If the target is in the same region, we can use direct pathfinding to get to
+        // the target.
+        if (regionIdsSequence.Length == 1)
+            return _lastMilePathFinder.FindPath(
+                targetNode.Position, 
+                initialNode.Position);
     
         // "First mile". Get the path to the nearest boundary node of the next region.
         uint currentRegionIndex = 0;
         uint currentRegionId = regionIdsSequence[currentRegionIndex];
         uint nextRegionId = regionIdsSequence[currentRegionIndex + 1];
         RegionNode nextRegion = regionGraph.GetRegionNodeById(nextRegionId);
-        List<uint> nextRegionBoundaryNodes = nextRegion.boundaryNodes[initialRegionId];
+        List<uint> nextRegionBoundaryNodes = 
+            nextRegion.boundaryNodes[initialRegionId].items;
         firstMilePathFinder.CalculateCosts(
             initialNode, 
             // End condition: exit when you find the first boundary node of the next

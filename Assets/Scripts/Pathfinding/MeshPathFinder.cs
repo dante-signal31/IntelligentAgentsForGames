@@ -39,16 +39,19 @@ public class MeshPathFinder: MonoBehaviour, IPathFinder
         _navMeshPath = new NavMeshPath();
     }
     
-    public PathData FindPath(Vector2 targetPosition)
+    public PathData FindPath(Vector2 targetPosition, Vector2 fromPosition=default)
     {
         _targetPosition = targetPosition;
-        RecalculatePath();
+        RecalculatePath(fromPosition);
         return _pathData;
     }
     
-    private void RecalculatePath()
+    private void RecalculatePath(Vector2 fromPosition=default)
     {
-        NavMesh.CalculatePath(transform.position, 
+        Vector2 sourcePosition = fromPosition == default ? 
+            transform.position : 
+            fromPosition;
+        NavMesh.CalculatePath(sourcePosition, 
             _targetPosition, 
             NavMesh.AllAreas, 
             _navMeshPath);
