@@ -24,6 +24,7 @@ public class NotInformedPathFindingTests
     private GameObject _meshPathFindingGameObject;
     private GameObject _unityNavMeshMovingAgentGameObject;
     private GameObject _smoothPathFinderCurrentPathGameObject;
+    private GameObject _regionPathFindingGameObject;
     private GameObject _target;
     private PathFinderSteeringBehavior _breathFirstPathFinderSteeringBehavior;
     private PathFinderSteeringBehavior _depthFirstPathFinderSteeringBehavior;
@@ -48,6 +49,7 @@ public class NotInformedPathFindingTests
         _meshPathFindingGameObject = null;
         _meshPathFindingGameObject = null;
         _smoothPathFinderCurrentPathGameObject = null;
+        _regionPathFindingGameObject = null;
         
         // Clean up any existing objects first.
 
@@ -115,6 +117,12 @@ public class NotInformedPathFindingTests
         {
             _unityNavMeshMovingAgentGameObject = GameObject.Find("UnityNavMeshMovingAgent");
             _unityNavMeshMovingAgentGameObject.SetActive(false);
+        }
+
+        if (_regionPathFindingGameObject == null)
+        {
+            _regionPathFindingGameObject = GameObject.Find("RegionPathFinderMovingAgent");
+            _regionPathFindingGameObject.SetActive(false);       
         }
         
         if (_pathGameObject == null)
@@ -213,12 +221,12 @@ public class NotInformedPathFindingTests
         // Start test.
         // Assert that the pathfinder agent can reach the first target.
         _target.transform.position = _position2.position;
-        yield return new WaitForSeconds(5);
+        yield return new WaitForSeconds(7);
         Assert.True(Vector2.Distance(_depthFirstPathFindingGameObject.transform.position, _position2.position) < 0.3f);
         
         // Assert that the pathfinder agent can reach the second target.
         _target.transform.position = _position3.position;
-        yield return new WaitForSeconds(7);
+        yield return new WaitForSeconds(9);
         Assert.True(Vector2.Distance(_depthFirstPathFindingGameObject.transform.position, _position3.position) < 0.3f);
     }
 }

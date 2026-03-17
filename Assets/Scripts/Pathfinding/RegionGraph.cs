@@ -22,7 +22,7 @@ public class RegionGraph : MonoBehaviour, IPositionGraph
     [Tooltip("Component to find the shortest path between an origin boundary node " +
              "and the nearest node of a target neighbor region.")]
     [SerializeField] private DijkstraGraphPathFinder dijkstraPathFinder;
-
+    
     [Header("DEBUG:")] 
     [SerializeField] public bool showGizmos;
     [SerializeField] public Color gridColor = Color.yellow;

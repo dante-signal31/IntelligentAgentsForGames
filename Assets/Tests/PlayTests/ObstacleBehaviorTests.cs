@@ -458,7 +458,7 @@ namespace Tests.PlayTests
             _target.transform.position = _position3.position;
             
             // Give hide agent time to hide.
-            yield return new WaitForSeconds(5f);
+            yield return new WaitForSeconds(4f);
             
             // Assert that seek agent can no longer see hide agent.
             Assert.False(hideSteeringBehavior.ThreatCanSeeUs);

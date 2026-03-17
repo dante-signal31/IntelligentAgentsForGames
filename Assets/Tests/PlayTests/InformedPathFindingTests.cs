@@ -24,6 +24,7 @@ public class InformedPathFindingTests
     private GameObject _depthFirstPathFindingGameObject;
     private GameObject _meshPathFindingGameObject;
     private GameObject _unityNavMeshMovingAgentGameObject;
+    private GameObject _regionPathFindingGameObject;
     private GameObject _target;
     private PathFollowingSteeringBehavior _pathFollowingSteeringBehavior;
     private PathFinderSteeringBehavior _dijkstraPathFinderSteeringBehavior;
@@ -32,6 +33,7 @@ public class InformedPathFindingTests
     private PathFinderSteeringBehavior _breathFirstPathFinderSteeringBehavior;
     private PathFinderSteeringBehavior _depthFirstPathFinderSteeringBehavior;
     private MeshPathFinderSteeringBehavior _meshPathFinderSteeringBehavior;
+    private PathFinderSteeringBehavior _regionPathFinderSteeringBehavior;
     private NavMeshAgent _unityNavMeshMovingAgent;
     private AgentMover _pathFollowingAgent;
     private AgentMover _dijkstraPathFinderAgent;
@@ -40,6 +42,7 @@ public class InformedPathFindingTests
     private AgentMover _breathFirstPathFinderAgent;
     private AgentMover _depthFirstPathFinderAgent;
     private AgentMover _meshPathFinderAgent;
+    private AgentMover _regionPathFinderAgent;
     private AgentColor _pathFollowingAgentColor;
     private AgentColor _dijkstraPathFinderAgentColor;
     private AgentColor _aStarPathFinderAgentColor;
@@ -48,6 +51,7 @@ public class InformedPathFindingTests
     private AgentColor _depthFirstPathFinderAgentColor;
     private AgentColor _meshPathFinderAgentColor;
     private AgentColor _unityNavMeshAgentColor;
+    private AgentColor _regionPathFinderAgentColor;
     private GameObject _pathGameObject;
     private GameObject _path2GameObject;
     private Path _path;
@@ -70,13 +74,12 @@ public class InformedPathFindingTests
         _depthFirstPathFindingGameObject = null;
         _meshPathFindingGameObject = null;
         _unityNavMeshMovingAgent = null;
+        _regionPathFindingGameObject = null;
         _path2GameObject = null;
         _pathFollowingAgent = null;
         _pathFollowingAgentColor = null;
         _pathGameObject = null;
         _path = null;
-        
-        // Clean up any existing objects first.
 
         // Load the test scene
         yield return TestLevelManagement.ReLoadScene(CurrentScene);
@@ -138,6 +141,12 @@ public class InformedPathFindingTests
             _unityNavMeshMovingAgentGameObject.SetActive(false);
         }
 
+        if (_regionPathFindingGameObject == null)
+        {
+            _regionPathFindingGameObject = GameObject.Find("RegionPathFinderMovingAgent");
+            _regionPathFindingGameObject.SetActive(false);
+        }
+
         if (_target == null)
         {
             _target = GameObject.Find("Target");
@@ -177,6 +186,9 @@ public class InformedPathFindingTests
         if (_meshPathFinderAgent == null)
             _meshPathFinderAgent = _meshPathFindingGameObject.GetComponent<AgentMover>();
         
+        if (_regionPathFinderAgent == null)
+            _regionPathFinderAgent = _regionPathFindingGameObject.GetComponent<AgentMover>();       
+        
         if (_unityNavMeshMovingAgent == null)
             _unityNavMeshMovingAgent = _unityNavMeshMovingAgentGameObject.GetComponent<NavMeshAgent>();
         
@@ -203,6 +215,10 @@ public class InformedPathFindingTests
         
         if (_meshPathFinderSteeringBehavior == null)
             _meshPathFinderSteeringBehavior = _meshPathFindingGameObject.GetComponentInChildren<MeshPathFinderSteeringBehavior>();
+
+        if (_regionPathFinderSteeringBehavior == null)
+            _regionPathFinderSteeringBehavior = _regionPathFindingGameObject
+                .GetComponentInChildren<PathFinderSteeringBehavior>();
         
         if (_pathFollowingAgentColor == null)
             _pathFollowingAgentColor = _pathFollowingGameObject.GetComponent<AgentColor>();
@@ -227,6 +243,9 @@ public class InformedPathFindingTests
         
         if (_unityNavMeshAgentColor == null)
             _unityNavMeshAgentColor = _unityNavMeshMovingAgentGameObject.GetComponent<AgentColor>();
+        
+        if (_regionPathFinderAgentColor == null)
+            _regionPathFinderAgentColor = _regionPathFindingGameObject.GetComponent<AgentColor>();       
         
         if (_path == null)
             _path = _pathGameObject.GetComponent<Path>();
@@ -282,6 +301,10 @@ public class InformedPathFindingTests
 
         if (_unityNavMeshMovingAgentGameObject != null)
             _unityNavMeshMovingAgentGameObject.SetActive(false);
+        
+        if (_regionPathFindingGameObject != null)
+            _regionPathFindingGameObject.SetActive(false);       
+        
         if (_target != null)
             _target.SetActive(false);
         
@@ -541,6 +564,35 @@ public class InformedPathFindingTests
         _target.transform.position = _position3.position;
         yield return new WaitForSeconds(9);
         Assert.True(Vector2.Distance(_unityNavMeshMovingAgentGameObject.transform.position, _position3.position) < 0.3f);
+    }
+    
+    /// <summary>
+    /// Test the region pathfinder behavior.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator RegionPathFindingBehaviorTest()
+    {
+        // Set up agents before the tests.
+        _regionPathFindingGameObject.transform.position = _position1.position;
+        _regionPathFinderAgent.MaximumSpeed = 6.0f;
+        _regionPathFinderAgent.StopSpeed = 0.01f;
+        _regionPathFinderAgent.MaximumRotationalSpeed = 1080f;
+        _regionPathFinderAgent.StopRotationThreshold = 1f;
+        _regionPathFinderAgentColor.Color = Color.green;
+        _regionPathFinderSteeringBehavior.ShowGizmos = true;
+        _regionPathFindingGameObject.SetActive(true);
+        _target.SetActive(true);
+
+        // Start test.
+        // Assert that the pathfinder agent can reach the first target.
+        _target.transform.position = _position2.position;
+        yield return new WaitForSeconds(5);
+        Assert.True(Vector2.Distance(_regionPathFindingGameObject.transform.position, _position2.position) < 0.3f);
+        
+        // Assert that the pathfinder agent can reach the second target.
+        _target.transform.position = _position3.position;
+        yield return new WaitForSeconds(5);
+        Assert.True(Vector2.Distance(_regionPathFindingGameObject.transform.position, _position3.position) < 0.3f);
     }
 }
 }
