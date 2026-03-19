@@ -1,10 +1,12 @@
 ﻿using Pathfinding;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace Editor.Inspectors
 {
+/// <summary>
+/// Custom editor to add a button to bake the smoothed regions.
+/// </summary>
 [CustomEditor(typeof(MapGraphRegionsSmoother))]
 public class MapGraphRegionsSmootherEditor : UnityEditor.Editor
 {

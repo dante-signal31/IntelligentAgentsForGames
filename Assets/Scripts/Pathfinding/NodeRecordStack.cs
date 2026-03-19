@@ -2,7 +2,12 @@
 
 namespace Pathfinding
 {
-    public class NodeRecordStack: INodeRecordCollection<NodeRecord>
+/// <summary>
+/// A stack-based collection used for managing NodeRecord objects during
+/// pathfinding operations. This class ensures that nodes are only added
+/// once and supports operations for adding, retrieving, and checking nodes.
+/// </summary>
+public class NodeRecordStack: INodeRecordCollection<NodeRecord>
 {
     // Needed to keep ordered the NodeRecords pending to be explored. The order is
     // last-found-first-to-be-explored.
@@ -38,6 +43,16 @@ namespace Pathfinding
         set => _nodeRecordDict[node] = value;
     }
 
+    /// <summary>
+    /// Retrieves and removes the top NodeRecord from the stack.
+    /// This method returns the NodeRecord instance currently
+    /// at the top of the stack while preserving its reference in the
+    /// associated dictionary used for tracking discovered nodes.
+    /// If the stack is empty, it returns null.
+    /// </summary>
+    /// <returns>
+    /// The NodeRecord at the top of the stack, or null if the stack is empty.
+    /// </returns>
     public NodeRecord Get()
     {
         if (_stack.Count == 0) return null;

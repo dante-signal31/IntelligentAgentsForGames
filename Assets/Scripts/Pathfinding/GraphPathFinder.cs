@@ -5,22 +5,33 @@ using UnityEngine;
 
 namespace Pathfinding
 {
+/// <summary>
+/// Abstract base class for finding paths in a graph. This class provides core
+/// pathfinding functionality, such as tracking explored nodes, building paths, and
+/// identifying start and target positions. It is designed to be extended by specific
+/// pathfinding implementations, such as heuristic-based or uninformed search strategies.
+/// </summary>
+/// <typeparam name="T">
+/// The type of node record used for pathfinding. Must inherit from NodeRecord and have
+/// a parameterless constructor.
+/// </typeparam>
 public abstract class GraphPathFinder<T> : MonoBehaviour, IGraphPathFinder 
-    where T: NodeRecord, new()
+where T: NodeRecord, new()
 {
     [Header("CONFIGURATION:")]
-    [Tooltip("Graph modeling the environment.")]
+    [Tooltip("Graph modeling the environment. It must comply with IPositionGraph " +
+             "interface.")]
     [InterfaceCompliant(typeof(IPositionGraph))]
     [SerializeField] private MonoBehaviour mapGraph;
     
     [Header("DEBUG:")]
-    public bool showGizmos;
-    public float exploredNodeGizmoRadius = 0.1f;
+    [SerializeField] public bool showGizmos;
+    [SerializeField] public float exploredNodeGizmoRadius = 0.1f;
     [SerializeField] private Color exploredNodeColor = Color.black;
     [SerializeField] private float pathNodeGizmoRadius = 0.1f;
     [SerializeField] private Color pathNodeColor = Color.greenYellow;
-    public Vector2 gizmoTextOffset = new(0.1f, 0.1f);
-    public Color textColor = Color.white;
+    [SerializeField] public Vector2 gizmoTextOffset = new(0.1f, 0.1f);
+    [SerializeField] public Color textColor = Color.white;
 
     /// <summary>
     /// Graph modeling the environment.

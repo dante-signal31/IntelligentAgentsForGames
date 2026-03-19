@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Events;
@@ -13,7 +12,7 @@ public class MeshPathFinder: MonoBehaviour, IPathFinder
 {
     [Header("CONFIGURATION:")]
     [Tooltip("Event invoked when the path changes.")]
-    public UnityEvent pathChanged = new();
+    [SerializeField] public UnityEvent pathChanged = new();
     
     /// <summary>
     /// Radius of the agent that uses this pathfinder.
@@ -45,7 +44,16 @@ public class MeshPathFinder: MonoBehaviour, IPathFinder
         RecalculatePath(fromPosition);
         return _pathData;
     }
-    
+
+    /// <summary>
+    /// Recalculates the navigation path from the specified starting position
+    /// to the current target position. If no starting position is provided,
+    /// the recalculation starts from the object's current position.
+    /// </summary>
+    /// <param name="fromPosition">
+    /// The starting position for recalculation. If not specified,
+    /// the object's current position is used as the starting point.
+    /// </param>
     private void RecalculatePath(Vector2 fromPosition=default)
     {
         Vector2 sourcePosition = fromPosition == default ? 
@@ -59,6 +67,11 @@ public class MeshPathFinder: MonoBehaviour, IPathFinder
         pathChanged?.Invoke();
     }
 
+    /// <summary>
+    /// Updates the internal path data structure with the current navigation path.
+    /// Converts the navigation path corners from 3D to 2D coordinates and loads
+    /// them into the path data object.
+    /// </summary>
     private void UpdatePathData()
     {
         Vector3[] path = _navMeshPath.corners;

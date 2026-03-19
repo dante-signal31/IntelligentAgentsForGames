@@ -5,6 +5,20 @@ using UnityEngine;
 
 namespace Pathfinding
 {
+/// <summary>
+/// The <c>MapGraphRegionsSmoother</c> class provides functionality for smoothing
+/// regions in a map graph through iterative relaxation techniques. It can also
+/// generate random region seeds if configured to do so.
+/// </summary>
+/// <remarks>
+/// This class works in conjunction with the <c>MapGraphRegions</c> class to define
+/// and process regions within a map graph. It includes options for:
+/// - Using random seeds to initialize the regions.
+/// - Configuring the number of random seeds to generate.
+/// - Setting the number of iterations for the relaxation process.
+/// The <c>SmoothRegions</c> method serves as the main entry point for performing
+/// the relaxation process, leveraging the configured parameters. 
+/// </remarks>
 public class MapGraphRegionsSmoother : MonoBehaviour
 {
     [Header("CONFIGURATION:")] 
@@ -108,7 +122,7 @@ public class MapGraphRegionsSmoother : MonoBehaviour
     /// </returns>
     private List<RegionSeed> GenerateRandomSeeds()
     {
-        List<RegionSeed> randomSeeds = new();
+        List<RegionSeed> generatedSeeds = new();
         Color mapGraphRegionsGizmoColor = mapGraphRegions.gizmosColor;
         HashSet<Color> selectedColors = new() { mapGraphRegionsGizmoColor };
 
@@ -153,9 +167,9 @@ public class MapGraphRegionsSmoother : MonoBehaviour
                 influence = 1,
                 gizmoColor = randomColor
             };
-            randomSeeds.Add(seed);
+            generatedSeeds.Add(seed);
         }
-        return randomSeeds;
+        return generatedSeeds;
     }
 }
 }

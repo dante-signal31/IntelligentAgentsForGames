@@ -18,8 +18,8 @@ namespace Pathfinding
 [Serializable]
 public class GraphNode: IEquatable<GraphNode>
 {
-    private static readonly HashSet<uint> assignedIds = new();
-    private static readonly Random random = new();
+    private static readonly HashSet<uint> AssignedIds = new();
+    private static readonly Random RandomGenerator = new();
 
     [SerializeField] private uint id = GenerateUniqueId();
 
@@ -67,11 +67,11 @@ public class GraphNode: IEquatable<GraphNode>
         byte[] buffer = new byte[4];
         do
         {
-            random.NextBytes(buffer);
+            RandomGenerator.NextBytes(buffer);
             newId = BitConverter.ToUInt32(buffer, 0);
-        } while (assignedIds.Contains(newId));
+        } while (AssignedIds.Contains(newId));
 
-        assignedIds.Add(newId);
+        AssignedIds.Add(newId);
         return newId;
     }
     

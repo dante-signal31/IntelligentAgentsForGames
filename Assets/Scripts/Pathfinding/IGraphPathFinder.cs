@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace Pathfinding
+﻿namespace Pathfinding
 {
 /// <summary>
 /// Interface for graph-bases pathfinding algorithms.

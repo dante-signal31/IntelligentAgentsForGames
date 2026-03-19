@@ -6,7 +6,7 @@ using UnityEngine;
 namespace SteeringBehaviors
 {
 /// <summary>
-/// <p>Steering behavior to find and follow a path to a given target.</p>
+/// <p>Steering behavior to find, and follow, a path to a given target.</p>
 /// <p>The pathfinder algorithm used depends on the IGraphPathFinder instance referenced
 /// from the pathFinderBehaviour field.</p> 
 /// </summary>
@@ -74,6 +74,13 @@ public class PathFinderSteeringBehavior: SteeringBehavior, IGizmos
         target.positionChanged.RemoveListener(OnPathTargetPositionChanged);
     }
 
+    /// <summary>
+    /// Handles the event triggered when the target's position changes. Updates the path
+    /// to the new target position and configures the path-following behavior to follow
+    /// the updated path.
+    /// </summary>
+    /// <param name="newTargetPosition">The new position of the target that the
+    /// pathfinding will calculate a path to reach.</param>
     private void OnPathTargetPositionChanged(Vector2 newTargetPosition)
     {
         PathData newPath = graphPathFinder.FindPath(newTargetPosition);

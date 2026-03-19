@@ -62,8 +62,7 @@ public class MapGraphRegions: MonoBehaviour
     [SerializeField] public float gizmoAlpha = 0.5f;
 
     public MapGraphRegionsResource GraphRegionsResource => graphRegionsResource;
-
-    // private uint _seedsCount;
+    
     private readonly NodeRegionsRecordSet _nodeRegionsOpenSet = new();
 
     /// <summary>

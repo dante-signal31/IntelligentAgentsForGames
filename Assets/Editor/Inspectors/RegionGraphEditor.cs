@@ -5,6 +5,10 @@ using UnityEngine;
 
 namespace Editor.Inspectors
 {
+/// <summary>
+/// Custom editor to add a button to bake the region graph and to show a mesh for the
+/// generated graph.
+/// </summary>
 [CustomEditor(typeof(RegionGraph))]
 public class RegionGraphEditor : UnityEditor.Editor
 {

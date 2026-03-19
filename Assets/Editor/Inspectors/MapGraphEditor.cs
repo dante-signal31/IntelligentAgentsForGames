@@ -6,8 +6,11 @@ using UnityEngine;
 
 namespace Editor.Inspectors
 {
+/// <summary>
+/// Custom editor to draw the grid of a map graph and add a button to bake it.
+/// </summary>
 [CustomEditor(typeof(MapGraph))]
-public partial class MapGraphEditor : UnityEditor.Editor
+public class MapGraphEditor : UnityEditor.Editor
 {
     public override void OnInspectorGUI()
     {

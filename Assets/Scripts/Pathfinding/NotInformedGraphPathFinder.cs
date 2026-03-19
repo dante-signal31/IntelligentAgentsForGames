@@ -10,18 +10,7 @@ public abstract class NotInformedGraphPathFinder<TN>: GraphPathFinder<NodeRecord
     where TN: INodeRecordCollection<NodeRecord>, new()
 {
     private readonly TN _openQueue = new();
-
-    /// <summary>
-    /// Finds and returns a path to the specified target position.
-    /// Depending on the implementation, this uses a specific node collection
-    /// type to determine the sequence of nodes to explore during pathfinding.
-    /// </summary>
-    /// <typeparam name="TN">The type of node collection to use for pathfinding.
-    /// Must implement INodeRecordCollection.</typeparam>
-    /// <param name="targetPosition">The target position to find a path to.</param>
-    /// <param name="fromPosition">The source position to find a path from.</param>
-    /// <returns>A Path object representing the found path from the start position
-    /// to the target position, or null if no valid path exists.</returns>
+    
     public override PathData FindPath(
         Vector2 targetPosition, 
         Vector2 fromPosition=default) 

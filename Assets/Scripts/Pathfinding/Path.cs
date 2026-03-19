@@ -40,17 +40,17 @@ public class Path : MonoBehaviour, IGizmos
     /// <summary>
     /// How many positions this path has.
     /// </summary>
-    public int PathLength => Data.PathPositionsLength;
+    public int PathLength => _data.PathPositionsLength;
 
     /// <summary>
     /// Current index of the position we are going to.
     /// </summary>
-    public int CurrentTargetPositionIndex => Data.CurrentTargetPositionIndex;
+    public int CurrentTargetPositionIndex => _data.CurrentTargetPositionIndex;
     
     /// <summary>
     /// Position at the current position index.
     /// </summary>
-    public Vector2 CurrentTargetPosition => Data.CurrentTargetPosition;
+    public Vector2 CurrentTargetPosition => _data.CurrentTargetPosition;
     
     /// <summary>
     /// Where to place strings with the number of positions.
@@ -66,20 +66,20 @@ public class Path : MonoBehaviour, IGizmos
     /// <p>If we are at the end and Loop is false, then the last target position is
     /// returned; whereas if the loop is true, then the index is reset to 0 and the
     /// first target position is returned.</p></returns>
-    public Vector2 GetNextPositionTarget() => Data.GetNextPositionTarget();
+    public Vector2 GetNextPositionTarget() => _data.GetNextPositionTarget();
 
     /// <summary>
     /// Encapsulates path-related data used for pathfinding, including positions,
     /// looping configuration, and current target position tracking.
     /// </summary>
-    public PathData Data { get; private set; }= new();
+    private PathData _data = new();
 
     private void Awake()
     {
         // Leave any internal initialization here to let external path users make their
         // initial path configuration at the Start phase.
-        Data.loop = loop;
-        Data.LoadPathData(positions);
+        _data.loop = loop;
+        _data.LoadPathData(positions);
     }
 
     /// <summary>
@@ -88,20 +88,20 @@ public class Path : MonoBehaviour, IGizmos
     /// <param name="newData">New positions in a PathData instance.</param>
     public void UpdatePathData(PathData newData)
     {
-        Data = newData;
+        _data = newData;
         positions.Clear();
-        positions.AddRange(Data.positions);
+        positions.AddRange(_data.positions);
     }
 
     /// <summary>
     /// Update the path data with new positions.
     /// </summary>
-    /// <param name="newData">New positions in a a list.</param>
+    /// <param name="newPositions">New positions in a list.</param>
     public void UpdatePathData(List<Vector2> newPositions)
     {
-        Data.LoadPathData(newPositions);
+        _data.LoadPathData(newPositions);
         positions.Clear();
-        positions.AddRange(Data.positions);
+        positions.AddRange(_data.positions);
     }
     
     /// <summary>
@@ -111,35 +111,35 @@ public class Path : MonoBehaviour, IGizmos
     public void AppendPath(Path path)
     {
         positions.AddRange(path.positions);
-        Data.AddPositionsToPath(path.positions);
+        _data.AddPositionsToPath(path.positions);
         pathUpdated?.Invoke();
     }
     
 #if UNITY_EDITOR
     private void OnValidate()
     {
-        Data.loop = loop;
-        Data.LoadPathData(positions);
+        _data.loop = loop;
+        _data.LoadPathData(positions);
     }
 
     private void OnDrawGizmos()
     {
         if (!ShowGizmos) return;
         
-        if (Data.PathPositionsLength < 1) return;
+        if (_data.PathPositionsLength < 1) return;
 
         Vector2 previousPosition = Vector2.zero;
         Gizmos.color = GizmosColor;
         // Draw path positions
-        for (int i=0; i < Data.PathPositionsLength; i++)
+        for (int i=0; i < _data.PathPositionsLength; i++)
         {
-            Gizmos.DrawWireSphere(Data.positions[i], positionGizmoRadius);
+            Gizmos.DrawWireSphere(_data.positions[i], positionGizmoRadius);
             if (i >= 1)
             {
                 // Draw edges between positions.
-                Gizmos.DrawLine(previousPosition, Data.positions[i]);
+                Gizmos.DrawLine(previousPosition, _data.positions[i]);
             }
-            previousPosition = Data.positions[i];
+            previousPosition = _data.positions[i];
         }
     }
 #endif

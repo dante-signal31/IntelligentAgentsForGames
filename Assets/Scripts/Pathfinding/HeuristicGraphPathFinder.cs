@@ -34,7 +34,7 @@ public abstract class HeuristicGraphPathFinder<T>: GraphPathFinder<T>
         
         // Needed to keep track of the nodes still pending to be explored and to quickly
         // get their respective records.
-        protected readonly Dictionary<IPositionNode, T> nodeRecordDict = new ();
+        private readonly Dictionary<IPositionNode, T> nodeRecordDict = new ();
     
         public int Count => nodeRecordDict.Count;
         

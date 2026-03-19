@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using PropertyAttribute;
 using UnityEngine;
 
@@ -7,7 +6,7 @@ namespace Pathfinding
 {
 /// <summary>
 /// A class to compute paths through a set of interconnected regions.
-/// The RegionPathFinder utilizes region-based pathfinding strategies, making it
+/// The RegionPathFinder uses region-based pathfinding strategies, making it
 /// suitable for large graph traversals where higher-level abstractions of the graph
 /// are necessary for efficiency.
 /// </summary>
@@ -33,11 +32,8 @@ public class RegionPathFinder : MonoBehaviour, IGraphPathFinder
 
     public IPositionGraph Graph
     {
-        get=> regionGraph;
-        set
-        {
-            regionGraph = (RegionGraph) value;
-        }
+        get => regionGraph;
+        set => regionGraph = (RegionGraph) value;
     }
 
     public void Start()
@@ -105,11 +101,9 @@ public class RegionPathFinder : MonoBehaviour, IGraphPathFinder
             return _lastMilePathFinder.FindPath(
                 targetNode.Position, 
                 initialNode.Position);
-    
+        
         // "First mile". Get the path to the nearest boundary node of the next region.
-        uint currentRegionIndex = 0;
-        uint currentRegionId = regionIdsSequence[currentRegionIndex];
-        uint nextRegionId = regionIdsSequence[currentRegionIndex + 1];
+        uint nextRegionId = regionIdsSequence[1];
         RegionNode nextRegion = regionGraph.GetRegionNodeById(nextRegionId);
         List<uint> nextRegionBoundaryNodes = 
             nextRegion.boundaryNodes[initialRegionId].items;
@@ -118,7 +112,7 @@ public class RegionPathFinder : MonoBehaviour, IGraphPathFinder
             // End condition: exit when you find the first boundary node of the next
             // region.
             () => nextRegionBoundaryNodes.Contains(
-                firstMilePathFinder.CurrentNodeRecord.node.Id));
+                firstMilePathFinder.currentNodeRecord.node.Id));
         PositionNode nearestNextRegionBoundaryNode = null;
         foreach (uint nextRegionBoundaryNode in nextRegionBoundaryNodes)
         {
@@ -141,8 +135,8 @@ public class RegionPathFinder : MonoBehaviour, IGraphPathFinder
     
         // Once you are in intermediate regions, you can use static routing embed in 
         // regionGraph to get to the final region.
-        currentRegionId = nextRegionId;
-        currentRegionIndex++;
+        uint currentRegionId = nextRegionId;
+        uint currentRegionIndex = 1;
         while (currentRegionId != targetRegionId)
         {
             // The last end position is now our starting position.
@@ -167,6 +161,7 @@ public class RegionPathFinder : MonoBehaviour, IGraphPathFinder
         //
         // Again, the last end position is now our starting position.
         PositionNode finalBoundaryNode = nearestNextRegionBoundaryNode;
+        if (finalBoundaryNode == null) return null;
         PathData pathToTarget = _lastMilePathFinder.FindPath(
             targetNode.Position,
             finalBoundaryNode.Position);

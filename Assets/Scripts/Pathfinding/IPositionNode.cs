@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Pathfinding
 {
 /// <summary>
-/// Interface for every graph node that has an spatial meaning.
+/// Interface for every graph node that has a spatial meaning.
 /// </summary>
 public interface IPositionNode
 {

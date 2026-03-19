@@ -11,11 +11,16 @@ namespace Pathfinding
 [Serializable]
 public class MapGraphResource
 {
-    public CustomUnityDictionaries.Vector2IntPositionNodeDictionary arrayPositionsToNodes = new();
+    /// <summary>
+    /// Dictionary graph array positions to their corresponding position nodes.
+    /// </summary>
+    public CustomUnityDictionaries.Vector2IntPositionNodeDictionary arrayPositionsToNodes 
+        = new();
     
-    // Nodes store GraphNodes indexed by their array position in the spatial grid.
-    // We need something to map node ids to array positions. That's what this
-    // dictionary does.
+    /// <summary>
+    /// Dictionary mapping nodes, identified by their ID, to their corresponding
+    /// graph array positions.
+    /// </summary>
     public CustomUnityDictionaries.UintVector2IntDictionary nodeIdsToArrayPositions = 
         new();
 }

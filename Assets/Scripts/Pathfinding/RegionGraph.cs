@@ -1,8 +1,6 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Tools;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Pathfinding
 {
@@ -36,9 +34,9 @@ public class RegionGraph : MonoBehaviour, IPositionGraph
     private readonly Dictionary<uint, float> _regionTraversalCosts = new();
     
     /// <summary>
-    /// The nodes our dijkstra pathfinder must reach to end the needed calculation.
+    /// The nodes our dijkstra pathfinder must reach to end the necessary calculation.
     /// </summary>
-    private HashSet<IPositionNode> _targetNodes = new();
+    private readonly HashSet<IPositionNode> _targetNodes = new();
     
     /// <summary>
     /// Retrieves the region ID for a given position in the map graph.
@@ -213,9 +211,9 @@ public class RegionGraph : MonoBehaviour, IPositionGraph
     /// otherwise returns false.</returns>
     private bool EndCondition()
     {
-        if (!_targetNodes.Contains(dijkstraPathFinder.CurrentNodeRecord.node)) 
+        if (!_targetNodes.Contains(dijkstraPathFinder.currentNodeRecord.node)) 
             return false;
-        _targetNodes.Remove(dijkstraPathFinder.CurrentNodeRecord.node);
+        _targetNodes.Remove(dijkstraPathFinder.currentNodeRecord.node);
         return _targetNodes.Count == 0;
     }
 
@@ -319,7 +317,7 @@ public class RegionGraph : MonoBehaviour, IPositionGraph
                             }
                         }
                     }
-                    catch (KeyNotFoundException e)
+                    catch (KeyNotFoundException)
                     {
                         Debug.LogError($"Boundary node not found " +
                                        $"({boundaryNodeId}) when calculating " +

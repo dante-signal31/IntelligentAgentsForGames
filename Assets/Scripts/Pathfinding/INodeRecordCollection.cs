@@ -1,5 +1,10 @@
 ﻿namespace Pathfinding
 {
+/// <summary>
+/// Represents a collection of node records, providing methods to manage and interact
+/// with the collection.
+/// </summary>
+/// <typeparam name="T">The type of the node records within the collection.</typeparam>
 public interface INodeRecordCollection<T>
 {
     /// <summary>

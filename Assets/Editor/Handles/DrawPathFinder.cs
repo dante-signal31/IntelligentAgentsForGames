@@ -20,7 +20,7 @@ public class DrawPathFinder<T> : UnityEditor.Editor where T: NodeRecord, new()
             normal = { textColor = pathFinder.textColor }
         };
 
-        foreach (PositionNode exploredNode in pathFinder.ExploredNodes.Keys)
+        foreach (IPositionNode exploredNode in pathFinder.ExploredNodes.Keys)
         {
             // Mark every node with the smallest cost to get there from the start node
             // and the local orientation of the connection to get there.

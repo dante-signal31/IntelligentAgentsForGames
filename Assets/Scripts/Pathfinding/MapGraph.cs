@@ -29,13 +29,13 @@ public class MapGraph : MonoBehaviour, IPositionGraph
 {
     [Header("CONFIGURATION:")]
     [Tooltip("Size of the map to analyze in physical units.")]
-    public Vector2Int mapSize = new(18, 10);
+    [SerializeField] public Vector2Int mapSize = new(18, 10);
     [Tooltip("Dimensions for the resulting array of nodes.")]
-    public Vector2Int cellResolution = new(18, 10);
+    [SerializeField] public Vector2Int cellResolution = new(18, 10);
     [Tooltip("Layers to consider as not walkable.")]
-    public LayerMask obstaclesLayers;
+    [SerializeField] public LayerMask obstaclesLayers;
     [Tooltip("Walkable tilemap")]
-    public Tilemap walkableTilemap;
+    [SerializeField] public Tilemap walkableTilemap;
     
     /// <summary>
     /// MapGraph serialized backend.
@@ -44,7 +44,7 @@ public class MapGraph : MonoBehaviour, IPositionGraph
     
     [Header("DEBUG:")]
     [SerializeField] private bool showGizmos = true;
-    public Color gridColor = Color.yellow;
+    [SerializeField] public Color gridColor = Color.yellow;
     [SerializeField] private float nodeRadius = 0.1f;
     [SerializeField] private Color nodeColor = Color.orange;
 
@@ -165,6 +165,18 @@ public class MapGraph : MonoBehaviour, IPositionGraph
         return nearestNode;
     }
 
+    /// <summary>
+    /// Finds the nearest array position with a valid node to a given target position
+    /// within the graph resource.
+    /// </summary>
+    /// <param name="targetPosition">
+    /// The target array position as a Vector2Int for which the nearest array position
+    /// is to be determined.
+    /// </param>
+    /// <returns>
+    /// The nearest array position as a Vector2Int based on the minimum distance to
+    /// the target position.
+    /// </returns>
     private Vector2Int FindNearestArrayPosition(Vector2Int targetPosition)
     {
         Vector2Int nearestPosition = Vector2Int.zero;
@@ -182,6 +194,17 @@ public class MapGraph : MonoBehaviour, IPositionGraph
         return nearestPosition;
     }
 
+    /// <summary>
+    /// Retrieves the node at the given array position within the grid.
+    /// </summary>
+    /// <param name="arrayPosition">
+    /// The position of the node in the grid as a Vector2Int, representing its
+    /// indices within the grid structure.
+    /// </param>
+    /// <returns>
+    /// The PositionNode corresponding to the specified array position. Returns null if
+    /// no node exists at the given position.
+    /// </returns>
     public PositionNode GetNodeAtArrayPosition(Vector2Int arrayPosition)
     {
         if (!graphResource.arrayPositionsToNodes.ContainsKey(arrayPosition)) return null;
@@ -404,7 +427,8 @@ public class MapGraph : MonoBehaviour, IPositionGraph
         
         // Draw nodes and their connections.
         Gizmos.color = nodeColor;
-        foreach (KeyValuePair<Vector2Int, PositionNode> nodeEntry in graphResource.arrayPositionsToNodes)
+        foreach (KeyValuePair<Vector2Int, PositionNode> nodeEntry in 
+                 graphResource.arrayPositionsToNodes)
         {
             Vector2 cellPosition = NodeGlobalPosition(nodeEntry.Key);
             PositionNode node = nodeEntry.Value;
