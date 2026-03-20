@@ -66,6 +66,27 @@ public class RegionPathFinder : MonoBehaviour, IGraphPathFinder
     /// <returns>A path to get to the targetPosition from fromPosition</returns>
     public PathData FindPath(Vector2 targetPosition, Vector2 fromPosition=default)
     {
+        // If the target is in the same region as the agent, we can use direct
+        // pathfinding. However, if the target is in another region, we use the region
+        // graph to get a region-level path. That path contains the sequence of regions
+        // we must traverse. With that sequence, we can generate a path at the node
+        // graph level. The resulting node graph level path is generated from three parts:
+        //
+        // * First mile: To get out from the origin region, the first mile pathfinder
+        // looks at the node graph level the nearest boundary node of the next region,
+        // in the region level path.
+        //
+        // * Intermediate regions: From the boundary node of the next region, the region
+        // pathfinder asks for the static routes encoded into the region graph. In the 
+        // region graph, every boundary node has a set of routes to the nearest boundary
+        // nodes of each of the neighbor regions. Region pathfinder only has to ask for
+        // the route to the next region, in the region level path, from the current
+        // boundary node. Every static route is appended to the current path until the
+        // target region is reached.
+        //
+        // * Last mile: When the pathfinder reaches the last region in the region level
+        // path, it uses a direct pathfinder to get from the boundary node to the target
+        // node. The resulting local route is appended to the overall path.   
         PathData totalPathData = new();
     
         PositionNode targetNode = 
