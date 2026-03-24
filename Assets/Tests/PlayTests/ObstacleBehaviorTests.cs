@@ -31,11 +31,13 @@ namespace Tests.PlayTests
         private GameObject _priorityDitheringBlendedHideWallAvoiderGameObject;
         private GameObject _pathFollowingGameObject;
         private GameObject _pathGameObject;
+        private GameObject _contextGameObject;
         
         private SeekSteeringBehavior _seekSteeringBehavior;
         private HideSteeringBehavior _hideSteeringBehavior;
         private ActiveWallAvoiderSteeringBehavior _wallAvoiderSteeringBehavior;
         private SmoothedWallAvoiderSteeringBehavior _smoothedWallAvoiderSteeringBehavior;
+        private ContextSteeringBehavior _contextSteeringBehavior;
         
         private AgentMover _seekAgent;
         private AgentMover _hideAgent;
@@ -44,6 +46,7 @@ namespace Tests.PlayTests
         private AgentMover _weightBlendedHideWallAvoiderAgent;
         private AgentMover _priorityWeightBlendedHideWallAvoiderAgent;
         private AgentMover _priorityDitheringBlendedHideWallAvoiderAgent;
+        private AgentMover _contextAgent;
         
         private AgentColor _seekAgentColor;
         private AgentColor _hideAgentColor;
@@ -52,6 +55,7 @@ namespace Tests.PlayTests
         private AgentColor _weightBlendedHideWallAvoiderAgentColor;
         private AgentColor _priorityWeightBlendedHideWallAvoiderAgentColor;
         private AgentColor _priorityDitheringBlendedHideWallAvoiderAgentColor;
+        private AgentColor _contextAgentColor;
         
         
 
@@ -77,6 +81,9 @@ namespace Tests.PlayTests
             _smoothedWallAvoiderAgentColor = null;
             _weightBlendedHideWallAvoiderAgentColor = null;
             _priorityWeightBlendedHideWallAvoiderAgentColor = null;
+            _contextGameObject = null;
+            _contextAgentColor = null;
+            _contextAgent = null;
             _target = null;
     
             // Load the test scene
@@ -153,6 +160,12 @@ namespace Tests.PlayTests
                 _pathFollowingGameObject = GameObject.Find("PathFollowingMovingAgent");
                 _pathFollowingGameObject.SetActive(false);
             }
+
+            if (_contextGameObject == null)
+            {
+                _contextGameObject = GameObject.Find("ContextMovingAgent");
+                _contextGameObject.SetActive(false);
+            }
             
             if (_pathGameObject == null)
             {
@@ -172,6 +185,8 @@ namespace Tests.PlayTests
             if (_smoothedWallAvoiderSteeringBehavior == null)
                 _smoothedWallAvoiderSteeringBehavior = 
                     _smoothedWallAvoiderGameObject.GetComponentInChildren<SmoothedWallAvoiderSteeringBehavior>();
+            if (_contextSteeringBehavior == null)
+                _contextSteeringBehavior = _contextGameObject.GetComponentInChildren<ContextSteeringBehavior>();
             if (_seekAgent == null)
                 _seekAgent = _seekGameObject.GetComponent<AgentMover>();
             if (_hideAgent == null)
@@ -192,6 +207,8 @@ namespace Tests.PlayTests
                 _priorityDitheringBlendedHideWallAvoiderAgent =
                     _priorityDitheringBlendedHideWallAvoiderGameObject
                         .GetComponent<AgentMover>();
+            if (_contextAgent == null)
+                _contextAgent = _contextGameObject.GetComponent<AgentMover>();
             
             if (_seekAgentColor == null)
                 _seekAgentColor = _seekGameObject.GetComponent<AgentColor>();
@@ -212,6 +229,8 @@ namespace Tests.PlayTests
             if (_priorityDitheringBlendedHideWallAvoiderAgentColor == null)
                 _priorityDitheringBlendedHideWallAvoiderAgentColor = 
                     _priorityDitheringBlendedHideWallAvoiderGameObject.GetComponent<AgentColor>();
+            if (_contextAgentColor == null)
+                _contextAgentColor = _contextGameObject.GetComponent<AgentColor>();
         }
         
         [UnityTearDown]
@@ -231,6 +250,8 @@ namespace Tests.PlayTests
                 _priorityWeightBlendedHideWallAvoiderGameObject.SetActive(false);
             if (_priorityDitheringBlendedHideWallAvoiderGameObject != null)
                 _priorityDitheringBlendedHideWallAvoiderGameObject.SetActive(false);
+            if (_contextGameObject != null)
+                _contextGameObject.SetActive(false);
             if (_target != null)
                 _target.Enabled = false;
 
@@ -640,6 +661,42 @@ namespace Tests.PlayTests
             // Assert we reached our target.
             Assert.True(Vector2.Distance(_priorityDitheringBlendedHideWallAvoiderAgent.transform.position, 
                 _position2.position) < 1.5f);
+        }
+        
+        /// <summary>
+        /// Test that ContextBehavior can move an agent from a point A to a point B
+        /// avoiding obstacles.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator ContextBehaviorTest()
+        {
+            // Setup agents before the tests.
+            _target.Enabled = true;
+            _target.TargetPosition = _position5.position;
+            
+            _contextGameObject.transform.position = _position6.position;
+            _contextAgent.MaximumSpeed = 1.0f;
+            _contextAgent.StopSpeed = 0.01f;
+            _contextAgent.MaximumRotationalSpeed = 1080f;
+            _contextAgent.StopRotationThreshold = 1f;
+            _contextAgent.AutoSmooth = false;
+            _contextAgentColor.Color = Color.green;
+            _contextSteeringBehavior.ContextResolution = 20;
+            _contextSteeringBehavior.ContextRadius = 1.25f;
+            _contextSteeringBehavior.addedInterests = 4;
+            _contextGameObject.GetComponentInChildren<ITargeter>().Target = _target.gameObject;
+            _contextGameObject.SetActive(true);
+            
+            
+            // Start test.
+            
+            // Give hide agent time to reach the target.
+            yield return new WaitForSeconds(15f);
+            
+            // Assert that wall avoider has reached the target.
+            Assert.True(Vector2.Distance(
+                _contextAgent.transform.position, 
+                _target.TargetPosition) < 0.3f);
         }
     }
 }
