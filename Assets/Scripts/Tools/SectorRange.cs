@@ -22,14 +22,14 @@ public class SectorRange : ConeRange
         set
         {
             minimumRange = value;
-            if (Updated != null) Updated.Invoke();
+            if (updated != null) updated.Invoke();
         }   
     }
 
 #if UNITY_EDITOR
     protected override void OnValidate()
     {
-        // OnValidate was being called while playing and that is not supposed to happen.
+        // OnValidate was being called while playing, and that is not supposed to happen.
         if (Application.isPlaying) return; 
         
         // Call properties to force event emission.

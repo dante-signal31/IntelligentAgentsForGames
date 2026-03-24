@@ -1,12 +1,11 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
 
 namespace Tools
 {
 /// <summary>
-/// Represents a 2D cone range primarily used for visualization and calculations in an
+/// Represents a 2D cone range primarily used for visualization and calculations in a
 /// Unity scene.
 /// The cone range is defined by its length, angular width, and an associated color
 /// for visual representation.
@@ -20,14 +19,15 @@ public class ConeRange : MonoBehaviour
     [Tooltip("If true, the range is fixed and cannot be changed with the visual handle.")]
     [SerializeField] private bool fixedRange;
     [Tooltip("Half angular width in degrees for this cone.")]
-    [Range(0, 90)]
+    [Range(0, 180)]
     [SerializeField] private float semiConeDegrees;
     [FormerlySerializedAs("coneColor")]
     [Tooltip("Color to display this cone in editor.")]
     [SerializeField] private Color color = new Color(1.0f, 0,0, 0.5f);
+    [FormerlySerializedAs("Updated")]
     [Space]
     [Tooltip("Event to trigger when the cone is updated.")]
-    public UnityEvent Updated;
+    public UnityEvent updated;
 
     /// <summary>
     /// Length of this cone.
@@ -38,7 +38,7 @@ public class ConeRange : MonoBehaviour
         set
         {
             range = value;
-            if (Updated != null) Updated.Invoke();
+            updated?.Invoke();
         }
     }
     
@@ -48,7 +48,7 @@ public class ConeRange : MonoBehaviour
     public bool FixedRange => fixedRange;
 
     /// <summary>
-    /// Half angular width in degrees for this cone.
+    /// Half-angular width in degrees for this cone.
     /// </summary>
     public float SemiConeDegrees
     {
@@ -56,25 +56,25 @@ public class ConeRange : MonoBehaviour
         set
         {
             semiConeDegrees = value;
-            if (Updated != null) Updated.Invoke();
+            if (updated != null) updated.Invoke();
         }
     }
     /// <summary>
-    /// Color to display this cone in editor.
+    /// Color to display this cone in the editor.
     /// </summary>
     public Color Color => color;
     
-    // <summary>
+    /// <summary>
     /// <p>This node global Forward vector.</p>
     /// </summary>
     public Vector3 Forward => transform.up;
     
-    // <summary>
+    /// <summary>
     /// <p>This node local Forward vector.</p>
     /// </summary>
     public Vector3 LocalForward => Vector3.up;  
 
-    // <summary>
+    /// <summary>
     /// <p>This node local Normal vector.</p>
     /// </summary>
     public Vector3 Normal => Vector3.forward;

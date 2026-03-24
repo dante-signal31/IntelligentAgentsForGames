@@ -233,6 +233,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8898312500515073516, guid: 97f92bb48208c7c41836db40fbded15b, type: 3}
+      propertyPath: updated.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8898312500515073516, guid: 97f92bb48208c7c41836db40fbded15b, type: 3}
       propertyPath: coneUpdated.m_PersistentCalls.m_Calls.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -241,7 +245,15 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8898312500515073516, guid: 97f92bb48208c7c41836db40fbded15b, type: 3}
+      propertyPath: updated.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8898312500515073516, guid: 97f92bb48208c7c41836db40fbded15b, type: 3}
       propertyPath: Updated.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 2850409223302585798}
+    - target: {fileID: 8898312500515073516, guid: 97f92bb48208c7c41836db40fbded15b, type: 3}
+      propertyPath: updated.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 2850409223302585798}
     - target: {fileID: 8898312500515073516, guid: 97f92bb48208c7c41836db40fbded15b, type: 3}
@@ -253,6 +265,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8898312500515073516, guid: 97f92bb48208c7c41836db40fbded15b, type: 3}
+      propertyPath: updated.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8898312500515073516, guid: 97f92bb48208c7c41836db40fbded15b, type: 3}
       propertyPath: Updated.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: OnConeRangeUpdated
       objectReference: {fileID: 0}
@@ -260,6 +276,10 @@ PrefabInstance:
       propertyPath: coneUpdated.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 2850409223302585798}
+    - target: {fileID: 8898312500515073516, guid: 97f92bb48208c7c41836db40fbded15b, type: 3}
+      propertyPath: updated.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnConeRangeUpdated
+      objectReference: {fileID: 0}
     - target: {fileID: 8898312500515073516, guid: 97f92bb48208c7c41836db40fbded15b, type: 3}
       propertyPath: coneUpdated.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 1
@@ -273,11 +293,19 @@ PrefabInstance:
       value: Sensors.ConeSensor, ScriptsAssembly
       objectReference: {fileID: 0}
     - target: {fileID: 8898312500515073516, guid: 97f92bb48208c7c41836db40fbded15b, type: 3}
+      propertyPath: updated.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Sensors.ConeSensor, ScriptsAssembly
+      objectReference: {fileID: 0}
+    - target: {fileID: 8898312500515073516, guid: 97f92bb48208c7c41836db40fbded15b, type: 3}
       propertyPath: coneUpdated.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: Sensors.ConeSensor, ScriptsAssembly
       objectReference: {fileID: 0}
     - target: {fileID: 8898312500515073516, guid: 97f92bb48208c7c41836db40fbded15b, type: 3}
       propertyPath: Updated.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 8898312500515073516, guid: 97f92bb48208c7c41836db40fbded15b, type: 3}
+      propertyPath: updated.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 8898312500515073516, guid: 97f92bb48208c7c41836db40fbded15b, type: 3}

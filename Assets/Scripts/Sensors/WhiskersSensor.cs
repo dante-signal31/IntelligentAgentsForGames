@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using SteeringBehaviors;
 using Tools;
@@ -11,8 +10,8 @@ namespace Sensors
 /// <summary>
 /// <p>An array of ray sensors placed over a circular sector.</p>
 ///
-/// <p>The sector is placed around the local Y axis, so forward direction for this sensor
-/// is the local UP direction.</p>
+/// <p>The sector is placed around the local Y axis, so the forward direction for this
+/// sensor is the local UP direction.</p>
 /// </summary>
 [ExecuteAlways]
 public class WhiskersSensor : MonoBehaviour, IGizmos
@@ -23,15 +22,15 @@ public class WhiskersSensor : MonoBehaviour, IGizmos
     private class RaySensorList : IEnumerable<RaySensor>
     {
         // It should have 2N + 3 sensors.
-        // Think in this array of sensors as looking to UP direction,
+        // Think of this array of sensors as looking in a UP direction,
         // Inside this list:
         //  * Top left sensor is always at index 0.
         //  * Center sensor is always at the middle index.
         //  * Top right sensor is always at the end index.
-        private List<RaySensor> _raySensors;
+        private readonly List<RaySensor> _raySensors;
     
         /// <summary>
-        /// Current amount of sensors in this list.
+        /// Current number of sensors in this list.
         /// </summary>
         public int Count { get; private set; }
 
@@ -41,12 +40,12 @@ public class WhiskersSensor : MonoBehaviour, IGizmos
         public RaySensor CenterSensor => _raySensors[Count / 2];
     
         /// <summary>
-        /// Get the leftmost sensor (assuming whiskers locally looks to UP direction).
+        /// Get the leftmost sensor (assuming whiskers locally look in the UP direction).
         /// </summary>
         public RaySensor LeftMostSensor => _raySensors[0];
     
         /// <summary>
-        /// Get the rightmost sensor (assuming whiskers locally looks to UP direction).
+        /// Get the rightmost sensor (assuming whiskers locally look in the UP direction).
         /// </summary>
         public RaySensor RightMostSensor => _raySensors[Count - 1];
     
@@ -96,22 +95,7 @@ public class WhiskersSensor : MonoBehaviour, IGizmos
             return GetEnumerator();
         }
     }
-
-    /// <summary>
-    /// Struct to represent ray ends for every sensor in prefab local space.
-    /// </summary>
-    [Serializable] public struct RayEnds
-    {
-        public Vector3 start;
-        public Vector3 end;
     
-        public RayEnds(Vector2 start, Vector2 end)
-        {
-            this.start = start;
-            this.end = end;
-        }
-    }
-
     [Header("CONFIGURATION:")]
     [Tooltip("Ray sensor to instance.")]
     [SerializeField] private GameObject sensor;
@@ -291,7 +275,7 @@ public class WhiskersSensor : MonoBehaviour, IGizmos
     }
 
     /// <summary>
-    /// Number of rays for this sensor with given resolution.
+    /// Number of rays for this sensor with the given resolution.
     /// </summary>
     public int SensorAmount => (sensorResolution * 2) + 3;
 
@@ -308,6 +292,22 @@ public class WhiskersSensor : MonoBehaviour, IGizmos
                 if (currentSensor.IsColliderDetected) return true;
             }
             return false;
+        }
+    }
+    
+    /// <summary>
+    /// Sensor indices where an object is detected. True if detected.
+    /// </summary>
+    public List<bool> DetectionMask
+    {
+        get
+        {
+            List<bool> detectionMask = new();
+            foreach (RaySensor currentSensor in _sensors)
+            {
+                detectionMask.Add(currentSensor.IsColliderDetected); 
+            }
+            return detectionMask;
         }
     }
 
@@ -374,10 +374,11 @@ public class WhiskersSensor : MonoBehaviour, IGizmos
         get => gizmosColor;
         set => gizmosColor = value;
     }
+    
+    public readonly List<RayEnds> rayEnds = new();
 
     private bool _parameterSetFromHere;
     private RaySensorList _sensors;
-    public List<RayEnds> _rayEnds;
 
     public void OnSectorRangeUpdated()
     {
@@ -398,12 +399,12 @@ public class WhiskersSensor : MonoBehaviour, IGizmos
     {
         if (Application.isPlaying)
         {
-            // If not in play mode then create real sensors.
+            // If not in play mode, then create real sensors.
             UpdateSensors();
         }
         else
         {
-            // If in editor mode then only place gizmos. 
+            // If in editor mode, then only place gizmos. 
             if (sectorRange == null) return;
             UpdateRayEnds();
         }
@@ -504,10 +505,11 @@ public class WhiskersSensor : MonoBehaviour, IGizmos
         List<RaySensor> raySensors = new List<RaySensor>();
         for (int i = 0; i < SensorAmount; i++)
         {
-            // It's really odd but this line works right when game is normally played, but
-            // when I run automated tests, it doesn't work because sensorInstance is not
-            // parented to whiskersSensors, so sensor stays floating at the hierarchy
-            // root or even disappears from automated test scene.
+            // It's really odd, but this line works right when the game is normally
+            // played, but when I run automated tests, it doesn't work because
+            // sensorInstance is not parented to whiskersSensors. So, the sensor stays
+            // floating at the hierarchy root or even disappears from
+            // the automated test scene.
             GameObject sensorInstance = Instantiate(sensor,gameObject.transform);
             raySensors.Add(sensorInstance.GetComponent<RaySensor>());
         }
@@ -515,7 +517,7 @@ public class WhiskersSensor : MonoBehaviour, IGizmos
     }
 
     /// <summary>
-    /// Clear current list of sensors.
+    /// Clear the current list of sensors.
     /// </summary>
     private void RemoveSensors()
     {
@@ -559,14 +561,14 @@ public class WhiskersSensor : MonoBehaviour, IGizmos
     /// </summary>
     private void PlaceSensors()
     {
-        List<RayEnds> rayEnds = _rayEnds;
+        // List<RayEnds> rayEnds = this.rayEnds;
 
         int i = 0;
-        foreach (RayEnds rayEnd in rayEnds)
+        foreach (RayEnds currentRayEnd in rayEnds)
         {
             RaySensor currentSensor = _sensors.GetSensorFromLeft(i);
-            currentSensor.StartPosition = transform.TransformPoint(rayEnd.start);
-            currentSensor.EndPosition = transform.TransformPoint(rayEnd.end);
+            currentSensor.StartPosition = transform.TransformPoint(currentRayEnd.start);
+            currentSensor.EndPosition = transform.TransformPoint(currentRayEnd.end);
             i++;
         }
     }
@@ -582,7 +584,7 @@ public class WhiskersSensor : MonoBehaviour, IGizmos
         if (leftRangeSemiCone == null || 
             rightRangeSemiCone == null) 
             return;
-        List<RayEnds> rayEnds = new();
+        List<RayEnds> newRayEnds = new();
 
         float totalPlacementAngle = SemiConeDegrees * 2;
         float placementAngleInterval = totalPlacementAngle / (SensorAmount - 1);
@@ -598,10 +600,11 @@ public class WhiskersSensor : MonoBehaviour, IGizmos
         
             RayEnds rayEnd = new RayEnds(placementVectorStart, placementVectorEnd);
         
-            rayEnds.Add(rayEnd);
+            newRayEnds.Add(rayEnd);
         }
     
-        _rayEnds = rayEnds;
+        rayEnds.Clear();
+        rayEnds.AddRange(newRayEnds);
     }
 
 
@@ -618,7 +621,7 @@ public class WhiskersSensor : MonoBehaviour, IGizmos
     /// It uses index to use the proper proportion curve for left and right side.
     /// </summary>
     /// <param name="sensorIndex">Index of this sensor</param>
-    /// <returns>This sensor length from minimum range.</returns>
+    /// <returns>This sensor length from the minimum range.</returns>
     public float GetSensorLength(int sensorIndex)
     {
         int middleSensorIndex = SensorAmount / 2;
@@ -630,12 +633,12 @@ public class WhiskersSensor : MonoBehaviour, IGizmos
     }
 
     /// <summary>
-    /// Calculate the length of the left sensor based on the sensor index using left
-    /// range semi cone curve.
+    /// Calculate the length of the left sensor based on the sensor index using the left
+    /// range semi-cone curve.
     /// </summary>
     /// <param name="sensorIndex">Index of this sensor.</param>
     /// <param name="middleSensorIndex">Middle sensor index.</param>
-    /// <returns>This sensor length from minimum range.</returns>
+    /// <returns>This sensor length from the minimum range.</returns>
     private float GetLeftSensorLength(int sensorIndex, int middleSensorIndex)
     {
         float curvePoint = Mathf.InverseLerp(0, middleSensorIndex, sensorIndex);
@@ -644,12 +647,12 @@ public class WhiskersSensor : MonoBehaviour, IGizmos
     }
 
     /// <summary>
-    /// Calculate the length of the right sensor based on the sensor index using right
-    /// range semi cone curve.
+    /// Calculate the length of the right sensor based on the sensor index using the right
+    /// range semi-cone curve.
     /// </summary>
     /// <param name="sensorIndex">Index of this sensor.</param>
     /// <param name="middleSensorIndex">Middle sensor index.</param>
-    /// <returns>This sensor length from minimum range.</returns>
+    /// <returns>This sensor length from the minimum range.</returns>
     private float GetRightSensorLength(int sensorIndex, int middleSensorIndex)
     {
         float curvePoint = Mathf.InverseLerp(
@@ -674,24 +677,24 @@ public class WhiskersSensor : MonoBehaviour, IGizmos
     private void OnDrawGizmos()
     {
         // Draw gizmos only if in editor mode. 
-        if (!Application.isPlaying && showGizmos && _rayEnds != null)
+        if (!Application.isPlaying && showGizmos && rayEnds != null)
         {
             Gizmos.color = gizmosColor;
-            foreach (RayEnds rayEnds in _rayEnds)
+            foreach (RayEnds currentRayEnds in rayEnds)
             {
                 Gizmos.color = gizmosColor;
                 Gizmos.DrawLine(
-                    transform.TransformPoint(rayEnds.start), 
-                    transform.TransformPoint(rayEnds.end));
+                    transform.TransformPoint(currentRayEnds.start), 
+                    transform.TransformPoint(currentRayEnds.end));
                 Gizmos.DrawWireSphere(
-                    transform.TransformPoint(rayEnds.start),
+                    transform.TransformPoint(currentRayEnds.start),
                     gizmoRadius);
                 Gizmos.DrawWireSphere(
-                    transform.TransformPoint(rayEnds.end),
+                    transform.TransformPoint(currentRayEnds.end),
                     gizmoRadius);
             }
         }
-        // If in play mode the gizmos I'm interested in are those drawn from the
+        // If in play mode, the gizmos I'm interested in are those drawn from the
         // RaySensors.
     }
 #endif
