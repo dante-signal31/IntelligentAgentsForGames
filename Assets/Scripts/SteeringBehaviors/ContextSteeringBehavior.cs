@@ -36,20 +36,20 @@ public class ContextSteeringBehavior : SteeringBehavior
             Interest b)
         {
             // Compare the values.
-            int result = b.Value.CompareTo(a.Value);
+            int result = b.value.CompareTo(a.value);
             if (result != 0) return result;
             
             // If the values are equal, give preference to the minimum angle from
             // agent's forward vector'.
             float angleX = Mathf.Abs(
-                Vector2.Angle(a.Direction, currentAgentTransform.up));
+                Vector2.Angle(a.direction, currentAgentTransform.up));
             float angleY = Mathf.Abs(
-                Vector2.Angle(b.Direction, currentAgentTransform.up));
+                Vector2.Angle(b.direction, currentAgentTransform.up));
             result = angleX.CompareTo(angleY);
             if (result != 0) return result;
             
             // Final deterministic tie-breaker.
-            return a.Direction.x.CompareTo(b.Direction.x);
+            return a.direction.x.CompareTo(b.direction.x);
         }
         
         public InterestComparer(Transform currentAgentTransform)
@@ -242,7 +242,7 @@ public class ContextSteeringBehavior : SteeringBehavior
         foreach (Interest interest in validInterests)
         {
             if (highestInterestIndex++ >= addedInterests) break;
-            _currentSteeringVector += interest.Direction * interest.Value;
+            _currentSteeringVector += interest.direction * interest.value;
         }
         
         _currentSteeringVector = _currentSteeringVector.normalized * args.MaximumSpeed;
@@ -290,7 +290,7 @@ public class ContextSteeringBehavior : SteeringBehavior
             Gizmos.DrawLine(
                 transform.position,
                 transform.position + 
-                (Vector3) interest.Direction.normalized * interest.Value);
+                (Vector3) interest.direction.normalized * interest.value);
         }
         
         // Draw resulting steering.
