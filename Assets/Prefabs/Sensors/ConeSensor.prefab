@@ -51,7 +51,7 @@ MonoBehaviour:
   detectionSemiconeAngle: 56.58013
   layersToDetect:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   objectEnteredCone:
     m_PersistentCalls:
       m_Calls: []

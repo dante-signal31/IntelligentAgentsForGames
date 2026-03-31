@@ -11,6 +11,13 @@ namespace Sensors
 [ExecuteAlways]
 public class VolumetricSensor : MonoBehaviour
 {
+    [Header("CONFIGURATION:")]
+    [Tooltip("Layers to be detected by this sensor.")]
+    [SerializeField] public LayerMask detectionLayers;
+    [Tooltip("Ignore detected collider if it is the same transform than sensor or in " +
+             "any of its parents.")]
+    [SerializeField] public bool ignoreOwner = true;
+    
     [Header("EVENTS:")] 
     [Tooltip("Subscribers for detection events.")] 
     [SerializeField] private UnityEvent<GameObject> objectEnteredDetectionArea;
@@ -22,31 +29,22 @@ public class VolumetricSensor : MonoBehaviour
     [Header("WIRING:")] 
     [Tooltip("Volumetric collider trigger.")] 
     [SerializeField] private Collider2D volumetricCollider;
-
-    private HashSet<GameObject> _objectsDetected;
-    private HashSet<ContactPoint2D> _contactPoints;
-
+    
     /// <summary>
     /// Set of GameObjects under sensor range.
     /// </summary>
-    public HashSet<GameObject> ObjectsDetected => _objectsDetected;
+    public HashSet<GameObject> ObjectsDetected { get; } = new ();
 
     /// <summary>
-    /// If sensor has any detected object under its range.
+    /// If the sensor has any detected object under its range.
     /// </summary>
-    public bool anyObjectDetected => ObjectsDetected.Count > 0;
+    public bool AnyObjectDetected => ObjectsDetected.Count > 0;
 
     /// <summary>
     /// This sensor collider. Useful to find approximate contact points.
     /// </summary>
-    public Collider2D SensorCollider => volumetricCollider;
-
-    private void Awake()
-    {
-        _objectsDetected = new HashSet<GameObject>();
-        _contactPoints = new HashSet<ContactPoint2D>();
-    }
-
+    protected Collider2D SensorCollider => volumetricCollider;
+    
     private void AddDetectedObject(GameObject obj)
     {
         ObjectsDetected.Add(obj);
@@ -59,6 +57,8 @@ public class VolumetricSensor : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        if (!IsColliderLayerInDetectionLayers(other)) return;
+        if (ignoreOwner && transform.IsChildOf(other.transform)) return;
         GameObject detectedGameObject = other.gameObject;
         AddDetectedObject(detectedGameObject);
         if (objectEnteredDetectionArea != null) 
@@ -67,6 +67,9 @@ public class VolumetricSensor : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D other)
     {
+        if (!IsColliderLayerInDetectionLayers(other)) return;
+        if (ignoreOwner && transform.IsChildOf(other.transform)) return;
+        
         GameObject detectedGameObject = other.gameObject;
         RemoveDetectedObject(detectedGameObject);
         if (objectLeftDetectionArea != null) 
@@ -74,12 +77,25 @@ public class VolumetricSensor : MonoBehaviour
     }
 
     private void OnTriggerStay2D(Collider2D other)
-    { 
+    {
+        if (!IsColliderLayerInDetectionLayers(other)) return;
+        if (ignoreOwner && transform.IsChildOf(other.transform)) return;
+
         GameObject detectedGameObject = other.gameObject;
         if (!ObjectsDetected.Contains(detectedGameObject)) 
             AddDetectedObject(detectedGameObject);
         if (objectStayDetectionArea != null) 
             objectStayDetectionArea.Invoke(detectedGameObject);
+    }
+    
+    /// <summary>
+    /// Whether the provided object layer is included in the detection layers LayerMask.
+    /// </summary>
+    /// <param name="other">Object to check.</param>
+    /// <returns>True if the object's layer is in the layer mask.</returns>
+    private bool IsColliderLayerInDetectionLayers(Collider2D other)
+    {
+        return (detectionLayers & (1 << other.gameObject.layer)) != 0;
     }
 }
 }

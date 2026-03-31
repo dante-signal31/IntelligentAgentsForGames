@@ -1,8 +1,15 @@
 ﻿using System.Timers;
+using PropertyAttribute;
 using UnityEngine;
 
 namespace SteeringBehaviors
 {
+/// <summary>
+/// Implements a steering behavior that enables an agent to avoid collisions with
+/// other agents while attempting to move towards a target. The behavior incorporates
+/// a cooldown mechanism to prevent erratic movements caused by rapid toggling between
+/// avoid and no-avoid actions.
+/// </summary>
 public class ActiveAgentAvoiderSteeringBehavior : SteeringBehavior
 {
     [Header("CONFIGURATION:")]
@@ -12,10 +19,10 @@ public class ActiveAgentAvoiderSteeringBehavior : SteeringBehavior
 
     [Header("WIRING:")]
     [Tooltip("Steering to go to target.")]
+    [InterfaceCompliant(typeof(ITargeter))]
     [SerializeField] private SteeringBehavior steeringToTarget;
     [Tooltip("Steering to avoid other agents.")]
-    [SerializeField] 
-    private PassiveAgentAvoiderSteeringBehavior passiveAgentAvoiderSteering;
+    [SerializeField] private SteeringBehavior passiveAgentAvoiderSteering;
     
     /// <summary>
     /// Timeout duration, in seconds, that starts after no further collisions are
@@ -32,7 +39,7 @@ public class ActiveAgentAvoiderSteeringBehavior : SteeringBehavior
         }
     }
     
-    private System.Timers.Timer _avoidanceTimer;
+    private Timer _avoidanceTimer;
     private bool _waitingForAvoidanceTimeout;
     private SteeringOutput _currentSteeringOutput;
 
@@ -43,9 +50,9 @@ public class ActiveAgentAvoiderSteeringBehavior : SteeringBehavior
     }
     
     /// <summary>
-    /// If we head to the main target as soon a collision forecast dissapears, we can end
-    /// with jittering. That's because when we head again to the main target we can put
-    /// ourselves in the same collision path we were just an instant ago. To avoid that
+    /// If we head to the main target as soon a collision forecast disappears, we can end
+    /// with jittering. That's because when we head again to the main target, we can put
+    /// ourselves in the same collision path we were just an instant ago. To avoid that,
     /// we let our avoidance maneuver act for a moment before heading again towards our
     /// main target. This avoidance timer defines how long that moment takes.
     /// </summary>
@@ -58,7 +65,7 @@ public class ActiveAgentAvoiderSteeringBehavior : SteeringBehavior
     }
     
     /// <summary>
-    /// Start avoidance timer from zero.
+    /// Start the avoidance timer from zero.
     /// </summary>
     private void StartAvoidanceTimer()
     {
@@ -85,9 +92,7 @@ public class ActiveAgentAvoiderSteeringBehavior : SteeringBehavior
         
         // Nothing to avoid, but we are waiting for avoidance timeout, so let's
         // continue our current velocity.
-        if (avoidingSteeringVelocity.Equals(SteeringOutput.Zero) &&
-            _waitingForAvoidanceTimeout)
-            return _currentSteeringOutput;
+        if (_waitingForAvoidanceTimeout) return _currentSteeringOutput;
         
         // Nothing to avoid and waiting nothing, so let's just go to our target.
         if (avoidingSteeringVelocity.Equals(SteeringOutput.Zero)) 
@@ -97,11 +102,14 @@ public class ActiveAgentAvoiderSteeringBehavior : SteeringBehavior
         // velocity to avoid collision. 
         Vector2 newVelocity = steeringToTargetVelocity.Linear + 
                               avoidingSteeringVelocity.Linear;
+        // Check resulting the speed is not higher than the maximum one.
+        if (newVelocity.magnitude > args.MaximumSpeed) 
+            newVelocity = newVelocity.normalized * args.MaximumSpeed;
         _currentSteeringOutput = new SteeringOutput(
             newVelocity, 
             steeringToTargetVelocity.Angular);
         
-        // We need a cooldown or we can get stuck in a cycle where our agent changes 
+        // We need a cooldown, or we can get stuck in a cycle where our agent changes 
         // its heading to avoid collision but, in the next frame, as its heading is
         // different, then algorithm can conclude there is no longer a collision risk
         // so avoiding vector is discarded... and, in the next frame, agent is looking

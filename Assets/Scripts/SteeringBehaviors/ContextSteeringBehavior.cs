@@ -14,7 +14,7 @@ namespace SteeringBehaviors
 /// The ContextSteeringBehavior class is responsible for implementing a context-based
 /// steering mechanism. This behavior processes environmental data using sensors, such as
 /// danger detection, and dynamically adjusts the steering output to avoid obstacles
-/// while pursuing the target objective. The algorithm uses interests and contextual
+/// while pursuing the target goal. The algorithm uses interests and contextual
 /// vectors to make nuanced adjustments based on the environment.
 /// </summary>
 /// <remarks>
@@ -112,13 +112,11 @@ public class ContextSteeringBehavior : SteeringBehavior
     private Vector2 _currentSteeringVector;
 
     /// <summary>
-    /// Configures the whisker components for the context steering behavior.
+    /// Configures the whisker components for the context-steering behavior.
     /// </summary>
     /// <remarks>
     /// This method ensures that both the danger sensor and interest whisker are
     /// properly configured to align with the current context resolution and radius.
-    /// It plays a key role in maintaining accurate and effective context steering
-    /// functionality by initializing the necessary sensors and whiskers.
     /// </remarks>
     private void ConfigureWhiskers()
     {
@@ -127,7 +125,7 @@ public class ContextSteeringBehavior : SteeringBehavior
     }
 
     /// <summary>
-    /// Configures the interest whisker component for the context steering behavior.
+    /// Configures the interest whisker component for the context-steering behavior.
     /// </summary>
     /// <remarks>
     /// This method ensures that the interest whisker is updated with the ray endpoints
@@ -177,7 +175,7 @@ public class ContextSteeringBehavior : SteeringBehavior
     /// </summary>
     /// <param name="mask">Mask whose bits we are going to set.</param>
     /// <param name="start">Index where to start to set bits.</param>
-    /// <param name="end">Index where to end bit setting (exclusive).</param>
+    /// <param name="end">Index where to end the bit setup (exclusive).</param>
     private void SetRangeToTrue(List<bool> mask, int start, int end)
     {
         for (int i = start; i < end; i++)

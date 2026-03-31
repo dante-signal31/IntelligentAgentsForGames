@@ -4,6 +4,7 @@ using System.Linq;
 using NUnit.Framework;
 using SteeringBehaviors;
 using ninja.dlab.Commontesttools;
+using Sensors;
 using Tools;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -13,7 +14,7 @@ namespace Tests.PlayTests
     public class SimpleBehaviourTests
     {
         private const string CurrentScene = "TestClearTiledYard";
-        
+
         private Transform _position5;
         private Transform _position6;
         private Transform _position7;
@@ -47,6 +48,7 @@ namespace Tests.PlayTests
         private GameObject _wanderGameObject;
         private GameObject _offsetFollowGameObject;
         private GameObject _agentAvoiderGameObject;
+        private GameObject _annAgentAvoiderGameObject;
 
         [UnitySetUp]
         public IEnumerator SetUp()
@@ -118,65 +120,80 @@ namespace Tests.PlayTests
                 _arriveNLAGameObject = GameObject.Find("ArriveNLAMovingAgent");
                 _arriveNLAGameObject.SetActive(false);
             }
-            
+
             if (_arriveLAGameObject == null)
             {
                 _arriveLAGameObject = GameObject.Find("ArriveLAMovingAgent");
                 _arriveLAGameObject.SetActive(false);
             }
-            
+
             if (_pursuitGameObject == null)
             {
                 _pursuitGameObject = GameObject.Find("PursuitMovingAgent");
                 _pursuitGameObject.SetActive(false);
             }
+
             if (_evadeGameObject == null)
             {
                 _evadeGameObject = GameObject.Find("EvadeMovingAgent");
                 _evadeGameObject.SetActive(false);
             }
+
             if (_velocityMatchingGameObject == null)
             {
-                _velocityMatchingGameObject = GameObject.Find("VelocityMatchingMovingAgent");
+                _velocityMatchingGameObject =
+                    GameObject.Find("VelocityMatchingMovingAgent");
                 _velocityMatchingGameObject.SetActive(false);
             }
+
             if (_interposeGameObject == null)
             {
                 _interposeGameObject = GameObject.Find("InterposeMovingAgent");
                 _interposeGameObject.SetActive(false);
             }
-            
+
             if (_separationGameObject == null)
             {
                 _separationGameObject = GameObject.Find("SeparationMovingAgent");
                 _separationGameObject.SetActive(false);
             }
-            
+
             if (_groupAlignGameObject == null)
             {
                 _groupAlignGameObject = GameObject.Find("GroupAlignMovingAgent");
                 _groupAlignGameObject.SetActive(false);
             }
-            
+
             if (_cohesionGameObject == null)
             {
                 _cohesionGameObject = GameObject.Find("CohesionMovingAgent");
                 _cohesionGameObject.SetActive(false);
             }
+
             if (_wanderGameObject == null)
             {
                 _wanderGameObject = GameObject.Find("WanderMovingAgent");
                 _wanderGameObject.SetActive(false);
             }
+
             if (_offsetFollowGameObject == null)
             {
                 _offsetFollowGameObject = GameObject.Find("OffsetFollowMovingAgent");
                 _offsetFollowGameObject.SetActive(false);
             }
+
             if (_agentAvoiderGameObject == null)
             {
-                _agentAvoiderGameObject = GameObject.Find("ActiveAgentAvoiderMovingAgent");
+                _agentAvoiderGameObject =
+                    GameObject.Find("ActiveAgentAvoiderMovingAgent");
                 _agentAvoiderGameObject.SetActive(false);
+            }
+
+            if (_annAgentAvoiderGameObject == null)
+            {
+                _annAgentAvoiderGameObject =
+                    GameObject.Find("ANNAgentAvoiderMovingAgent");
+                _annAgentAvoiderGameObject.SetActive(false);
             }
         }
 
@@ -217,7 +234,8 @@ namespace Tests.PlayTests
         /// </summary>
         [UnityTest]
         public IEnumerator ArriveBehaviourNLATest()
-        { // TODO: This test fails too often. There's something wrong with. Must check it.
+        {
+            // TODO: This test fails too often. There's something wrong with. Must check it.
             // Test setup.
             _arriveNLAGameObject.transform.position = _position5.position;
             var arriveSteeringBehavior =
@@ -275,7 +293,7 @@ namespace Tests.PlayTests
             _arriveNLAGameObject.SetActive(false);
             _target.Enabled = false;
         }
-        
+
         /// <summary>
         /// Test that ArriveBehaviorLA can reach a target and that it accelerates
         /// at the beginning and brakes at the end.
@@ -506,7 +524,7 @@ namespace Tests.PlayTests
             targetMovingAgent.MaximumDeceleration = 1.8f;
             var targetMovingAgentColor = _seekGameObject.GetComponent<AgentColor>();
             targetMovingAgentColor.Color = Color.red;
-            var seekSteeringBehavior = 
+            var seekSteeringBehavior =
                 _seekGameObject.GetComponentInChildren<SeekSteeringBehavior>();
             seekSteeringBehavior.Target = _target.gameObject;
             seekSteeringBehavior.ArrivalDistance = 0.2f;
@@ -519,28 +537,28 @@ namespace Tests.PlayTests
             pursueAgentMover.StopSpeed = 0.1f;
             pursueAgentMover.MaximumAcceleration = 2;
             pursueAgentMover.MaximumDeceleration = 4;
-            var pursueSteeringBehavior = 
+            var pursueSteeringBehavior =
                 _pursuitGameObject.GetComponentInChildren<PursuitSteeringBehavior>();
             pursueSteeringBehavior.Target = targetMovingAgent;
             _seekGameObject.SetActive(true);
             _pursuitGameObject.SetActive(true);
-            
+
             // Give time for the chaser to get to the target.
             yield return new WaitForSeconds(2.7f);
-            
+
             // Assert the target was reached.
             // We test for a distance equal to the radius of both agents, plus
             // a 0.1 of tolerance. That should be the distance of centers when
             // both agents are touching.
-            Assert.True(Vector3.Distance(_seekGameObject.transform.position, 
-                            _pursuitGameObject.transform.position) <= (1.1f));
-            
+            Assert.True(Vector3.Distance(_seekGameObject.transform.position,
+                _pursuitGameObject.transform.position) <= (1.1f));
+
             // Cleanup.
             _seekGameObject.SetActive(false);
             _pursuitGameObject.SetActive(false);
             _target.Enabled = false;
         }
-        
+
         /// <summary>
         /// Test that OffsetFollowBehavior can follow its target keeping its offset.
         /// </summary>
@@ -560,11 +578,11 @@ namespace Tests.PlayTests
             targetMovingAgent.MaximumDeceleration = 1.8f;
             var targetMovingAgentColor = _seekGameObject.GetComponent<AgentColor>();
             targetMovingAgentColor.Color = Color.red;
-            var seekSteeringBehavior = 
+            var seekSteeringBehavior =
                 _seekGameObject.GetComponentInChildren<SeekSteeringBehavior>();
             seekSteeringBehavior.Target = _target.gameObject;
             seekSteeringBehavior.ArrivalDistance = 0.2f;
-            
+
             _offsetFollowGameObject.transform.position = _position1.position;
             var pursueAgentMover = _offsetFollowGameObject.GetComponent<AgentMover>();
             pursueAgentMover.MaximumSpeed = 2.5f;
@@ -574,43 +592,45 @@ namespace Tests.PlayTests
             pursueAgentMover.StopSpeed = 0.1f;
             pursueAgentMover.MaximumAcceleration = 2;
             pursueAgentMover.MaximumDeceleration = 4;
-            var offsetFollowBehavior = 
-                _offsetFollowGameObject.GetComponentInChildren<OffsetFollowSteeringBehavior>();
+            var offsetFollowBehavior =
+                _offsetFollowGameObject
+                    .GetComponentInChildren<OffsetFollowSteeringBehavior>();
             offsetFollowBehavior.Target = targetMovingAgent.gameObject;
-            GameObject offsetFromTargetMarker = 
-                offsetFollowBehavior.gameObject.transform.Find("OffsetFromTargetMarker").gameObject;
-            
+            GameObject offsetFromTargetMarker =
+                offsetFollowBehavior.gameObject.transform.Find("OffsetFromTargetMarker")
+                    .gameObject;
+
             Vector2 offsetFromTarget = new Vector2(1, -1);
             offsetFromTargetMarker.transform.position =
                 targetMovingAgent.transform.TransformPoint(offsetFromTarget);
             offsetFollowBehavior.UpdateOffsetFromTarget();
-            
+
             _seekGameObject.SetActive(true);
             _offsetFollowGameObject.SetActive(true);
-            
+
             // Give time for the follower to get to the target.
             yield return new WaitForSeconds(3.5f);
-            
+
             // Assert follow agent is at the offset position from target agent.
             Assert.True(Vector3.Distance(_offsetFollowGameObject.transform.position,
                 targetMovingAgent.transform.TransformPoint(offsetFromTarget)) <= (1.5f));
-            
+
             // Move again target agent.
             _target.TargetPosition = _position1.position;
-            
+
             // Give time for the follower to get to the target.
             yield return new WaitForSeconds(3.0f);
-            
+
             // Assert follow agent is at the offset position from target agent.
             Assert.True(Vector3.Distance(_offsetFollowGameObject.transform.position,
                 targetMovingAgent.transform.TransformPoint(offsetFromTarget)) <= (1.5f));
-            
+
             // Cleanup.
             _seekGameObject.SetActive(false);
             _offsetFollowGameObject.SetActive(false);
             _target.Enabled = false;
         }
-        
+
         /// <summary>
         /// Test that EvadeBehavior can can keep away its agent from its chaser.
         /// </summary>
@@ -619,8 +639,10 @@ namespace Tests.PlayTests
         {
             // Test setup.
             var evadeAgentMover = _evadeGameObject.GetComponent<AgentMover>();
-            var evadeSteeringBehavior = _evadeGameObject.GetComponentInChildren<EvadeSteeringBehavior>();
-            var seekSteeringBehavior = _seekGameObject.GetComponentInChildren<SeekSteeringBehavior>();
+            var evadeSteeringBehavior =
+                _evadeGameObject.GetComponentInChildren<EvadeSteeringBehavior>();
+            var seekSteeringBehavior =
+                _seekGameObject.GetComponentInChildren<SeekSteeringBehavior>();
             var seekAgentMover = _seekGameObject.GetComponent<AgentMover>();
             _evadeGameObject.transform.position = _position8.position;
             evadeAgentMover.MaximumSpeed = 2.0f;
@@ -632,21 +654,21 @@ namespace Tests.PlayTests
             seekSteeringBehavior.Target = _evadeGameObject;
             _evadeGameObject.SetActive(true);
             _seekGameObject.SetActive(true);
-            
+
             // Give time for the chaser to try to reach evader.
             yield return new WaitForSeconds(4.0f);
-            
+
             // Assert the evader was not reached.
-            Assert.True(Vector3.Distance(_seekGameObject.transform.position, 
-                _evadeGameObject.transform.position) >= 
+            Assert.True(Vector3.Distance(_seekGameObject.transform.position,
+                            _evadeGameObject.transform.position) >=
                         (evadeSteeringBehavior.PanicDistance));
-            
+
             // Cleanup.
             _seekGameObject.SetActive(false);
             _evadeGameObject.SetActive(false);
             _target.Enabled = false;
         }
-    
+
         /// <summary>
         /// Test that VelocityMatchingBehavior can copy its target's velocity.
         /// </summary>
@@ -664,7 +686,7 @@ namespace Tests.PlayTests
                 _arriveLAGameObject.GetComponentInChildren<ArriveSteeringBehaviorLA>();
             var arriveAgentMover = _arriveLAGameObject.GetComponent<AgentMover>();
             var arriveRigidbody = _arriveLAGameObject.GetComponent<Rigidbody2D>();
-            
+
             // Setup agents before the test.
             _arriveLAGameObject.transform.position = _position6.position;
             arriveAgentMover.MaximumSpeed = 5.55f;
@@ -698,22 +720,27 @@ namespace Tests.PlayTests
                 Mathf.Approximately(
                     arriveAgentMover.CurrentSpeed,
                     arriveAgentMover.MaximumSpeed));
-            yield return new WaitForSecondsRealtime(velocityMatchingSteeringBehavior.TimeToMatch);
-            Assert.True(velocityMatchingAgentMover.Velocity.normalized == arriveAgentMover.Velocity.normalized &&
-                        Mathf.Abs(velocityMatchingAgentMover.Velocity.magnitude - arriveAgentMover.Velocity.magnitude) < 0.01f);
+            yield return new WaitForSecondsRealtime(velocityMatchingSteeringBehavior
+                .TimeToMatch);
+            Assert.True(velocityMatchingAgentMover.Velocity.normalized ==
+                        arriveAgentMover.Velocity.normalized &&
+                        Mathf.Abs(velocityMatchingAgentMover.Velocity.magnitude -
+                                  arriveAgentMover.Velocity.magnitude) < 0.01f);
 
             // Wait until arriver brakes and asserts that the VelocityMatcher
             // has braked too.
             yield return new WaitUntil(() =>
                 Mathf.Approximately(arriveAgentMover.CurrentSpeed, 0));
-            yield return new WaitForSecondsRealtime(velocityMatchingSteeringBehavior.TimeToMatch);
-            Assert.True(Mathf.Abs(velocityMatchingAgentMover.Velocity.magnitude - arriveAgentMover.Velocity.magnitude) < 0.01f);
+            yield return new WaitForSecondsRealtime(velocityMatchingSteeringBehavior
+                .TimeToMatch);
+            Assert.True(Mathf.Abs(velocityMatchingAgentMover.Velocity.magnitude -
+                                  arriveAgentMover.Velocity.magnitude) < 0.01f);
 
             // Cleanup.
             _velocityMatchingGameObject.SetActive(false);
             _arriveLAGameObject.SetActive(false);
         }
-        
+
         /// <summary>
         /// Test that InterposeMatchingBehavior can place and agent between two
         /// moving agents.
@@ -736,7 +763,7 @@ namespace Tests.PlayTests
                 _interposeGameObject.GetComponentInChildren<InterposeSteeringBehavior>();
             var interposeAgentMover = _interposeGameObject.GetComponent<AgentMover>();
             var interposeRigidbody = _interposeGameObject.GetComponent<Rigidbody2D>();
-            
+
             // Setup agents before the test.
             _arriveLAGameObject.transform.position = _position6.position;
             arriveAgentMover.MaximumSpeed = 5.55f;
@@ -758,7 +785,8 @@ namespace Tests.PlayTests
             velocityMatchingAgentMover.MaximumDeceleration = 200f;
             velocityMatchingSteeringBehavior.TimeToMatch = 0.1f;
             velocityMatchingSteeringBehavior.Target = arriveAgentMover;
-            var velocityMatchingColor = _velocityMatchingGameObject.GetComponent<AgentColor>();
+            var velocityMatchingColor =
+                _velocityMatchingGameObject.GetComponent<AgentColor>();
             velocityMatchingColor.Color = Color.red;
             _interposeGameObject.transform.position = _position11.position;
             interposeAgentMover.MaximumSpeed = 5.55f;
@@ -777,40 +805,42 @@ namespace Tests.PlayTests
             _interposeGameObject.SetActive(true);
 
             // Start test.
-            
+
             // Give time for the followed agent to try to reach its target
             // cruise velocity and assert interposed agent in the middle of the two agents.
             yield return new WaitUntil(() =>
                 Mathf.Approximately(
                     arriveAgentMover.CurrentSpeed,
                     arriveAgentMover.MaximumSpeed));
-            yield return new WaitForSecondsRealtime(velocityMatchingSteeringBehavior.TimeToMatch);
+            yield return new WaitForSecondsRealtime(velocityMatchingSteeringBehavior
+                .TimeToMatch);
             Assert.True(
-                ((Vector2) _interposeGameObject.transform.position -
-                InterposeSteeringBehavior.GetMidPoint(
-                    _velocityMatchingGameObject.transform.position, 
-                    _arriveLAGameObject.transform.position)).magnitude < 0.2f);
+                ((Vector2)_interposeGameObject.transform.position -
+                 InterposeSteeringBehavior.GetMidPoint(
+                     _velocityMatchingGameObject.transform.position,
+                     _arriveLAGameObject.transform.position)).magnitude < 0.2f);
 
             // Wait until arriver brakes and asserts that the interpose agent stays in
             // the middle.
             yield return new WaitUntil(() =>
                 Mathf.Approximately(arriveAgentMover.CurrentSpeed, 0));
-            yield return new WaitForSecondsRealtime(velocityMatchingSteeringBehavior.TimeToMatch);
+            yield return new WaitForSecondsRealtime(velocityMatchingSteeringBehavior
+                .TimeToMatch);
             Assert.True(
-                ((Vector2) _interposeGameObject.transform.position -
+                ((Vector2)_interposeGameObject.transform.position -
                  InterposeSteeringBehavior.GetMidPoint(
-                     _velocityMatchingGameObject.transform.position, 
+                     _velocityMatchingGameObject.transform.position,
                      _arriveLAGameObject.transform.position)).magnitude < 0.2f);
-            
+
             // Cleanup.
             _velocityMatchingGameObject.SetActive(false);
             _arriveLAGameObject.SetActive(false);
             _interposeGameObject.SetActive(false);
         }
-        
-         /// <summary>
-         /// Test that SeparationMatchingBehavior can separate its agent from two moving agents
-         /// using a linear algorithm.
+
+        /// <summary>
+        /// Test that SeparationMatchingBehavior can separate its agent from two moving agents
+        /// using a linear algorithm.
         /// </summary>
         [UnityTest]
         public IEnumerator SeparationBehaviourLinearTest()
@@ -827,10 +857,11 @@ namespace Tests.PlayTests
             var arriveAgentMover = _arriveLAGameObject.GetComponent<AgentMover>();
             var arriveRigidbody = _arriveLAGameObject.GetComponent<Rigidbody2D>();
             var separationSteeringBehavior =
-                _separationGameObject.GetComponentInChildren<SeparationSteeringBehavior>();
+                _separationGameObject
+                    .GetComponentInChildren<SeparationSteeringBehavior>();
             var separationAgentMover = _separationGameObject.GetComponent<AgentMover>();
             var separationRigidbody = _separationGameObject.GetComponent<Rigidbody2D>();
-            
+
             // Setup agents before the test.
             _arriveLAGameObject.transform.position = _position6.position;
             arriveAgentMover.MaximumSpeed = 5.55f;
@@ -852,7 +883,8 @@ namespace Tests.PlayTests
             velocityMatchingAgentMover.MaximumDeceleration = 200f;
             velocityMatchingSteeringBehavior.TimeToMatch = 0.1f;
             velocityMatchingSteeringBehavior.Target = arriveAgentMover;
-            var velocityMatchingColor = _velocityMatchingGameObject.GetComponent<AgentColor>();
+            var velocityMatchingColor =
+                _velocityMatchingGameObject.GetComponent<AgentColor>();
             velocityMatchingColor.Color = Color.red;
             _separationGameObject.transform.position = _position12.position;
             separationAgentMover.MaximumSpeed = 5.55f;
@@ -865,7 +897,7 @@ namespace Tests.PlayTests
             separationSteeringBehavior.Threats.Add(velocityMatchingAgentMover);
             separationSteeringBehavior.SeparationThreshold = 4f;
             separationSteeringBehavior.DecayCoefficient = 2f;
-            separationSteeringBehavior.SeparationAlgorithm = 
+            separationSteeringBehavior.SeparationAlgorithm =
                 SeparationSteeringBehavior.SeparationAlgorithms.Linear;
             separationRigidbody.linearVelocity = Vector2.zero;
             velocityMatchingRigidbody.linearVelocity = Vector2.zero;
@@ -875,15 +907,15 @@ namespace Tests.PlayTests
             _separationGameObject.SetActive(true);
 
             // Start test.
-            
+
             // Assert that both agents start under separation threshold.
             Assert.True(
-                ( _velocityMatchingGameObject.transform.position -
-                _separationGameObject.transform.position).magnitude <= 
+                (_velocityMatchingGameObject.transform.position -
+                 _separationGameObject.transform.position).magnitude <=
                 separationSteeringBehavior.SeparationThreshold);
             Assert.True(
-                ( _arriveLAGameObject.transform.position -
-                  _separationGameObject.transform.position).magnitude <= 
+                (_arriveLAGameObject.transform.position -
+                 _separationGameObject.transform.position).magnitude <=
                 separationSteeringBehavior.SeparationThreshold);
 
             // Let separation agent time to go away from the two agents.
@@ -891,20 +923,20 @@ namespace Tests.PlayTests
 
             // Assert that both agents are above separation threshold.
             Assert.True(
-                ( _velocityMatchingGameObject.transform.position -
-                  _separationGameObject.transform.position).magnitude >= 
+                (_velocityMatchingGameObject.transform.position -
+                 _separationGameObject.transform.position).magnitude >=
                 separationSteeringBehavior.SeparationThreshold);
             Assert.True(
-                ( _arriveLAGameObject.transform.position -
-                  _separationGameObject.transform.position).magnitude >= 
+                (_arriveLAGameObject.transform.position -
+                 _separationGameObject.transform.position).magnitude >=
                 separationSteeringBehavior.SeparationThreshold);
-            
+
             // Cleanup.
             _velocityMatchingGameObject.SetActive(false);
             _arriveLAGameObject.SetActive(false);
             _separationGameObject.SetActive(false);
         }
-         
+
         /// <summary>
         /// Test that SeparationMatchingBehavior can separate its agent from two
         /// moving agents using an inverse square algorithm.
@@ -924,10 +956,11 @@ namespace Tests.PlayTests
             var arriveAgentMover = _arriveLAGameObject.GetComponent<AgentMover>();
             var arriveRigidbody = _arriveLAGameObject.GetComponent<Rigidbody2D>();
             var separationSteeringBehavior =
-                _separationGameObject.GetComponentInChildren<SeparationSteeringBehavior>();
+                _separationGameObject
+                    .GetComponentInChildren<SeparationSteeringBehavior>();
             var separationAgentMover = _separationGameObject.GetComponent<AgentMover>();
             var separationRigidbody = _separationGameObject.GetComponent<Rigidbody2D>();
-            
+
             // Setup agents before the test.
             _arriveLAGameObject.transform.position = _position6.position;
             arriveAgentMover.MaximumSpeed = 5.55f;
@@ -949,7 +982,8 @@ namespace Tests.PlayTests
             velocityMatchingAgentMover.MaximumDeceleration = 200f;
             velocityMatchingSteeringBehavior.TimeToMatch = 0.1f;
             velocityMatchingSteeringBehavior.Target = arriveAgentMover;
-            var velocityMatchingColor = _velocityMatchingGameObject.GetComponent<AgentColor>();
+            var velocityMatchingColor =
+                _velocityMatchingGameObject.GetComponent<AgentColor>();
             velocityMatchingColor.Color = Color.red;
             _separationGameObject.transform.position = _position12.position;
             separationAgentMover.MaximumSpeed = 5.55f;
@@ -962,7 +996,7 @@ namespace Tests.PlayTests
             separationSteeringBehavior.Threats.Add(velocityMatchingAgentMover);
             separationSteeringBehavior.SeparationThreshold = 4f;
             separationSteeringBehavior.DecayCoefficient = 2f;
-            separationSteeringBehavior.SeparationAlgorithm = 
+            separationSteeringBehavior.SeparationAlgorithm =
                 SeparationSteeringBehavior.SeparationAlgorithms.InverseSquare;
             separationRigidbody.linearVelocity = Vector2.zero;
             velocityMatchingRigidbody.linearVelocity = Vector2.zero;
@@ -972,15 +1006,15 @@ namespace Tests.PlayTests
             _separationGameObject.SetActive(true);
 
             // Start test.
-            
+
             // Assert that both agents start under separation threshold.
             Assert.True(
-                ( _velocityMatchingGameObject.transform.position -
-                _separationGameObject.transform.position).magnitude <= 
+                (_velocityMatchingGameObject.transform.position -
+                 _separationGameObject.transform.position).magnitude <=
                 separationSteeringBehavior.SeparationThreshold);
             Assert.True(
-                ( _arriveLAGameObject.transform.position -
-                  _separationGameObject.transform.position).magnitude <= 
+                (_arriveLAGameObject.transform.position -
+                 _separationGameObject.transform.position).magnitude <=
                 separationSteeringBehavior.SeparationThreshold);
 
             // Let separation agent time to go away from the two agents.
@@ -988,20 +1022,20 @@ namespace Tests.PlayTests
 
             // Assert that both agents are above separation threshold.
             Assert.True(
-                ( _velocityMatchingGameObject.transform.position -
-                  _separationGameObject.transform.position).magnitude >= 
+                (_velocityMatchingGameObject.transform.position -
+                 _separationGameObject.transform.position).magnitude >=
                 separationSteeringBehavior.SeparationThreshold);
             Assert.True(
-                ( _arriveLAGameObject.transform.position -
-                  _separationGameObject.transform.position).magnitude >= 
+                (_arriveLAGameObject.transform.position -
+                 _separationGameObject.transform.position).magnitude >=
                 separationSteeringBehavior.SeparationThreshold);
-            
+
             // Cleanup.
             _velocityMatchingGameObject.SetActive(false);
             _arriveLAGameObject.SetActive(false);
             _separationGameObject.SetActive(false);
         }
-        
+
         /// <summary>
         /// Test that GroupAlignBehavior calculates the average between two target agent's
         /// orientations.
@@ -1024,7 +1058,7 @@ namespace Tests.PlayTests
                 _seekGameObject.GetComponentInChildren<SeekSteeringBehavior>();
             var seekAgentMover = _seekGameObject.GetComponent<AgentMover>();
             var seekRigidbody = _seekGameObject.GetComponent<Rigidbody2D>();
-            
+
             // Setup agents before the test.
             _arriveLAGameObject.transform.position = _position10.position;
             arriveAgentMover.MaximumSpeed = 5.55f;
@@ -1063,27 +1097,28 @@ namespace Tests.PlayTests
             _seekGameObject.SetActive(true);
 
             // Start test.
-            
+
             // Assert that group align agent starts with 0 rotation.
             Assert.True(Mathf.Approximately(groupAlignAgentMover.Orientation, 0));
-            
+
             // Let time arrive agent to go to its target.
             yield return new WaitForSecondsRealtime(4);
-            
+
             // Assert that group align agent is no longer at 0 rotation but at the average
             // of other two agents rotation.
             Assert.False(Mathf.Approximately(groupAlignAgentMover.Orientation, 0));
-            float rotationAverage = (arriveAgentMover.Orientation + 
-                seekAgentMover.Orientation) / 2f;
-            Assert.True(Mathf.Abs(groupAlignAgentMover.Orientation - 
-                rotationAverage) <= groupAlignAgentMover.StopRotationThreshold);
-            
+            float rotationAverage = (arriveAgentMover.Orientation +
+                                     seekAgentMover.Orientation) / 2f;
+            Assert.True(Mathf.Abs(groupAlignAgentMover.Orientation -
+                                  rotationAverage) <=
+                        groupAlignAgentMover.StopRotationThreshold);
+
             // Cleanup.
             _groupAlignGameObject.SetActive(false);
             _arriveLAGameObject.SetActive(false);
             _seekGameObject.SetActive(false);
         }
-        
+
         /// <summary>
         /// Test that CohesionMatchingBehavior can place and agent in the center of mass of
         /// a 3 agent group.
@@ -1110,7 +1145,7 @@ namespace Tests.PlayTests
                 _cohesionGameObject.GetComponentInChildren<CohesionSteeringBehavior>();
             var cohesionAgentMover = _cohesionGameObject.GetComponent<AgentMover>();
             var cohesionRigidbody = _cohesionGameObject.GetComponent<Rigidbody2D>();
-            
+
             // Setup agents before the test.
             _arriveLAGameObject.transform.position = _position9.position;
             arriveAgentMover.MaximumSpeed = 5.55f;
@@ -1132,7 +1167,8 @@ namespace Tests.PlayTests
             velocityMatchingAgentMover.MaximumDeceleration = 200f;
             velocityMatchingSteeringBehavior.TimeToMatch = 0.1f;
             velocityMatchingSteeringBehavior.Target = arriveAgentMover;
-            var velocityMatchingColor = _velocityMatchingGameObject.GetComponent<AgentColor>();
+            var velocityMatchingColor =
+                _velocityMatchingGameObject.GetComponent<AgentColor>();
             velocityMatchingColor.Color = Color.red;
             _seekGameObject.transform.position =
                 _position8.position;
@@ -1168,29 +1204,29 @@ namespace Tests.PlayTests
             _seekGameObject.SetActive(true);
 
             // Start test.
-            
+
             // Check that agent starts out of place.
             Assert.False(
-                ((Vector2) _cohesionGameObject.transform.position -
-                 cohesionSteeringBehavior.AveragePosition).magnitude <= 
+                ((Vector2)_cohesionGameObject.transform.position -
+                 cohesionSteeringBehavior.AveragePosition).magnitude <=
                 cohesionSteeringBehavior.ArrivalDistance);
-            
+
             // Let it time to reach its position.
             yield return new WaitForSecondsRealtime(3f);
-            
+
             // Check that agent now is in place.
             Assert.True(
-                ((Vector2) _cohesionGameObject.transform.position -
-                 cohesionSteeringBehavior.AveragePosition).magnitude <= 
+                ((Vector2)_cohesionGameObject.transform.position -
+                 cohesionSteeringBehavior.AveragePosition).magnitude <=
                 cohesionSteeringBehavior.ArrivalDistance);
-            
+
             // Cleanup.
             _velocityMatchingGameObject.SetActive(false);
             _arriveLAGameObject.SetActive(false);
             _cohesionGameObject.SetActive(false);
             _seekGameObject.SetActive(false);
         }
-        
+
         /// <summary>
         /// Test that WanderSteeringBehavior constantly changes position and orientation.
         /// </summary>
@@ -1214,7 +1250,7 @@ namespace Tests.PlayTests
             wanderSteeringBehavior.WanderDistance = 6;
             wanderSteeringBehavior.WanderRecalculationTime = 0.2f;
             _wanderGameObject.SetActive(true);
-            
+
             // Start test.
             List<Vector2> previousVelocities = new();
             foreach (var _ in Enumerable.Range(0, numberOfTestSamples))
@@ -1233,7 +1269,7 @@ namespace Tests.PlayTests
             _wanderGameObject.SetActive(false);
             _target.Enabled = false;
         }
-        
+
         /// <summary>
         /// Test that AgentAvoiderBehavior can reach its target without touching another
         /// moving agent that goes across its path.
@@ -1251,10 +1287,10 @@ namespace Tests.PlayTests
             obstacleMovingAgent.MaximumDeceleration = 1.8f;
             var obstacleMovingAgentColor = _seekGameObject.GetComponent<AgentColor>();
             obstacleMovingAgentColor.Color = Color.red;
-            var seekSteeringBehavior = 
+            var seekSteeringBehavior =
                 _seekGameObject.GetComponentInChildren<SeekSteeringBehavior>();
             seekSteeringBehavior.ArrivalDistance = 0.2f;
-            
+
             var agentAvoider = _agentAvoiderGameObject.GetComponent<AgentMover>();
             agentAvoider.MaximumSpeed = 2.7f;
             agentAvoider.MaximumAcceleration = 4.0f;
@@ -1263,8 +1299,9 @@ namespace Tests.PlayTests
             agentAvoider.StopSpeed = 0.1f;
             agentAvoider.MaximumAcceleration = 2;
             agentAvoider.MaximumDeceleration = 4;
-            var agentAvoiderSeekSteeringBehavior = _agentAvoiderGameObject.GetComponentInChildren<SeekSteeringBehavior>();
-            
+            var agentAvoiderSeekSteeringBehavior = _agentAvoiderGameObject
+                .GetComponentInChildren<SeekSteeringBehavior>();
+
             // FIRST SCENARIO:
             _target.TargetPosition = _position11.position;
             _agentAvoiderGameObject.transform.position = _position14.position;
@@ -1274,26 +1311,26 @@ namespace Tests.PlayTests
             _target.Enabled = true;
             _seekGameObject.SetActive(true);
             _agentAvoiderGameObject.SetActive(true);
-            
+
             // Assert we move without touching the obstacle agent.
             int steps = 6;
-            for (int i=0; i < steps; i++)
+            for (int i = 0; i < steps; i++)
             {
                 yield return new WaitForSeconds(1.0f);
-                Assert.True(Vector3.Distance(_seekGameObject.transform.position, 
+                Assert.True(Vector3.Distance(_seekGameObject.transform.position,
                     _agentAvoiderGameObject.transform.position) >= (1.5f));
             }
-            
+
             // Assert we reached target.
-            Assert.True(Vector3.Distance(_agentAvoiderGameObject.transform.position, 
-                    _target.transform.position) <= (0.7f));
-            
+            Assert.True(Vector3.Distance(_agentAvoiderGameObject.transform.position,
+                _target.transform.position) <= (0.7f));
+
             // Cleanup.
             _seekGameObject.SetActive(false);
             _agentAvoiderGameObject.SetActive(false);
             _target.Enabled = false;
         }
-        
+
         /// <summary>
         /// Test that AgentAvoiderBehavior can reach its target without touching another
         /// moving agent that goes across its path.
@@ -1311,10 +1348,10 @@ namespace Tests.PlayTests
             obstacleMovingAgent.MaximumDeceleration = 1.8f;
             var obstacleMovingAgentColor = _seekGameObject.GetComponent<AgentColor>();
             obstacleMovingAgentColor.Color = Color.red;
-            var seekSteeringBehavior = 
+            var seekSteeringBehavior =
                 _seekGameObject.GetComponentInChildren<SeekSteeringBehavior>();
             seekSteeringBehavior.ArrivalDistance = 0.2f;
-            
+
             var agentAvoider = _agentAvoiderGameObject.GetComponent<AgentMover>();
             agentAvoider.MaximumSpeed = 2.0f;
             agentAvoider.MaximumAcceleration = 4.0f;
@@ -1323,8 +1360,9 @@ namespace Tests.PlayTests
             agentAvoider.StopSpeed = 0.1f;
             agentAvoider.MaximumAcceleration = 2;
             agentAvoider.MaximumDeceleration = 4;
-            var agentAvoiderSeekSteeringBehavior = _agentAvoiderGameObject.GetComponentInChildren<SeekSteeringBehavior>();
-            
+            var agentAvoiderSeekSteeringBehavior = _agentAvoiderGameObject
+                .GetComponentInChildren<SeekSteeringBehavior>();
+
             // SECOND SCENARIO:
             _target.TargetPosition = _position11.position;
             _agentAvoiderGameObject.transform.position = _position14.position;
@@ -1334,26 +1372,26 @@ namespace Tests.PlayTests
             _target.Enabled = true;
             _seekGameObject.SetActive(true);
             _agentAvoiderGameObject.SetActive(true);
-            
+
             // Assert we move without touching the obstacle agent.
             int steps = 7;
-            for (int i=0; i < steps; i++)
+            for (int i = 0; i < steps; i++)
             {
                 yield return new WaitForSeconds(1.2f);
-                Assert.True(Vector3.Distance(_seekGameObject.transform.position, 
+                Assert.True(Vector3.Distance(_seekGameObject.transform.position,
                     _agentAvoiderGameObject.transform.position) >= (1.1f));
             }
-            
+
             // Assert we reached target.
-            Assert.True(Vector3.Distance(_agentAvoiderGameObject.transform.position, 
-                    _target.transform.position) <= (0.5f));
-            
+            Assert.True(Vector3.Distance(_agentAvoiderGameObject.transform.position,
+                _target.transform.position) <= (0.5f));
+
             // Cleanup.
             _seekGameObject.SetActive(false);
             _agentAvoiderGameObject.SetActive(false);
             _target.Enabled = false;
         }
-        
+
         /// <summary>
         /// Test that AgentAvoiderBehavior can reach its target without touching another
         /// moving agent that goes across its path.
@@ -1371,10 +1409,10 @@ namespace Tests.PlayTests
             obstacleMovingAgent.MaximumDeceleration = 1.8f;
             var obstacleMovingAgentColor = _seekGameObject.GetComponent<AgentColor>();
             obstacleMovingAgentColor.Color = Color.red;
-            var seekSteeringBehavior = 
+            var seekSteeringBehavior =
                 _seekGameObject.GetComponentInChildren<SeekSteeringBehavior>();
             seekSteeringBehavior.ArrivalDistance = 0.2f;
-            
+
             var agentAvoider = _agentAvoiderGameObject.GetComponent<AgentMover>();
             agentAvoider.MaximumSpeed = 2.7f;
             agentAvoider.MaximumAcceleration = 4.0f;
@@ -1383,9 +1421,10 @@ namespace Tests.PlayTests
             agentAvoider.StopSpeed = 0.1f;
             agentAvoider.MaximumAcceleration = 2;
             agentAvoider.MaximumDeceleration = 4;
-            var agentAvoiderSeekSteeringBehavior = _agentAvoiderGameObject.GetComponentInChildren<SeekSteeringBehavior>();
+            var agentAvoiderSeekSteeringBehavior = _agentAvoiderGameObject
+                .GetComponentInChildren<SeekSteeringBehavior>();
 
-            
+
             // THIRD SCENARIO:
             _target.TargetPosition = _position14.position;
             _agentAvoiderGameObject.transform.position = _position7.position;
@@ -1395,26 +1434,26 @@ namespace Tests.PlayTests
             _target.Enabled = true;
             _seekGameObject.SetActive(true);
             _agentAvoiderGameObject.SetActive(true);
-            
+
             // Assert we move without touching the obstacle agent.
             int steps = 6;
-            for (int i=0; i < steps; i++)
+            for (int i = 0; i < steps; i++)
             {
                 yield return new WaitForSeconds(1.0f);
-                Assert.True(Vector3.Distance(_seekGameObject.transform.position, 
+                Assert.True(Vector3.Distance(_seekGameObject.transform.position,
                     _agentAvoiderGameObject.transform.position) >= (1.5f));
             }
-            
+
             // Assert we reached target.
-            Assert.True(Vector3.Distance(_agentAvoiderGameObject.transform.position, 
-                    _target.transform.position) <= (0.1f));
-            
+            Assert.True(Vector3.Distance(_agentAvoiderGameObject.transform.position,
+                _target.transform.position) <= (0.1f));
+
             // Cleanup.
             _seekGameObject.SetActive(false);
             _agentAvoiderGameObject.SetActive(false);
             _target.Enabled = false;
         }
-        
+
         /// <summary>
         /// Test that AgentAvoiderBehavior can reach its target without touching another
         /// moving agent that goes across its path.
@@ -1432,10 +1471,10 @@ namespace Tests.PlayTests
             obstacleMovingAgent.MaximumDeceleration = 1.8f;
             var obstacleMovingAgentColor = _seekGameObject.GetComponent<AgentColor>();
             obstacleMovingAgentColor.Color = Color.red;
-            var seekSteeringBehavior = 
+            var seekSteeringBehavior =
                 _seekGameObject.GetComponentInChildren<SeekSteeringBehavior>();
             seekSteeringBehavior.ArrivalDistance = 0.2f;
-            
+
             var agentAvoider = _agentAvoiderGameObject.GetComponent<AgentMover>();
             agentAvoider.MaximumSpeed = 2.7f;
             agentAvoider.MaximumAcceleration = 4.0f;
@@ -1444,9 +1483,10 @@ namespace Tests.PlayTests
             agentAvoider.StopSpeed = 0.1f;
             agentAvoider.MaximumAcceleration = 2;
             agentAvoider.MaximumDeceleration = 4;
-            var agentAvoiderSeekSteeringBehavior = _agentAvoiderGameObject.GetComponentInChildren<SeekSteeringBehavior>();
+            var agentAvoiderSeekSteeringBehavior = _agentAvoiderGameObject
+                .GetComponentInChildren<SeekSteeringBehavior>();
 
-            
+
             // FOURTH SCENARIO:
             _target.TargetPosition = _position14.position;
             agentAvoiderSeekSteeringBehavior.Target = _target.gameObject;
@@ -1456,26 +1496,26 @@ namespace Tests.PlayTests
             _target.Enabled = true;
             _seekGameObject.SetActive(true);
             _agentAvoiderGameObject.SetActive(true);
-            
+
             // Assert we move without touching the obstacle agent.
             int steps = 5;
-            for (int i=0; i < steps; i++)
+            for (int i = 0; i < steps; i++)
             {
                 yield return new WaitForSeconds(1.0f);
-                Assert.True(Vector3.Distance(_seekGameObject.transform.position, 
+                Assert.True(Vector3.Distance(_seekGameObject.transform.position,
                     _agentAvoiderGameObject.transform.position) >= (1.5f));
             }
-            
+
             // Assert we reached target.
-            Assert.True(Vector3.Distance(_agentAvoiderGameObject.transform.position, 
-                    _target.transform.position) <= (0.1f));
-            
+            Assert.True(Vector3.Distance(_agentAvoiderGameObject.transform.position,
+                _target.transform.position) <= (0.1f));
+
             // Cleanup.
             _seekGameObject.SetActive(false);
             _agentAvoiderGameObject.SetActive(false);
             _target.Enabled = false;
         }
-        
+
         /// <summary>
         /// Test that AgentAvoiderBehavior can reach its target without touching another
         /// moving agent that goes across its path.
@@ -1493,10 +1533,10 @@ namespace Tests.PlayTests
             obstacleMovingAgent.MaximumDeceleration = 1.8f;
             var obstacleMovingAgentColor = _seekGameObject.GetComponent<AgentColor>();
             obstacleMovingAgentColor.Color = Color.red;
-            var seekSteeringBehavior = 
+            var seekSteeringBehavior =
                 _seekGameObject.GetComponentInChildren<SeekSteeringBehavior>();
             seekSteeringBehavior.ArrivalDistance = 0.2f;
-            
+
             var agentAvoider = _agentAvoiderGameObject.GetComponent<AgentMover>();
             agentAvoider.MaximumSpeed = 2.7f;
             agentAvoider.MaximumAcceleration = 4.0f;
@@ -1505,9 +1545,10 @@ namespace Tests.PlayTests
             agentAvoider.StopSpeed = 0.1f;
             agentAvoider.MaximumAcceleration = 2;
             agentAvoider.MaximumDeceleration = 4;
-            var agentAvoiderSeekSteeringBehavior = _agentAvoiderGameObject.GetComponentInChildren<SeekSteeringBehavior>();
+            var agentAvoiderSeekSteeringBehavior = _agentAvoiderGameObject
+                .GetComponentInChildren<SeekSteeringBehavior>();
 
-            
+
             // FIFTH SCENARIO:
             _target.TargetPosition = _position12.position;
             agentAvoiderSeekSteeringBehavior.Target = _target.gameObject;
@@ -1517,23 +1558,381 @@ namespace Tests.PlayTests
             _target.Enabled = true;
             _seekGameObject.SetActive(true);
             _agentAvoiderGameObject.SetActive(true);
-            
+
             // Assert we move without touching the obstacle agent.
             int steps = 5;
-            for (int i=0; i < steps; i++)
+            for (int i = 0; i < steps; i++)
             {
                 yield return new WaitForSeconds(1.0f);
-                Assert.True(Vector3.Distance(_seekGameObject.transform.position, 
+                Assert.True(Vector3.Distance(_seekGameObject.transform.position,
                     _agentAvoiderGameObject.transform.position) >= (1.5f));
             }
-            
+
             // Assert we reached target.
-            Assert.True(Vector3.Distance(_agentAvoiderGameObject.transform.position, 
-                    _target.transform.position) <= (0.1f));
-            
+            Assert.True(Vector3.Distance(_agentAvoiderGameObject.transform.position,
+                _target.transform.position) <= (0.1f));
+
             // Cleanup.
             _seekGameObject.SetActive(false);
             _agentAvoiderGameObject.SetActive(false);
+            _target.Enabled = false;
+        }
+
+        /// <summary>
+        /// Test that ANNAgentAvoiderBehavior can reach its target without touching another
+        /// moving agent that goes across its path.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator ANNAgentAvoiderBehaviorTestFirstScenario()
+        {
+            // Test setup.
+            var obstacleMovingAgent =
+                _seekGameObject.GetComponent<AgentMover>();
+            obstacleMovingAgent.MaximumSpeed = 2.0f;
+            obstacleMovingAgent.StopSpeed = 0.1f;
+            obstacleMovingAgent.MaximumRotationalSpeed = 180f;
+            obstacleMovingAgent.StopRotationThreshold = 1f;
+            obstacleMovingAgent.MaximumAcceleration = 1.8f;
+            obstacleMovingAgent.MaximumDeceleration = 1.8f;
+            var obstacleMovingAgentColor = _seekGameObject.GetComponent<AgentColor>();
+            obstacleMovingAgentColor.Color = Color.red;
+            var seekSteeringBehavior =
+                _seekGameObject.GetComponentInChildren<SeekSteeringBehavior>();
+            seekSteeringBehavior.ArrivalDistance = 0.2f;
+
+            var agentAvoider = _annAgentAvoiderGameObject.GetComponent<AgentMover>();
+            agentAvoider.MaximumSpeed = 3.5f;
+            agentAvoider.MaximumAcceleration = 4.0f;
+            agentAvoider.MaximumRotationalSpeed = 180f;
+            agentAvoider.StopRotationThreshold = 1f;
+            agentAvoider.StopSpeed = 0.1f;
+            agentAvoider.MaximumAcceleration = 2;
+            agentAvoider.MaximumDeceleration = 4;
+            var agentAvoiderSeekSteeringBehavior = _annAgentAvoiderGameObject
+                .GetComponentInChildren<SeekSteeringBehavior>();
+            var agentAvoiderBehavior = _annAgentAvoiderGameObject
+                .GetComponentInChildren<ActiveAgentAvoiderSteeringBehavior>();
+            var annAgentAvoiderSteeringBehavior = _annAgentAvoiderGameObject
+                .GetComponentInChildren<AnnPassiveAgentAvoiderBehavior>();
+            var circleSensor = 
+                _annAgentAvoiderGameObject.GetComponentInChildren<CircleSensor>();
+
+            agentAvoiderBehavior.AvoidanceTimeout = 0.5f;
+            annAgentAvoiderSteeringBehavior.minimumDistanceBetweenAgents = 4.0f;
+            circleSensor.Radius = 2.01f;
+
+            // FIRST SCENARIO:
+            _target.TargetPosition = _position11.position;
+            _annAgentAvoiderGameObject.transform.position = _position14.position;
+            _seekGameObject.transform.position = _position10.position;
+            seekSteeringBehavior.Target = _position1.gameObject;
+            agentAvoiderSeekSteeringBehavior.Target = _target.gameObject;
+            _target.Enabled = true;
+            _seekGameObject.SetActive(true);
+            _annAgentAvoiderGameObject.SetActive(true);
+
+            // Assert we move without touching the obstacle agent.
+            int steps = 6;
+            for (int i = 0; i < steps; i++)
+            {
+                yield return new WaitForSeconds(1.0f);
+                Assert.True(Vector3.Distance(_seekGameObject.transform.position,
+                    _annAgentAvoiderGameObject.transform.position) >= (1.5f));
+            }
+
+            // Assert we reached target.
+            Assert.True(Vector3.Distance(_annAgentAvoiderGameObject.transform.position,
+                _target.transform.position) <= (0.7f));
+
+            // Cleanup.
+            _seekGameObject.SetActive(false);
+            _annAgentAvoiderGameObject.SetActive(false);
+            _target.Enabled = false;
+        }
+        
+        /// <summary>
+        /// Test that ANNAgentAvoiderBehavior can reach its target without touching another
+        /// moving agent that goes across its path.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator ANNAgentAvoiderBehaviorTestSecondScenario()
+        {
+            // Test setup.
+            var obstacleMovingAgent = _seekGameObject.GetComponent<AgentMover>();
+            obstacleMovingAgent.MaximumSpeed = 2.0f;
+            obstacleMovingAgent.StopSpeed = 0.1f;
+            obstacleMovingAgent.MaximumRotationalSpeed = 180f;
+            obstacleMovingAgent.StopRotationThreshold = 1f;
+            obstacleMovingAgent.MaximumAcceleration = 1.8f;
+            obstacleMovingAgent.MaximumDeceleration = 1.8f;
+            var obstacleMovingAgentColor = _seekGameObject.GetComponent<AgentColor>();
+            obstacleMovingAgentColor.Color = Color.red;
+            var seekSteeringBehavior =
+                _seekGameObject.GetComponentInChildren<SeekSteeringBehavior>();
+            seekSteeringBehavior.ArrivalDistance = 0.2f;
+
+            var agentAvoider = _annAgentAvoiderGameObject.GetComponent<AgentMover>();
+            agentAvoider.MaximumSpeed = 2.0f;
+            agentAvoider.MaximumAcceleration = 4.0f;
+            agentAvoider.MaximumRotationalSpeed = 180f;
+            agentAvoider.StopRotationThreshold = 1f;
+            agentAvoider.StopSpeed = 0.1f;
+            agentAvoider.MaximumAcceleration = 2;
+            agentAvoider.MaximumDeceleration = 4;
+            var agentAvoiderSeekSteeringBehavior = _annAgentAvoiderGameObject
+                .GetComponentInChildren<SeekSteeringBehavior>();
+            var agentAvoiderBehavior = _annAgentAvoiderGameObject
+                .GetComponentInChildren<ActiveAgentAvoiderSteeringBehavior>();
+            var annAgentAvoiderSteeringBehavior = _annAgentAvoiderGameObject
+                .GetComponentInChildren<AnnPassiveAgentAvoiderBehavior>();
+            var circleSensor = 
+                _annAgentAvoiderGameObject.GetComponentInChildren<CircleSensor>();
+
+            agentAvoiderBehavior.AvoidanceTimeout = 0.5f;
+            annAgentAvoiderSteeringBehavior.minimumDistanceBetweenAgents = 4.0f;
+            circleSensor.Radius = 2.01f;
+
+            // SECOND SCENARIO:
+            _target.TargetPosition = _position11.position;
+            _annAgentAvoiderGameObject.transform.position = _position14.position;
+            _seekGameObject.transform.position = _position1.position;
+            seekSteeringBehavior.Target = _position10.gameObject;
+            agentAvoiderSeekSteeringBehavior.Target = _target.gameObject;
+            _target.Enabled = true;
+            _seekGameObject.SetActive(true);
+            _annAgentAvoiderGameObject.SetActive(true);
+
+            // Assert we move without touching the obstacle agent.
+            int steps = 9;
+            for (int i = 0; i < steps; i++)
+            {
+                yield return new WaitForSeconds(1.2f);
+                Assert.True(Vector3.Distance(_seekGameObject.transform.position,
+                    _annAgentAvoiderGameObject.transform.position) >= (1.1f));
+            }
+
+            // Assert we reached target.
+            Assert.True(Vector3.Distance(_annAgentAvoiderGameObject.transform.position,
+                _target.transform.position) <= (0.5f));
+
+            // Cleanup.
+            _seekGameObject.SetActive(false);
+            _annAgentAvoiderGameObject.SetActive(false);
+            _target.Enabled = false;
+        }
+        
+        /// <summary>
+        /// Test that ANNAgentAvoiderBehavior can reach its target without touching another
+        /// moving agent that goes across its path.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator ANNAgentAvoiderBehaviorTestThirdScenario()
+        {
+            // Test setup.
+            var obstacleMovingAgent = _seekGameObject.GetComponent<AgentMover>();
+            obstacleMovingAgent.MaximumSpeed = 2.0f;
+            obstacleMovingAgent.StopSpeed = 0.1f;
+            obstacleMovingAgent.MaximumRotationalSpeed = 180f;
+            obstacleMovingAgent.StopRotationThreshold = 1f;
+            obstacleMovingAgent.MaximumAcceleration = 1.8f;
+            obstacleMovingAgent.MaximumDeceleration = 1.8f;
+            var obstacleMovingAgentColor = _seekGameObject.GetComponent<AgentColor>();
+            obstacleMovingAgentColor.Color = Color.red;
+            var seekSteeringBehavior =
+                _seekGameObject.GetComponentInChildren<SeekSteeringBehavior>();
+            seekSteeringBehavior.ArrivalDistance = 0.2f;
+
+            var agentAvoider = _annAgentAvoiderGameObject.GetComponent<AgentMover>();
+            agentAvoider.MaximumSpeed = 3.5f;
+            agentAvoider.MaximumAcceleration = 4.0f;
+            agentAvoider.MaximumRotationalSpeed = 180f;
+            agentAvoider.StopRotationThreshold = 1f;
+            agentAvoider.StopSpeed = 0.1f;
+            agentAvoider.MaximumAcceleration = 2;
+            agentAvoider.MaximumDeceleration = 4;
+            var agentAvoiderSeekSteeringBehavior = _annAgentAvoiderGameObject
+                .GetComponentInChildren<SeekSteeringBehavior>();
+            var agentAvoiderBehavior = _annAgentAvoiderGameObject
+                .GetComponentInChildren<ActiveAgentAvoiderSteeringBehavior>();
+            var annAgentAvoiderSteeringBehavior = _annAgentAvoiderGameObject
+                .GetComponentInChildren<AnnPassiveAgentAvoiderBehavior>();
+            var circleSensor = 
+                _annAgentAvoiderGameObject.GetComponentInChildren<CircleSensor>();
+
+            agentAvoiderBehavior.AvoidanceTimeout = 0.5f;
+            annAgentAvoiderSteeringBehavior.minimumDistanceBetweenAgents = 4.0f;
+            circleSensor.Radius = 2.01f;
+
+            // THIRD SCENARIO:
+            _target.TargetPosition = _position14.position;
+            _annAgentAvoiderGameObject.transform.position = _position7.position;
+            _seekGameObject.transform.position = _position1.position;
+            seekSteeringBehavior.Target = _position10.gameObject;
+            agentAvoiderSeekSteeringBehavior.Target = _target.gameObject;
+            _target.Enabled = true;
+            _seekGameObject.SetActive(true);
+            _annAgentAvoiderGameObject.SetActive(true);
+
+            // Assert we move without touching the obstacle agent.
+            int steps = 6;
+            for (int i = 0; i < steps; i++)
+            {
+                yield return new WaitForSeconds(1.0f);
+                Assert.True(Vector3.Distance(_seekGameObject.transform.position,
+                    _annAgentAvoiderGameObject.transform.position) >= (1.5f));
+            }
+
+            // Assert we reached target.
+            Assert.True(Vector3.Distance(_annAgentAvoiderGameObject.transform.position,
+                _target.transform.position) <= (0.1f));
+
+            // Cleanup.
+            _seekGameObject.SetActive(false);
+            _annAgentAvoiderGameObject.SetActive(false);
+            _target.Enabled = false;
+        }
+        
+        /// <summary>
+        /// Test that ANNAgentAvoiderBehavior can reach its target without touching another
+        /// moving agent that goes across its path.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator ANNAgentAvoiderBehaviorTestFourthScenario()
+        {
+            // Test setup.
+            var obstacleMovingAgent = _seekGameObject.GetComponent<AgentMover>();
+            obstacleMovingAgent.MaximumSpeed = 2.0f;
+            obstacleMovingAgent.StopSpeed = 0.1f;
+            obstacleMovingAgent.MaximumRotationalSpeed = 180f;
+            obstacleMovingAgent.StopRotationThreshold = 1f;
+            obstacleMovingAgent.MaximumAcceleration = 1.8f;
+            obstacleMovingAgent.MaximumDeceleration = 1.8f;
+            var obstacleMovingAgentColor = _seekGameObject.GetComponent<AgentColor>();
+            obstacleMovingAgentColor.Color = Color.red;
+            var seekSteeringBehavior =
+                _seekGameObject.GetComponentInChildren<SeekSteeringBehavior>();
+            seekSteeringBehavior.ArrivalDistance = 0.2f;
+
+            var agentAvoider = _annAgentAvoiderGameObject.GetComponent<AgentMover>();
+            agentAvoider.MaximumSpeed = 2.7f;
+            agentAvoider.MaximumAcceleration = 4.0f;
+            agentAvoider.MaximumRotationalSpeed = 180f;
+            agentAvoider.StopRotationThreshold = 1f;
+            agentAvoider.StopSpeed = 0.1f;
+            agentAvoider.MaximumAcceleration = 2;
+            agentAvoider.MaximumDeceleration = 4;
+            var agentAvoiderSeekSteeringBehavior = _annAgentAvoiderGameObject
+                .GetComponentInChildren<SeekSteeringBehavior>();
+            var agentAvoiderBehavior = _annAgentAvoiderGameObject
+                .GetComponentInChildren<ActiveAgentAvoiderSteeringBehavior>();
+            var annAgentAvoiderSteeringBehavior = _annAgentAvoiderGameObject
+                .GetComponentInChildren<AnnPassiveAgentAvoiderBehavior>();
+            var circleSensor = 
+                _annAgentAvoiderGameObject.GetComponentInChildren<CircleSensor>();
+
+            agentAvoiderBehavior.AvoidanceTimeout = 0.5f;
+            annAgentAvoiderSteeringBehavior.minimumDistanceBetweenAgents = 4.0f;
+            circleSensor.Radius = 2.01f;
+
+
+            // FOURTH SCENARIO:
+            _target.TargetPosition = _position14.position;
+            agentAvoiderSeekSteeringBehavior.Target = _target.gameObject;
+            _annAgentAvoiderGameObject.transform.position = _position10.position;
+            _seekGameObject.transform.position = _position14.position;
+            seekSteeringBehavior.Target = _position10.gameObject;
+            _target.Enabled = true;
+            _seekGameObject.SetActive(true);
+            _annAgentAvoiderGameObject.SetActive(true);
+
+            // Assert we move without touching the obstacle agent.
+            int steps = 5;
+            for (int i = 0; i < steps; i++)
+            {
+                yield return new WaitForSeconds(1.0f);
+                Assert.True(Vector3.Distance(_seekGameObject.transform.position,
+                    _annAgentAvoiderGameObject.transform.position) >= (1.1f));
+            }
+
+            // Assert we reached target.
+            Assert.True(Vector3.Distance(_annAgentAvoiderGameObject.transform.position,
+                _target.transform.position) <= (0.1f));
+
+            // Cleanup.
+            _seekGameObject.SetActive(false);
+            _annAgentAvoiderGameObject.SetActive(false);
+            _target.Enabled = false;
+        }
+        
+        /// <summary>
+        /// Test that ANNAgentAvoiderBehavior can reach its target without touching another
+        /// moving agent that goes across its path.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator ANNAgentAvoiderBehaviorTestFifthScenario()
+        {
+            // Test setup.
+            var obstacleMovingAgent = _seekGameObject.GetComponent<AgentMover>();
+            obstacleMovingAgent.MaximumSpeed = 2.0f;
+            obstacleMovingAgent.StopSpeed = 0.1f;
+            obstacleMovingAgent.MaximumRotationalSpeed = 180f;
+            obstacleMovingAgent.StopRotationThreshold = 1f;
+            obstacleMovingAgent.MaximumAcceleration = 1.8f;
+            obstacleMovingAgent.MaximumDeceleration = 1.8f;
+            var obstacleMovingAgentColor = _seekGameObject.GetComponent<AgentColor>();
+            obstacleMovingAgentColor.Color = Color.red;
+            var seekSteeringBehavior =
+                _seekGameObject.GetComponentInChildren<SeekSteeringBehavior>();
+            seekSteeringBehavior.ArrivalDistance = 0.2f;
+
+            var agentAvoider = _annAgentAvoiderGameObject.GetComponent<AgentMover>();
+            agentAvoider.MaximumSpeed = 2.7f;
+            agentAvoider.MaximumAcceleration = 4.0f;
+            agentAvoider.MaximumRotationalSpeed = 180f;
+            agentAvoider.StopRotationThreshold = 1f;
+            agentAvoider.StopSpeed = 0.1f;
+            agentAvoider.MaximumAcceleration = 2;
+            agentAvoider.MaximumDeceleration = 4;
+            var agentAvoiderSeekSteeringBehavior = _annAgentAvoiderGameObject
+                .GetComponentInChildren<SeekSteeringBehavior>();
+            var agentAvoiderBehavior = _annAgentAvoiderGameObject
+                .GetComponentInChildren<ActiveAgentAvoiderSteeringBehavior>();
+            var annAgentAvoiderSteeringBehavior = _annAgentAvoiderGameObject
+                .GetComponentInChildren<AnnPassiveAgentAvoiderBehavior>();
+            var circleSensor = 
+                _annAgentAvoiderGameObject.GetComponentInChildren<CircleSensor>();
+
+            agentAvoiderBehavior.AvoidanceTimeout = 0.5f;
+            annAgentAvoiderSteeringBehavior.minimumDistanceBetweenAgents = 4.0f;
+            circleSensor.Radius = 2.01f;
+
+
+            // FIFTH SCENARIO:
+            _target.TargetPosition = _position12.position;
+            agentAvoiderSeekSteeringBehavior.Target = _target.gameObject;
+            _annAgentAvoiderGameObject.transform.position = _position2.position;
+            _seekGameObject.transform.position = _position12.position;
+            seekSteeringBehavior.Target = _position2.gameObject;
+            _target.Enabled = true;
+            _seekGameObject.SetActive(true);
+            _annAgentAvoiderGameObject.SetActive(true);
+
+            // Assert we move without touching the obstacle agent.
+            int steps = 5;
+            for (int i = 0; i < steps; i++)
+            {
+                yield return new WaitForSeconds(1.0f);
+                Assert.True(Vector3.Distance(_seekGameObject.transform.position,
+                    _annAgentAvoiderGameObject.transform.position) >= (1.0f));
+            }
+
+            // Assert we reached target.
+            Assert.True(Vector3.Distance(_annAgentAvoiderGameObject.transform.position,
+                _target.transform.position) <= (0.1f));
+
+            // Cleanup.
+            _seekGameObject.SetActive(false);
+            _annAgentAvoiderGameObject.SetActive(false);
             _target.Enabled = false;
         }
     }

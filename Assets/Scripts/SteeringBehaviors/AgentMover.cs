@@ -6,7 +6,7 @@ using Vector3 = UnityEngine.Vector3;
 namespace SteeringBehaviors
 {
 /// <summary>
-/// This component moves its gameobject using the velocity vector calculated
+/// This component moves its game object using the velocity vector calculated
 /// by a steering behavior component.
 /// </summary>
 public class AgentMover : MonoBehaviour
@@ -17,7 +17,7 @@ public class AgentMover : MonoBehaviour
     [Tooltip("Speed at which we consider agent should stop.")]
     [SerializeField] private float stopSpeed;
     [Tooltip("Movement rotation will not surpass this maximum rotational speed " +
-             "(degress).")]
+             "(degrees).")]
     [SerializeField] protected float maximumRotationalSpeed;
     [Tooltip("Rotation will stop when the difference in degrees between the current " +
              "rotation and current forward vector is less than this value.")]
@@ -57,7 +57,7 @@ public class AgentMover : MonoBehaviour
     }
 
     /// <summary>
-    /// Speed at which we consider agent should stop.
+    /// Speed at which we consider the agent should stop.
     /// </summary>
     public float StopSpeed
     {
@@ -127,7 +127,7 @@ public class AgentMover : MonoBehaviour
     }
 
     /// <summary>
-    /// Steering behaviour component that will return movement vectors.
+    /// Steering behavior component that will return movement vectors.
     /// </summary>
     public SteeringBehavior SteeringBehavior
     {
@@ -153,17 +153,23 @@ public class AgentMover : MonoBehaviour
     public LayerMask CollisionLayer => gameObject.layer;
 
     /// <summary>
-    /// Disable this agent's autonomous movement.
-    /// <remarks>Only useful for formations.</remarks>   
+    /// Radius of this agent's collider.
     /// </summary>
-    //  TODO: Remove this. Actually is not used.
-    public bool AutonomousMovementDisabled { get; set; }
+    public float Radius
+    {
+        get
+        {
+            if (agentShape == null) return 0;
+            return agentShape.radius;
+        }
+    }
 
     protected SteeringBehaviorArgs behaviorArgs;
     private float maximumRotationSpeedRadNormalized;
     private MovingWindow lastRotations;
+    private CircleCollider2D agentShape;
 
-    protected virtual SteeringBehaviorArgs GetSteeringBehaviorArgs()
+    private SteeringBehaviorArgs GetSteeringBehaviorArgs()
     {
         return new SteeringBehaviorArgs(
             gameObject, 
@@ -185,11 +191,12 @@ public class AgentMover : MonoBehaviour
         maximumRotationSpeedRadNormalized = maximumRotationalSpeed * Mathf.Deg2Rad / 
                                              (2 * Mathf.PI);
         lastRotations = new MovingWindow(autoSmoothSamples);
+        agentShape = GetComponent<CircleCollider2D>();
     }
 
     protected virtual void FixedUpdate()
     {
-        if (AutonomousMovementDisabled || behaviorArgs == null) return;
+        if (behaviorArgs == null) return;
         
         UpdateSteeringBehaviorArgs(Time.fixedDeltaTime);
 
