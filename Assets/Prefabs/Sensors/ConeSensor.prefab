@@ -52,13 +52,13 @@ MonoBehaviour:
   layersToDetect:
     serializedVersion: 2
     m_Bits: 128
-  objectEnteredCone:
+  objectEnteredSensor:
     m_PersistentCalls:
       m_Calls: []
-  objectStayCone:
+  objectStayedInSensor:
     m_PersistentCalls:
       m_Calls: []
-  objectLeftCone:
+  objectLeftSensor:
     m_PersistentCalls:
       m_Calls: []
   coneSensorDimensionsChanged:
@@ -358,6 +358,18 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3755691273847252397, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
+      propertyPath: objectLeftSensor.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3755691273847252397, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
+      propertyPath: objectEnteredSensor.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3755691273847252397, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
+      propertyPath: objectStayedInSensor.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3755691273847252397, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
       propertyPath: objectLeftDetectionArea.m_PersistentCalls.m_Calls.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -370,6 +382,34 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3755691273847252397, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
+      propertyPath: objectLeftSensor.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 2850409223302585798}
+    - target: {fileID: 3755691273847252397, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
+      propertyPath: objectEnteredSensor.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 2850409223302585798}
+    - target: {fileID: 3755691273847252397, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
+      propertyPath: objectLeftSensor.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3755691273847252397, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
+      propertyPath: objectLeftSensor.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnObjectExitedCone
+      objectReference: {fileID: 0}
+    - target: {fileID: 3755691273847252397, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
+      propertyPath: objectStayedInSensor.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 2850409223302585798}
+    - target: {fileID: 3755691273847252397, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
+      propertyPath: objectEnteredSensor.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3755691273847252397, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
+      propertyPath: objectEnteredSensor.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnObjectEnteredCone
+      objectReference: {fileID: 0}
+    - target: {fileID: 3755691273847252397, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
       propertyPath: objectLeftDetectionArea.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 2850409223302585798}
@@ -377,6 +417,14 @@ PrefabInstance:
       propertyPath: objectStayDetectionArea.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 2850409223302585798}
+    - target: {fileID: 3755691273847252397, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
+      propertyPath: objectStayedInSensor.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3755691273847252397, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
+      propertyPath: objectStayedInSensor.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnObjectStayCone
+      objectReference: {fileID: 0}
     - target: {fileID: 3755691273847252397, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
       propertyPath: objectEnteredDetectionArea.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -406,6 +454,18 @@ PrefabInstance:
       value: OnObjectEnteredCone
       objectReference: {fileID: 0}
     - target: {fileID: 3755691273847252397, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
+      propertyPath: objectLeftSensor.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Sensors.ConeSensor, ScriptsAssembly
+      objectReference: {fileID: 0}
+    - target: {fileID: 3755691273847252397, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
+      propertyPath: objectEnteredSensor.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Sensors.ConeSensor, ScriptsAssembly
+      objectReference: {fileID: 0}
+    - target: {fileID: 3755691273847252397, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
+      propertyPath: objectStayedInSensor.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Sensors.ConeSensor, ScriptsAssembly
+      objectReference: {fileID: 0}
+    - target: {fileID: 3755691273847252397, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
       propertyPath: objectLeftDetectionArea.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: Sensors.ConeSensor, ScriptsAssembly
       objectReference: {fileID: 0}
@@ -416,6 +476,18 @@ PrefabInstance:
     - target: {fileID: 3755691273847252397, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
       propertyPath: objectEnteredDetectionArea.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: Sensors.ConeSensor, ScriptsAssembly
+      objectReference: {fileID: 0}
+    - target: {fileID: 3755691273847252397, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
+      propertyPath: objectLeftSensor.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 3755691273847252397, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
+      propertyPath: objectEnteredSensor.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 3755691273847252397, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
+      propertyPath: objectStayedInSensor.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 3755691273847252397, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
       propertyPath: objectLeftDetectionArea.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName

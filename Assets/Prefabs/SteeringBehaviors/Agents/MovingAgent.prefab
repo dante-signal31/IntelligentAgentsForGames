@@ -284,7 +284,15 @@ MonoBehaviour:
   maximumAcceleration: 0
   maximumDeceleration: 0
   autoSmooth: 0
+  smoothingMethod: 0
   autoSmoothSamples: 10
+  smoothingCurve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  exponentialConvergenceRate: 0.6
   steeringBehavior: {fileID: 0}
   rigidBody: {fileID: 1790575542233831108}
 --- !u!50 &1790575542233831108

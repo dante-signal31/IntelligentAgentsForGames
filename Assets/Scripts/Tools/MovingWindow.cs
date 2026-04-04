@@ -9,7 +9,6 @@ namespace Tools
 public class MovingWindow
 {
     private readonly Queue<float> _queue;
-    private float _sum;
 
     /// <summary>
     /// Returns the maximum number of elements that can be stored in the moving window.
@@ -22,11 +21,10 @@ public class MovingWindow
     public int Count => _queue.Count;
     
     /// <summary>
-    /// Returns the average of the elements in the moving window.
+    /// Array of current values in the moving window.
     /// </summary>
-    /// <returns>The average of the elements in the moving window.</returns>
-    public float Average => _queue.Count == 0 ? 0f : _sum / _queue.Count;
-
+    public float[] Values => _queue.ToArray();
+    
     /// <summary>
     /// Creates a new moving window with the specified capacity.
     /// </summary>
@@ -52,12 +50,9 @@ public class MovingWindow
     public void Add(float value)
     {
         if (_queue.Count == Capacity)
-            _sum -= _queue.Dequeue();
+            _queue.Dequeue();
 
         _queue.Enqueue(value);
-        _sum += value;
     }
-
-
 }
 }

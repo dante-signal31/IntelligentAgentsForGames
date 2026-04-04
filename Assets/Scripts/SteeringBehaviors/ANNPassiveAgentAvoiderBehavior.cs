@@ -43,7 +43,7 @@ public class AnnPassiveAgentAvoiderBehavior : SteeringBehavior
         if (!sensor.AnyObjectDetected) return SteeringOutput.Zero;
 
         // Find the nearest agent.
-        HashSet<GameObject> detectedObjects = sensor.ObjectsDetected;
+        HashSet<GameObject> detectedObjects = sensor.DetectedObjects;
         AgentMover nearestAgent = null;
         float distance = float.MaxValue;
         Vector2 evasionVector = Vector2.zero;

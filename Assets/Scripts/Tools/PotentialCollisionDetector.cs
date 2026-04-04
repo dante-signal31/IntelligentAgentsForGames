@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using PropertyAttribute;
 using Sensors;
 using SteeringBehaviors;
 using UnityEngine;
@@ -12,46 +14,13 @@ namespace Tools
 public class PotentialCollisionDetector : MonoBehaviour
 {
     [Header("CONFIGURATION:")]
-    [Tooltip("Range to detect possible collisions.")]
-    [SerializeField] private float detectionRange = 10f;
-    [Tooltip("Semicone angle for detection (in degrees).")]
-    [Range(0f, 90f)]
-    [SerializeField] private float detectionSemiconeAngle = 45f;
-    [Tooltip("Specifies the physics layers that the will monitor for potential " +
-             "collisions.")]
-    [SerializeField] private LayerMask layersToDetect;
     [Tooltip("Represents the radius of an agent used for potential collision detection.")]
     [SerializeField] private float agentRadius;
     
     [Header("WIRING:")]
-    [SerializeField] private ConeSensor sensor;
-
-    /// <summary>
-    /// Range to detect possible collisions.
-    /// </summary>
-    public float DetectionRange
-    {
-        get => sensor.DetectionRange;
-        set => sensor.DetectionRange = value;
-    }
-    
-    /// <summary>
-    /// Semicone angle for detection (in degrees).
-    /// </summary>
-    public float DetectionSemiconeAngle
-    {
-        get => sensor.DetectionSemiconeAngle;
-        set => sensor.DetectionSemiconeAngle = value;
-    }
-    
-    /// <summary>
-    /// Specifies the physics layers that the will monitor for potential collisions.
-    /// </summary>
-    public LayerMask LayersToDetect
-    {
-        get => sensor.LayersToDetect;
-        set => sensor.LayersToDetect = value;
-    }
+    [Tooltip("Sensor to detect potential collisions.")]
+    [InterfaceCompliant(typeof(ISensor))]
+    [SerializeField] private MonoBehaviour iSensor;
     
     /// <summary>
     /// Represents the radius of an agent used for potential collision detection.
@@ -72,12 +41,12 @@ public class PotentialCollisionDetector : MonoBehaviour
     public bool PotentialCollisionDetected { get; private set; }
     
     /// <summary>
-    /// Agent whose heading con collide with us.
+    /// Agent whose heading can collide with us.
     /// </summary>
     public AgentMover PotentialCollisionAgent { get; private set; }
     
     /// <summary>
-    /// Time to potential collision with the other agent.
+    /// Time for potential collision with the other agent.
     /// </summary>
     public float TimeToPotentialCollision {get; private set; }
     
@@ -94,7 +63,7 @@ public class PotentialCollisionDetector : MonoBehaviour
     public float SeparationAtPotentialCollision {get; private set; }
     
     /// <summary>
-    /// Present vector from us to the agent we can collide with.
+    /// The present vector from us to the agent we can collide with.
     /// </summary>
     public Vector2 CurrentRelativePositionToPotentialCollisionAgent {get; private set; }
     
@@ -114,8 +83,14 @@ public class PotentialCollisionDetector : MonoBehaviour
     /// </summary>
     public float CollisionDistance { get; private set; }
     
+    /// <summary>
+    /// Indicates whether the system is currently evaluating any potential collisions.
+    /// </summary>
+    public bool EvaluatingPotentialCollision => _detectedAgents.Count > 0;
+    
     private AgentMover _currentAgent;
-    private HashSet<AgentMover> _detectedAgents = new();
+    private readonly HashSet<AgentMover> _detectedAgents = new();
+    private ISensor sensor;
 
     /// <summary>
     /// Event handler to use when another agent enters our detection area.
@@ -141,7 +116,9 @@ public class PotentialCollisionDetector : MonoBehaviour
         
         if (otherAgentMover == null) return;
         
-        if (_detectedAgents.Contains(otherAgentMover)) return;
+        // Object may already be in the list if it entered the sensor area, but if it 
+        // was inside when sensor started, then this method is the way to register it as
+        // detected.
         _detectedAgents.Add(otherAgentMover);
     }
 
@@ -158,27 +135,137 @@ public class PotentialCollisionDetector : MonoBehaviour
         
         _detectedAgents.Remove(otherAgentMover);
     }
+    
+    /// <summary>
+    /// Assess if the current agent can collide with any of the detected agents, with
+    /// the given velocity and radius.
+    /// </summary>
+    /// <param name="currentVelocity">Velocity for the current agent.</param>
+    /// <param name="currentRadius">Radius for the current agent.</param>
+    /// <param name="collisionTime">If a potential collision is detected, returns time
+    /// to suffer that collision if the given velocity is applied to the current agent.
+    /// If no potential collision is detected, then a float.PositiveInfinity is
+    /// returned in this parameter.</param>
+    /// <returns>True if any potential collision is detected. False otherwise.</returns>
+    public bool IsCollidingVelocity(
+        Vector2 currentVelocity, 
+        float currentRadius, 
+        out float collisionTime)
+    {
+        List<AgentMover> otherAgents = GetDetectedAgents();
+        foreach (AgentMover otherAgent in otherAgents)
+        {
+            if (IsGoingToHappenACollision(
+                    otherAgent, 
+                    currentVelocity,
+                    currentRadius + otherAgent.Radius,
+                    out var _, 
+                    out var _, 
+                    out var timeToClosestPosition, 
+                    out var _, 
+                    out var _))
+            {
+                collisionTime = timeToClosestPosition;
+                return true;
+            }
+        }
+        // No collision detected for that currentVelocity with that currentRadius.
+        collisionTime = float.PositiveInfinity;
+        return false;
+    }
+    
+    /// <summary>
+    /// Gets all agents detected by the sensor.
+    /// </summary>
+    /// <returns>An array with the MovingAgent components of detected agents.</returns>
+    private List<AgentMover> GetDetectedAgents()
+    {
+        return new List<AgentMover>(
+            sensor.DetectedObjects.Where(x => 
+                    x.GetComponent<AgentMover>() != null && 
+                    // Don't take in count our own agent.
+                    (x.GetComponent<AgentMover>()).name != _currentAgent.name)
+                .Select(x => x.GetComponent<AgentMover>())
+                .ToArray());
+    }
+
 
     /// <summary>
-    /// Event handler to use when the cone sensor changes its dimensions.
+    /// Determines whether a collision is likely to occur between the current agent and
+    /// a target agent based on their velocities and positions.
     /// </summary>
-    /// <param name="range">New range.</param>
-    /// <param name="semiConeDegrees">New semiConeDegrees.</param>
-    public void OnSensorDimensionsChanged(float range, float semiConeDegrees)
+    /// <param name="target">The agent that is being checked for a potential
+    /// collision.</param>
+    /// <param name="currentVelocity">The velocity of the current agent.</param>
+    /// <param name="collisionDistance">The minimum distance at which a collision is
+    /// considered to occur.</param>
+    /// <param name="relativePosition">The relative position vector between the current
+    /// agent and the target.</param>
+    /// <param name="relativeVelocity">The relative velocity vector between the current
+    /// agent and the target.</param>
+    /// <param name="timeToClosestPosition">The calculated time at which the two agents
+    /// will be closest to each other, given their current velocities.</param>
+    /// <param name="minRelativePosition">The relative position vector at the time of
+    /// closest approach.</param>
+    /// <param name="minSeparation">The minimum separation distance between the two
+    /// agents at the time of closest approach.</param>
+    /// <returns>
+    /// True if a collision is predicted to occur, otherwise false.
+    /// </returns>
+    private bool IsGoingToHappenACollision(
+        AgentMover target,
+        Vector2 currentVelocity,
+        float collisionDistance,
+        out Vector2 relativePosition,
+        out Vector2 relativeVelocity,
+        out float timeToClosestPosition,
+        out Vector2 minRelativePosition,
+        out float minSeparation)
     {
-        if (!Mathf.Approximately(detectionRange, range)) 
-            detectionRange = range;
-        if (!Mathf.Approximately(detectionSemiconeAngle, semiConeDegrees)) 
-            detectionSemiconeAngle = semiConeDegrees;
+        // Calculate time to collision.
+        relativePosition = target.transform.position - 
+                                   _currentAgent.transform.position;
+        relativeVelocity = target.Velocity - currentVelocity;
+        float relativeSpeed = relativeVelocity.magnitude;
+            
+        // I've used Millington algorithm as a reference, but here mine differs from
+        // his. Millington algorithm uses de positive dot product between
+        // relativePosition and relativeVelocity. I guess it's an error.
+        // In my calculations, that would get a positive result for a non-collision
+        // approach, that wouldn't be correct because timeToClosestPosition should
+        // be negative if agents go away from each other and positive if they go
+        // towards each other.
+        // Besides, I've found sources where this formula is defined, and they 
+        // multiply by -1.0 the numerator:
+        // https://medium.com/@knave/collision-avoidance-the-math-1f6cdf383b5c
+        //
+        // So, I've multiplied by -1.0 the numerator.
+        timeToClosestPosition = -1.0f * Vector2.Dot(
+                                    relativePosition, 
+                                    relativeVelocity) / 
+                                Mathf.Pow(relativeSpeed, 2.0f);
+        
+        // Here too, my implementation differs from Millington's. He calculates
+        // minSeparation subtracting relativeSpeed * timeToClosestPosition from the 
+        // modulus of relative position. My tests show that you must do instead the
+        // operations summing with vectors and later get the module.
+        minRelativePosition = relativePosition + relativeVelocity * timeToClosestPosition; 
+        minSeparation = minRelativePosition.magnitude;
+        
+        // They are moving away, so no collision possible.
+        if (timeToClosestPosition < 0)
+        {
+            minSeparation = float.MaxValue;
+            return false;
+        }
+        
+        // If timeToClosestPosition is 0, then the two agents
+        // If minSeparation is greater than _collisionDistance, then we have no
+        // collision at all, so we assess the next target.
+        if (minSeparation > collisionDistance) return false;
+        return true;
     }
-    
-    private void UpdateSensorConfiguration()
-    {
-        sensor.DetectionRange = detectionRange; 
-        sensor.DetectionSemiconeAngle = detectionSemiconeAngle;
-        sensor.LayersToDetect = layersToDetect;
-    }
-    
+
     private void Awake()
     {
         _currentAgent = GetComponentInParent<AgentMover>();
@@ -187,13 +274,14 @@ public class PotentialCollisionDetector : MonoBehaviour
 
     private void Start()
     {
-        UpdateSensorConfiguration();
+        sensor = (ISensor) iSensor;
     }
 
     private void FixedUpdate()
     {
         PotentialCollisionDetected = false;
         if (_detectedAgents.Count == 0) return;
+
         
         float shortestTimeToCollision = float.MaxValue;
         Vector2 relativePositionAtPotentialCollision = Vector2.zero;
@@ -204,43 +292,17 @@ public class PotentialCollisionDetector : MonoBehaviour
 
         foreach (AgentMover target in _detectedAgents)
         {
-            // Calculate time to collision.
-            Vector2 relativePosition = target.transform.position - 
-                                       _currentAgent.transform.position;
-            Vector2 relativeVelocity = target.Velocity - _currentAgent.Velocity;
-            float relativeSpeed = relativeVelocity.magnitude;
-            
-            // I've used Millington algorithm as a reference, but here mine differs from
-            // his. Millington algorithm uses de positive dot product between
-            // relativePosition and relativeVelocity. I guess it's an error.
-            // In my calculations, that would get a positive result for a non-collision
-            // approach, that wouldn't be correct because timeToClosestPosition should
-            // be negative if agents go away from each other and positive if they go
-            // towards each other.
-            // Besides, I've found sources where this formula is defined, and they 
-            // multiply by -1.0 the numerator:
-            // https://medium.com/@knave/collision-avoidance-the-math-1f6cdf383b5c
-            //
-            // So, I've multiplied by -1.0 the numerator.
-            float timeToClosestPosition = -1.0f * Vector2.Dot(
-                                              relativePosition, 
-                                              relativeVelocity) / 
-                                          Mathf.Pow(relativeSpeed, 2.0f);
-            
-            // They are moving away, so no collision possible.
-            if (timeToClosestPosition < 0) continue;
-
-            // Here too, my implementation differs from Millington's. He calculates
-            // miSeparation substracting relativeSpeed * timeToClosestPosition from the 
-            // modulus of relative position. My tests show that you must do instead the
-            // operations summing with vectors and later get the module.
-            Vector2 minRelativePosition =
-                relativePosition + relativeVelocity * timeToClosestPosition; 
-            float minSeparation = minRelativePosition.magnitude;
-            
-            // If minSeparation is greater than _collisionDistance, then we have no
-            // collision at all, so we assess the next target.
-            if (minSeparation > CollisionDistance) continue;
+            // If it isn't going to happen with that target, then continue to the next
+            // target.
+            if (!IsGoingToHappenACollision(
+                    target, 
+                    _currentAgent.Velocity,
+                    CollisionDistance,
+                    out var relativePosition, 
+                    out var relativeVelocity, 
+                    out var timeToClosestPosition, 
+                    out var minRelativePosition, 
+                    out var minSeparation)) continue;
             
             // OK, we have a candidate potential collision, but is it the nearest?
             if (timeToClosestPosition < shortestTimeToCollision)
@@ -265,13 +327,6 @@ public class PotentialCollisionDetector : MonoBehaviour
             currentRelativeVelocityToPotentialCollisionAgent;
         PotentialCollisionDetected = PotentialCollisionAgent != null;
     }
-    
-#if UNITY_EDITOR
-    private void OnValidate()
-    {
-        UpdateSensorConfiguration();
-    }
-#endif
 }
 }
 

@@ -1,3 +1,4 @@
+using System;
 using Tools;
 using UnityEngine;
 using Vector2 = UnityEngine.Vector2;
@@ -28,8 +29,14 @@ public class AgentMover : MonoBehaviour
     [SerializeField] private float maximumDeceleration;
     [Tooltip("Smooth heading averaging velocity vector.")] 
     [SerializeField] private bool autoSmooth;
+    [Tooltip("Smoothing method to use for auto smoothing.")]
+    [SerializeField] private SmoothingMethods smoothingMethod = SmoothingMethods.Average;
     [Tooltip("How many samples to use to smooth heading.")]
     [SerializeField] private int autoSmoothSamples = 10;
+    [Tooltip("Curve to be used if Weighted Moving Average smoothing method is selected.")]
+    [SerializeField] private AnimationCurve smoothingCurve = new();
+    [Tooltip("Convergence rate for exponential smoothing.")]
+    [SerializeField] public float exponentialConvergenceRate = 0.6f;
     
     [Header("WIRING:")]
     [Tooltip("Steering behaviour component that will return movement vectors.")]
@@ -123,7 +130,21 @@ public class AgentMover : MonoBehaviour
             if (value == autoSmoothSamples) return;
             autoSmoothSamples = value;  
             lastRotations = new MovingWindow(value);
+            UpdateSmoothingWeights();
         } 
+    }
+    
+    /// <summary>
+    /// Curve to be used if Weighted Moving Average smoothing method is selected.
+    /// </summary>
+    public AnimationCurve SmoothingCurve
+    {
+        get => smoothingCurve;
+        set
+        {
+            smoothingCurve = value;
+            UpdateSmoothingWeights();
+        }
     }
 
     /// <summary>
@@ -168,6 +189,13 @@ public class AgentMover : MonoBehaviour
     private float maximumRotationSpeedRadNormalized;
     private MovingWindow lastRotations;
     private CircleCollider2D agentShape;
+    private float lastRotation;
+    private float[] weights;
+    
+    private void UpdateSmoothingWeights()
+    {
+        weights = ValueSmoother.SampleWeights(AutoSmoothSamples, SmoothingCurve);
+    }
 
     private SteeringBehaviorArgs GetSteeringBehaviorArgs()
     {
@@ -192,6 +220,7 @@ public class AgentMover : MonoBehaviour
                                              (2 * Mathf.PI);
         lastRotations = new MovingWindow(autoSmoothSamples);
         agentShape = GetComponent<CircleCollider2D>();
+        UpdateSmoothingWeights();
     }
 
     protected virtual void FixedUpdate()
@@ -211,20 +240,38 @@ public class AgentMover : MonoBehaviour
             // to spin. The solution I found is to set angular velocity to zero.
             rigidBody.angularVelocity = 0;
         }
+        // Agent faces to the velocity direction.
         else if (steeringOutput.Angular == 0 && steeringOutput.Linear != Vector2.zero)
-        {
+        { 
             if (autoSmooth)
             {
                 // If no explicit angular steering, but autoSmoothing is desired, we will
-                // smooth the heading by averaging the last few rotations.
+                // smooth the rotation.
                 float rotationNeeded = Vector2.SignedAngle(
                     Forward, 
                     steeringOutput.Linear);
                 lastRotations.Add(rotationNeeded);
-                float averageRotation = lastRotations.Average;
-                Vector2 averageHeading = Quaternion.Euler(0, 0, averageRotation) * 
+                float smoothedRotation = smoothingMethod switch
+                {
+                    SmoothingMethods.Average => 
+                        ValueSmoother.Average(lastRotations.Values),
+                    SmoothingMethods.WeightedMovingAverage =>
+                        ValueSmoother.WeightedMovingAverage(lastRotations, weights),
+                    SmoothingMethods.Exponential =>
+                        ValueSmoother.Exponential(
+                            lastRotation, 
+                            rotationNeeded, 
+                            exponentialConvergenceRate),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+                lastRotation = smoothedRotation;
+                Vector2 smoothedHeading = Quaternion.Euler(0, 0, smoothedRotation) * 
                                          Forward;
-                SetRotation(averageHeading);
+                steeringOutput = 
+                    new SteeringOutput(
+                        smoothedHeading.normalized * 
+                        steeringOutput.Linear.magnitude);
+                SetRotation(smoothedHeading);
             }
             else
             {
@@ -234,6 +281,7 @@ public class AgentMover : MonoBehaviour
                 SetRotation(steeringOutput.Linear);
             }
         }
+        // Agent moves in a direction while faces another direction (e.g., strafing)
         else if (steeringOutput.Angular != 0)
         {
             // In this case, our steering wants us to face and move in different

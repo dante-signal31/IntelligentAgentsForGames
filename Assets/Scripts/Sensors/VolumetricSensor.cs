@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace Sensors
 {
@@ -9,7 +10,7 @@ namespace Sensors
 /// attached to. 
 /// </summary>
 [ExecuteAlways]
-public class VolumetricSensor : MonoBehaviour
+public class VolumetricSensor : MonoBehaviour, ISensor
 {
     [Header("CONFIGURATION:")]
     [Tooltip("Layers to be detected by this sensor.")]
@@ -19,26 +20,38 @@ public class VolumetricSensor : MonoBehaviour
     [SerializeField] public bool ignoreOwner = true;
     
     [Header("EVENTS:")] 
+    [FormerlySerializedAs("objectEnteredDetectionArea")]
     [Tooltip("Subscribers for detection events.")] 
-    [SerializeField] private UnityEvent<GameObject> objectEnteredDetectionArea;
+    [SerializeField] private UnityEvent<GameObject> objectEnteredSensor;
+    
+    [FormerlySerializedAs("objectStayDetectionArea")]
     [Tooltip("Subscribers to object staying in volumetric area.")]
-    [SerializeField] private UnityEvent<GameObject> objectStayDetectionArea;
+    [SerializeField] private UnityEvent<GameObject> objectStayedInSensor;
+    
+    [FormerlySerializedAs("objectLeftDetectionArea")]
     [Tooltip("Subscribers to object leaving volumetric area.")] 
-    [SerializeField] private UnityEvent<GameObject> objectLeftDetectionArea;
+    [SerializeField] private UnityEvent<GameObject> objectLeftSensor;
 
     [Header("WIRING:")] 
     [Tooltip("Volumetric collider trigger.")] 
     [SerializeField] private Collider2D volumetricCollider;
-    
+
     /// <summary>
     /// Set of GameObjects under sensor range.
     /// </summary>
-    public HashSet<GameObject> ObjectsDetected { get; } = new ();
+    public HashSet<GameObject> DetectedObjects { get; } = new ();
+
+    public UnityEvent<GameObject> ObjectEnteredSensor => objectEnteredSensor;
+
+    public UnityEvent<GameObject> ObjectStayedInSensor => objectStayedInSensor;
+
+    public UnityEvent<GameObject> ObjectLeftSensor => objectLeftSensor;
+    
 
     /// <summary>
     /// If the sensor has any detected object under its range.
     /// </summary>
-    public bool AnyObjectDetected => ObjectsDetected.Count > 0;
+    public bool AnyObjectDetected => DetectedObjects.Count > 0;
 
     /// <summary>
     /// This sensor collider. Useful to find approximate contact points.
@@ -47,12 +60,12 @@ public class VolumetricSensor : MonoBehaviour
     
     private void AddDetectedObject(GameObject obj)
     {
-        ObjectsDetected.Add(obj);
+        DetectedObjects.Add(obj);
     }
 
     private void RemoveDetectedObject(GameObject obj)
     {
-        ObjectsDetected.Remove(obj);
+        DetectedObjects.Remove(obj);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -61,8 +74,7 @@ public class VolumetricSensor : MonoBehaviour
         if (ignoreOwner && transform.IsChildOf(other.transform)) return;
         GameObject detectedGameObject = other.gameObject;
         AddDetectedObject(detectedGameObject);
-        if (objectEnteredDetectionArea != null) 
-            objectEnteredDetectionArea.Invoke(detectedGameObject);
+        objectEnteredSensor?.Invoke(detectedGameObject);
     }
 
     private void OnTriggerExit2D(Collider2D other)
@@ -72,8 +84,7 @@ public class VolumetricSensor : MonoBehaviour
         
         GameObject detectedGameObject = other.gameObject;
         RemoveDetectedObject(detectedGameObject);
-        if (objectLeftDetectionArea != null) 
-            objectLeftDetectionArea.Invoke(detectedGameObject);
+        objectLeftSensor?.Invoke(detectedGameObject);
     }
 
     private void OnTriggerStay2D(Collider2D other)
@@ -82,10 +93,9 @@ public class VolumetricSensor : MonoBehaviour
         if (ignoreOwner && transform.IsChildOf(other.transform)) return;
 
         GameObject detectedGameObject = other.gameObject;
-        if (!ObjectsDetected.Contains(detectedGameObject)) 
+        if (!DetectedObjects.Contains(detectedGameObject)) 
             AddDetectedObject(detectedGameObject);
-        if (objectStayDetectionArea != null) 
-            objectStayDetectionArea.Invoke(detectedGameObject);
+        objectStayedInSensor?.Invoke(detectedGameObject);
     }
     
     /// <summary>

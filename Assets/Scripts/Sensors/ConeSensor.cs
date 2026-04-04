@@ -2,13 +2,14 @@ using System.Collections.Generic;
 using Tools;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace Sensors
 {
 /// <summary>
 /// Component to implement a cone of vision sensor.
 /// </summary>
-public class ConeSensor : MonoBehaviour
+public class ConeSensor : MonoBehaviour, ISensor
 {
     [Header("CONFIGURATION:")]
     [Tooltip("Range to detect possible collisions.")]
@@ -18,14 +19,22 @@ public class ConeSensor : MonoBehaviour
     [SerializeField] private float detectionSemiconeAngle = 45f;
     [Tooltip("Specifies the physics layers that the sensor will monitor for objects")]
     [SerializeField] private LayerMask layersToDetect;
-    
+
+
     [Header("EVENTS:")]
-    [Tooltip("Subscriptions")] 
-    [SerializeField] private UnityEvent<GameObject> objectEnteredCone;
+    
+    [FormerlySerializedAs("objectEnteredCone")]
+    [Tooltip("Subscriptions to new detections.")]
+    [SerializeField] private UnityEvent<GameObject> objectEnteredSensor;
+    
+    [FormerlySerializedAs("objectStayCone")]
     [Tooltip("Subscriptions to object staying in volumetric area.")]
-    [SerializeField] private UnityEvent<GameObject> objectStayCone;
+    [SerializeField] private UnityEvent<GameObject> objectStayedInSensor;
+    
+    [FormerlySerializedAs("objectLeftCone")]
     [Tooltip("Subscriptions to object leaving volumetric area.")] 
-    [SerializeField] private UnityEvent<GameObject> objectLeftCone;
+    [SerializeField] private UnityEvent<GameObject> objectLeftSensor;
+    
     [Tooltip("Subscriptions to this cone sensor changing its dimensions. It includes " +
              "<newRange, newDegrees>.")]
     [SerializeField] private UnityEvent<float, float> coneSensorDimensionsChanged;
@@ -36,6 +45,7 @@ public class ConeSensor : MonoBehaviour
     [SerializeField] private ConeRange coneRange;
 
     private bool _parameterSetFromHere;
+    
     /// <summary>
     /// Range to detect objects.
     /// </summary>
@@ -46,10 +56,9 @@ public class ConeSensor : MonoBehaviour
         {
             detectionRange = value;
             UpdateDetectionArea();
-            if (coneSensorDimensionsChanged != null) 
-                coneSensorDimensionsChanged.Invoke(
-                    DetectionRange, 
-                    DetectionSemiconeAngle);
+            coneSensorDimensionsChanged?.Invoke(
+                DetectionRange,
+                DetectionSemiconeAngle);
             
             // Guard needed to avoid infinite calls between this component and _coneRange
             // when changing the range.
@@ -68,10 +77,9 @@ public class ConeSensor : MonoBehaviour
         {
             detectionSemiconeAngle = value;
             UpdateDetectionArea();
-            if (coneSensorDimensionsChanged != null) 
-                coneSensorDimensionsChanged.Invoke(
-                    DetectionRange, 
-                    DetectionSemiconeAngle);
+            coneSensorDimensionsChanged?.Invoke(
+                DetectionRange,
+                DetectionSemiconeAngle);
 
             // Guard needed to avoid infinite calls between this component and _coneRange
             // when changing the angle.
@@ -103,13 +111,24 @@ public class ConeSensor : MonoBehaviour
         set => transform.up = value;
     }
 
+    public UnityEvent<GameObject> ObjectEnteredSensor => objectEnteredSensor;
+
+    public UnityEvent<GameObject> ObjectStayedInSensor => objectStayedInSensor;
+
+    public UnityEvent<GameObject> ObjectLeftSensor => objectLeftSensor;
+    
+    /// <summary>
+    /// Whether the sensor is detecting any object.
+    /// </summary>
+    public bool AnyObjectDetected => DetectedObjects.Count > 0;
+
     /// <summary>
     /// <p>List of objects currently inside this sensor range.</p>
     /// <p>Only are considered those objects included in the layer mask provided
     /// to ConeSensor.</p> 
     /// </summary>
     public HashSet<GameObject> DetectedObjects { get; } = new();
-
+    
     /// <summary>
     /// Whether a global position is inside the cone range of the agent.
     /// </summary>
@@ -152,8 +171,7 @@ public class ConeSensor : MonoBehaviour
         
         DetectedObjects.Add(otherObject);
         
-        if (objectEnteredCone != null) 
-            objectEnteredCone.Invoke(otherObject);
+        objectEnteredSensor?.Invoke(otherObject);
     }
     
     /// <summary>
@@ -175,10 +193,10 @@ public class ConeSensor : MonoBehaviour
         if (!PositionIsInConeRange(otherObject.transform.position)) 
             return;
         
-        // If the object is in cone range but not in DetectedObjects, then add it.
-        if (!DetectedObjects.Contains(otherObject)) DetectedObjects.Add(otherObject);
+        // If the object is in the cone range, then add it to DetectedObjects.
+        DetectedObjects.Add(otherObject);
         
-        objectStayCone?.Invoke(otherObject);
+        objectStayedInSensor?.Invoke(otherObject);
     }
 
     /// <summary>
@@ -191,8 +209,8 @@ public class ConeSensor : MonoBehaviour
         
         DetectedObjects.Remove(otherObject);
         
-        if (objectLeftCone != null) 
-            objectLeftCone.Invoke(otherObject);
+        if (objectLeftSensor != null) 
+            objectLeftSensor.Invoke(otherObject);
     }
     
     /// <summary>
