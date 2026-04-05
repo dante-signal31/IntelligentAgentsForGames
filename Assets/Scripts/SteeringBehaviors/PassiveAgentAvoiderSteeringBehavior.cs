@@ -96,6 +96,10 @@ public class PassiveAgentAvoiderSteeringBehavior : SteeringBehavior, IGizmos
         // vector goes from agent to its target, so as it is that vector would approach
         // those two agents. To make them farther away, you should take the opposite
         // vector as I'm doing here with -minimumDistanceRelativePosition.
+        //
+        // Some versions of the algorithm make the avoidanceVelocity inversely
+        // proportional to the time to collision. That's the case of:
+        // https://www.gameaipro.com/GameAIPro2/GameAIPro2_Chapter19_Guide_to_Anticipatory_Collision_Avoidance.pdf
         Vector2 avoidanceVelocity = -minimumDistanceRelativePosition.normalized *
                                     args.MaximumSpeed;
         

@@ -19,7 +19,7 @@ public class ConeRange : MonoBehaviour
     [Tooltip("If true, the range is fixed and cannot be changed with the visual handle.")]
     [SerializeField] private bool fixedRange;
     [Tooltip("Half angular width in degrees for this cone.")]
-    [Range(0, 180)]
+    [Range(0, 90)]
     [SerializeField] private float semiConeDegrees;
     [FormerlySerializedAs("coneColor")]
     [Tooltip("Color to display this cone in editor.")]
