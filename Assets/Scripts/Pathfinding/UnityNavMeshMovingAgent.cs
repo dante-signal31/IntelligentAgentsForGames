@@ -16,6 +16,25 @@ public class UnityNavMeshMovingAgent : MonoBehaviour
     [Header("WIRING:")]
     [SerializeField] private NavMeshAgent navMeshAgent;
 
+    public Target Target
+    {
+        get => target;
+        set
+        {
+            // We don't want the event from the previous target any longer.
+            if (target != null)
+                target.positionChanged?.RemoveListener(OnTargetPositionChanged);
+            
+            target = value;
+            // We want to listen to the new target's position changes.
+            target.positionChanged?.AddListener(OnTargetPositionChanged);
+            
+            // Head to initial target position.
+            if (navMeshAgent == null || !navMeshAgent.isActiveAndEnabled) return;
+            OnTargetPositionChanged(target.transform.position);
+        }
+    }
+
     private void Start()
     {
         // Nav mesh agent expects to be used in a 3D environment. In a 2D environment,
@@ -23,6 +42,8 @@ public class UnityNavMeshMovingAgent : MonoBehaviour
         // longitudinal to the view axis, making the agent invisible.
         navMeshAgent.updateRotation = false;
         navMeshAgent.updateUpAxis = false;
+        // Head to initial target position.
+        OnTargetPositionChanged(target.transform.position);
     }
 
     private void OnEnable()
