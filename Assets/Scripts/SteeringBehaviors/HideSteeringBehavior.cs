@@ -153,7 +153,7 @@ public class HideSteeringBehavior : SteeringBehavior
         set
         {
             _hidingPoint = value;
-            meshPathFinderSteeringBehavior.TargetPosition = value;
+            _hidingPointMarker.transform.position = value;
         }
     }
 
@@ -175,6 +175,7 @@ public class HideSteeringBehavior : SteeringBehavior
     private bool _hidingPointReached;
     private Timer _pathRecalculationTimer;
     private bool _pathRecalculationCooldownActive;
+    private GameObject _hidingPointMarker;
 
     private void Awake()
     {
@@ -182,6 +183,8 @@ public class HideSteeringBehavior : SteeringBehavior
         _pathRecalculationTimer = new Timer(pathRecalculationTime * 1000);
         _pathRecalculationTimer.Elapsed += OnRecalculationPathTimerTimeout;
         _pathRecalculationTimer.AutoReset = false;
+        _hidingPointMarker = new GameObject($"{name} - HidingPointMarker");
+        _hidingPointMarker.transform.position = HidingPoint;
     }
 
     private void Start()
@@ -227,7 +230,7 @@ public class HideSteeringBehavior : SteeringBehavior
 
     private void InitNavigationAgent()
     {
-        meshPathFinderSteeringBehavior.TargetPosition = HidingPoint;
+        meshPathFinderSteeringBehavior.Target = _hidingPointMarker;
         meshPathFinderSteeringBehavior.agentRadius = AgentRadius;
     }
 

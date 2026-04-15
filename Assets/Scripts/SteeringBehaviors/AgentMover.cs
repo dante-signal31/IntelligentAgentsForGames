@@ -289,9 +289,11 @@ public class AgentMover : MonoBehaviour
             rigidBody.angularVelocity = steeringOutput.Angular;
         }
         
-        // Apply the new velocity vector to our GameObject. I don't enforce the StopSpeed
-        // because I've found it more flexible to do it at steering behavior level.
-        rigidBody.linearVelocity = steeringOutput.Linear;
+        // Apply the new velocity vector to our GameObject.
+        Vector2 newVelocity = steeringOutput.Linear;
+        if (newVelocity.magnitude > MaximumSpeed) 
+            newVelocity = newVelocity.normalized * MaximumSpeed;
+        rigidBody.linearVelocity = newVelocity;
     }
 
     protected virtual void UpdateSteeringBehaviorArgs(float deltaTime = 0)

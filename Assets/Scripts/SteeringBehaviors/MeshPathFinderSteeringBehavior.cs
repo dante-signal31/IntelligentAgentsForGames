@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using Pathfinding;
-using Tools;
+﻿using Pathfinding;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace SteeringBehaviors
 {
@@ -11,11 +9,12 @@ namespace SteeringBehaviors
 /// This class allows an agent to follow a dynamically updated path
 /// to a specified target while considering obstacles and navigation-specific constraints.
 /// </summary>
-public class MeshPathFinderSteeringBehavior : SteeringBehavior, IGizmos
+public class MeshPathFinderSteeringBehavior : SteeringBehavior, IGizmos, ITargeter
 {
     [Header("CONFIGURATION:")]
+    [FormerlySerializedAs("pathTarget")]
     [Tooltip("Target to go to.")]
-    [SerializeField] private Target pathTarget;
+    [SerializeField] private GameObject target;
     [Tooltip("Radius of the agent. Needed to find a path wide enough.")]
     public float agentRadius = 0.5f;
     
@@ -51,13 +50,13 @@ public class MeshPathFinderSteeringBehavior : SteeringBehavior, IGizmos
         }
     }
     
-    public Target PathTarget
+    public GameObject Target
     {
-        get => pathTarget;
+        get => target;
         set
         {
-            if (pathTarget == value) return;
-            SetupNewTarget(value);
+            if (target == value) return;
+            TargetPosition = value.transform.position;
         }
     }
 
@@ -65,7 +64,7 @@ public class MeshPathFinderSteeringBehavior : SteeringBehavior, IGizmos
     /// <summary>
     /// Target position to go to.
     /// </summary>
-    public Vector2 TargetPosition
+    private Vector2 TargetPosition
     {
         get => _targetPosition;
         set
@@ -75,11 +74,6 @@ public class MeshPathFinderSteeringBehavior : SteeringBehavior, IGizmos
         }
     }
     
-    // /// <summary>
-    // /// Whether we have got the path end.
-    // /// </summary>
-    // public bool IsPathEnded => pathFollowingSteeringBehavior.IsPathEnded;
-    
     /// <summary>
     /// Current pathfinder used to generate the path.
     /// </summary>
@@ -87,37 +81,6 @@ public class MeshPathFinderSteeringBehavior : SteeringBehavior, IGizmos
     
     private Path _currentPath;
     
-    /// <summary>
-    /// Assign a new target game object to follow.
-    /// </summary>
-    /// <param name="value">New target game object.</param>
-    private void SetupNewTarget(Target value)
-    {
-        // In case we are changing the followed target, then we are no longer interested
-        // in the old target's position changes.
-        if (pathTarget != null) 
-            pathTarget.positionChanged.RemoveListener(OnPathTargetPositionChanged);
-        
-        // Set the new target and subscribe to its position changes.
-        pathTarget = value;
-        pathTarget.positionChanged.AddListener(OnPathTargetPositionChanged);
-        
-        // Find a path to the new target position.
-        TargetPosition = value.TargetPosition;
-    }
-    
-    /// <summary>
-    /// <p>Callback for when the target position changes.</p>
-    /// <p>This method updates the mesh navigation server's target position and generates
-    /// a synthetic call to the server to force it to recalculate the path to the new
-    /// target.</p>'
-    /// </summary>
-    /// <param name="newTargetPosition">New target position.</param>
-    private void OnPathTargetPositionChanged(Vector2 newTargetPosition)
-    {
-        UpdatePath(newTargetPosition);
-    }
-
     private void UpdatePath(Vector2 newTargetPosition)
     {
         PathData newPath = meshPathFinder.FindPath(newTargetPosition);
@@ -136,19 +99,6 @@ public class MeshPathFinderSteeringBehavior : SteeringBehavior, IGizmos
         _currentPath.GizmosColor = GizmosColor;
     }
 
-    private void OnEnable()
-    {
-        // Make the agent head to the target if we already have one.
-        if (pathTarget == null) return;
-        SetupNewTarget(pathTarget);
-    }
-
-    private void OnDisable()
-    { 
-        if (pathTarget != null) 
-            pathTarget.positionChanged.RemoveListener(OnPathTargetPositionChanged);
-    }
-
     private void Start()
     {
         // Show path gizmo if we are debugging.
@@ -164,10 +114,22 @@ public class MeshPathFinderSteeringBehavior : SteeringBehavior, IGizmos
         meshPathFinder.Radius = agentRadius;
     }
 
+    private void FixedUpdate()
+    {
+        if (Target == null) return;
+        if ((Vector2)Target.transform.position != TargetPosition)
+        {
+            // When you change the target position, the pathfinder will be updated.
+            TargetPosition = Target.transform.position;
+        }
+    }
+
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
         return pathFollowingSteeringBehavior.GetSteering(args);
     }
+
+
 }
 }
 

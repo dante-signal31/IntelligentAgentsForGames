@@ -1,4 +1,5 @@
-﻿using System.Timers;
+﻿using System;
+using System.Timers;
 using PropertyAttribute;
 using UnityEngine;
 
@@ -24,6 +25,12 @@ public class ActiveAgentAvoiderSteeringBehavior : SteeringBehavior
     [Tooltip("Steering to avoid other agents.")]
     [SerializeField] private SteeringBehavior passiveAgentAvoiderSteering;
     
+    [Header("DEBUG:")]
+    [SerializeField] private bool showGizmos;
+    [SerializeField] private Color gizmosColorSteering = Color.green;
+    [SerializeField] private Color gizmosColorAvoidance = Color.red;
+    [SerializeField] private Color gizmosColorResultingVelocity = Color.blue;
+    
     /// <summary>
     /// Timeout duration, in seconds, that starts after no further collisions are
     /// detected before resuming travel toward the target.
@@ -41,6 +48,8 @@ public class ActiveAgentAvoiderSteeringBehavior : SteeringBehavior
     
     private Timer _avoidanceTimer;
     private bool _waitingForAvoidanceTimeout;
+    private SteeringOutput _steeringToTarget;
+    private SteeringOutput _avoidingSteering;
     private SteeringOutput _currentSteeringOutput;
 
     private void Start()
@@ -85,29 +94,25 @@ public class ActiveAgentAvoiderSteeringBehavior : SteeringBehavior
     }
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
-    {
-        SteeringOutput steeringToTargetVelocity = steeringToTarget.GetSteering(args);
-        SteeringOutput avoidingSteeringVelocity = 
-            passiveAgentAvoiderSteering.GetSteering(args);
+    { 
+        _steeringToTarget = steeringToTarget.GetSteering(args);
+        _avoidingSteering = passiveAgentAvoiderSteering.GetSteering(args);
         
         // Nothing to avoid, but we are waiting for avoidance timeout, so let's
         // continue our current velocity.
         if (_waitingForAvoidanceTimeout) return _currentSteeringOutput;
         
         // Nothing to avoid and waiting nothing, so let's just go to our target.
-        if (avoidingSteeringVelocity.Equals(SteeringOutput.Zero)) 
-            return steeringToTargetVelocity;
+        if (_avoidingSteering.Equals(SteeringOutput.Zero)) 
+            return _steeringToTarget;
         
         // If we get here, then there's an agent to avoid. Add avoiding vector to our
         // velocity to avoid collision. 
-        Vector2 newVelocity = steeringToTargetVelocity.Linear + 
-                              avoidingSteeringVelocity.Linear;
-        // Check resulting the speed is not higher than the maximum one.
-        if (newVelocity.magnitude > args.MaximumSpeed) 
-            newVelocity = newVelocity.normalized * args.MaximumSpeed;
+        Vector2 newVelocity = _steeringToTarget.Linear + 
+                              _avoidingSteering.Linear;
         _currentSteeringOutput = new SteeringOutput(
             newVelocity, 
-            steeringToTargetVelocity.Angular);
+            _steeringToTarget.Angular);
         
         // We need a cooldown, or we can get stuck in a cycle where our agent changes 
         // its heading to avoid collision but, in the next frame, as its heading is
@@ -119,6 +124,26 @@ public class ActiveAgentAvoiderSteeringBehavior : SteeringBehavior
         
         return _currentSteeringOutput;
     }
+
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+        if (!showGizmos) return;
+        
+        Gizmos.color = gizmosColorAvoidance;
+        Gizmos.DrawLine(
+            transform.position, 
+            transform.position + (Vector3) _avoidingSteering.Linear);
+        Gizmos.color = gizmosColorSteering;
+        Gizmos.DrawLine(
+            transform.position, 
+            transform.position + (Vector3) _steeringToTarget.Linear);
+        Gizmos.color = gizmosColorResultingVelocity;
+        Gizmos.DrawLine(
+            transform.position, 
+            transform.position + (Vector3)_currentSteeringOutput.Linear);
+    }
+#endif
 }
 }
 
