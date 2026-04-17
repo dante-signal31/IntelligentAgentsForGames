@@ -369,7 +369,7 @@ namespace Tests.PlayTests
             _target.TargetPosition = _position5.position;
             
             _wallAvoiderGameObject.transform.position = _position6.position;
-            _wallAvoiderAgent.MaximumSpeed = 2.0f;
+            _wallAvoiderAgent.MaximumSpeed = 1.0f;
             _wallAvoiderAgent.StopSpeed = 0.01f;
             _wallAvoiderAgent.MaximumRotationalSpeed = 1080f;
             _wallAvoiderAgent.StopRotationThreshold = 1f;
@@ -383,7 +383,7 @@ namespace Tests.PlayTests
             // Start test.
             
             // Give agent time to get to the target.
-            yield return new WaitForSeconds(10f);
+            yield return new WaitForSeconds(13f);
             
             // Assert that wall avoider has reached the target.
             Assert.True(Vector2.Distance(

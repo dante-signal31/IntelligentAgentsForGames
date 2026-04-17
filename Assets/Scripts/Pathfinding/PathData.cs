@@ -22,10 +22,19 @@ public class PathData
     /// </summary>
     public float PathLength { get; private set; }
 
+    private int _currentTargetPositionIndex;
     /// <summary>
     /// Current index of the position we are going to.
+    /// <remarks>
+    /// If the given index is greater than the number of positions in the path, the
+    /// modulus will be applied to the index to get the correct position index.
+    /// </remarks>
     /// </summary>
-    public int CurrentTargetPositionIndex { get; private set; }
+    public int CurrentTargetPositionIndex
+    {
+        get => _currentTargetPositionIndex;
+        set => _currentTargetPositionIndex = value != 0 ? value % positions.Count : 0;
+    }
 
     /// <summary>
     /// Position at the current position index.
@@ -88,7 +97,7 @@ public class PathData
     /// <p>If we are at the end and Loop is false, then the last target position is
     /// returned; whereas if the loop is true, then the index is reset to 0 and the
     /// first target position is returned.</p></returns>
-    public Vector2 GetNextPositionTarget()
+    public Vector2 GetNextTargetPosition()
     {
         if (CurrentTargetPositionIndex == positions.Count - 1)
         {

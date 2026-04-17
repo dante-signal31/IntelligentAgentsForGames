@@ -55,6 +55,9 @@ namespace Tests.PlayTests
         private GameObject _agentAvoiderGameObject;
         private GameObject _annAgentAvoiderGameObject;
         private GameObject _voAgentAvoiderGameObject;
+        private GameObject _unityMeshAgentAvoiderGameObject;
+        private GameObject _unityMeshAgentAvoiderGameObject2;
+        private GameObject _unityMeshAgentAvoiderGameObject3;
         private GameObject _meshAgentAvoiderGameObject;
         private GameObject _meshAgentAvoiderGameObject2;
         private GameObject _meshAgentAvoiderGameObject3;
@@ -227,24 +230,45 @@ namespace Tests.PlayTests
                 _voAgentAvoiderGameObject.SetActive(false);
             }
 
+            if (_unityMeshAgentAvoiderGameObject == null)
+            {
+                _unityMeshAgentAvoiderGameObject =
+                    GameObject.Find("UnityNavMeshMovingAgent");
+                _unityMeshAgentAvoiderGameObject.SetActive(false);
+            }
+
+            if (_unityMeshAgentAvoiderGameObject2 == null)
+            {
+                _unityMeshAgentAvoiderGameObject2 =
+                    GameObject.Find("UnityNavMeshMovingAgent2");
+                _unityMeshAgentAvoiderGameObject2.SetActive(false);
+            }
+
+            if (_unityMeshAgentAvoiderGameObject3 == null)
+            {
+                _unityMeshAgentAvoiderGameObject3 =
+                    GameObject.Find("UnityNavMeshMovingAgent3");
+                _unityMeshAgentAvoiderGameObject3.SetActive(false);
+            }
+
             if (_meshAgentAvoiderGameObject == null)
             {
                 _meshAgentAvoiderGameObject =
-                    GameObject.Find("UnityNavMeshMovingAgent");
+                    GameObject.Find("MeshAgentAvoiderMovingAgent");
                 _meshAgentAvoiderGameObject.SetActive(false);
             }
 
             if (_meshAgentAvoiderGameObject2 == null)
             {
                 _meshAgentAvoiderGameObject2 =
-                    GameObject.Find("UnityNavMeshMovingAgent2");
+                    GameObject.Find("MeshAgentAvoiderMovingAgent2");
                 _meshAgentAvoiderGameObject2.SetActive(false);
             }
-
+            
             if (_meshAgentAvoiderGameObject3 == null)
             {
                 _meshAgentAvoiderGameObject3 =
-                    GameObject.Find("UnityNavMeshMovingAgent3");
+                    GameObject.Find("MeshAgentAvoiderMovingAgent3");
                 _meshAgentAvoiderGameObject3.SetActive(false);
             }
         }
@@ -1836,7 +1860,7 @@ namespace Tests.PlayTests
             _annAgentAvoiderGameObject.SetActive(true);
 
             // Assert we move without touching the obstacle agent.
-            int steps = 10;
+            int steps = 12;
             for (int i = 0; i < steps; i++)
             {
                 yield return new WaitForSeconds(1.2f);
@@ -2143,7 +2167,9 @@ namespace Tests.PlayTests
             {
                 yield return new WaitForSeconds(1.0f);
                 Assert.True(Vector3.Distance(_seekGameObject.transform.position,
-                    _annAgentAvoiderGameObject.transform.position) >= (1.0f));
+                    _annAgentAvoiderGameObject.transform.position) >= (1.1f));
+                Assert.True(Vector3.Distance(_arriveLAGameObject.transform.position,
+                    _annAgentAvoiderGameObject.transform.position) >= (1.1f));
             }
 
             // Assert we reached target.
@@ -2529,7 +2555,7 @@ namespace Tests.PlayTests
         {
             // Test setup.
             var obstacleMovingAgent = _seekGameObject.GetComponent<AgentMover>();
-            obstacleMovingAgent.MaximumSpeed = 2.0f;
+            obstacleMovingAgent.MaximumSpeed = 1.0f;
             obstacleMovingAgent.StopSpeed = 0.1f;
             obstacleMovingAgent.MaximumRotationalSpeed = 180f;
             obstacleMovingAgent.StopRotationThreshold = 1f;
@@ -2597,7 +2623,9 @@ namespace Tests.PlayTests
             {
                 yield return new WaitForSeconds(1.0f);
                 Assert.True(Vector3.Distance(_seekGameObject.transform.position,
-                    _voAgentAvoiderGameObject.transform.position) >= (1.0f));
+                    _voAgentAvoiderGameObject.transform.position) >= (1.1f));
+                Assert.True(Vector3.Distance(_arriveLAGameObject.transform.position,
+                    _voAgentAvoiderGameObject.transform.position) >= (1.1f));
             }
 
             // Assert we reached target.
@@ -2612,384 +2640,613 @@ namespace Tests.PlayTests
         }
         
         /// <summary>
-        /// Test that MeshAgentAvoiderBehavior can reach its target without touching another
+        /// Test that UnityNavMeshMovingAgent can reach its target without touching another
         /// moving agent that goes across its path.
         /// </summary>
         [UnityTest]
-        public IEnumerator MeshAgentAvoiderBehaviorTestFirstScenario()
+        public IEnumerator UnityMeshAgentAvoiderBehaviorTestFirstScenario()
         {
             // Test setup.
-            var obstacleMovingAgent = _meshAgentAvoiderGameObject2.GetComponent<NavMeshAgent>();
+            var obstacleMovingAgent = _unityMeshAgentAvoiderGameObject2.GetComponent<NavMeshAgent>();
             obstacleMovingAgent.speed = 2.3f;
             obstacleMovingAgent.angularSpeed = 180f;
             obstacleMovingAgent.acceleration = 1.8f;
             obstacleMovingAgent.stoppingDistance = 0.1f;
             obstacleMovingAgent.autoBraking = true;
             obstacleMovingAgent.radius = 0.75f;
-            var obstacleMovingAgentColor = _meshAgentAvoiderGameObject2.GetComponent<AgentColor>();
+            var obstacleMovingAgentColor = _unityMeshAgentAvoiderGameObject2.GetComponent<AgentColor>();
             obstacleMovingAgentColor.Color = Color.red;
             var obstacleSteeringBehavior =
-                _meshAgentAvoiderGameObject2.GetComponentInChildren<UnityNavMeshMovingAgent>();
+                _unityMeshAgentAvoiderGameObject2.GetComponentInChildren<UnityNavMeshMovingAgent>();
             obstacleSteeringBehavior.Target = _target2;
 
-            var agentAvoider = _meshAgentAvoiderGameObject.GetComponent<NavMeshAgent>();
+            var agentAvoider = _unityMeshAgentAvoiderGameObject.GetComponent<NavMeshAgent>();
             agentAvoider.speed = 2.3f;
             agentAvoider.angularSpeed = 180f;
             agentAvoider.acceleration = 1.8f;
             agentAvoider.stoppingDistance = 0.1f;
             agentAvoider.autoBraking = true;
             agentAvoider.radius = 0.75f;
-            var agentAvoiderColor = _meshAgentAvoiderGameObject.GetComponent<AgentColor>();
+            var agentAvoiderColor = _unityMeshAgentAvoiderGameObject.GetComponent<AgentColor>();
             agentAvoiderColor.Color = Color.green;
-            var agentAvoiderSteeringBehavior = _meshAgentAvoiderGameObject
+            var agentAvoiderSteeringBehavior = _unityMeshAgentAvoiderGameObject
                 .GetComponentInChildren<UnityNavMeshMovingAgent>();
             agentAvoiderSteeringBehavior.Target = _target;
 
             // FIRST SCENARIO:
             _target.TargetPosition = _position11.position;
-            _meshAgentAvoiderGameObject.transform.position = _position14.position;
-            _meshAgentAvoiderGameObject2.transform.position = _position10.position;
+            _unityMeshAgentAvoiderGameObject.transform.position = _position14.position;
+            _unityMeshAgentAvoiderGameObject2.transform.position = _position10.position;
             _target2.TargetPosition = _position1.position;
             _target.Enabled = true;
             _target2.Enabled = true;
-            _meshAgentAvoiderGameObject2.SetActive(true);
-            _meshAgentAvoiderGameObject.SetActive(true);
+            _unityMeshAgentAvoiderGameObject2.SetActive(true);
+            _unityMeshAgentAvoiderGameObject.SetActive(true);
 
             // Assert we move without touching the obstacle agent.
             int steps = 8;
             for (int i = 0; i < steps; i++)
             {
                 yield return new WaitForSeconds(1.0f);
-                Assert.True(Vector3.Distance(_meshAgentAvoiderGameObject2.transform.position,
-                    _meshAgentAvoiderGameObject.transform.position) >= (1.5f));
+                Assert.True(Vector3.Distance(_unityMeshAgentAvoiderGameObject2.transform.position,
+                    _unityMeshAgentAvoiderGameObject.transform.position) >= (1.5f));
             }
 
             // Assert we reached target.
-            Assert.True(Vector3.Distance(_meshAgentAvoiderGameObject.transform.position,
+            Assert.True(Vector3.Distance(_unityMeshAgentAvoiderGameObject.transform.position,
                 _target.transform.position) <= (0.7f));
 
             // Cleanup.
-            _meshAgentAvoiderGameObject2.SetActive(false);
-            _meshAgentAvoiderGameObject2.SetActive(false);
+            _unityMeshAgentAvoiderGameObject2.SetActive(false);
+            _unityMeshAgentAvoiderGameObject2.SetActive(false);
             _target.Enabled = false;
             _target2.Enabled = false;
         }
         
         /// <summary>
-        /// Test that MeshAgentAvoiderBehavior can reach its target without touching another
+        /// Test that UnityNavMeshMovingAgent can reach its target without touching another
         /// moving agent that goes across its path.
         /// </summary>
         [UnityTest]
-        public IEnumerator MeshAgentAvoiderBehaviorTestSecondScenario()
+        public IEnumerator UnityMeshAgentAvoiderBehaviorTestSecondScenario()
         {
             // Test setup.
-            var obstacleMovingAgent = _meshAgentAvoiderGameObject2.GetComponent<NavMeshAgent>();
+            var obstacleMovingAgent = _unityMeshAgentAvoiderGameObject2.GetComponent<NavMeshAgent>();
             obstacleMovingAgent.speed = 2.3f;
             obstacleMovingAgent.angularSpeed = 180f;
             obstacleMovingAgent.acceleration = 1.8f;
             obstacleMovingAgent.stoppingDistance = 0.1f;
             obstacleMovingAgent.autoBraking = true;
             obstacleMovingAgent.radius = 0.75f;
-            var obstacleMovingAgentColor = _meshAgentAvoiderGameObject2.GetComponent<AgentColor>();
+            var obstacleMovingAgentColor = _unityMeshAgentAvoiderGameObject2.GetComponent<AgentColor>();
             obstacleMovingAgentColor.Color = Color.red;
             var obstacleSteeringBehavior =
-                _meshAgentAvoiderGameObject2.GetComponentInChildren<UnityNavMeshMovingAgent>();
+                _unityMeshAgentAvoiderGameObject2.GetComponentInChildren<UnityNavMeshMovingAgent>();
             obstacleSteeringBehavior.Target = _target2;
 
-            var agentAvoider = _meshAgentAvoiderGameObject.GetComponent<NavMeshAgent>();
+            var agentAvoider = _unityMeshAgentAvoiderGameObject.GetComponent<NavMeshAgent>();
             agentAvoider.speed = 2.3f;
             agentAvoider.angularSpeed = 180f;
             agentAvoider.acceleration = 1.8f;
             agentAvoider.stoppingDistance = 0.1f;
             agentAvoider.autoBraking = true;
             agentAvoider.radius = 0.75f;
-            var agentAvoiderColor = _meshAgentAvoiderGameObject.GetComponent<AgentColor>();
+            var agentAvoiderColor = _unityMeshAgentAvoiderGameObject.GetComponent<AgentColor>();
             agentAvoiderColor.Color = Color.green;
-            var agentAvoiderSteeringBehavior = _meshAgentAvoiderGameObject
+            var agentAvoiderSteeringBehavior = _unityMeshAgentAvoiderGameObject
                 .GetComponentInChildren<UnityNavMeshMovingAgent>();
             agentAvoiderSteeringBehavior.Target = _target;
 
             // SECOND SCENARIO:
             _target.TargetPosition = _position11.position;
-            _meshAgentAvoiderGameObject.transform.position = _position14.position;
-            _meshAgentAvoiderGameObject2.transform.position = _position1.position;
+            _unityMeshAgentAvoiderGameObject.transform.position = _position14.position;
+            _unityMeshAgentAvoiderGameObject2.transform.position = _position1.position;
             _target2.TargetPosition = _position10.position;
             _target.Enabled = true;
             _target2.Enabled = true;
-            _meshAgentAvoiderGameObject2.SetActive(true);
-            _meshAgentAvoiderGameObject.SetActive(true);
+            _unityMeshAgentAvoiderGameObject2.SetActive(true);
+            _unityMeshAgentAvoiderGameObject.SetActive(true);
 
             // Assert we move without touching the obstacle agent.
             int steps = 8;
             for (int i = 0; i < steps; i++)
             {
                 yield return new WaitForSeconds(1.0f);
-                Assert.True(Vector3.Distance(_meshAgentAvoiderGameObject2.transform.position,
-                    _meshAgentAvoiderGameObject.transform.position) >= (1.5f));
+                Assert.True(Vector3.Distance(_unityMeshAgentAvoiderGameObject2.transform.position,
+                    _unityMeshAgentAvoiderGameObject.transform.position) >= (1.5f));
             }
 
             // Assert we reached target.
-            Assert.True(Vector3.Distance(_meshAgentAvoiderGameObject.transform.position,
+            Assert.True(Vector3.Distance(_unityMeshAgentAvoiderGameObject.transform.position,
                 _target.transform.position) <= (0.7f));
 
             // Cleanup.
-            _meshAgentAvoiderGameObject2.SetActive(false);
-            _meshAgentAvoiderGameObject2.SetActive(false);
+            _unityMeshAgentAvoiderGameObject2.SetActive(false);
+            _unityMeshAgentAvoiderGameObject2.SetActive(false);
             _target.Enabled = false;
             _target2.Enabled = false;
         }
         
         /// <summary>
-        /// Test that MeshAgentAvoiderBehavior can reach its target without touching another
+        /// Test that UnityNavMeshMovingAgent can reach its target without touching another
         /// moving agent that goes across its path.
         /// </summary>
         [UnityTest]
-        public IEnumerator MeshAgentAvoiderBehaviorTestThirdScenario()
+        public IEnumerator UnityMeshAgentAvoiderBehaviorTestThirdScenario()
         {
             // Test setup.
-            var obstacleMovingAgent = _meshAgentAvoiderGameObject2.GetComponent<NavMeshAgent>();
+            var obstacleMovingAgent = _unityMeshAgentAvoiderGameObject2.GetComponent<NavMeshAgent>();
             obstacleMovingAgent.speed = 2.5f;
             obstacleMovingAgent.angularSpeed = 180f;
             obstacleMovingAgent.acceleration = 5;
             obstacleMovingAgent.stoppingDistance = 0.1f;
             obstacleMovingAgent.autoBraking = true;
             obstacleMovingAgent.radius = 0.75f;
-            var obstacleMovingAgentColor = _meshAgentAvoiderGameObject2.GetComponent<AgentColor>();
+            var obstacleMovingAgentColor = _unityMeshAgentAvoiderGameObject2.GetComponent<AgentColor>();
             obstacleMovingAgentColor.Color = Color.red;
             var obstacleSteeringBehavior =
-                _meshAgentAvoiderGameObject2.GetComponentInChildren<UnityNavMeshMovingAgent>();
+                _unityMeshAgentAvoiderGameObject2.GetComponentInChildren<UnityNavMeshMovingAgent>();
             obstacleSteeringBehavior.Target = _target2;
 
-            var agentAvoider = _meshAgentAvoiderGameObject.GetComponent<NavMeshAgent>();
+            var agentAvoider = _unityMeshAgentAvoiderGameObject.GetComponent<NavMeshAgent>();
             agentAvoider.speed = 4f;
             agentAvoider.angularSpeed = 180f;
             agentAvoider.acceleration = 5f;
             agentAvoider.stoppingDistance = 0.1f;
             agentAvoider.autoBraking = true;
             agentAvoider.radius = 0.75f;
-            var agentAvoiderColor = _meshAgentAvoiderGameObject.GetComponent<AgentColor>();
+            var agentAvoiderColor = _unityMeshAgentAvoiderGameObject.GetComponent<AgentColor>();
             agentAvoiderColor.Color = Color.green;
-            var agentAvoiderSteeringBehavior = _meshAgentAvoiderGameObject
+            var agentAvoiderSteeringBehavior = _unityMeshAgentAvoiderGameObject
                 .GetComponentInChildren<UnityNavMeshMovingAgent>();
             agentAvoiderSteeringBehavior.Target = _target;
 
             // THIRD SCENARIO:
             _target.TargetPosition = _position14.position;
-            _meshAgentAvoiderGameObject.transform.position = _position7.position;
-            _meshAgentAvoiderGameObject2.transform.position = _position1.position;
+            _unityMeshAgentAvoiderGameObject.transform.position = _position7.position;
+            _unityMeshAgentAvoiderGameObject2.transform.position = _position1.position;
             _target2.TargetPosition = _position10.position;
             _target.Enabled = true;
             _target2.Enabled = true;
-            _meshAgentAvoiderGameObject2.SetActive(true);
-            _meshAgentAvoiderGameObject.SetActive(true);
+            _unityMeshAgentAvoiderGameObject2.SetActive(true);
+            _unityMeshAgentAvoiderGameObject.SetActive(true);
 
             // Assert we move without touching the obstacle agent.
             int steps = 8;
             for (int i = 0; i < steps; i++)
             {
                 yield return new WaitForSeconds(1.0f);
-                Assert.True(Vector3.Distance(_meshAgentAvoiderGameObject2.transform.position,
-                    _meshAgentAvoiderGameObject.transform.position) >= (1.5f));
+                Assert.True(Vector3.Distance(_unityMeshAgentAvoiderGameObject2.transform.position,
+                    _unityMeshAgentAvoiderGameObject.transform.position) >= (1.5f));
             }
 
             // Assert we reached target.
-            Assert.True(Vector3.Distance(_meshAgentAvoiderGameObject.transform.position,
+            Assert.True(Vector3.Distance(_unityMeshAgentAvoiderGameObject.transform.position,
                 _target.transform.position) <= (0.7f));
 
             // Cleanup.
-            _meshAgentAvoiderGameObject2.SetActive(false);
-            _meshAgentAvoiderGameObject2.SetActive(false);
+            _unityMeshAgentAvoiderGameObject2.SetActive(false);
+            _unityMeshAgentAvoiderGameObject2.SetActive(false);
             _target.Enabled = false;
             _target2.Enabled = false;
         }
         
         /// <summary>
-        /// Test that MeshAgentAvoiderBehavior can reach its target without touching another
+        /// Test that UnityNavMeshMovingAgent can reach its target without touching another
         /// moving agent that goes across its path.
         /// </summary>
         [UnityTest]
-        public IEnumerator MeshAgentAvoiderBehaviorTestFourthScenario()
+        public IEnumerator UnityMeshAgentAvoiderBehaviorTestFourthScenario()
         {
             // Test setup.
-            var obstacleMovingAgent = _meshAgentAvoiderGameObject2.GetComponent<NavMeshAgent>();
+            var obstacleMovingAgent = _unityMeshAgentAvoiderGameObject2.GetComponent<NavMeshAgent>();
             obstacleMovingAgent.speed = 2.0f;
             obstacleMovingAgent.angularSpeed = 180f;
             obstacleMovingAgent.acceleration = 5f;
             obstacleMovingAgent.stoppingDistance = 0.1f;
             obstacleMovingAgent.autoBraking = true;
             obstacleMovingAgent.radius = 0.75f;
-            var obstacleMovingAgentColor = _meshAgentAvoiderGameObject2.GetComponent<AgentColor>();
+            var obstacleMovingAgentColor = _unityMeshAgentAvoiderGameObject2.GetComponent<AgentColor>();
             obstacleMovingAgentColor.Color = Color.red;
             var obstacleSteeringBehavior =
-                _meshAgentAvoiderGameObject2.GetComponentInChildren<UnityNavMeshMovingAgent>();
+                _unityMeshAgentAvoiderGameObject2.GetComponentInChildren<UnityNavMeshMovingAgent>();
             obstacleSteeringBehavior.Target = _target2;
 
-            var agentAvoider = _meshAgentAvoiderGameObject.GetComponent<NavMeshAgent>();
+            var agentAvoider = _unityMeshAgentAvoiderGameObject.GetComponent<NavMeshAgent>();
             agentAvoider.speed = 2.7f;
             agentAvoider.angularSpeed = 180f;
             agentAvoider.acceleration = 5f;
             agentAvoider.stoppingDistance = 0.1f;
             agentAvoider.autoBraking = true;
             agentAvoider.radius = 0.75f;
-            var agentAvoiderColor = _meshAgentAvoiderGameObject.GetComponent<AgentColor>();
+            var agentAvoiderColor = _unityMeshAgentAvoiderGameObject.GetComponent<AgentColor>();
             agentAvoiderColor.Color = Color.green;
-            var agentAvoiderSteeringBehavior = _meshAgentAvoiderGameObject
+            var agentAvoiderSteeringBehavior = _unityMeshAgentAvoiderGameObject
                 .GetComponentInChildren<UnityNavMeshMovingAgent>();
             agentAvoiderSteeringBehavior.Target = _target;
 
             // FOURTH SCENARIO:
             _target.TargetPosition = _position14.position;
-            _meshAgentAvoiderGameObject.transform.position = _position10.position;
-            _meshAgentAvoiderGameObject2.transform.position = _position14.position;
+            _unityMeshAgentAvoiderGameObject.transform.position = _position10.position;
+            _unityMeshAgentAvoiderGameObject2.transform.position = _position14.position;
             _target2.TargetPosition = _position10.position;
             _target.Enabled = true;
             _target2.Enabled = true;
-            _meshAgentAvoiderGameObject2.SetActive(true);
-            _meshAgentAvoiderGameObject.SetActive(true);
+            _unityMeshAgentAvoiderGameObject2.SetActive(true);
+            _unityMeshAgentAvoiderGameObject.SetActive(true);
 
             // Assert we move without touching the obstacle agent.
             int steps = 8;
             for (int i = 0; i < steps; i++)
             {
                 yield return new WaitForSeconds(1.0f);
-                Assert.True(Vector3.Distance(_meshAgentAvoiderGameObject2.transform.position,
-                    _meshAgentAvoiderGameObject.transform.position) >= (1.5f));
+                Assert.True(Vector3.Distance(_unityMeshAgentAvoiderGameObject2.transform.position,
+                    _unityMeshAgentAvoiderGameObject.transform.position) >= (1.5f));
             }
 
             // Assert we reached target.
-            Assert.True(Vector3.Distance(_meshAgentAvoiderGameObject.transform.position,
+            Assert.True(Vector3.Distance(_unityMeshAgentAvoiderGameObject.transform.position,
                 _target.transform.position) <= (0.7f));
 
             // Cleanup.
-            _meshAgentAvoiderGameObject2.SetActive(false);
-            _meshAgentAvoiderGameObject2.SetActive(false);
+            _unityMeshAgentAvoiderGameObject2.SetActive(false);
+            _unityMeshAgentAvoiderGameObject2.SetActive(false);
             _target.Enabled = false;
             _target2.Enabled = false;
         }
         
         /// <summary>
-        /// Test that MeshAgentAvoiderBehavior can reach its target without touching another
+        /// Test that UnityNavMeshMovingAgent can reach its target without touching another
         /// moving agent that goes across its path.
         /// </summary>
         [UnityTest]
-        public IEnumerator MeshAgentAvoiderBehaviorTestFifthScenario()
+        public IEnumerator UnityMeshAgentAvoiderBehaviorTestFifthScenario()
         {
             // Test setup.
-            var obstacleMovingAgent = _meshAgentAvoiderGameObject2.GetComponent<NavMeshAgent>();
+            var obstacleMovingAgent = _unityMeshAgentAvoiderGameObject2.GetComponent<NavMeshAgent>();
             obstacleMovingAgent.speed = 2.0f;
             obstacleMovingAgent.angularSpeed = 180f;
             obstacleMovingAgent.acceleration = 5f;
             obstacleMovingAgent.stoppingDistance = 0.1f;
             obstacleMovingAgent.autoBraking = true;
             obstacleMovingAgent.radius = 0.75f;
-            var obstacleMovingAgentColor = _meshAgentAvoiderGameObject2.GetComponent<AgentColor>();
+            var obstacleMovingAgentColor = _unityMeshAgentAvoiderGameObject2.GetComponent<AgentColor>();
             obstacleMovingAgentColor.Color = Color.red;
             var obstacleSteeringBehavior =
-                _meshAgentAvoiderGameObject2.GetComponentInChildren<UnityNavMeshMovingAgent>();
+                _unityMeshAgentAvoiderGameObject2.GetComponentInChildren<UnityNavMeshMovingAgent>();
             obstacleSteeringBehavior.Target = _target2;
 
-            var agentAvoider = _meshAgentAvoiderGameObject.GetComponent<NavMeshAgent>();
+            var agentAvoider = _unityMeshAgentAvoiderGameObject.GetComponent<NavMeshAgent>();
             agentAvoider.speed = 2.7f;
             agentAvoider.angularSpeed = 180f;
             agentAvoider.acceleration = 5f;
             agentAvoider.stoppingDistance = 0.1f;
             agentAvoider.autoBraking = true;
             agentAvoider.radius = 0.75f;
-            var agentAvoiderColor = _meshAgentAvoiderGameObject.GetComponent<AgentColor>();
+            var agentAvoiderColor = _unityMeshAgentAvoiderGameObject.GetComponent<AgentColor>();
             agentAvoiderColor.Color = Color.green;
-            var agentAvoiderSteeringBehavior = _meshAgentAvoiderGameObject
+            var agentAvoiderSteeringBehavior = _unityMeshAgentAvoiderGameObject
                 .GetComponentInChildren<UnityNavMeshMovingAgent>();
             agentAvoiderSteeringBehavior.Target = _target;
 
             // FIFTH SCENARIO:
             _target.TargetPosition = _position12.position;
-            _meshAgentAvoiderGameObject.transform.position = _position2.position;
-            _meshAgentAvoiderGameObject2.transform.position = _position12.position;
+            _unityMeshAgentAvoiderGameObject.transform.position = _position2.position;
+            _unityMeshAgentAvoiderGameObject2.transform.position = _position12.position;
             _target2.TargetPosition = _position2.position;
             _target.Enabled = true;
             _target2.Enabled = true;
-            _meshAgentAvoiderGameObject2.SetActive(true);
-            _meshAgentAvoiderGameObject.SetActive(true);
+            _unityMeshAgentAvoiderGameObject2.SetActive(true);
+            _unityMeshAgentAvoiderGameObject.SetActive(true);
 
             // Assert we move without touching the obstacle agent.
             int steps = 8;
             for (int i = 0; i < steps; i++)
             {
                 yield return new WaitForSeconds(1.0f);
-                Assert.True(Vector3.Distance(_meshAgentAvoiderGameObject2.transform.position,
-                    _meshAgentAvoiderGameObject.transform.position) >= (1.5f));
+                Assert.True(Vector3.Distance(_unityMeshAgentAvoiderGameObject2.transform.position,
+                    _unityMeshAgentAvoiderGameObject.transform.position) >= (1.5f));
             }
 
             // Assert we reached target.
-            Assert.True(Vector3.Distance(_meshAgentAvoiderGameObject.transform.position,
+            Assert.True(Vector3.Distance(_unityMeshAgentAvoiderGameObject.transform.position,
                 _target.transform.position) <= (0.7f));
 
             // Cleanup.
-            _meshAgentAvoiderGameObject2.SetActive(false);
-            _meshAgentAvoiderGameObject2.SetActive(false);
+            _unityMeshAgentAvoiderGameObject2.SetActive(false);
+            _unityMeshAgentAvoiderGameObject2.SetActive(false);
             _target.Enabled = false;
             _target2.Enabled = false;
         }
         
         /// <summary>
-        /// Test that MeshAgentAvoiderBehavior can reach its target without touching another
+        /// Test that UnityNavMeshMovingAgent can reach its target without touching another
         /// moving agent that goes across its path.
         /// </summary>
         [UnityTest]
-        public IEnumerator MeshAgentAvoiderBehaviorTestSixthScenario()
+        public IEnumerator UnityMeshAgentAvoiderBehaviorTestSixthScenario()
         {
             // Test setup.
-            var obstacleMovingAgent = _meshAgentAvoiderGameObject2.GetComponent<NavMeshAgent>();
+            var obstacleMovingAgent = _unityMeshAgentAvoiderGameObject2.GetComponent<NavMeshAgent>();
             obstacleMovingAgent.speed = 0.75f;
             obstacleMovingAgent.angularSpeed = 180f;
             obstacleMovingAgent.acceleration = 5f;
             obstacleMovingAgent.stoppingDistance = 0.1f;
             obstacleMovingAgent.autoBraking = true;
             obstacleMovingAgent.radius = 0.75f;
-            var obstacleMovingAgentColor = _meshAgentAvoiderGameObject2.GetComponent<AgentColor>();
+            var obstacleMovingAgentColor = _unityMeshAgentAvoiderGameObject2.GetComponent<AgentColor>();
             obstacleMovingAgentColor.Color = Color.red;
             var obstacleSteeringBehavior =
-                _meshAgentAvoiderGameObject2.GetComponentInChildren<UnityNavMeshMovingAgent>();
+                _unityMeshAgentAvoiderGameObject2.GetComponentInChildren<UnityNavMeshMovingAgent>();
             obstacleSteeringBehavior.Target = _target2;
             
-            var obstacleMovingAgent2 = _meshAgentAvoiderGameObject3.GetComponent<NavMeshAgent>();
+            var obstacleMovingAgent2 = _unityMeshAgentAvoiderGameObject3.GetComponent<NavMeshAgent>();
             obstacleMovingAgent2.speed = 2f;
             obstacleMovingAgent2.angularSpeed = 180f;
             obstacleMovingAgent2.acceleration = 5f;
             obstacleMovingAgent2.stoppingDistance = 0.1f;
             obstacleMovingAgent2.autoBraking = true;
             obstacleMovingAgent2.radius = 0.75f;
-            var obstacleMovingAgentColor2 = _meshAgentAvoiderGameObject3.GetComponent<AgentColor>();
+            var obstacleMovingAgentColor2 = _unityMeshAgentAvoiderGameObject3.GetComponent<AgentColor>();
             obstacleMovingAgentColor2.Color = Color.red;
             var obstacleSteeringBehavior2 =
-                _meshAgentAvoiderGameObject3.GetComponentInChildren<UnityNavMeshMovingAgent>();
+                _unityMeshAgentAvoiderGameObject3.GetComponentInChildren<UnityNavMeshMovingAgent>();
             obstacleSteeringBehavior2.Target = _target3;
 
-            var agentAvoider = _meshAgentAvoiderGameObject.GetComponent<NavMeshAgent>();
+            var agentAvoider = _unityMeshAgentAvoiderGameObject.GetComponent<NavMeshAgent>();
             agentAvoider.speed = 3f;
             agentAvoider.angularSpeed = 180f;
             agentAvoider.acceleration = 5f;
             agentAvoider.stoppingDistance = 0.1f;
             agentAvoider.autoBraking = true;
             agentAvoider.radius = 0.75f;
-            var agentAvoiderColor = _meshAgentAvoiderGameObject.GetComponent<AgentColor>();
+            var agentAvoiderColor = _unityMeshAgentAvoiderGameObject.GetComponent<AgentColor>();
             agentAvoiderColor.Color = Color.green;
-            var agentAvoiderSteeringBehavior = _meshAgentAvoiderGameObject
+            var agentAvoiderSteeringBehavior = _unityMeshAgentAvoiderGameObject
                 .GetComponentInChildren<UnityNavMeshMovingAgent>();
             agentAvoiderSteeringBehavior.Target = _target;
 
             // SIXTH SCENARIO:
             _target.TargetPosition = _position10.position;
-            _meshAgentAvoiderGameObject.transform.position = _position1.position;
-            _meshAgentAvoiderGameObject2.transform.position = _position7.position;
-            _meshAgentAvoiderGameObject3.transform.position = _position15.position;
             _target2.TargetPosition = _position13.position;
             _target3.TargetPosition = _position9.position;
+            _unityMeshAgentAvoiderGameObject.transform.position = _position1.position;
+            _unityMeshAgentAvoiderGameObject2.transform.position = _position7.position;
+            _unityMeshAgentAvoiderGameObject3.transform.position = _position15.position;
             _target.Enabled = true;
             _target2.Enabled = true;
             _target3.Enabled = true;
+            _unityMeshAgentAvoiderGameObject2.SetActive(true);
+            _unityMeshAgentAvoiderGameObject3.SetActive(true);
+            _unityMeshAgentAvoiderGameObject.SetActive(true);
+
+            // Assert we move without touching the obstacle agent.
+            int steps = 8;
+            for (int i = 0; i < steps; i++)
+            {
+                yield return new WaitForSeconds(1.0f);
+                Assert.True(Vector3.Distance(_unityMeshAgentAvoiderGameObject2.transform.position,
+                    _unityMeshAgentAvoiderGameObject.transform.position) >= (1.5f));
+                Assert.True(Vector3.Distance(_unityMeshAgentAvoiderGameObject3.transform.position,
+                    _unityMeshAgentAvoiderGameObject.transform.position) >= (1.5f));
+            }
+
+            // Assert we reached target.
+            Assert.True(Vector3.Distance(_unityMeshAgentAvoiderGameObject.transform.position,
+                _target.transform.position) <= (0.7f));
+
+            // Cleanup.
+            _unityMeshAgentAvoiderGameObject.SetActive(false);
+            _unityMeshAgentAvoiderGameObject2.SetActive(false);
+            _unityMeshAgentAvoiderGameObject3.SetActive(false);
+            _target.Enabled = false;
+            _target2.Enabled = false;
+            _target3.Enabled = false;
+        }
+        
+        /// <summary>
+        /// Test that MeshAgentAvoiderSteeringBehavior can reach its target without
+        /// touching another moving agent that goes across its path.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator MeshAgentAvoiderBehaviorTestFirstScenario()
+        {
+            // Test setup.
+            var obstacleMovingAgent =
+                _meshAgentAvoiderGameObject2.GetComponent<AgentMover>();
+            obstacleMovingAgent.MaximumSpeed = 2.3f;
+            obstacleMovingAgent.StopSpeed = 0.1f;
+            obstacleMovingAgent.MaximumRotationalSpeed = 180f;
+            obstacleMovingAgent.StopRotationThreshold = 1f;
+            obstacleMovingAgent.MaximumAcceleration = 1.8f;
+            obstacleMovingAgent.MaximumDeceleration = 1.8f;
+            var obstacleMovingAgentColor = _meshAgentAvoiderGameObject2.GetComponent<AgentColor>();
+            obstacleMovingAgentColor.Color = Color.red;
+            var obstacleSeekSteeringBehavior =
+                _meshAgentAvoiderGameObject2.GetComponentInChildren<SeekSteeringBehavior>();
+            obstacleSeekSteeringBehavior.ArrivalDistance = 0.2f;
+            var obstacleSteeringBehavior = 
+                _meshAgentAvoiderGameObject2.GetComponentInChildren<MeshAgentAvoiderSteeringBehavior>();
+
+            var agentAvoider = _meshAgentAvoiderGameObject.GetComponent<AgentMover>();
+            agentAvoider.MaximumSpeed = 2.3f;
+            agentAvoider.MaximumAcceleration = 4.0f;
+            agentAvoider.MaximumRotationalSpeed = 180f;
+            agentAvoider.StopRotationThreshold = 1f;
+            agentAvoider.StopSpeed = 0.1f;
+            agentAvoider.MaximumAcceleration = 2;
+            agentAvoider.MaximumDeceleration = 4;
+            agentAvoider.AutoSmooth = true;
+            agentAvoider.AutoSmoothSamples = 10;
+            var agentAvoiderSeekSteeringBehavior = _meshAgentAvoiderGameObject
+                .GetComponentInChildren<SeekSteeringBehavior>();
+            var agentAvoiderSteeringBehavior = _meshAgentAvoiderGameObject
+                .GetComponentInChildren<MeshAgentAvoiderSteeringBehavior>();
+
+            agentAvoiderSeekSteeringBehavior.Target = _target.gameObject;
+            obstacleSeekSteeringBehavior.Target = _target2.gameObject;
+
+            agentAvoiderSteeringBehavior.MinimumDistanceBetweenAgents = 0.5f;
+            obstacleSteeringBehavior.MinimumDistanceBetweenAgents = 0.5f;
+
+            // FIRST SCENARIO:
+            _target.TargetPosition = _position11.position;
+            _target2.TargetPosition = _position1.position;
+            _meshAgentAvoiderGameObject.transform.position = _position14.position;
+            _meshAgentAvoiderGameObject2.transform.position = _position10.position;
+            _target.Enabled = true;
+            _target2.Enabled = true;
             _meshAgentAvoiderGameObject2.SetActive(true);
-            _meshAgentAvoiderGameObject3.SetActive(true);
+            _meshAgentAvoiderGameObject.SetActive(true);
+
+            // Assert we move without touching the obstacle agent.
+            int steps = 9;
+            for (int i = 0; i < steps; i++)
+            {
+                yield return new WaitForSeconds(1.0f);
+                Assert.True(Vector3.Distance(_meshAgentAvoiderGameObject2.transform.position,
+                    _meshAgentAvoiderGameObject.transform.position) >= (1.3f));
+            }
+
+            // Assert we reached target.
+            Assert.True(Vector3.Distance(_meshAgentAvoiderGameObject.transform.position,
+                _target.transform.position) <= (0.7f));
+
+            // Cleanup.
+            _meshAgentAvoiderGameObject.SetActive(false);
+            _meshAgentAvoiderGameObject2.SetActive(false);
+            _target.Enabled = false;
+            _target2.Enabled = false;
+        }
+        
+        /// <summary>
+        /// Test that MeshAgentAvoiderSteeringBehavior can reach its target without
+        /// touching another moving agent that goes across its path.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator MeshAgentAvoiderBehaviorTestSecondScenario()
+        {
+            // Test setup.
+            var obstacleMovingAgent =
+                _meshAgentAvoiderGameObject2.GetComponent<AgentMover>();
+            obstacleMovingAgent.MaximumSpeed = 2.3f;
+            obstacleMovingAgent.StopSpeed = 0.1f;
+            obstacleMovingAgent.MaximumRotationalSpeed = 180f;
+            obstacleMovingAgent.StopRotationThreshold = 1f;
+            obstacleMovingAgent.MaximumAcceleration = 1.8f;
+            obstacleMovingAgent.MaximumDeceleration = 1.8f;
+            var obstacleMovingAgentColor = _meshAgentAvoiderGameObject2.GetComponent<AgentColor>();
+            obstacleMovingAgentColor.Color = Color.red;
+            var obstacleSeekSteeringBehavior =
+                _meshAgentAvoiderGameObject2.GetComponentInChildren<SeekSteeringBehavior>();
+            obstacleSeekSteeringBehavior.ArrivalDistance = 0.2f;
+            var obstacleSteeringBehavior = 
+                _meshAgentAvoiderGameObject2.GetComponentInChildren<MeshAgentAvoiderSteeringBehavior>();
+
+            var agentAvoider = _meshAgentAvoiderGameObject.GetComponent<AgentMover>();
+            agentAvoider.MaximumSpeed = 2.3f;
+            agentAvoider.MaximumAcceleration = 4.0f;
+            agentAvoider.MaximumRotationalSpeed = 180f;
+            agentAvoider.StopRotationThreshold = 1f;
+            agentAvoider.StopSpeed = 0.1f;
+            agentAvoider.MaximumAcceleration = 2;
+            agentAvoider.MaximumDeceleration = 4;
+            agentAvoider.AutoSmooth = true;
+            agentAvoider.AutoSmoothSamples = 10;
+            var agentAvoiderSeekSteeringBehavior = _meshAgentAvoiderGameObject
+                .GetComponentInChildren<SeekSteeringBehavior>();
+            var agentAvoiderSteeringBehavior = _meshAgentAvoiderGameObject
+                .GetComponentInChildren<MeshAgentAvoiderSteeringBehavior>();
+
+            agentAvoiderSeekSteeringBehavior.Target = _target.gameObject;
+            obstacleSeekSteeringBehavior.Target = _target2.gameObject;
+
+            agentAvoiderSteeringBehavior.MinimumDistanceBetweenAgents = 0.5f;
+            obstacleSteeringBehavior.MinimumDistanceBetweenAgents = 0.5f;
+
+            // SECOND SCENARIO:
+            _target.TargetPosition = _position11.position;
+            _target2.TargetPosition = _position10.position;
+            _meshAgentAvoiderGameObject.transform.position = _position14.position;
+            _meshAgentAvoiderGameObject2.transform.position = _position1.position;
+            _target.Enabled = true;
+            _target2.Enabled = true;
+            _meshAgentAvoiderGameObject2.SetActive(true);
+            _meshAgentAvoiderGameObject.SetActive(true);
+
+            // Assert we move without touching the obstacle agent.
+            int steps = 8;
+            for (int i = 0; i < steps; i++)
+            {
+                yield return new WaitForSeconds(1.0f);
+                Assert.True(Vector3.Distance(_meshAgentAvoiderGameObject2.transform.position,
+                    _meshAgentAvoiderGameObject.transform.position) >= (1.2f));
+            }
+
+            // Assert we reached target.
+            Assert.True(Vector3.Distance(_meshAgentAvoiderGameObject.transform.position,
+                _target.transform.position) <= (0.7f));
+
+            // Cleanup.
+            _meshAgentAvoiderGameObject.SetActive(false);
+            _meshAgentAvoiderGameObject2.SetActive(false);
+            _target.Enabled = false;
+            _target2.Enabled = false;
+        }
+        
+        /// <summary>
+        /// Test that MeshAgentAvoiderSteeringBehavior can reach its target without
+        /// touching another moving agent that goes across its path.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator MeshAgentAvoiderBehaviorTestThirdScenario()
+        {
+            // Test setup.
+            var obstacleMovingAgent =
+                _meshAgentAvoiderGameObject2.GetComponent<AgentMover>();
+            obstacleMovingAgent.MaximumSpeed = 2.5f;
+            obstacleMovingAgent.StopSpeed = 0.1f;
+            obstacleMovingAgent.MaximumRotationalSpeed = 180f;
+            obstacleMovingAgent.StopRotationThreshold = 1f;
+            obstacleMovingAgent.MaximumAcceleration = 1.8f;
+            obstacleMovingAgent.MaximumDeceleration = 1.8f;
+            var obstacleMovingAgentColor = _meshAgentAvoiderGameObject2.GetComponent<AgentColor>();
+            obstacleMovingAgentColor.Color = Color.red;
+            var obstacleSeekSteeringBehavior =
+                _meshAgentAvoiderGameObject2.GetComponentInChildren<SeekSteeringBehavior>();
+            obstacleSeekSteeringBehavior.ArrivalDistance = 0.2f;
+            var obstacleSteeringBehavior = 
+                _meshAgentAvoiderGameObject2.GetComponentInChildren<MeshAgentAvoiderSteeringBehavior>();
+
+            var agentAvoider = _meshAgentAvoiderGameObject.GetComponent<AgentMover>();
+            agentAvoider.MaximumSpeed = 4f;
+            agentAvoider.MaximumAcceleration = 4.0f;
+            agentAvoider.MaximumRotationalSpeed = 180f;
+            agentAvoider.StopRotationThreshold = 1f;
+            agentAvoider.StopSpeed = 0.1f;
+            agentAvoider.MaximumAcceleration = 2;
+            agentAvoider.MaximumDeceleration = 4;
+            agentAvoider.AutoSmooth = true;
+            agentAvoider.AutoSmoothSamples = 10;
+            var agentAvoiderSeekSteeringBehavior = _meshAgentAvoiderGameObject
+                .GetComponentInChildren<SeekSteeringBehavior>();
+            var agentAvoiderSteeringBehavior = _meshAgentAvoiderGameObject
+                .GetComponentInChildren<MeshAgentAvoiderSteeringBehavior>();
+
+            agentAvoiderSeekSteeringBehavior.Target = _target.gameObject;
+            obstacleSeekSteeringBehavior.Target = _target2.gameObject;
+
+            agentAvoiderSteeringBehavior.MinimumDistanceBetweenAgents = 0.5f;
+            obstacleSteeringBehavior.MinimumDistanceBetweenAgents = 0.5f;
+
+            // THIRD SCENARIO:
+            _target.TargetPosition = _position14.position;
+            _target2.TargetPosition = _position10.position;
+            _meshAgentAvoiderGameObject.transform.position = _position7.position;
+            _meshAgentAvoiderGameObject2.transform.position = _position1.position;
+            _target.Enabled = true;
+            _target2.Enabled = true;
+            _meshAgentAvoiderGameObject2.SetActive(true);
             _meshAgentAvoiderGameObject.SetActive(true);
 
             // Assert we move without touching the obstacle agent.
@@ -2999,6 +3256,255 @@ namespace Tests.PlayTests
                 yield return new WaitForSeconds(1.0f);
                 Assert.True(Vector3.Distance(_meshAgentAvoiderGameObject2.transform.position,
                     _meshAgentAvoiderGameObject.transform.position) >= (1.5f));
+            }
+
+            // Assert we reached target.
+            Assert.True(Vector3.Distance(_meshAgentAvoiderGameObject.transform.position,
+                _target.transform.position) <= (0.7f));
+
+            // Cleanup.
+            _meshAgentAvoiderGameObject.SetActive(false);
+            _meshAgentAvoiderGameObject2.SetActive(false);
+            _target.Enabled = false;
+            _target2.Enabled = false;
+        }
+        
+        /// <summary>
+        /// Test that MeshAgentAvoiderSteeringBehavior can reach its target without
+        /// touching another moving agent that goes across its path.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator MeshAgentAvoiderBehaviorTestFourthScenario()
+        {
+            // Test setup.
+            var obstacleMovingAgent =
+                _meshAgentAvoiderGameObject2.GetComponent<AgentMover>();
+            obstacleMovingAgent.MaximumSpeed = 2f;
+            obstacleMovingAgent.StopSpeed = 0.1f;
+            obstacleMovingAgent.MaximumRotationalSpeed = 180f;
+            obstacleMovingAgent.StopRotationThreshold = 1f;
+            obstacleMovingAgent.MaximumAcceleration = 1.8f;
+            obstacleMovingAgent.MaximumDeceleration = 1.8f;
+            var obstacleMovingAgentColor = _meshAgentAvoiderGameObject2.GetComponent<AgentColor>();
+            obstacleMovingAgentColor.Color = Color.red;
+            var obstacleSeekSteeringBehavior =
+                _meshAgentAvoiderGameObject2.GetComponentInChildren<SeekSteeringBehavior>();
+            obstacleSeekSteeringBehavior.ArrivalDistance = 0.2f;
+            var obstacleSteeringBehavior = 
+                _meshAgentAvoiderGameObject2.GetComponentInChildren<MeshAgentAvoiderSteeringBehavior>();
+
+            var agentAvoider = _meshAgentAvoiderGameObject.GetComponent<AgentMover>();
+            agentAvoider.MaximumSpeed = 2.7f;
+            agentAvoider.MaximumAcceleration = 4.0f;
+            agentAvoider.MaximumRotationalSpeed = 180f;
+            agentAvoider.StopRotationThreshold = 1f;
+            agentAvoider.StopSpeed = 0.1f;
+            agentAvoider.MaximumAcceleration = 2;
+            agentAvoider.MaximumDeceleration = 4;
+            agentAvoider.AutoSmooth = true;
+            agentAvoider.AutoSmoothSamples = 10;
+            var agentAvoiderSeekSteeringBehavior = _meshAgentAvoiderGameObject
+                .GetComponentInChildren<SeekSteeringBehavior>();
+            var agentAvoiderSteeringBehavior = _meshAgentAvoiderGameObject
+                .GetComponentInChildren<MeshAgentAvoiderSteeringBehavior>();
+
+            agentAvoiderSeekSteeringBehavior.Target = _target.gameObject;
+            obstacleSeekSteeringBehavior.Target = _target2.gameObject;
+
+            agentAvoiderSteeringBehavior.MinimumDistanceBetweenAgents = 0.5f;
+            obstacleSteeringBehavior.MinimumDistanceBetweenAgents = 0.5f;
+
+            // FOURTH SCENARIO:
+            _target.TargetPosition = _position14.position;
+            _target2.TargetPosition = _position10.position;
+            _meshAgentAvoiderGameObject.transform.position = _position10.position;
+            _meshAgentAvoiderGameObject2.transform.position = _position14.position;
+            _target.Enabled = true;
+            _target2.Enabled = true;
+            _meshAgentAvoiderGameObject2.SetActive(true);
+            _meshAgentAvoiderGameObject.SetActive(true);
+
+            // Assert we move without touching the obstacle agent.
+            int steps = 8;
+            for (int i = 0; i < steps; i++)
+            {
+                yield return new WaitForSeconds(1.0f);
+                Assert.True(Vector3.Distance(_meshAgentAvoiderGameObject2.transform.position,
+                    _meshAgentAvoiderGameObject.transform.position) >= (1.5f));
+            }
+
+            // Assert we reached target.
+            Assert.True(Vector3.Distance(_meshAgentAvoiderGameObject.transform.position,
+                _target.transform.position) <= (0.7f));
+
+            // Cleanup.
+            _meshAgentAvoiderGameObject.SetActive(false);
+            _meshAgentAvoiderGameObject2.SetActive(false);
+            _target.Enabled = false;
+            _target2.Enabled = false;
+        }
+        
+        /// <summary>
+        /// Test that MeshAgentAvoiderSteeringBehavior can reach its target without
+        /// touching another moving agent that goes across its path.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator MeshAgentAvoiderBehaviorTestFifthScenario()
+        {
+            // Test setup.
+            var obstacleMovingAgent =
+                _meshAgentAvoiderGameObject2.GetComponent<AgentMover>();
+            obstacleMovingAgent.MaximumSpeed = 2f;
+            obstacleMovingAgent.StopSpeed = 0.1f;
+            obstacleMovingAgent.MaximumRotationalSpeed = 180f;
+            obstacleMovingAgent.StopRotationThreshold = 1f;
+            obstacleMovingAgent.MaximumAcceleration = 1.8f;
+            obstacleMovingAgent.MaximumDeceleration = 1.8f;
+            var obstacleMovingAgentColor = _meshAgentAvoiderGameObject2.GetComponent<AgentColor>();
+            obstacleMovingAgentColor.Color = Color.red;
+            var obstacleSeekSteeringBehavior =
+                _meshAgentAvoiderGameObject2.GetComponentInChildren<SeekSteeringBehavior>();
+            obstacleSeekSteeringBehavior.ArrivalDistance = 0.2f;
+            var obstacleSteeringBehavior = 
+                _meshAgentAvoiderGameObject2.GetComponentInChildren<MeshAgentAvoiderSteeringBehavior>();
+
+            var agentAvoider = _meshAgentAvoiderGameObject.GetComponent<AgentMover>();
+            agentAvoider.MaximumSpeed = 2.7f;
+            agentAvoider.MaximumAcceleration = 4.0f;
+            agentAvoider.MaximumRotationalSpeed = 180f;
+            agentAvoider.StopRotationThreshold = 1f;
+            agentAvoider.StopSpeed = 0.1f;
+            agentAvoider.MaximumAcceleration = 2;
+            agentAvoider.MaximumDeceleration = 4;
+            agentAvoider.AutoSmooth = true;
+            agentAvoider.AutoSmoothSamples = 10;
+            var agentAvoiderSeekSteeringBehavior = _meshAgentAvoiderGameObject
+                .GetComponentInChildren<SeekSteeringBehavior>();
+            var agentAvoiderSteeringBehavior = _meshAgentAvoiderGameObject
+                .GetComponentInChildren<MeshAgentAvoiderSteeringBehavior>();
+
+            agentAvoiderSeekSteeringBehavior.Target = _target.gameObject;
+            obstacleSeekSteeringBehavior.Target = _target2.gameObject;
+
+            agentAvoiderSteeringBehavior.MinimumDistanceBetweenAgents = 0.5f;
+            obstacleSteeringBehavior.MinimumDistanceBetweenAgents = 0.5f;
+
+            // FIFTH SCENARIO:
+            _target.TargetPosition = _position12.position;
+            _target2.TargetPosition = _position2.position;
+            _meshAgentAvoiderGameObject.transform.position = _position2.position;
+            _meshAgentAvoiderGameObject2.transform.position = _position12.position;
+            _target.Enabled = true;
+            _target2.Enabled = true;
+            _meshAgentAvoiderGameObject2.SetActive(true);
+            _meshAgentAvoiderGameObject.SetActive(true);
+
+            // Assert we move without touching the obstacle agent.
+            int steps = 8;
+            for (int i = 0; i < steps; i++)
+            {
+                yield return new WaitForSeconds(1.0f);
+                Assert.True(Vector3.Distance(_meshAgentAvoiderGameObject2.transform.position,
+                    _meshAgentAvoiderGameObject.transform.position) >= (1.3f));
+            }
+
+            // Assert we reached target.
+            Assert.True(Vector3.Distance(_meshAgentAvoiderGameObject.transform.position,
+                _target.transform.position) <= (0.7f));
+
+            // Cleanup.
+            _meshAgentAvoiderGameObject.SetActive(false);
+            _meshAgentAvoiderGameObject2.SetActive(false);
+            _target.Enabled = false;
+            _target2.Enabled = false;
+        }
+        
+        /// <summary>
+        /// Test that MeshAgentAvoiderSteeringBehavior can reach its target without
+        /// touching another moving agent that goes across its path.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator MeshAgentAvoiderBehaviorTestSixthScenario()
+        {
+            // Test setup.
+            var obstacleMovingAgent =
+                _meshAgentAvoiderGameObject2.GetComponent<AgentMover>();
+            obstacleMovingAgent.MaximumSpeed = 1f;
+            obstacleMovingAgent.StopSpeed = 0.1f;
+            obstacleMovingAgent.MaximumRotationalSpeed = 180f;
+            obstacleMovingAgent.StopRotationThreshold = 1f;
+            obstacleMovingAgent.MaximumAcceleration = 1.8f;
+            obstacleMovingAgent.MaximumDeceleration = 1.8f;
+            var obstacleMovingAgentColor = _meshAgentAvoiderGameObject2.GetComponent<AgentColor>();
+            obstacleMovingAgentColor.Color = Color.red;
+            var obstacleSeekSteeringBehavior =
+                _meshAgentAvoiderGameObject2.GetComponentInChildren<SeekSteeringBehavior>();
+            obstacleSeekSteeringBehavior.ArrivalDistance = 0.2f;
+            var obstacleSteeringBehavior = 
+                _meshAgentAvoiderGameObject2.GetComponentInChildren<MeshAgentAvoiderSteeringBehavior>();
+            
+            var obstacleMovingAgent2 =
+                _meshAgentAvoiderGameObject3.GetComponent<AgentMover>();
+            obstacleMovingAgent2.MaximumSpeed = 2f;
+            obstacleMovingAgent2.StopSpeed = 0.1f;
+            obstacleMovingAgent2.MaximumRotationalSpeed = 180f;
+            obstacleMovingAgent2.StopRotationThreshold = 1f;
+            obstacleMovingAgent2.MaximumAcceleration = 1.8f;
+            obstacleMovingAgent2.MaximumDeceleration = 1.8f;
+            var obstacleMovingAgentColor2 = _meshAgentAvoiderGameObject3.GetComponent<AgentColor>();
+            obstacleMovingAgentColor.Color = Color.red;
+            var obstacleSeekSteeringBehavior2 =
+                _meshAgentAvoiderGameObject3.GetComponentInChildren<SeekSteeringBehavior>();
+            obstacleSeekSteeringBehavior.ArrivalDistance = 0.2f;
+            var obstacleSteeringBehavior2 = 
+                _meshAgentAvoiderGameObject3.GetComponentInChildren<MeshAgentAvoiderSteeringBehavior>();
+
+            var agentAvoider = _meshAgentAvoiderGameObject.GetComponent<AgentMover>();
+            agentAvoider.MaximumSpeed = 3f;
+            agentAvoider.MaximumAcceleration = 4.0f;
+            agentAvoider.MaximumRotationalSpeed = 180f;
+            agentAvoider.StopRotationThreshold = 1f;
+            agentAvoider.StopSpeed = 0.1f;
+            agentAvoider.MaximumAcceleration = 2;
+            agentAvoider.MaximumDeceleration = 4;
+            agentAvoider.AutoSmooth = true;
+            agentAvoider.AutoSmoothSamples = 10;
+            var agentAvoiderSeekSteeringBehavior = _meshAgentAvoiderGameObject
+                .GetComponentInChildren<SeekSteeringBehavior>();
+            var agentAvoiderSteeringBehavior = _meshAgentAvoiderGameObject
+                .GetComponentInChildren<MeshAgentAvoiderSteeringBehavior>();
+
+            agentAvoiderSeekSteeringBehavior.Target = _target.gameObject;
+            obstacleSeekSteeringBehavior.Target = _target2.gameObject;
+            obstacleSeekSteeringBehavior2.Target = _target3.gameObject;
+
+            agentAvoiderSteeringBehavior.MinimumDistanceBetweenAgents = 0.5f;
+            obstacleSteeringBehavior.MinimumDistanceBetweenAgents = 0.5f;
+            obstacleSteeringBehavior2.MinimumDistanceBetweenAgents = 0.5f;
+
+            // SIXTH SCENARIO:
+            _target.TargetPosition = _position10.position;
+            _target2.TargetPosition = _position13.position;
+            _target3.TargetPosition = _position9.position;
+            _meshAgentAvoiderGameObject.transform.position = _position1.position;
+            _meshAgentAvoiderGameObject2.transform.position = _position7.position;
+            _meshAgentAvoiderGameObject3.transform.position = _position15.position;
+            _target.Enabled = true;
+            _target2.Enabled = true;
+            _target3.Enabled = true;
+            _meshAgentAvoiderGameObject.SetActive(true);
+            _meshAgentAvoiderGameObject2.SetActive(true);
+            _meshAgentAvoiderGameObject3.SetActive(true);
+
+            // Assert we move without touching the obstacle agent.
+            int steps = 10;
+            for (int i = 0; i < steps; i++)
+            {
+                yield return new WaitForSeconds(1.0f);
+                Assert.True(Vector3.Distance(_meshAgentAvoiderGameObject2.transform.position,
+                    _meshAgentAvoiderGameObject.transform.position) >= (1.1f));
+                Assert.True(Vector3.Distance(_meshAgentAvoiderGameObject3.transform.position,
+                    _meshAgentAvoiderGameObject.transform.position) >= (1.1f));
             }
 
             // Assert we reached target.

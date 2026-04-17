@@ -1,4 +1,5 @@
-﻿using Pathfinding;
+﻿using System;
+using Pathfinding;
 using PropertyAttribute;
 using UnityEngine;
 
@@ -12,7 +13,6 @@ public class PathFollowingSteeringBehavior : SteeringBehavior
 {
     [Header("CONFIGURATION:")]
     [SerializeField] private Path followPath;
-    // TODO: I'm repeating this param in the underlying steering behavior. I must refactor this into ITargeter interface.
     [SerializeField] public float arrivalDistance;
 
     [Header("WIRING:")]
@@ -33,22 +33,29 @@ public class PathFollowingSteeringBehavior : SteeringBehavior
             _pathStarted = false;
         }
     }
-    
-    // /// <summary>
-    // /// Whether we have got the path end.
-    // /// </summary>
-    // public bool IsPathEnded => 
-    //     Vector2.Distance(
-    //         transform.position, 
-    //         FollowPath.Data.positions[^1]) < arrivalDistance;
 
+    private void OnPathUpdated()
+    {
+        (Vector2 newTargetPosition, uint pathIndex) = 
+            FollowPath.GetNearestPosition(FollowPath.CurrentTargetPosition);
+        _target.transform.position = newTargetPosition;
+        FollowPath.CurrentTargetPositionIndex = (int) pathIndex;
+    }
+    
     private void Awake()
     {
         _targeter = (ITargeter) steeringBehavior;
         _target = new GameObject($"TargetMarker_{name}");
         _targeter.Target = _target;
     }
-    
+
+    private void Start()
+    {
+        if (FollowPath == null) return;
+        _target.transform.position = FollowPath.CurrentTargetPosition;
+        FollowPath.pathUpdated.AddListener(OnPathUpdated);
+    }
+
     private void OnDestroy()
     {
         Destroy(_target);

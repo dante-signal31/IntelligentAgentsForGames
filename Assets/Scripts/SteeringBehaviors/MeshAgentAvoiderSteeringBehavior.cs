@@ -11,6 +11,10 @@ namespace SteeringBehaviors
 /// Defines a steering behavior for avoiding collisions with other agents. This behavior
 /// uses Unity's builtin NavMeshAgent component to calculate avoidance vector.
 /// </summary>
+/// <remarks>
+/// By itself, the algorithm works, but it may show some oscillation. To avoid that
+/// oscillation, you can enable autoSmooth in the AgentMover component.  
+/// </remarks>
 public class MeshAgentAvoiderSteeringBehavior: SteeringBehavior
 {
     [Header("CONFIGURATION:")] 
@@ -41,13 +45,27 @@ public class MeshAgentAvoiderSteeringBehavior: SteeringBehavior
     private Vector2 _avoidVector = Vector2.zero;
     private Vector2 _newVelocity = Vector2.zero;
     private AgentMover _currentAgent;
-    
+
+    public float MinimumDistanceBetweenAgents
+    {
+        get => minimumDistanceBetweenAgents;
+        set
+        {
+            minimumDistanceBetweenAgents = value;
+            float avoidanceRadius = minimumDistanceBetweenAgents/2 + _currentAgent.Radius;
+            potentialCollisionDetector.AgentRadius = avoidanceRadius;
+            navMeshAgent.radius = avoidanceRadius;
+        }
+    }
+
     private void Awake()
     {
         _currentAgent = GetComponentInParent<AgentMover>();
-        float avoidanceRadius = minimumDistanceBetweenAgents + _currentAgent.Radius;
-        potentialCollisionDetector.AgentRadius = avoidanceRadius;
-        navMeshAgent.radius = avoidanceRadius;
+    }
+
+    private void Start()
+    {
+        MinimumDistanceBetweenAgents = minimumDistanceBetweenAgents;
         navMeshAgent.speed = _currentAgent.MaximumSpeed;
         navMeshAgent.angularSpeed = _currentAgent.MaximumRotationalSpeed;
         navMeshAgent.acceleration = _currentAgent.MaximumAcceleration;
@@ -56,7 +74,7 @@ public class MeshAgentAvoiderSteeringBehavior: SteeringBehavior
         navMeshAgent.updatePosition = false;
         navMeshAgent.updateRotation = false;
     }
-    
+
     private void Update()
     {
         UpdateAgent();

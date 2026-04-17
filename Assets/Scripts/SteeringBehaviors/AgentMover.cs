@@ -211,6 +211,11 @@ public class AgentMover : MonoBehaviour
             0);
     }
 
+    private void Awake()
+    {
+        agentShape = GetComponent<CircleCollider2D>();
+    }
+
     protected virtual void Start()
     {
         if (rigidBody == null) return;
@@ -219,7 +224,6 @@ public class AgentMover : MonoBehaviour
         maximumRotationSpeedRadNormalized = maximumRotationalSpeed * Mathf.Deg2Rad / 
                                              (2 * Mathf.PI);
         lastRotations = new MovingWindow(autoSmoothSamples);
-        agentShape = GetComponent<CircleCollider2D>();
         UpdateSmoothingWeights();
     }
 

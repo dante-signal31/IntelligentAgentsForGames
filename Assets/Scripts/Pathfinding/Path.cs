@@ -17,7 +17,7 @@ public class Path : MonoBehaviour, IGizmos
     [SerializeField] public bool loop;
     [Tooltip("Target global positions of the path")] 
     [SerializeField] public List<Vector2> positions = new();
-    [SerializeField] public UnityEvent pathUpdated;
+    [SerializeField] public UnityEvent pathUpdated = new();
     
     [Header("DEBUG:")]
     [SerializeField] private bool showGizmos;
@@ -45,7 +45,11 @@ public class Path : MonoBehaviour, IGizmos
     /// <summary>
     /// Current index of the position we are going to.
     /// </summary>
-    public int CurrentTargetPositionIndex => _data.CurrentTargetPositionIndex;
+    public int CurrentTargetPositionIndex
+    {
+        get => _data.CurrentTargetPositionIndex;
+        set => _data.CurrentTargetPositionIndex = value;
+    }
     
     /// <summary>
     /// Position at the current position index.
@@ -66,7 +70,7 @@ public class Path : MonoBehaviour, IGizmos
     /// <p>If we are at the end and Loop is false, then the last target position is
     /// returned; whereas if the loop is true, then the index is reset to 0 and the
     /// first target position is returned.</p></returns>
-    public Vector2 GetNextPositionTarget() => _data.GetNextPositionTarget();
+    public Vector2 GetNextPositionTarget() => _data.GetNextTargetPosition();
 
     /// <summary>
     /// Encapsulates path-related data used for pathfinding, including positions,
@@ -91,6 +95,7 @@ public class Path : MonoBehaviour, IGizmos
         _data = newData;
         positions.Clear();
         positions.AddRange(_data.positions);
+        pathUpdated?.Invoke();
     }
 
     /// <summary>
@@ -102,6 +107,7 @@ public class Path : MonoBehaviour, IGizmos
         _data.LoadPathData(newPositions);
         positions.Clear();
         positions.AddRange(_data.positions);
+        pathUpdated?.Invoke();
     }
     
     /// <summary>
@@ -113,6 +119,33 @@ public class Path : MonoBehaviour, IGizmos
         positions.AddRange(path.positions);
         _data.AddPositionsToPath(path.positions);
         pathUpdated?.Invoke();
+    }
+
+    /// <summary>
+    /// Retrieves the nearest position in the path to the specified point, along with
+    /// its index.
+    /// </summary>
+    /// <param name="position">The reference position from which the nearest path
+    /// position is calculated.</param>
+    /// <returns>
+    /// A tuple where the first element is the nearest position in the path and the
+    /// second element is the index of this position in the path.
+    /// </returns>
+    public (Vector2, uint) GetNearestPosition(Vector2 position)
+    {
+        uint index = 0;
+        float minDistance = int.MaxValue;
+        Vector2 nearestPosition = Vector2.zero;
+        uint nearestIndex = 0;
+        foreach (Vector2 dataPosition in _data.positions)
+        {
+            float distance = Vector2.Distance(position, dataPosition);
+            if (distance >= minDistance) continue;
+            minDistance = distance;
+            nearestPosition = dataPosition;
+            nearestIndex = index++;
+        }
+        return (nearestPosition, nearestIndex);
     }
     
 #if UNITY_EDITOR

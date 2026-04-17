@@ -179,12 +179,11 @@ public class HideSteeringBehavior : SteeringBehavior
 
     private void Awake()
     {
+        _hidingPointMarker = new GameObject($"{name} - HidingPointMarker");
         HidingPoint = transform.position;
         _pathRecalculationTimer = new Timer(pathRecalculationTime * 1000);
         _pathRecalculationTimer.Elapsed += OnRecalculationPathTimerTimeout;
         _pathRecalculationTimer.AutoReset = false;
-        _hidingPointMarker = new GameObject($"{name} - HidingPointMarker");
-        _hidingPointMarker.transform.position = HidingPoint;
     }
 
     private void Start()

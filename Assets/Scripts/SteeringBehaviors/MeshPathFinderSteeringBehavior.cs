@@ -56,6 +56,7 @@ public class MeshPathFinderSteeringBehavior : SteeringBehavior, IGizmos, ITarget
         set
         {
             if (target == value) return;
+            target = value;
             TargetPosition = value.transform.position;
         }
     }
@@ -87,29 +88,26 @@ public class MeshPathFinderSteeringBehavior : SteeringBehavior, IGizmos, ITarget
         if (newPath == null) return;
         _currentPath.UpdatePathData(newPath);
     }
+    
+    
 
     private void Awake()
     {
         // Create a GameObject at the scene root to include the new path instance in
         // Unity life cycle.
-        _currentPath = 
-            new GameObject("MeshPathFinderSteeringBehavior - CurrentPath")
-                .AddComponent<Path>();
-        _currentPath.ShowGizmos = ShowGizmos;
-        _currentPath.GizmosColor = GizmosColor;
-    }
-
-    private void Start()
-    {
+        _currentPath = new GameObject().AddComponent<Path>();
         // Show path gizmo if we are debugging.
-        _currentPath.name = $"{name} - Path";
         _currentPath.ShowGizmos = ShowGizmos;
         _currentPath.GizmosColor = GizmosColor;
+        _currentPath.name = $"{name} - Path";
         
         // Configure the path following steering behavior to follow the path generated
         // here.
         pathFollowingSteeringBehavior.FollowPath = _currentPath;
-        
+    }
+
+    private void Start()
+    {
         // Configure the mesh pathfinder.
         meshPathFinder.Radius = agentRadius;
     }
