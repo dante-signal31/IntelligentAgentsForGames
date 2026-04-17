@@ -3,13 +3,13 @@
 namespace SteeringBehaviors
 {
 /// <summary>
-/// <p>Monobehaviour to offer an Arrive steering behaviour.</p>
+/// <p>Mono behavior to offer an Arrive steering behavior.</p>
 /// 
-/// <p>Arrive behavior is a Seek-like steering behaviour in which agent accelerates at
-/// the startup and brakes gradually when approachs the end.</p>
+/// <p>Arrive behavior is a Seek-like steering behavior in which the agent speeds up at
+/// the startup and brakes gradually when it approaches the end.</p>
 /// <p> LA behavior implements a Linear-Acceleration approach. So, 
-/// acceleration is given by a fixed acceleration values. In this case, that values are
-/// maximum acceleration and maximum deceleration values from agent.</p>
+/// acceleration is given by a fixed acceleration value. In this case, those values are
+/// maximum acceleration and maximum deceleration values from the agent.</p>
 /// </summary>
 public class ArriveSteeringBehaviorLA : SteeringBehavior, ITargeter
 {
@@ -29,7 +29,7 @@ public class ArriveSteeringBehaviorLA : SteeringBehavior, ITargeter
     }
 
     /// <summary>
-    /// At this distance from target, agent will full stop.
+    /// At this distance from the target, the agent will fully stop.
     /// </summary>
     public float ArrivalDistance
     {
@@ -38,7 +38,7 @@ public class ArriveSteeringBehaviorLA : SteeringBehavior, ITargeter
     }
 
     /// <summary>
-    /// Radius to start slowing down using deceleration curve.
+    /// Radius to start slowing down using the deceleration curve.
     /// </summary>
     public float BrakingRadius=>
         GetBrakingRadius(_currentSpeed, _currentMaximumDeceleration);
@@ -53,7 +53,7 @@ public class ArriveSteeringBehaviorLA : SteeringBehavior, ITargeter
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        if (Target == null) return new SteeringOutput(Vector2.zero, 0);
+        if (Target == null) return new SteeringOutput(Vector2.zero);
     
         Vector2 targetPosition = Target.transform.position;
         Vector2 currentPosition = args.Position;
@@ -97,7 +97,7 @@ public class ArriveSteeringBehaviorLA : SteeringBehavior, ITargeter
     
         Vector2 newVelocity = toTarget.normalized * newSpeed;
     
-        return new SteeringOutput(newVelocity, 0);
+        return new SteeringOutput(newVelocity);
     }
 }
 }

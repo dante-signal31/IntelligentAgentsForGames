@@ -4,18 +4,19 @@ using UnityEngine.Serialization;
 namespace SteeringBehaviors
 {
 /// <summary>
-/// <p>Monobehaviour to offer a Flee steering behaviour.</p>
+/// <p>Mono behavior to offer a Flee steering behavior.</p>
 ///
-/// <p>Flee steering behaviour makes the agent go away from another GameObject marked
-/// as threath.</p>
+/// <p>Flee steering behavior makes the agent go away from another GameObject marked
+/// as a threat.</p>
 /// </summary>
 public class FleeSteeringBehavior : SteeringBehavior
 {
     private const float MinimumPanicDistance = 0.3f;
 
+    [FormerlySerializedAs("threath")]
     [Header("CONFIGURATION:")]
-    [SerializeField] private GameObject threath;
-    [Tooltip("Minimum distance to threath before fleeing.")]
+    [SerializeField] private GameObject threat;
+    [Tooltip("Minimum distance to threat before fleeing.")]
     [Min(MinimumPanicDistance)]
     [SerializeField] private float panicDistance;
     
@@ -23,12 +24,12 @@ public class FleeSteeringBehavior : SteeringBehavior
     [Tooltip("Steering behavior to actually move this agent.")]
     [SerializeField] private SeekSteeringBehavior seekSteeringBehaviour;
 
-    public GameObject Threath
+    public GameObject Threat
     {
-        get => threath;
+        get => threat;
         set
         {
-            threath = value;
+            threat = value;
             if (seekSteeringBehaviour != null) 
                 seekSteeringBehaviour.Target = value;
         }
@@ -37,25 +38,22 @@ public class FleeSteeringBehavior : SteeringBehavior
     public float PanicDistance
     {
         get => panicDistance;
-        set
-        {
-            panicDistance = Mathf.Max(MinimumPanicDistance, value);
-        }
+        set => panicDistance = Mathf.Max(MinimumPanicDistance, value);
     }
 
     private void Awake()
     {
-        if (Threath == null) return;
-        seekSteeringBehaviour.Target = Threath;
+        if (Threat == null) return;
+        seekSteeringBehaviour.Target = Threat;
     }
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        if (Threath == null) return SteeringOutput.Zero;
+        if (Threat == null) return SteeringOutput.Zero;
         
         if (Vector2.Distance(
                 args.CurrentAgent.transform.position,
-                Threath.transform.position) > PanicDistance)
+                Threat.transform.position) > PanicDistance)
         { // Out of panic distance, so we stop fleeing.
             return SteeringOutput.Zero;
         }

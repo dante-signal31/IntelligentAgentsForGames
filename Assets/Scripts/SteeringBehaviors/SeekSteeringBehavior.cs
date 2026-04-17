@@ -3,9 +3,9 @@
 namespace SteeringBehaviors
 {
 /// <summary>
-/// <p>Monobehaviour to offer a Seek steering behaviour.</p>
+/// <p>Mono behavior to offer a Seek steering behavior.</p>
 /// 
-/// <p>Seek steering behaviour makes the agent move towards a target position.</p>
+/// <p>Seek steering behavior makes the agent move towards a target position.</p>
 /// </summary>
 public class SeekSteeringBehavior : SteeringBehavior, ITargeter
 {
@@ -25,7 +25,7 @@ public class SeekSteeringBehavior : SteeringBehavior, ITargeter
     }
 
     /// <summary>
-    /// Distance at which we give our goal as reached and we stop our agent.
+    /// Distance at which we give our goal as reached, and we stop our agent.
     /// </summary>
     public float ArrivalDistance
     {
@@ -47,7 +47,7 @@ public class SeekSteeringBehavior : SteeringBehavior, ITargeter
             toTarget.normalized * maximumSpeed:
             Vector2.zero;
     
-        return new SteeringOutput(newVelocity, 0);
+        return new SteeringOutput(newVelocity);
     }
 }
 }

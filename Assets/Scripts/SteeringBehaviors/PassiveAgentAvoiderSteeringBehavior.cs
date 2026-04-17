@@ -1,14 +1,13 @@
-﻿using System;
-using Tools;
+﻿using Tools;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace SteeringBehaviors
 {
 /// <summary>
-/// <p>Node to offer an agent avoider steering behaviour over a given velocity.</p>
-/// <p>Represents a steering behavior where an agent avoids another agents it may
-/// collision with in its path.</p>
+/// <p>Node to offer an agent avoider steering behavior over a given velocity.</p>
+/// <p>Represents a steering behavior where an agent avoids other agents it may
+/// collide with in its path.</p>
 /// <p>The difference with an obstacle avoidance algorithm is that obstacles don't move
 /// while agents do.</p>
 /// </summary>

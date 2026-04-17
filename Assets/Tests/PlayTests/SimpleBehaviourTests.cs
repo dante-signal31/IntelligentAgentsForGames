@@ -444,7 +444,7 @@ namespace Tests.PlayTests
             _fleeGameObject.transform.position = _position8.position;
             var fleeSteeringBehavior =
                 _fleeGameObject.GetComponentInChildren<FleeSteeringBehavior>();
-            fleeSteeringBehavior.Threath = _target.gameObject;
+            fleeSteeringBehavior.Threat = _target.gameObject;
             fleeSteeringBehavior.PanicDistance = 5.0f;
             var agentMover = _fleeGameObject.GetComponent<AgentMover>();
             agentMover.MaximumSpeed = 10.0f;

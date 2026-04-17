@@ -1,5 +1,4 @@
-﻿using System;
-using Pathfinding;
+﻿using Pathfinding;
 using PropertyAttribute;
 using UnityEngine;
 

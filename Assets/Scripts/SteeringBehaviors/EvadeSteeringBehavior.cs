@@ -54,7 +54,7 @@ public class EvadeSteeringBehavior : SteeringBehavior
     {
         _predictedPositionMarker = new GameObject();
         fleeSteeringBehaviour.PanicDistance = PanicDistance;
-        fleeSteeringBehaviour.Threath = _predictedPositionMarker;
+        fleeSteeringBehaviour.Threat = _predictedPositionMarker;
         _agentColor = GetComponentInParent<AgentColor>().Color;
     }
 
