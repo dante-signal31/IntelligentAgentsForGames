@@ -35,6 +35,17 @@ public class PathFollowingSteeringBehavior : SteeringBehavior
 
     private void OnPathUpdated()
     {
+        // If a new path has been generated, we must enter that path in a natural way. We
+        // could start the path from the beginning. However, we have no guarantee that we
+        // have not actually advanced the new path, and starting from the beginning would
+        // actually mean going backwards to return back later to our former position. No,
+        // it's better to query the new path where is the best point to start following
+        // it. One naive approach would be asking for the path position nearest to our
+        // current position. However, that could make us going backwards (for instance)
+        // if we have just abandoned a path position and the path change is only some
+        // new positions at the path end. I think it's better to enter the new path by
+        // the path position nearest to our current target (the target position of our
+        // current path). This way you can avoid going backwards.
         (Vector2 newTargetPosition, uint pathIndex) = 
             FollowPath.GetNearestPosition(FollowPath.CurrentTargetPosition);
         _target.transform.position = newTargetPosition;
@@ -45,6 +56,8 @@ public class PathFollowingSteeringBehavior : SteeringBehavior
     {
         _targeter = (ITargeter) steeringBehavior;
         _target = new GameObject($"TargetMarker_{name}");
+        // We will move the target to make the targeter behavior calculate the velocity
+        // to get there.
         _targeter.Target = _target;
     }
 

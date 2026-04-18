@@ -117,7 +117,8 @@ public class MeshPathFinderSteeringBehavior : SteeringBehavior, IGizmos, ITarget
         if (Target == null) return;
         if ((Vector2)Target.transform.position != TargetPosition)
         {
-            // When you change the target position, the pathfinder will be updated.
+            // When you change the target position property, the pathfinder will be
+            // updated.
             TargetPosition = Target.transform.position;
         }
     }
@@ -126,8 +127,6 @@ public class MeshPathFinderSteeringBehavior : SteeringBehavior, IGizmos, ITarget
     {
         return pathFollowingSteeringBehavior.GetSteering(args);
     }
-
-
 }
 }
 
