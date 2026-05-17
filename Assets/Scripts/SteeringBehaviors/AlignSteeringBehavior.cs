@@ -3,9 +3,9 @@
 namespace SteeringBehaviors
 {
 /// <summary>
-/// <p> Monobehaviour to offer an Align steering behaviour. </p>
+/// <p> MonoBehaviour to offer an Align steering behavior. </p>
 ///
-/// <p> Align steering behaviour makes the agent look at the same direction than
+/// <p> Align steering behavior makes the agent look in the same direction as
 /// a target GameObject. </p>
 /// </summary>
 public class AlignSteeringBehavior : SteeringBehavior, ITargeter
@@ -13,11 +13,11 @@ public class AlignSteeringBehavior : SteeringBehavior, ITargeter
     [Header("CONFIGURATION:")]
     [Tooltip("Target to align with.")]
     [SerializeField] private GameObject target;
-    [Tooltip("Rotation to start to slow down (degress).")]
+    [Tooltip("Rotation to start to slow down (degrees).")]
     [SerializeField] private float decelerationRadius;
     [Tooltip("Deceleration curve.")] 
     [SerializeField] private AnimationCurve decelerationCurve;
-    [Tooltip("At this rotation start angle will be at full speed (degress).")]
+    [Tooltip("At this rotation start angle will be at full speed (degrees).")]
     [SerializeField] private float accelerationRadius;
     [Tooltip("Acceleration curve.")] 
     [SerializeField] private AnimationCurve accelerationCurve;
@@ -32,7 +32,7 @@ public class AlignSteeringBehavior : SteeringBehavior, ITargeter
     }
 
     /// <summary>
-    /// Rotation to start to slow down (degress).
+    /// Rotation to start to slow down (degrees).
     /// </summary>
     public float DecelerationRadius
     {
@@ -50,7 +50,7 @@ public class AlignSteeringBehavior : SteeringBehavior, ITargeter
     }
 
     /// <summary>
-    /// At this rotation start angle will be at full speed (degress).
+    /// At this rotation the start angle will be at full speed (degrees).
     /// </summary>
     public float AccelerationRadius
     {
@@ -72,9 +72,9 @@ public class AlignSteeringBehavior : SteeringBehavior, ITargeter
     private bool _idle = true;
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
-    { // I want smooth rotations, so I will use the same approach than in
+    {   // I want smooth rotations, so I will use the same approach as in
         // ArriveSteeringBehavior.
-        if (Target == null) return new SteeringOutput(Vector2.zero, 0);
+        if (Target == null) return new SteeringOutput(Vector2.zero);
     
         float targetOrientation = Target.transform.rotation.eulerAngles.z;
         float currentOrientation = args.Orientation;
@@ -85,23 +85,23 @@ public class AlignSteeringBehavior : SteeringBehavior, ITargeter
         int rotationSide = (toTargetRotation < 0) ? -1 : 1;
         float toTargetRotationAbs = Mathf.Abs(toTargetRotation);
     
-        float newRotationalSpeed = 0.0f;
+        float newRotationalSpeed;
 
         if (_idle && toTargetRotationAbs < arrivingMargin)
-        { // If you are stopped and you are close enough to target rotation, you are done.
-            // Just stay there.
-            return new SteeringOutput(Vector2.zero, 0);
+        {   // If you are stopped, and you are close enough to target rotation, you are
+            // done. Just stay there.
+            return new SteeringOutput(Vector2.zero);
         }
     
         if (_idle && _rotationFromStartAbs > 0)
-        { // If you are stopped and you are not close enough to target rotation, you need
-            // to start rotating. But first, you need to reset your rotation counter.
+        {   // If you are stopped, and you are not close enough to target rotation, you
+            // need to start rotating. But first, you need to reset your rotation counter.
             _rotationFromStartAbs = 0;
         }
     
         if (toTargetRotationAbs >= arrivingMargin && 
             _rotationFromStartAbs < AccelerationRadius)
-        { // Acceleration phase.
+        {   // Acceleration phase.
             if (_idle)
             {
                 _startOrientation = currentOrientation;
@@ -140,7 +140,7 @@ public class AlignSteeringBehavior : SteeringBehavior, ITargeter
             newRotationalSpeed = maximumRotationalSpeed * rotationSide;
         }
     
-        return new SteeringOutput(Vector2.zero, newRotationalSpeed);
+        return new SteeringOutput(angular: newRotationalSpeed);
     }
 }
 }

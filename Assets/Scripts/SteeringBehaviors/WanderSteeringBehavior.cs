@@ -5,9 +5,9 @@ using Random = UnityEngine.Random;
 namespace SteeringBehaviors
 {
 /// <summary>
-/// <p>Monobehaviour to offer a wandering steering behaviour.</p>
+/// <p>Script to offer a wandering steering behavior.</p>
 ///
-/// <p>Wandering steering behaviour makes the agent move randomly around the scene.</p>
+/// <p>Wandering steering behavior makes the agent move randomly around the scene.</p>
 /// </summary>
 public class WanderSteeringBehavior : SteeringBehavior
 {
@@ -35,7 +35,7 @@ public class WanderSteeringBehavior : SteeringBehavior
     [SerializeField] private bool predictedPositionMarkerVisible = true;
 
     /// <summary>
-    /// Distance at which we give our goal as reached and we stop our agent.
+    /// Distance at which we give our goal as reached, and we stop our agent.
     /// </summary>
     public float ArrivalDistance
     {
@@ -103,7 +103,7 @@ public class WanderSteeringBehavior : SteeringBehavior
     
         // Place WanderPosition in a point constrained to the edge of a circle of
         // radius wanderRadius.
-        _wanderLocalPosition = GetRandomCircunferencePoint(Vector2.zero, 
+        _wanderLocalPosition = GetRandomCircumferencePoint(Vector2.zero, 
             wanderRadius);
     }
 
@@ -127,7 +127,7 @@ public class WanderSteeringBehavior : SteeringBehavior
     /// <param name="center">Center of a circle.</param>
     /// <param name="radius">Radius of the circle.</param>
     /// <returns>Random point.</returns>
-    private static Vector2 GetRandomCircunferencePoint(Vector2 center, float radius)
+    private static Vector2 GetRandomCircumferencePoint(Vector2 center, float radius)
     {
         return center + Random.insideUnitCircle.normalized * radius;
     } 
@@ -149,11 +149,11 @@ public class WanderSteeringBehavior : SteeringBehavior
         SteeringBehaviorArgs args = _currentSteeringBehaviorArgs;
     
         // Add random displacement over an area of a circle of radius wanderJitter. This
-        // circle is around current wander local position.
+        // circle is around the current wander local position.
         _wanderLocalPosition += Random.insideUnitCircle * WanderJitter;
     
         // Reproject this new vector back onto a unit circle. This circle is around
-        // current agent.
+        // the current agent.
         _wanderLocalPosition = _wanderLocalPosition.normalized * WanderRadius;
     
         // Create a targetLocal into a position WanderDist distance in front of the agent.

@@ -4,9 +4,9 @@ using UnityEngine.Serialization;
 namespace SteeringBehaviors
 {
 /// <summary>
-/// <p>Monobehaviour to offer a evade steering behaviour.</p>
-/// <p>Evade steering behaviour makes the agent go away from another GameObject marked
-/// as threath.</p>
+/// <p>Script to offer an evasion steering behavior.</p>
+/// <p>Evade steering behavior makes the agent go away from another GameObject marked
+/// as a threat.</p>
 /// </summary>
 public class EvadeSteeringBehavior : SteeringBehavior
 {
@@ -14,7 +14,7 @@ public class EvadeSteeringBehavior : SteeringBehavior
     [Header("CONFIGURATION:")]
     [Tooltip("Agent to run from.")]
     [SerializeField] private AgentMover threatAgent;
-    [Tooltip("Minimum distance to threath before fleeing.")]
+    [Tooltip("Minimum distance to threat before fleeing.")]
     [SerializeField] private float panicDistance;
     
     [Header("WIRING:")]
@@ -65,26 +65,26 @@ public class EvadeSteeringBehavior : SteeringBehavior
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        if (Threat == null) return SteeringOutput.Zero;
+        if (Threat == null) return SteeringOutput.zero;
     
         Vector2 currentPosition = args.Position;
         float maximumSpeed = args.MaximumSpeed;
-        Vector2 threathPosition = Threat.transform.position;
+        Vector2 threatPosition = Threat.transform.position;
 
-        Vector2 toThreath = threathPosition - currentPosition;
+        Vector2 toThreat = threatPosition - currentPosition;
     
         // The look-ahead time is proportional to the distance between the evader
         // and the pursuer; and is inversely proportional to the sum of the
         // agent's velocities
-        float lookAheadTime = toThreath.magnitude / 
+        float lookAheadTime = toThreat.magnitude / 
                               (maximumSpeed + Threat.Velocity.magnitude);
     
         // Place the marker where we think the chaser will be at the look-ahead
         // time.
-        _predictedPositionMarker.transform.position = threathPosition + 
+        _predictedPositionMarker.transform.position = threatPosition + 
                                                       Threat.Velocity * lookAheadTime;
 
-        // Make the flee behavior go away from the predicted position.
+        // Make the flee-behavior go away from the predicted position.
         return fleeSteeringBehaviour.GetSteering(args);
     }
 

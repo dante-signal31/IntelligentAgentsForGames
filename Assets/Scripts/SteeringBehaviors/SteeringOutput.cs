@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 
+namespace SteeringBehaviors
+{
 /// <summary>
 /// Velocities to move agent.
 /// </summary>
@@ -8,25 +10,38 @@ public class SteeringOutput
     /// <summary>
     /// Zero steering output.
     /// </summary>
-    public static SteeringOutput Zero = new SteeringOutput();
-    
+    public static readonly SteeringOutput zero = new SteeringOutput();
+
     /// <summary>
     /// Linear velocity vector.
     /// </summary>
     public Vector2 Linear { get; }
-    
+
+    /// <summary>
+    /// True if the linear velocity has been explicitly set.
+    /// </summary>
+    public bool IsLinearSet { get; }
+
     /// <summary>
     /// Angular rotation speed in degrees. In Unity's 2D, a positive rotation means an
     /// anticlockwise rotation.
     /// </summary>
     public float Angular { get; }
 
-    public SteeringOutput(Vector2 linear=new Vector2(), float angular=0)
+    /// <summary>
+    /// True if the angular velocity has been explicitly set.
+    /// </summary>
+    public bool IsAngularSet { get; }
+
+
+    public SteeringOutput(Vector2? linear = null, float angular=Mathf.NegativeInfinity)
     {
-        Linear = linear;
+        IsLinearSet = linear.HasValue;
+        Linear = linear ?? Vector2.negativeInfinity;
+        IsAngularSet = angular > Mathf.NegativeInfinity;
         Angular = angular;
     }
-    
+
     /// <summary>
     /// Operator for adding two SteeringOutput objects.
     /// </summary>
@@ -37,7 +52,7 @@ public class SteeringOutput
     {
         return new SteeringOutput(a.Linear + b.Linear, a.Angular + b.Angular);
     }
-    
+
     /// <summary>
     /// Operator for multiplying a SteeringOutput object and a float.
     /// </summary>
@@ -48,7 +63,7 @@ public class SteeringOutput
     {
         return new SteeringOutput(a.Linear * b, a.Angular * b);
     }
-    
+
     /// <summary>
     /// Equality comparison with another object.
     /// </summary>
@@ -68,4 +83,5 @@ public class SteeringOutput
     {
         return Linear.GetHashCode() ^ Angular.GetHashCode();
     }
+}
 }

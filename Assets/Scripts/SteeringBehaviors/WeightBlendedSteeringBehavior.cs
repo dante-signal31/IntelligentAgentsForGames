@@ -5,8 +5,8 @@ using UnityEngine;
 namespace SteeringBehaviors
 {
 /// <summary>
-/// This steering behavior takes a set of other steering behaviors and blend their outputs
-/// using weights.
+/// This steering behavior takes a set of other steering behaviors and blends their
+/// outputs using weights.
 /// </summary>
 public class WeightBlendedSteeringBehavior : SteeringBehavior, IGizmos
 {
@@ -26,15 +26,15 @@ public class WeightBlendedSteeringBehavior : SteeringBehavior, IGizmos
     /// </summary>
     private struct WeightedOutput
     {
-        public readonly SteeringOutput SteeringOutput;
-        public readonly float Weight;
-        public readonly Color DebugColor;
+        public readonly SteeringOutput steeringOutput;
+        public readonly float weight;
+        public readonly Color debugColor;
     
         public WeightedOutput(SteeringOutput steeringOutput, float weight, Color color)
         {
-            this.SteeringOutput = steeringOutput;
-            this.Weight = weight;
-            DebugColor = color;
+            this.steeringOutput = steeringOutput;
+            this.weight = weight;
+            debugColor = color;
         }
     }
 
@@ -78,7 +78,7 @@ public class WeightBlendedSteeringBehavior : SteeringBehavior, IGizmos
         foreach (var weightedBehavior in weightedBehaviors)
         {
             SteeringOutput output = weightedBehavior.steeringBehavior.GetSteering(args);
-            if (output.Equals(SteeringOutput.Zero)) continue;
+            if (output.Equals(SteeringOutput.zero)) continue;
             _activeOutputs.Add(
                 new WeightedOutput(
                     output, 
@@ -91,8 +91,8 @@ public class WeightBlendedSteeringBehavior : SteeringBehavior, IGizmos
         _currentSteering = new SteeringOutput();
         foreach (WeightedOutput weightedOutput in _activeOutputs)
         {
-            float outputRelativeWeight = weightedOutput.Weight / _totalWeight;
-            _currentSteering += weightedOutput.SteeringOutput * outputRelativeWeight;
+            float outputRelativeWeight = weightedOutput.weight / _totalWeight;
+            _currentSteering += weightedOutput.steeringOutput * outputRelativeWeight;
         }
         return _currentSteering;
     }
@@ -104,15 +104,15 @@ public class WeightBlendedSteeringBehavior : SteeringBehavior, IGizmos
         
         Gizmos.color = gizmosColor;
         
-        // Draw first partial steerings.
+        // Draw first partial steering.
         foreach (WeightedOutput weightedOutput in _activeOutputs)
         {
-            float outputRelativeWeight = weightedOutput.Weight / _totalWeight;
-            Gizmos.color = weightedOutput.DebugColor;
+            float outputRelativeWeight = weightedOutput.weight / _totalWeight;
+            Gizmos.color = weightedOutput.debugColor;
             Gizmos.DrawLine(
                 transform.position,
                 transform.position +
-                (Vector3) weightedOutput.SteeringOutput.Linear * outputRelativeWeight);
+                (Vector3) weightedOutput.steeringOutput.Linear * outputRelativeWeight);
         }
         
         // Next draw total steering.

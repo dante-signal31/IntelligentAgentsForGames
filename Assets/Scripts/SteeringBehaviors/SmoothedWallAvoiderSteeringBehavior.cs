@@ -1,12 +1,11 @@
 ﻿using PropertyAttribute;
 using Tools;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace SteeringBehaviors
 {
 /// <summary>
-/// Steering behavior to avoid walls and obstacles using usher algorithm to smooth
+/// Steering behavior to avoid walls and obstacles using the usher algorithm to smooth
 /// movements.
 /// </summary>
 [RequireComponent(typeof(CustomTimer))]
@@ -134,7 +133,7 @@ public class SmoothedWallAvoiderSteeringBehavior: SteeringBehavior, ITargeter
 
     private void ConfigureUsher()
     {
-        // Place usher ahead of our agent.
+        // Place the usher ahead of our agent.
         _usherAgent.transform.position = _currentAgent.transform.position + 
                                usherAdvantage * (Vector3)_currentAgent.Forward;
         
@@ -172,7 +171,7 @@ public class SmoothedWallAvoiderSteeringBehavior: SteeringBehavior, ITargeter
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
         if (chaseToUsherSteeringBehavior == null || _usherAgent == null) 
-            return SteeringOutput.Zero;
+            return SteeringOutput.zero;
 
         float distanceToUsher = Vector2.Distance(
             _currentAgent.transform.position, 

@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using NUnit.Framework;
-using Pathfinding;
 using SteeringBehaviors;
 using ninja.dlab.Commontesttools;
 using UnityEngine;
@@ -23,7 +22,7 @@ public class NotInformedPathFindingTests
     private GameObject _depthFirstPathFindingGameObject;
     private GameObject _meshPathFindingGameObject;
     private GameObject _unityNavMeshMovingAgentGameObject;
-    private GameObject _smoothPathFinderCurrentPathGameObject;
+    // private GameObject _smoothPathFinderCurrentPathGameObject;
     private GameObject _regionPathFindingGameObject;
     private GameObject _target;
     private PathFinderSteeringBehavior _breathFirstPathFinderSteeringBehavior;
@@ -48,7 +47,7 @@ public class NotInformedPathFindingTests
         _depthFirstPathFindingGameObject = null;
         _meshPathFindingGameObject = null;
         _meshPathFindingGameObject = null;
-        _smoothPathFinderCurrentPathGameObject = null;
+        // _smoothPathFinderCurrentPathGameObject = null;
         _regionPathFindingGameObject = null;
         
         // Clean up any existing objects first.

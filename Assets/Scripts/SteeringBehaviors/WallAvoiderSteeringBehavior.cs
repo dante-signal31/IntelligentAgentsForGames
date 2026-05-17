@@ -16,9 +16,9 @@ public class WallAvoiderSteeringBehavior : SteeringBehavior, IGizmos, ITargeter
     /// </summary>
     private struct ClosestHitData
     {
-        public float Distance;
-        public RaycastHit2D Hit;
-        public int DetectionSensorIndex;
+        public float distance;
+        public RaycastHit2D hit;
+        public int detectionSensorIndex;
     }
     
     [Header("CONFIGURATION:")]
@@ -170,11 +170,11 @@ public class WallAvoiderSteeringBehavior : SteeringBehavior, IGizmos, ITargeter
         if (_obstacleDetected)
         {
             ClosestHitData closestHitData = GetClosestHit(args);
-            _closestHit = closestHitData.Hit;
+            _closestHit = closestHitData.hit;
             
             float overShootFactor = GetOverShootFactor(
-                closestHitData.DetectionSensorIndex, 
-                closestHitData.Distance);
+                closestHitData.detectionSensorIndex, 
+                closestHitData.distance);
 
             // Buckland and Millington calculate avoidVector this way but I is 
             // troublesome when center sensor detect a wall perpendicular to current
@@ -190,7 +190,7 @@ public class WallAvoiderSteeringBehavior : SteeringBehavior, IGizmos, ITargeter
             float indexSide = Mathf.InverseLerp(
                 0, 
                 whiskersSensor.SensorAmount-1,
-                closestHitData.DetectionSensorIndex);
+                closestHitData.detectionSensorIndex);
             
             // Positive means the detecting sensor is in the left side of the
             // agent. Negative means the detecting sensor is in the right side of the
@@ -282,17 +282,17 @@ public class WallAvoiderSteeringBehavior : SteeringBehavior, IGizmos, ITargeter
     private ClosestHitData GetClosestHit(SteeringBehaviorArgs args)
     {
         ClosestHitData closestHit = new();
-        closestHit.Distance = float.MaxValue;
-        closestHit.DetectionSensorIndex = -1;
+        closestHit.distance = float.MaxValue;
+        closestHit.detectionSensorIndex = -1;
 
         foreach ((RaycastHit2D hit, int index) in whiskersSensor.DetectedHits)
         {
             float hitDistance = Vector2.Distance(hit.point, args.Position);
-            if (hitDistance < closestHit.Distance)
+            if (hitDistance < closestHit.distance)
             {
-                closestHit.Distance = hitDistance;
-                closestHit.Hit = hit;
-                closestHit.DetectionSensorIndex= index;
+                closestHit.distance = hitDistance;
+                closestHit.hit = hit;
+                closestHit.detectionSensorIndex= index;
             }
         }
 

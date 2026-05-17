@@ -40,7 +40,7 @@ public class AnnPassiveAgentAvoiderBehavior : SteeringBehavior
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
         // No agents near? No need to avoid.
-        if (!sensor.AnyObjectDetected) return SteeringOutput.Zero;
+        if (!sensor.AnyObjectDetected) return SteeringOutput.zero;
 
         // Find the nearest agent.
         HashSet<GameObject> detectedObjects = sensor.DetectedObjects;
@@ -63,7 +63,7 @@ public class AnnPassiveAgentAvoiderBehavior : SteeringBehavior
         
         // If the sensor detected anything, then we must have found the nearest agent.
         // But just in case...
-        if (nearestAgent == null) return SteeringOutput.Zero;
+        if (nearestAgent == null) return SteeringOutput.zero;
         
         // Calculate the evasion vector and speed. The evasion vector is the vector
         // opposed to the relative vector from the agent to the nearest agent. The evasion

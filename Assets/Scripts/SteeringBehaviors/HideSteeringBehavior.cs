@@ -235,7 +235,7 @@ public class HideSteeringBehavior : SteeringBehavior
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        if (Threat == null || rayCastToThreat == null) return SteeringOutput.Zero;
+        if (Threat == null || rayCastToThreat == null) return SteeringOutput.zero;
         
         // Check if there is a line of sight with the threat.
         CheckThreatVisibility();
@@ -287,7 +287,7 @@ public class HideSteeringBehavior : SteeringBehavior
         if (_hidingPointReached)
         {
             // If we don't need to hide, then return zero.
-            return SteeringOutput.Zero;
+            return SteeringOutput.zero;
         }
         return meshPathFinderSteeringBehavior.GetSteering(args);
     }

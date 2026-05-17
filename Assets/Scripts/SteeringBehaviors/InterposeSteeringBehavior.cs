@@ -1,12 +1,11 @@
 ﻿using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace SteeringBehaviors
 {
 /// <summary>
-/// <p>Monobehaviour to offer an Interpose steering behaviour.</p>
-/// <p>Interpose make an agent to place itself between two other agents.</p>
-/// <p>It's an usual protection behavior. E.g. a bodyguard.</p>
+/// <p>Script to offer an Interpose steering behavior.</p>
+/// <p>Interpose makes an agent to place itself between two other agents.</p>
+/// <p>It's a usual protection behavior. E.g., a bodyguard.</p>
 /// </summary>
 public class InterposeSteeringBehavior: SteeringBehavior
 {
@@ -62,11 +61,11 @@ public class InterposeSteeringBehavior: SteeringBehavior
 
     private void Awake()
     {
-        // Configure seek steering behaviour to go to that marker.
+        // Configure seek steering behavior to go to that marker.
         seekSteeringBehavior.ArrivalDistance = ArrivalDistance;
         
-        // Create an invisible object as marker to place it at target predicted future
-        // position. That marker will be used by seek steering behaviour as target.
+        // Create an invisible object as the marker to place it at target predicted future
+        // position. That marker will be used by seek steering behavior as the target.
         _predictedPositionMarker = new GameObject();
         seekSteeringBehavior.Target = _predictedPositionMarker;
         if (agentA == null || agentB == null) return;
@@ -90,20 +89,20 @@ public class InterposeSteeringBehavior: SteeringBehavior
     }
 
     /// <summary>
-    /// Get midway point between two positions.
+    /// Get a midway point between two positions.
     /// </summary>
     /// <param name="position1">First position.</param>
     /// <param name="position2">Second position.</param>
     /// <returns>Midpoint position.</returns>
     public static Vector2 GetMidPoint(Vector2 position1, Vector2 position2)
     {
-        Vector2 vectorBetweeenPositions = position2 - position1;
-        return position1 + vectorBetweeenPositions / 2;
+        Vector2 vectorBetweenPositions = position2 - position1;
+        return position1 + vectorBetweenPositions / 2;
     }
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        if (AgentA == null || AgentB == null) return SteeringOutput.Zero;
+        if (AgentA == null || AgentB == null) return SteeringOutput.zero;
         
         Vector2 currentPosition = args.CurrentAgent.transform.position;
         float maximumSpeed = args.MaximumSpeed;
@@ -119,9 +118,9 @@ public class InterposeSteeringBehavior: SteeringBehavior
             float timeToReachMidPoint = (midPoint - currentPosition).magnitude / 
                                         maximumSpeed;
     
-            // But actually agents won't be static, so while we move to midPoint,
+            // But actually, agents won't be static, so while we move to midPoint,
             // they will move too. So, we must figure out where target agents are going
-            // to be after TimeToReachMidPoint has passed. To get that we'll assume both
+            // to be after TimeToReachMidPoint has passed. To get that, we'll assume both
             // target agents are going to continue on a straight trajectory (so, no
             // velocity change), so we'll extrapolate their future position using
             // their current velocity.

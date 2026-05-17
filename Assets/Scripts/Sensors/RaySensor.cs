@@ -6,9 +6,9 @@ namespace Sensors
 /// <summary>
 /// <p>Generic component for ray sensors.</p>
 ///
-/// <p>Just place it and give it the layer were you want to detect colliders. It will
-/// emit a colliderDetected event whenever one is hit by ray and a noColliderDetected
-/// event when ray is clear. </p>s
+/// <p>Place it and give it the layer where you want to detect colliders. It will
+/// emit a colliderDetected event whenever a ray hits one and a noColliderDetected
+/// event when the ray is clear. </p>s
 /// </summary>
 public class RaySensor : MonoBehaviour
 {
@@ -52,10 +52,7 @@ public class RaySensor : MonoBehaviour
     public LayerMask SensorLayerMask
     {
         get => detectionLayers;
-        set
-        {
-            detectionLayers = value;
-        }
+        set => detectionLayers = value;
     }
 
     /// <summary>
@@ -64,10 +61,7 @@ public class RaySensor : MonoBehaviour
     public bool IgnoreCollidersOverlappingStartPoint
     {
         get => ignoreCollidersOverlappingStartPoint;
-        set
-        {
-            ignoreCollidersOverlappingStartPoint = value;
-        }
+        set => ignoreCollidersOverlappingStartPoint = value;
     }
 
     private Collider2D _detectedCollider;
@@ -128,6 +122,14 @@ public class RaySensor : MonoBehaviour
     {
         get => showGizmos;
         set => showGizmos = value;
+    }
+
+    /// <summary>
+    /// Update the raycast without waiting for the next fixed update.
+    /// </summary>
+    public void UpdateRay()
+    {
+        PerformRaycast();
     }
 
     private Vector3 GetRayDirection()

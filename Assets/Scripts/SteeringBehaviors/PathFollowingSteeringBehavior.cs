@@ -22,6 +22,7 @@ public class PathFollowingSteeringBehavior : SteeringBehavior
     private bool _pathStarted;
     private ITargeter _targeter;
     private GameObject _target;
+    private Vector2 _previousTargetPosition;
     
     public Path FollowPath
     {
@@ -75,8 +76,8 @@ public class PathFollowingSteeringBehavior : SteeringBehavior
     
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        if (FollowPath == null || FollowPath.PathLength == 0) 
-            return SteeringOutput.Zero;
+        if (FollowPath == null || FollowPath.PathPositionsCount == 0) 
+            return SteeringOutput.zero;
         
         if (!_pathStarted)
         {
@@ -84,11 +85,17 @@ public class PathFollowingSteeringBehavior : SteeringBehavior
             _pathStarted = true;
         }
         
-        float distanceToTarget = 
-            Vector2.Distance(transform.position, FollowPath.CurrentTargetPosition);
-        if (distanceToTarget < arrivalDistance)
+        // float distanceToTarget = 
+        //     Vector2.Distance(transform.position, FollowPath.CurrentTargetPosition);
+        // if (distanceToTarget < arrivalDistance)
+        while (Vector2.Distance(transform.position, FollowPath.CurrentTargetPosition) < 
+               arrivalDistance)
         {
+            _previousTargetPosition = _target.transform.position;
             _target.transform.position = FollowPath.GetNextPositionTarget();
+            // If path has ended, then GetNextPositionTarget will return the same
+            // position as the last one.
+            if ((Vector2) _target.transform.position == _previousTargetPosition) break;
         }
         
         return steeringBehavior.GetSteering(args);

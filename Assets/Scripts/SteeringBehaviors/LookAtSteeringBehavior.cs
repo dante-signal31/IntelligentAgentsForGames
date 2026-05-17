@@ -1,14 +1,13 @@
 ﻿using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace SteeringBehaviors
 {
 /// <summary>
-/// <p>Monobehaviour to offer a face to a target steering behaviour.</p>
+/// <p>Script to offer a face to a target steering behavior.</p>
 ///
 /// <p>This behavior makes its agent look at its target.</p>
 /// </summary>
-public class FaceMatchingSteeringBehavior : SteeringBehavior, ITargeter
+public class LookAtSteeringBehavior : SteeringBehavior, ITargeter
 {
     [Header("CONFIGURATION:")]
     [Tooltip("Target to face to.")]
@@ -31,12 +30,12 @@ public class FaceMatchingSteeringBehavior : SteeringBehavior, ITargeter
 
     private void Awake()
     {
-        // We use an align steering behavior to make the agent update its rotation. But
+        // We use an align-steering behavior to make the agent update its rotation. But
         // align behavior copies another GameObject rotation, so we need a dummy
         // GameObject to rotate it in the direction to look at. That dummy GameObject
         // will be passed to align steering behavior, to give it something to copy.
         _marker = new GameObject("MarkerForAlignSteeringBehavior");
-        // Make the align steering behavior to copy the dummy GameObject rotation.
+        // Make the align-steering behavior to copy the dummy GameObject rotation.
         alignSteeringBehavior.Target = _marker;
     }
 
@@ -47,7 +46,7 @@ public class FaceMatchingSteeringBehavior : SteeringBehavior, ITargeter
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        if (Target == null) return SteeringOutput.Zero;
+        if (Target == null) return SteeringOutput.zero;
     
         _targetPosition = Target.transform.position;
         Vector2 currentPosition = args.Position;

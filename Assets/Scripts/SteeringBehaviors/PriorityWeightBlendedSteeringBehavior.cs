@@ -44,14 +44,14 @@ public class PriorityWeightBlendedSteeringBehavior: SteeringBehavior, IGizmos
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        _currentSteering = SteeringOutput.Zero;
+        _currentSteering = SteeringOutput.zero;
         
         foreach (WeightBlendedSteeringBehavior weightBlendedSteeringBehavior in
                  _weightBlendedSteeringBehaviors)
         {
             SteeringOutput steeringOutput = 
                 weightBlendedSteeringBehavior.GetSteering(args);
-            if (steeringOutput.Equals(SteeringOutput.Zero)) continue;
+            if (steeringOutput.Equals(SteeringOutput.zero)) continue;
             _currentSteering = steeringOutput;
             break;
         }

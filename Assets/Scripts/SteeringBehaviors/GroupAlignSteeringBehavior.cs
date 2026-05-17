@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace SteeringBehaviors
 {
 /// <summary>
-/// <p> Monobehaviour to offer an Align steering behaviour. </p>
-/// <p> Group align steering behaviour makes the agent look at the same direction than
+/// <p> Script to offer an Align steering behavior. </p>
+/// <p> Group align steering behavior makes the agent look in the same direction as
 /// the average orientation of a group of target nodes. </p>
 /// </summary>
 public class GroupAlignSteeringBehavior: SteeringBehavior
@@ -14,11 +13,11 @@ public class GroupAlignSteeringBehavior: SteeringBehavior
     [Header("CONFIGURATION:")]
     [Tooltip("List of agents to align with averaging their orientations.")]
     [SerializeField] private List<GameObject> targets = new List<GameObject>();
-    [Tooltip("Rotation to start to slow down (degress).")]
+    [Tooltip("Rotation to start to slow down (degrees).")]
     [SerializeField] private float decelerationRadius = 30f;
     [Tooltip("Deceleration curve.")]
     [SerializeField] private AnimationCurve decelerationCurve;
-    [Tooltip("At this rotation start angle will be at full speed (degress).")]
+    [Tooltip("At this rotation start angle will be at full speed (degrees).")]
     [SerializeField] private float accelerationRadius = 30f;
     [Tooltip("Acceleration curve.")]
     [SerializeField] private AnimationCurve accelerationCurve;
@@ -44,7 +43,7 @@ public class GroupAlignSteeringBehavior: SteeringBehavior
     public List<GameObject> Targets { get => targets; set => targets = value; }
 
     /// <summary>
-    /// Rotation to start to slow down (degress).
+    /// Rotation to start to slow down (degrees).
     /// </summary>
     public float DecelerationRadius
     {
@@ -72,7 +71,7 @@ public class GroupAlignSteeringBehavior: SteeringBehavior
     }
 
     /// <summary>
-    /// At this rotation start angle will be at full speed (degress).
+    /// At this rotation the start angle will be at full speed (degrees).
     /// </summary>
     public float AccelerationRadius
     {
@@ -124,18 +123,18 @@ public class GroupAlignSteeringBehavior: SteeringBehavior
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
         if (Targets == null || Targets.Count == 0 || alignSteeringBehavior == null) 
-            return SteeringOutput.Zero;
+            return SteeringOutput.zero;
 
         // Let's average heading counting every agent's targets. You'd better get an
         // average vector from heading vectors than average their angle rotation values.
-        // This way you can be sure that resulting average is in the inner angle between
+        // This way you can be sure that the resulting average is in the inner angle between
         // every target vector pair.
         Vector2 headingSum = new();
         foreach (GameObject target in Targets)
         {
-            // Remember that, for our agents, forward direction point upwards, i.e. Y
-            // axis. So, their respective transform.up vectors are actually their heading
-            // vectors.
+            // Remember that, for our agents, the forward direction points upwards, i.e.,
+            // Y axis. So, their respective transform.up vectors are actually their
+            // heading vectors.
             headingSum += (Vector2) target.transform.up;
         }
         Vector2 averageHeading = (headingSum / Targets.Count);

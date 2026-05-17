@@ -60,11 +60,11 @@ public class PriorityDitheringBlendedSteeringBehavior : SteeringBehavior, IGizmo
         {
             if (Random.value > randomBehavior.probability) continue;
             SteeringOutput output = randomBehavior.steeringBehavior.GetSteering(args);
-            if (output.Equals(SteeringOutput.Zero)) continue;
+            if (output.Equals(SteeringOutput.zero)) continue;
             _currentSteering = output;
             return output;
         }
-        return SteeringOutput.Zero;
+        return SteeringOutput.zero;
     }
 
 #if UNITY_EDITOR

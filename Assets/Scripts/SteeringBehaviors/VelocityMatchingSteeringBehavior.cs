@@ -3,8 +3,8 @@
 namespace SteeringBehaviors
 {
 /// <summary>
-/// <p>Monobehaviour to offer a velocity match steering behaviour.</p>
-/// <p> Velocity matching steering behaviour makes the agent get the same velocity than
+/// <p>Script to offer a velocity match steering behavior.</p>
+/// <p> Velocity-matching steering behavior makes the agent get the same velocity as
 /// a target AgentMover. </p>
 /// </summary>
 public class VelocityMatchingSteeringBehavior : SteeringBehavior
@@ -40,7 +40,7 @@ public class VelocityMatchingSteeringBehavior : SteeringBehavior
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        if (Target == null) return SteeringOutput.Zero;
+        if (Target == null) return SteeringOutput.zero;
     
         _currentVelocity = args.CurrentVelocity;
         float stopSpeed = args.StopSpeed;
@@ -53,10 +53,10 @@ public class VelocityMatchingSteeringBehavior : SteeringBehavior
             _targetVelocity = Target.Velocity;
         
             // Millington recalculates neededAcceleration in every frame, but I
-            // think that is an error. Doing that way apparently works but, actually,
-            // target velocity is never entirely reached because current gap between
+            // think that is an error. Doing that way apparently works, but actually,
+            // target velocity is never entirely reached because the current gap between
             // target and current velocity is always divided by timeToMatch.
-            // So, my version calculates neededAcceleration only when target velocity
+            // So, my version calculates neededAcceleration only when the target velocity
             // has changed. This way target velocity is accurately reached, although I
             // have to check for border cases where a minimum amount of acceleration can
             // make us overpass target velocity.
@@ -78,7 +78,7 @@ public class VelocityMatchingSteeringBehavior : SteeringBehavior
             }
             else if (_isBraking && _currentVelocity.magnitude <= stopSpeed)
             {
-                return SteeringOutput.Zero;
+                return SteeringOutput.zero;
             }
             else if (_isBraking && neededAcceleration.magnitude > maximumDeceleration)
             {
@@ -98,7 +98,7 @@ public class VelocityMatchingSteeringBehavior : SteeringBehavior
         { 
             newVelocity = Vector2.zero;
         } 
-        // While not accelerating, don't overpass target velocity
+        // While not speeding up, don't overpass target velocity
         else if (!_isBraking && 
                  frameAcceleration.magnitude > 
                  (_targetVelocity - _currentVelocity).magnitude)

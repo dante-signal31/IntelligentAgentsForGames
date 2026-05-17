@@ -14,7 +14,7 @@ namespace SteeringBehaviors
 /// best if the auto-smoothing method is WeightedMovingAverage with 20 samples and a
 /// gaussian curve.</remarks>
 /// </summary>
-public class VoAgentAvoiderBehavior: SteeringBehavior
+public class VOAgentAvoiderSteeringBehavior: SteeringBehavior
 {
     [Header("CONFIGURATION:")] 
     [Tooltip("Number of samples for the velocity sampling disc. The higher the " +
@@ -89,6 +89,19 @@ public class VoAgentAvoiderBehavior: SteeringBehavior
     }
 
     /// <summary>
+    /// Regenerate the velocity sampling disc with the new maximum speed and resolution.
+    /// </summary>
+    /// <remarks>This method updates SamplingDiscResolution and CurrentMaximumSpeed
+    /// properties with the values given as parameters.</remarks>
+    /// <param name="maximumSpeed">Maximum radius for the clouds of points</param>
+    /// <param name="resolution">Number of points for the cloud.</param>
+    public void UpdateSamplingDisc(float maximumSpeed, uint resolution = 0)
+    {
+        if (resolution != 0) SamplingDiscResolution = resolution;
+        CurrentMaximumSpeed = maximumSpeed;
+    }
+
+    /// <summary>
     /// Generate a cloud of relative positions. Every position represents a potential
     /// velocity vector for the agent. So, the cloud is supposed to be centered on the
     /// agent position, and it cannot extend further than the maximum speed.
@@ -123,9 +136,6 @@ public class VoAgentAvoiderBehavior: SteeringBehavior
         
         SteeringOutput steeringToTargetVelocity = 
             toTargetSteeringBehavior.GetSteering(args);
-     
-        noCollisionCandidateVelocities.Clear();
-        collisionCandidateVelocities.Clear();
         
         // If there is no potential collision, then we don't need to do anything. Just go
         // straight to the target.
@@ -137,8 +147,31 @@ public class VoAgentAvoiderBehavior: SteeringBehavior
 
         // If a collision is going to happen in the future, then calculate the avoiding
         // vector nearest to the ideal velocity to target.
+        bestCandidateVelocity = GetBestCandidateVelocity(steeringToTargetVelocity.Linear);
+
+        // Return the best candidate velocity as part of the steering output.
+        return new SteeringOutput(
+            bestCandidateVelocity, 
+            steeringToTargetVelocity.Angular);
+    }
+
+    /// <summary>
+    /// Determines the optimal candidate velocity closest to the ideal velocity
+    /// while avoiding potential collisions with other agents.
+    /// </summary>
+    /// <param name="idealVelocity">
+    /// The desired velocity vector towards which the agent is attempting to move.
+    /// </param>
+    /// <returns>
+    /// The best candidate velocity vector that minimizes divergence from ideal velocity
+    /// and avoids collisions.
+    /// </returns>
+    public Vector2 GetBestCandidateVelocity(Vector2 idealVelocity)
+    {
         float lowestPenalty = float.MaxValue;
-        bestCandidateVelocity = Vector2.zero;
+        Vector2 bestVelocity = Vector2.zero;
+        noCollisionCandidateVelocities.Clear();
+        collisionCandidateVelocities.Clear();
         foreach (Vector2 candidateVelocity in _velocitySamplingDisc)
         {
             // Add candidate velocity to one of the lists used for debugging.
@@ -153,20 +186,41 @@ public class VoAgentAvoiderBehavior: SteeringBehavior
             {
                 noCollisionCandidateVelocities.Add(candidateVelocity);
             }
-            float vectorDivergence =
-                (steeringToTargetVelocity.Linear - candidateVelocity).magnitude;
-            float penalty = vectorDivergence + (evasionStrength / collisionTime);
+            
+            float penalty = GetDivergencePenalty(
+                idealVelocity, 
+                candidateVelocity, 
+                collisionTime);
             if (penalty < lowestPenalty)
             {
                 lowestPenalty = penalty;
-                bestCandidateVelocity = candidateVelocity;
+                bestVelocity = candidateVelocity;
             }
         }
-        
-        // Return the best candidate velocity as part of the steering output.
-        return new SteeringOutput(
-            bestCandidateVelocity, 
-            steeringToTargetVelocity.Angular);
+        return bestVelocity;
+    }
+    
+    /// <summary>
+    /// Calculates a penalty value for a candidate velocity based on its divergence
+    /// from the ideal velocity and the expected collision time. Higher penalties
+    /// indicate that the candidate velocity is less similar to the ideal velocity or
+    /// more prone to a collision.
+    /// </summary>
+    /// <param name="idealVelocity">The optimal velocity vector for the agent.</param>
+    /// <param name="candidateVelocity">The potential velocity vector being
+    /// evaluated.</param>
+    /// <param name="collisionTime">The time until collision if the candidate velocity
+    /// is chosen.</param>
+    /// <return>A float representing the penalty for the given candidate
+    /// velocity.</return>
+    private float GetDivergencePenalty(
+        Vector2 idealVelocity, 
+        Vector2 candidateVelocity,
+        float collisionTime)
+    {
+        float vectorDivergence = (idealVelocity - candidateVelocity).magnitude;
+        float penalty = vectorDivergence + (evasionStrength / collisionTime);
+        return penalty;
     }
 
     private void OnDrawGizmos()

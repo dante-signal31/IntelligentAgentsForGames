@@ -102,7 +102,7 @@ public class ActiveAgentAvoiderSteeringBehavior : SteeringBehavior
         if (_waitingForAvoidanceTimeout) return _currentSteeringOutput;
         
         // Nothing to avoid and waiting nothing, so let's just go to our target.
-        if (_avoidingSteering.Equals(SteeringOutput.Zero)) 
+        if (_avoidingSteering.Equals(SteeringOutput.zero)) 
             return _steeringToTarget;
         
         // If we get here, then there's an agent to avoid. Add avoiding vector to our

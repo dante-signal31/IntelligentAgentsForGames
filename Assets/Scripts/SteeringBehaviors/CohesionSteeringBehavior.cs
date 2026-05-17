@@ -5,8 +5,8 @@ using UnityEngine.Serialization;
 namespace SteeringBehaviors
 {
 /// <summary>
-/// <p> Monobehaviour to offer a cohesion steering behaviour. </p>
-/// <p> Cohesion steering behaviour makes the agent to place himself in the center of a
+/// <p> Script to offer a cohesion-steering behavior. </p>
+/// <p> Cohesion-steering behavior makes the agent to place himself in the center of a
 /// group of other agents. </p>
 /// </summary>
 public class CohesionSteeringBehavior: SteeringBehavior
@@ -36,7 +36,7 @@ public class CohesionSteeringBehavior: SteeringBehavior
     public List<GameObject> Targets { get => targets; set => targets = value; }
 
     /// <summary>
-    /// Distance at which we give our goal as reached and we stop our agent.
+    /// Distance at which we give our goal as reached, and we stop our agent.
     /// </summary>
     public float ArrivalDistance
     {
@@ -73,7 +73,7 @@ public class CohesionSteeringBehavior: SteeringBehavior
         if (Targets == null || 
             Targets.Count == 0 || 
             seekSteeringBehavior == null) 
-            return SteeringOutput.Zero;
+            return SteeringOutput.zero;
 
         // Let's average position counting every agent's targets. 
         Vector2 positionSum = new();

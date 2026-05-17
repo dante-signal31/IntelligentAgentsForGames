@@ -20,7 +20,7 @@ public class PathData
     /// Represents the total length of the path, calculated as the sum of distances
     /// between consecutive positions in the path.
     /// </summary>
-    public float PathLength { get; private set; }
+    public float PathLength => GetPathLength();
 
     private int _currentTargetPositionIndex;
     /// <summary>
@@ -65,7 +65,11 @@ public class PathData
     public void AddPositionsToPath(List<Vector2> addedPositions)
     {
         positions.AddRange(addedPositions);
-        PathLength = GetPathLength();
+    }
+
+    public void ClearPositions()
+    {
+        positions.Clear();
     }
 
     /// <summary>

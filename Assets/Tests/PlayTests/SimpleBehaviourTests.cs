@@ -551,7 +551,7 @@ namespace Tests.PlayTests
             seekColor.Color = Color.red;
             _faceGameObject.transform.position = _position7.position;
             var faceSteeringBehavior =
-                _faceGameObject.GetComponentInChildren<FaceMatchingSteeringBehavior>();
+                _faceGameObject.GetComponentInChildren<LookAtSteeringBehavior>();
             faceSteeringBehavior.Target = _seekGameObject;
             _faceGameObject.SetActive(true);
             _seekGameObject.SetActive(true);
@@ -2218,7 +2218,7 @@ namespace Tests.PlayTests
             var agentAvoiderSeekSteeringBehavior = _voAgentAvoiderGameObject
                 .GetComponentInChildren<SeekSteeringBehavior>();
             var voAgentAvoiderSteeringBehavior = _voAgentAvoiderGameObject
-                .GetComponentInChildren<VoAgentAvoiderBehavior>();
+                .GetComponentInChildren<VOAgentAvoiderSteeringBehavior>();
             var circleSensor =
                 _voAgentAvoiderGameObject.GetComponentInChildren<CircleSensor>();
 
@@ -2290,7 +2290,7 @@ namespace Tests.PlayTests
             var agentAvoiderSeekSteeringBehavior = _voAgentAvoiderGameObject
                 .GetComponentInChildren<SeekSteeringBehavior>();
             var voAgentAvoiderSteeringBehavior = _voAgentAvoiderGameObject
-                .GetComponentInChildren<VoAgentAvoiderBehavior>();
+                .GetComponentInChildren<VOAgentAvoiderSteeringBehavior>();
             var circleSensor =
                 _voAgentAvoiderGameObject.GetComponentInChildren<CircleSensor>();
 
@@ -2362,7 +2362,7 @@ namespace Tests.PlayTests
             var agentAvoiderSeekSteeringBehavior = _voAgentAvoiderGameObject
                 .GetComponentInChildren<SeekSteeringBehavior>();
             var voAgentAvoiderSteeringBehavior = _voAgentAvoiderGameObject
-                .GetComponentInChildren<VoAgentAvoiderBehavior>();
+                .GetComponentInChildren<VOAgentAvoiderSteeringBehavior>();
             var circleSensor =
                 _voAgentAvoiderGameObject.GetComponentInChildren<CircleSensor>();
 
@@ -2434,7 +2434,7 @@ namespace Tests.PlayTests
             var agentAvoiderSeekSteeringBehavior = _voAgentAvoiderGameObject
                 .GetComponentInChildren<SeekSteeringBehavior>();
             var voAgentAvoiderSteeringBehavior = _voAgentAvoiderGameObject
-                .GetComponentInChildren<VoAgentAvoiderBehavior>();
+                .GetComponentInChildren<VOAgentAvoiderSteeringBehavior>();
             var circleSensor =
                 _voAgentAvoiderGameObject.GetComponentInChildren<CircleSensor>();
 
@@ -2507,7 +2507,7 @@ namespace Tests.PlayTests
             var agentAvoiderSeekSteeringBehavior = _voAgentAvoiderGameObject
                 .GetComponentInChildren<SeekSteeringBehavior>();
             var voAgentAvoiderSteeringBehavior = _voAgentAvoiderGameObject
-                .GetComponentInChildren<VoAgentAvoiderBehavior>();
+                .GetComponentInChildren<VOAgentAvoiderSteeringBehavior>();
             var circleSensor =
                 _voAgentAvoiderGameObject.GetComponentInChildren<CircleSensor>();
 
@@ -2593,7 +2593,7 @@ namespace Tests.PlayTests
             var agentAvoiderSeekSteeringBehavior = _voAgentAvoiderGameObject
                 .GetComponentInChildren<SeekSteeringBehavior>();
             var voAgentAvoiderSteeringBehavior = _voAgentAvoiderGameObject
-                .GetComponentInChildren<VoAgentAvoiderBehavior>();
+                .GetComponentInChildren<VOAgentAvoiderSteeringBehavior>();
             var circleSensor =
                 _voAgentAvoiderGameObject.GetComponentInChildren<CircleSensor>();
 

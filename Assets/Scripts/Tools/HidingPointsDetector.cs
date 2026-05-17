@@ -139,13 +139,8 @@ public class HidingPointsDetector : MonoBehaviour
 
     private void Start()
     {
+        ObstaclesLayer = obstaclesLayer;
         if (raySensor == null || Threat == null) return;
-        InitRaySensor();
-    }
-
-    private void InitRaySensor()
-    {
-        raySensor.SensorLayerMask = ObstaclesLayer;
         raySensor.StartPosition = Threat.transform.position;
     }
 

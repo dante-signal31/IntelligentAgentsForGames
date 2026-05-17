@@ -68,7 +68,7 @@ public class PassiveAgentAvoiderSteeringBehavior : SteeringBehavior, IGizmos
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
         if (!potentialCollisionDetector.PotentialCollisionDetected) 
-            return SteeringOutput.Zero;
+            return SteeringOutput.zero;
         
         Vector2 minimumDistanceRelativePosition;
         // If we're going to collide, or are already colliding, then we do the steering

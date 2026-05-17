@@ -4,12 +4,12 @@ using UnityEngine;
 
 namespace Editor
 {
-[CustomEditor(typeof(VoAgentAvoiderBehavior))]
+[CustomEditor(typeof(VOAgentAvoiderSteeringBehavior))]
 public class DrawVoAgentAvoider : UnityEditor.Editor
 {
     private void OnSceneGUI()
     {
-        var voAgent = (VoAgentAvoiderBehavior)target;
+        var voAgent = (VOAgentAvoiderSteeringBehavior)target;
 
         if (!voAgent.showGizmos) return;
         

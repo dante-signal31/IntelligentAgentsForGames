@@ -5,10 +5,10 @@ using UnityEngine;
 namespace SteeringBehaviors
 {
 /// <summary>
-/// <p>Monobehaviour to offer a separation steering behaviour.</p>
-/// <p>Separation steering behaviour makes the agent go away from other GameObjects
-/// marked as threat. It's similar to flee, but the threat is not a single GameObject,
-/// but a group and the repulsion force is inversely proportional to the distance.</p>
+/// <p>Script to offer a separation-steering behavior.</p>
+/// <p>Separation steering behavior makes the agent go away from other GameObjects
+/// marked as a threat. It's similar to flee, but the threat is not a single GameObject,
+/// but a group, and the repulsion force is inversely proportional to the distance.</p>
 /// </summary>
 public class SeparationSteeringBehavior: SteeringBehavior
 {
@@ -69,7 +69,7 @@ public class SeparationSteeringBehavior: SteeringBehavior
 
     /// <summary>
     /// <p>Color used for debugging gizmos.</p>
-    /// <p>Property read by editor handle script.</p>
+    /// <p>Property read by the editor handle script.</p>
     /// </summary>
     public Color MarkerColor => markerColor;
 
@@ -93,7 +93,7 @@ public class SeparationSteeringBehavior: SteeringBehavior
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        if (Threats == null || Threats.Count == 0) return SteeringOutput.Zero;
+        if (Threats == null || Threats.Count == 0) return SteeringOutput.zero;
 
         Vector2 newVelocity = args.CurrentVelocity;
         Vector2 currentPosition = args.Position;

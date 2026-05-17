@@ -49,13 +49,13 @@ public class FleeSteeringBehavior : SteeringBehavior
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        if (Threat == null) return SteeringOutput.Zero;
+        if (Threat == null) return SteeringOutput.zero;
         
         if (Vector2.Distance(
                 args.CurrentAgent.transform.position,
                 Threat.transform.position) > PanicDistance)
         { // Out of panic distance, so we stop fleeing.
-            return SteeringOutput.Zero;
+            return SteeringOutput.zero;
         }
         else
         { // Threat inside panic distance, so run in the opposite direction seek

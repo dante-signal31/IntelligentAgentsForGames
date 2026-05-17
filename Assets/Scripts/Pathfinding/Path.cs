@@ -40,7 +40,25 @@ public class Path : MonoBehaviour, IGizmos
     /// <summary>
     /// How many positions this path has.
     /// </summary>
-    public int PathLength => _data.PathPositionsLength;
+    public int PathPositionsCount => _data.PathPositionsLength;
+    
+    /// <summary>
+    /// Length of the path.
+    /// </summary>
+    public float PathLength
+    {
+        get
+        {
+            float length = 0;
+            Vector2 initialPosition = positions[0];
+            foreach (Vector2 targetPosition in positions)
+            {
+                length += (targetPosition - initialPosition).magnitude;
+                initialPosition = targetPosition;
+            }
+            return length;
+        }
+    }
 
     /// <summary>
     /// Current index of the position we are going to.
@@ -118,6 +136,24 @@ public class Path : MonoBehaviour, IGizmos
     {
         positions.AddRange(path.positions);
         _data.AddPositionsToPath(path.positions);
+        pathUpdated?.Invoke();
+    }
+
+    /// <summary>
+    /// Appends a position to the end of the path.
+    /// </summary>
+    /// <param name="position">Position to add.</param>
+    public void AppendPosition(Vector2 position)
+    {
+        positions.Add(position);
+        _data.AddPositionsToPath(new List<Vector2> {position});
+        pathUpdated?.Invoke();
+    }
+
+    public void ClearPath()
+    {
+        positions.Clear();
+        _data.ClearPositions();
         pathUpdated?.Invoke();
     }
 

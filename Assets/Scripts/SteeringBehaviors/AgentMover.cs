@@ -237,7 +237,7 @@ public class AgentMover : MonoBehaviour
         SteeringOutput steeringOutput = SteeringBehavior.GetSteering(behaviorArgs);
         
         // Apply the necessary rotation.
-        if (steeringOutput.Angular == 0 && steeringOutput.Linear == Vector2.zero)
+        if (!steeringOutput.IsAngularSet && !steeringOutput.IsLinearSet)
         {
             // Sometimes, when an agent touches a surface, a residual angular velocity
             // is left behind. This is a problem because when the agent stops, it starts
@@ -245,7 +245,7 @@ public class AgentMover : MonoBehaviour
             rigidBody.angularVelocity = 0;
         }
         // Agent faces to the velocity direction.
-        else if (steeringOutput.Angular == 0 && steeringOutput.Linear != Vector2.zero)
+        else if (!steeringOutput.IsAngularSet && steeringOutput.IsLinearSet)
         { 
             if (autoSmooth)
             {
@@ -286,7 +286,7 @@ public class AgentMover : MonoBehaviour
             }
         }
         // Agent moves in a direction while faces another direction (e.g., strafing)
-        else if (steeringOutput.Angular != 0)
+        else if (steeringOutput.IsAngularSet)
         {
             // In this case, our steering wants us to face and move in different
             // directions. Steering checks that no threshold is surpassed.
