@@ -27,11 +27,7 @@ public class PipelineMeshPathFinderActuator: MonoBehaviour, IPipelineActuator
 
     public SteeringOutput GetOutput(PipelineGoal goal, SteeringBehaviorArgs args)
     {
-        // if (currentGoalPosition != goal.Position)
-        // {
-            meshPathFinderSteeringBehavior.TargetPosition = goal.Position;
-        //     currentGoalPosition = goal.Position;
-        // }
+        meshPathFinderSteeringBehavior.TargetPosition = goal.Position;
         
         SteeringOutput steeringOutput = 
             meshPathFinderSteeringBehavior.GetSteering(args);
@@ -39,7 +35,7 @@ public class PipelineMeshPathFinderActuator: MonoBehaviour, IPipelineActuator
             linear: goal.HasSpeed? 
                 steeringOutput.Linear.normalized * goal.Speed: 
                 steeringOutput.Linear.normalized * args.MaximumSpeed,
-            angular: goal.HasRotation? goal.Rotation: 0);
+            angular: goal.HasRotation? goal.Rotation: SteeringOutput.angularUnset);
         return output;
     }
 }

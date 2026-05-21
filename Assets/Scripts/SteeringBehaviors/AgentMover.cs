@@ -236,8 +236,16 @@ public class AgentMover : MonoBehaviour
         // Get steering output.
         SteeringOutput steeringOutput = SteeringBehavior.GetSteering(behaviorArgs);
         
+        // Zero output? Then don't move.
+        if (steeringOutput == SteeringOutput.zero)
+        {
+            rigidBody.angularVelocity = 0;
+            rigidBody.linearVelocity = Vector2.zero;
+            return;
+        }
+        
         // Apply the necessary rotation.
-        if (!steeringOutput.IsAngularSet && !steeringOutput.IsLinearSet)
+        if (!steeringOutput.IsAngularSet && steeringOutput.Linear == Vector2.zero)
         {
             // Sometimes, when an agent touches a surface, a residual angular velocity
             // is left behind. This is a problem because when the agent stops, it starts
@@ -292,12 +300,19 @@ public class AgentMover : MonoBehaviour
             // directions. Steering checks that no threshold is surpassed.
             rigidBody.angularVelocity = steeringOutput.Angular;
         }
+
+        // Finally, apply linear velocity if any was set.
+        if (steeringOutput.IsLinearSet)
+        {
+            // Apply the new velocity vector to our GameObject.
+            Vector2 newVelocity = steeringOutput.Linear;
+            if (newVelocity.magnitude > MaximumSpeed) 
+                newVelocity = newVelocity.normalized * MaximumSpeed;
         
-        // Apply the new velocity vector to our GameObject.
-        Vector2 newVelocity = steeringOutput.Linear;
-        if (newVelocity.magnitude > MaximumSpeed) 
-            newVelocity = newVelocity.normalized * MaximumSpeed;
-        rigidBody.linearVelocity = newVelocity;
+            if (float.IsNaN(newVelocity.x) || float.IsNaN(newVelocity.y)) return;
+        
+            rigidBody.linearVelocity = newVelocity;
+        }
     }
 
     protected virtual void UpdateSteeringBehaviorArgs(float deltaTime = 0)

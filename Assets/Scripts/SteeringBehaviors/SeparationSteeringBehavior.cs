@@ -72,6 +72,9 @@ public class SeparationSteeringBehavior: SteeringBehavior
     /// <p>Property read by the editor handle script.</p>
     /// </summary>
     public Color MarkerColor => markerColor;
+    
+    // Minimum acceleration to apply separation force.
+    private const float StopAcceleration = float.Epsilon;
 
     private Vector2 _currentVelocity;
     private float GetLinearSeparationStrength(
@@ -94,9 +97,9 @@ public class SeparationSteeringBehavior: SteeringBehavior
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
         if (Threats == null || Threats.Count == 0) return SteeringOutput.zero;
-
-        Vector2 newVelocity = args.CurrentVelocity;
+        
         Vector2 currentPosition = args.Position;
+        Vector2 repulsion = Vector2.zero;
 
         // Traverse every target and sum up their respective repulsion forces.
         foreach (AgentMover target in Threats)
@@ -124,13 +127,19 @@ public class SeparationSteeringBehavior: SteeringBehavior
                 Vector2 toTargetDirection = toTarget.normalized;
                 Vector2 repulsionDirection = -toTargetDirection;
                 // Add current repulsion to previously added from other targets.
-                newVelocity += repulsionDirection * 
-                               (strengthAcceleration * args.DeltaTime);
+                repulsion += repulsionDirection * strengthAcceleration;
             }
         }
+        
+        // We don't want to return a repulsion velocity if we are so far away from threats
+        // that repulsion acceleration is near zero. So, in that case we return a zero
+        // velocity.
+        Vector2 newVelocity = repulsion.magnitude > StopAcceleration? 
+            args.CurrentVelocity + repulsion * args.DeltaTime:
+            Vector2.zero;
 
         _currentVelocity = newVelocity;
-        return new SteeringOutput(newVelocity, 0);
+        return new SteeringOutput(newVelocity);
     }
 
 #if UNITY_EDITOR

@@ -3,11 +3,11 @@ using UnityEngine;
 
 namespace SteeringBehaviors
 {
-    /// <summary>
-    /// <p> This steering behavior takes its children WeightBlendedSteeringBehavior nodes
-    /// by order and gets the steering of the first node that returns non-zero
-    /// steering.</p>
-    /// </summary>
+/// <summary>
+/// <p> This steering behavior takes its children WeightBlendedSteeringBehavior nodes
+/// by order and gets the steering of the first node that returns non-zero
+/// steering.</p>
+/// </summary>
 public class PriorityWeightBlendedSteeringBehavior: SteeringBehavior, IGizmos
 {
     [Header("DEBUG:")]
@@ -51,7 +51,7 @@ public class PriorityWeightBlendedSteeringBehavior: SteeringBehavior, IGizmos
         {
             SteeringOutput steeringOutput = 
                 weightBlendedSteeringBehavior.GetSteering(args);
-            if (steeringOutput.Equals(SteeringOutput.zero)) continue;
+            if (steeringOutput == SteeringOutput.zero) continue;
             _currentSteering = steeringOutput;
             break;
         }

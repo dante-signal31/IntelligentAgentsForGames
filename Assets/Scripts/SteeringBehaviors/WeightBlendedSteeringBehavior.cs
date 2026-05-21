@@ -78,7 +78,7 @@ public class WeightBlendedSteeringBehavior : SteeringBehavior, IGizmos
         foreach (var weightedBehavior in weightedBehaviors)
         {
             SteeringOutput output = weightedBehavior.steeringBehavior.GetSteering(args);
-            if (output.Equals(SteeringOutput.zero)) continue;
+            if (output == SteeringOutput.zero) continue;
             _activeOutputs.Add(
                 new WeightedOutput(
                     output, 

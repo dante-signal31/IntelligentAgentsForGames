@@ -85,9 +85,6 @@ public class PathFollowingSteeringBehavior : SteeringBehavior
             _pathStarted = true;
         }
         
-        // float distanceToTarget = 
-        //     Vector2.Distance(transform.position, FollowPath.CurrentTargetPosition);
-        // if (distanceToTarget < arrivalDistance)
         while (Vector2.Distance(transform.position, FollowPath.CurrentTargetPosition) < 
                arrivalDistance)
         {

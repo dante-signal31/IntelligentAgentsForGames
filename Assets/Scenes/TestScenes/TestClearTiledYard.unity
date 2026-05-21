@@ -1743,6 +1743,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: MeshAgentAvoiderMovingAgent3
       objectReference: {fileID: 0}
+    - target: {fileID: 8413821950923100397, guid: 7893e8d7072cc52409160ac354eaf015, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8902378517506094111, guid: 7893e8d7072cc52409160ac354eaf015, type: 3}
       propertyPath: m_LocalPosition.x
       value: -1.61
@@ -1965,6 +1969,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: MeshAgentAvoiderMovingAgent2
       objectReference: {fileID: 0}
+    - target: {fileID: 8413821950923100397, guid: 7893e8d7072cc52409160ac354eaf015, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8902378517506094111, guid: 7893e8d7072cc52409160ac354eaf015, type: 3}
       propertyPath: m_LocalPosition.x
       value: -3.49
@@ -2152,6 +2160,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6872363212706771536, guid: c757e5c7d7bd76a4fb3720b955d9e5f8, type: 3}
       propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8251199419700848689, guid: c757e5c7d7bd76a4fb3720b955d9e5f8, type: 3}
+      propertyPath: showGizmos
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8251199419700848689, guid: c757e5c7d7bd76a4fb3720b955d9e5f8, type: 3}
@@ -2536,7 +2548,7 @@ PrefabInstance:
     - target: {fileID: 1427894083363882658, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
       propertyPath: target
       value: 
-      objectReference: {fileID: 537020376}
+      objectReference: {fileID: 1939550359}
     - target: {fileID: 1599485924749689140, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
       propertyPath: m_Name
       value: SeekMovingAgent
@@ -2547,11 +2559,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1836060849959232966, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2.49
+      value: 5.98
       objectReference: {fileID: 0}
     - target: {fileID: 1836060849959232966, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.25
+      value: -2.05
       objectReference: {fileID: 0}
     - target: {fileID: 1836060849959232966, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
       propertyPath: m_LocalPosition.z
@@ -3091,6 +3103,10 @@ PrefabInstance:
     - target: {fileID: 8413821950923100397, guid: 7893e8d7072cc52409160ac354eaf015, type: 3}
       propertyPath: m_Name
       value: MeshAgentAvoiderMovingAgent
+      objectReference: {fileID: 0}
+    - target: {fileID: 8413821950923100397, guid: 7893e8d7072cc52409160ac354eaf015, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8902378517506094111, guid: 7893e8d7072cc52409160ac354eaf015, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3725,6 +3741,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 779731452}
     m_Modifications:
+    - target: {fileID: 2043812190143142109, guid: e3978fb6145077242b822424d1250194, type: 3}
+      propertyPath: threat
+      value: 
+      objectReference: {fileID: 1098409788}
     - target: {fileID: 2685377904653685238, guid: e3978fb6145077242b822424d1250194, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.8
@@ -3930,11 +3950,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3374666069497621577, guid: 7039a0f10eac5e4449a3edf7e5f9edc7, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -4.94
+      value: 5.48
       objectReference: {fileID: 0}
     - target: {fileID: 3374666069497621577, guid: 7039a0f10eac5e4449a3edf7e5f9edc7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.01
+      value: 1.68
       objectReference: {fileID: 0}
     - target: {fileID: 3374666069497621577, guid: 7039a0f10eac5e4449a3edf7e5f9edc7, type: 3}
       propertyPath: m_LocalPosition.z
@@ -6022,7 +6042,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6200962277490338011, guid: b7a2efd0074c3cd49af239ebf838ec23, type: 3}
       propertyPath: m_Name
-      value: FaceMovingAgent
+      value: LookAtMovingAgent
       objectReference: {fileID: 0}
     - target: {fileID: 6200962277490338011, guid: b7a2efd0074c3cd49af239ebf838ec23, type: 3}
       propertyPath: m_IsActive
@@ -6067,6 +6087,10 @@ PrefabInstance:
     - target: {fileID: 6432901902195461161, guid: b7a2efd0074c3cd49af239ebf838ec23, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7661373168042029914, guid: b7a2efd0074c3cd49af239ebf838ec23, type: 3}
+      propertyPath: m_Name
+      value: LookAtSteeringBehavior
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

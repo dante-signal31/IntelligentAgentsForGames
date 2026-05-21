@@ -20,6 +20,14 @@ public interface IPipelineActuator
     /// <returns>The best steering output available to achieve the goal.</returns>
     public Path GetPath(PipelineGoal goal, SteeringBehaviorArgs args);
 
+    /// <summary>
+    /// Generates the steering output for the given goal and behavior arguments.
+    /// </summary>
+    /// <param name="goal">The specific goal to achieve.</param>
+    /// <param name="args">The steering behavior arguments used to compute the
+    /// output.</param>
+    /// <returns>The computed steering output for the provided goal
+    /// and arguments.</returns>
     public SteeringOutput GetOutput(PipelineGoal goal, SteeringBehaviorArgs args);
 }
 }

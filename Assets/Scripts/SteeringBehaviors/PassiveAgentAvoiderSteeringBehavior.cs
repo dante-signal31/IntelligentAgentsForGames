@@ -133,9 +133,7 @@ public class PassiveAgentAvoiderSteeringBehavior : SteeringBehavior, IGizmos
             avoidanceVelocity = neededVelocity - _currentAgent.Velocity;
         }
         
-        _currentSteeringOutput = new SteeringOutput(
-            linear: avoidanceVelocity,
-            angular: 0);
+        _currentSteeringOutput = new SteeringOutput(linear: avoidanceVelocity);
         
         return _currentSteeringOutput;
     }

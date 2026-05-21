@@ -54,11 +54,12 @@ public class ActiveWallAvoiderSteeringBehavior : SteeringBehavior, ITargeter, IG
     
     private ITargeter _targeter;
     private Vector2 _avoidVector;
-    private Vector2 _previousAvoidVector;
     private Vector2 _toTargetVector;
-    private System.Timers.Timer _avoidanceTimer;
+    private Timer _avoidanceTimer;
     private bool _waitingForAvoidanceTimeout;
     private SteeringOutput _currentSteering;
+    private SteeringOutput toTargetSteering;
+    private SteeringOutput avoidingSteering;
     
     private void Start()
     {
@@ -68,7 +69,7 @@ public class ActiveWallAvoiderSteeringBehavior : SteeringBehavior, ITargeter, IG
     }
     
     /// <summary>
-    /// <p> Setup  timer for running away from an obstacle. </p>
+    /// <p> Set up the timer for running away from an obstacle. </p>
     /// <p> While the timer is on, the object will run away from an obstacle, so will
     /// keep its evasion vector. This is useful to avoid jittering when avoiding small
     /// obstacles.</p>
@@ -83,7 +84,6 @@ public class ActiveWallAvoiderSteeringBehavior : SteeringBehavior, ITargeter, IG
     private void OnTimerTimeout(object sender, ElapsedEventArgs e)
     {
         _waitingForAvoidanceTimeout = false;
-        _previousAvoidVector = Vector2.zero;
     }
     
     private void StartAvoidanceTimer()
@@ -96,23 +96,24 @@ public class ActiveWallAvoiderSteeringBehavior : SteeringBehavior, ITargeter, IG
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
         if (_waitingForAvoidanceTimeout) return _currentSteering;
+        
+        // Get steering to target.
+        toTargetSteering = steeringBehavior.GetSteering(args);
 
-        _avoidVector = Vector2.zero;
-        SteeringOutput avoidingSteering =
-            passiveWallAvoiderSteeringBehavior.GetSteering(args);
-        _avoidVector = avoidingSteering.Linear;
+        // Get avoid vector.
+        avoidingSteering = passiveWallAvoiderSteeringBehavior.GetSteering(args);
         
-        if (_avoidVector != Vector2.zero && _previousAvoidVector == Vector2.zero)
-            StartAvoidanceTimer();
-        _previousAvoidVector = _avoidVector;
-        
-        if (_avoidVector != Vector2.zero)
+        // No need to avoid anything? Then just go to the target.
+        if (avoidingSteering == SteeringOutput.zero)
         {
-            _currentSteering = avoidingSteering;
+            _currentSteering = toTargetSteering;
         }
+        // If we need to avoid an obstacle, then return the avoiding steering.
         else
         {
-            _currentSteering = steeringBehavior.GetSteering(args);
+            // Start timer to give time to the agent to avoid the obstacle.
+            StartAvoidanceTimer();
+            _currentSteering = avoidingSteering;
         }
         
         return _currentSteering;
@@ -123,18 +124,30 @@ public class ActiveWallAvoiderSteeringBehavior : SteeringBehavior, ITargeter, IG
     {
         if (!showGizmos) return;
         if (_currentSteering == null) return;
-        Gizmos.color = gizmosColor;
-        Gizmos.DrawLine(
-            transform.position, 
-            (Vector2) transform.position + _avoidVector);
-        Gizmos.color = Color.beige;
-        Gizmos.DrawLine(
-            transform.position, 
-            (Vector2) transform.position + _toTargetVector);
-        Gizmos.color = Color.blue;
-        Gizmos.DrawLine(
-            transform.position, 
-            (Vector2) transform.position + _currentSteering.Linear);
+        
+        if (avoidingSteering.IsLinearSet)
+        {
+            Gizmos.color = gizmosColor;
+            Gizmos.DrawLine(
+                transform.position, 
+                (Vector2) transform.position + avoidingSteering.Linear);
+        }
+
+        if (toTargetSteering.IsLinearSet)
+        {
+            Gizmos.color = Color.beige;
+            Gizmos.DrawLine(
+                transform.position, 
+                (Vector2) transform.position + toTargetSteering.Linear);
+        }
+
+        if (_currentSteering.IsLinearSet)
+        {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawLine(
+                transform.position, 
+                (Vector2) transform.position + _currentSteering.Linear);
+        }
     }
 #endif
 }

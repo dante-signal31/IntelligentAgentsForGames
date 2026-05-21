@@ -53,7 +53,7 @@ public class ArriveSteeringBehaviorLA : SteeringBehavior, ITargeter
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        if (Target == null) return new SteeringOutput(Vector2.zero);
+        if (Target == null) return SteeringOutput.zero;
     
         Vector2 targetPosition = Target.transform.position;
         Vector2 currentPosition = args.Position;

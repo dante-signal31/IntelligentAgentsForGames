@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using SteeringBehaviors;
 using ninja.dlab.Commontesttools;
+using Pathfinding;
 using Tools;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -19,6 +20,7 @@ namespace Tests.PlayTests
         private Transform _position4;
         private Transform _position5;
         private Transform _position6;
+        private Transform _position7;
 
         private Target _target;
         
@@ -32,12 +34,16 @@ namespace Tests.PlayTests
         private GameObject _pathFollowingGameObject;
         private GameObject _pathGameObject;
         private GameObject _contextGameObject;
+        private GameObject _pipelineGameObject;
+        private GameObject _wanderObstacleGameObject;
+        private GameObject _pipelineTestPath;
         
         private SeekSteeringBehavior _seekSteeringBehavior;
         private HideSteeringBehavior _hideSteeringBehavior;
         private ActiveWallAvoiderSteeringBehavior _wallAvoiderSteeringBehavior;
         private SmoothedWallAvoiderSteeringBehavior _smoothedWallAvoiderSteeringBehavior;
         private ContextSteeringBehavior _contextSteeringBehavior;
+        private PathFollowingSteeringBehavior _pathFollowingSteeringBehavior;
         
         private AgentMover _seekAgent;
         private AgentMover _hideAgent;
@@ -47,6 +53,9 @@ namespace Tests.PlayTests
         private AgentMover _priorityWeightBlendedHideWallAvoiderAgent;
         private AgentMover _priorityDitheringBlendedHideWallAvoiderAgent;
         private AgentMover _contextAgent;
+        private AgentMover _pipelineAgent;
+        private AgentMover _wanderObstacleAgent;
+        private AgentMover _pathFollowingAgent;
         
         private AgentColor _seekAgentColor;
         private AgentColor _hideAgentColor;
@@ -56,6 +65,9 @@ namespace Tests.PlayTests
         private AgentColor _priorityWeightBlendedHideWallAvoiderAgentColor;
         private AgentColor _priorityDitheringBlendedHideWallAvoiderAgentColor;
         private AgentColor _contextAgentColor;
+        private AgentColor _pipelineAgentColor;
+        private AgentColor _wanderObstacleAgentColor;
+        private AgentColor _pathFollowingAgentColor;
         
         
 
@@ -84,6 +96,11 @@ namespace Tests.PlayTests
             _contextGameObject = null;
             _contextAgentColor = null;
             _contextAgent = null;
+            _pipelineGameObject = null;
+            _pipelineAgent = null;
+            _wanderObstacleGameObject = null;
+            _wanderObstacleAgent = null;
+            _pathFollowingGameObject = null;
             _target = null;
     
             // Load the test scene
@@ -102,6 +119,8 @@ namespace Tests.PlayTests
                 _position5 = GameObject.Find("Position5").transform;
             if (_position6 == null)
                 _position6 = GameObject.Find("Position6").transform;
+            if (_position7 == null)
+                _position7 = GameObject.Find("Position7").transform;
             if (_target == null)
             {
                 _target = GameObject.Find("Target").GetComponent<Target>();
@@ -166,11 +185,29 @@ namespace Tests.PlayTests
                 _contextGameObject = GameObject.Find("ContextMovingAgent");
                 _contextGameObject.SetActive(false);
             }
+
+            if (_pipelineGameObject == null)
+            {
+                _pipelineGameObject = GameObject.Find("PipelineMovingAgent");
+                _pipelineGameObject.SetActive(false);
+            }
+            
+            if (_wanderObstacleGameObject == null)
+            {
+                _wanderObstacleGameObject = GameObject.Find("WanderMovingAgent_Obstacle");
+                _wanderObstacleGameObject.SetActive(false);
+            }
             
             if (_pathGameObject == null)
             {
                 _pathGameObject = GameObject.Find("Path");
                 _pathGameObject.SetActive(false);
+            }
+
+            if (_pipelineTestPath == null)
+            {
+                _pipelineTestPath = GameObject.Find("PipelineTestPath");
+                _pipelineTestPath.SetActive(false);
             }
             
             if (_seekSteeringBehavior == null)
@@ -187,6 +224,9 @@ namespace Tests.PlayTests
                     _smoothedWallAvoiderGameObject.GetComponentInChildren<SmoothedWallAvoiderSteeringBehavior>();
             if (_contextSteeringBehavior == null)
                 _contextSteeringBehavior = _contextGameObject.GetComponentInChildren<ContextSteeringBehavior>();
+            if (_pathFollowingSteeringBehavior == null)
+                _pathFollowingSteeringBehavior = _pathFollowingGameObject.GetComponentInChildren<PathFollowingSteeringBehavior>();
+            
             if (_seekAgent == null)
                 _seekAgent = _seekGameObject.GetComponent<AgentMover>();
             if (_hideAgent == null)
@@ -209,6 +249,12 @@ namespace Tests.PlayTests
                         .GetComponent<AgentMover>();
             if (_contextAgent == null)
                 _contextAgent = _contextGameObject.GetComponent<AgentMover>();
+            if (_pipelineAgent == null)
+                _pipelineAgent = _pipelineGameObject.GetComponent<AgentMover>();
+            if (_wanderObstacleAgent == null)
+                _wanderObstacleAgent = _wanderObstacleGameObject.GetComponent<AgentMover>();
+            if (_pathFollowingAgent == null)
+                _pathFollowingAgent = _pathFollowingGameObject.GetComponent<AgentMover>();
             
             if (_seekAgentColor == null)
                 _seekAgentColor = _seekGameObject.GetComponent<AgentColor>();
@@ -231,6 +277,12 @@ namespace Tests.PlayTests
                     _priorityDitheringBlendedHideWallAvoiderGameObject.GetComponent<AgentColor>();
             if (_contextAgentColor == null)
                 _contextAgentColor = _contextGameObject.GetComponent<AgentColor>();
+            if (_pipelineAgentColor == null)
+                _pipelineAgentColor = _pipelineGameObject.GetComponent<AgentColor>();
+            if (_wanderObstacleAgentColor)
+                _wanderObstacleAgentColor = _wanderObstacleGameObject.GetComponent<AgentColor>();
+            if (_pathFollowingAgentColor == null)
+                _pathFollowingAgentColor = _pathFollowingGameObject.GetComponent<AgentColor>();
         }
         
         [UnityTearDown]
@@ -252,6 +304,12 @@ namespace Tests.PlayTests
                 _priorityDitheringBlendedHideWallAvoiderGameObject.SetActive(false);
             if (_contextGameObject != null)
                 _contextGameObject.SetActive(false);
+            if (_pipelineGameObject != null)
+                _pipelineGameObject.SetActive(false);
+            if (_wanderObstacleGameObject != null)
+                _wanderObstacleGameObject.SetActive(false);
+            if (_pathGameObject != null)
+                _pathGameObject.SetActive(false);
             if (_target != null)
                 _target.Enabled = false;
 
@@ -383,7 +441,7 @@ namespace Tests.PlayTests
             // Start test.
             
             // Give agent time to get to the target.
-            yield return new WaitForSeconds(13f);
+            yield return new WaitForSeconds(14f);
             
             // Assert that wall avoider has reached the target.
             Assert.True(Vector2.Distance(
@@ -660,6 +718,93 @@ namespace Tests.PlayTests
             
             // Assert we reached our target.
             Assert.True(Vector2.Distance(_priorityDitheringBlendedHideWallAvoiderAgent.transform.position, 
+                _position2.position) < 1.5f);
+        }
+        
+        /// <summary>
+        /// Test that pipeline behavior can hide from a
+        /// moving SeekBehavior and reach its final destination.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator PipelineBehaviorTest()
+        {
+            // Setup agents before the tests.
+            _target.Enabled = true;
+            _target.TargetPosition = _position2.position;
+            _seekGameObject.transform.position = _position1.position;
+            _seekAgent.MaximumSpeed = 1.6f;
+            _seekAgent.StopSpeed = 0.01f;
+            _seekAgent.MaximumRotationalSpeed = 1080f;
+            _seekAgent.StopRotationThreshold = 1f;
+            _seekAgentColor.Color = Color.red;
+            _seekSteeringBehavior.Target = _target.gameObject;
+            _seekSteeringBehavior.ArrivalDistance = 0.3f;
+            _seekGameObject.SetActive(true);
+            
+            _pathFollowingGameObject.transform.position = _position7.position;
+            _pathFollowingAgent.MaximumSpeed = 2.0f;
+            _pathFollowingAgent.StopSpeed = 0.01f;
+            _pathFollowingAgent.MaximumRotationalSpeed = 1080f;
+            _pathFollowingAgent.StopRotationThreshold = 1f;
+            _pathFollowingAgentColor.Color = Color.orange;
+            _pathFollowingSteeringBehavior.FollowPath = _pipelineTestPath.GetComponent<Path>();
+            _pathFollowingGameObject.SetActive(true);
+            
+            _pipelineAgent.transform.position = _position3.position;
+            _pipelineAgent.MaximumSpeed = 2.0f;
+            _pipelineAgent.StopSpeed = 0.1f;
+            _pipelineAgent.MaximumRotationalSpeed = 45f;
+            _pipelineAgent.StopRotationThreshold = 10f;
+            _pipelineAgentColor.Color = Color.green;
+            
+            PipelineHidingConstraint hidingConstraint = 
+                _pipelineAgent.GetComponentInChildren<PipelineHidingConstraint>();
+            hidingConstraint.Threat = _seekAgent;
+
+            PipelineLookAtTargeter lookAtTargeter = 
+                _pipelineAgent.GetComponentInChildren<PipelineLookAtTargeter>();
+            lookAtTargeter.target = _pathFollowingGameObject;
+            
+            PipelineManualPositionTargeter positionTargeter = 
+                _pipelineAgent.GetComponentInChildren<PipelineManualPositionTargeter>();
+            positionTargeter.target = _position2.gameObject;
+            
+            _pipelineGameObject.SetActive(true);
+            
+            // Start test.
+            // Assert that seek agent can see hide agent.
+            yield return new WaitForSeconds(0.2f);
+            Assert.True(hidingConstraint.ThreatCanSeeUs);
+            
+            // Give hide agent time to hide.
+            yield return new WaitForSeconds(5f);
+            
+            // Assert that seek agent can no longer see hide agent.
+            Assert.False(hidingConstraint.ThreatCanSeeUs);
+            
+            // Move seek agent to another position.
+            _target.transform.position = _position3.position;
+            
+            // Give hide agent time to hide.
+            yield return new WaitForSeconds(5f);
+            
+            // Assert that seek agent can no longer see hide agent.
+            Assert.False(hidingConstraint.ThreatCanSeeUs);
+            
+            // Move seek agent to another position.
+            _target.transform.position = _position4.position;
+            
+            // Give hide agent time to hide.
+            yield return new WaitForSeconds(3f);
+            
+            // Assert that seek agent can no longer see hide agent.
+            Assert.False(hidingConstraint.ThreatCanSeeUs);
+            
+            // Give agent time to reach its final destination.
+            yield return new WaitForSeconds(3f);
+            
+            // Assert we reached our target.
+            Assert.True(Vector2.Distance(_pipelineAgent.transform.position, 
                 _position2.position) < 1.5f);
         }
         

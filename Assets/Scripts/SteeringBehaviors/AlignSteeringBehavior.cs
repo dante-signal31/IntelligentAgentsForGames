@@ -74,7 +74,7 @@ public class AlignSteeringBehavior : SteeringBehavior, ITargeter
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {   // I want smooth rotations, so I will use the same approach as in
         // ArriveSteeringBehavior.
-        if (Target == null) return new SteeringOutput(Vector2.zero);
+        if (Target == null) return SteeringOutput.zero;
     
         float targetOrientation = Target.transform.rotation.eulerAngles.z;
         float currentOrientation = args.Orientation;

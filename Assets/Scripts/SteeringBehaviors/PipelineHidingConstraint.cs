@@ -37,6 +37,12 @@ public class PipelineHidingConstraint: MonoBehaviour, IPipelineConstraint
         }
     }
     
+    /// <summary>
+    /// Whether threat can see the current agent.
+    /// </summary>
+    /// <returns>True is threat can see the current agent. Otherwise, false.</returns>
+    public bool ThreatCanSeeUs => IsPositionVisibleByThreat(transform.position);
+    
     private Courtyard _currentLevel;
     private Vector2 _alternativeGoalPosition = Vector2.positiveInfinity;
     private readonly Queue<Vector2> _alreadyUsedHidingPoints = new();

@@ -119,12 +119,12 @@ public class PassiveWallAvoiderSteeringBehavior : SteeringBehavior, IGizmos
         // If no obstacle detected, then this behavior has nothing to say.
         if (!_obstacleDetected)
         {
-            _currentSteering = new SteeringOutput(linear: Vector2.zero, angular: 0);
+            _currentSteering = SteeringOutput.zero;
             return _currentSteering;
         }
         
         // Millington algorithm: head to a point way from the obstacle. This point is
-        // defined by _avoidVector, using aas base the closest point detected by the
+        // defined by _avoidVector, using as the base the closest point detected by the
         // sensor.
         _avoidVector = GetAvoidVector(args);
         Vector2 recommendedTargetToAvoidObstacle = _closestHit.point + _avoidVector;
@@ -132,10 +132,8 @@ public class PassiveWallAvoiderSteeringBehavior : SteeringBehavior, IGizmos
             (recommendedTargetToAvoidObstacle - (Vector2) _agentMover.transform.position)
             .normalized;
         
-        _currentSteering = new SteeringOutput(
-            linear: vectorToGetRecommendedTarget * args.MaximumSpeed,
-            angular: 0);
-        
+        _currentSteering = 
+            new SteeringOutput(vectorToGetRecommendedTarget * args.MaximumSpeed);
         return _currentSteering;
     }
 
@@ -166,7 +164,7 @@ public class PassiveWallAvoiderSteeringBehavior : SteeringBehavior, IGizmos
             Vector2 normalizedHeading = args.CurrentVelocity == Vector2.zero? 
                 _agentMover.Forward: 
                 args.CurrentVelocity.normalized;
-            // How much the avoidVector is longitudinal to the current heading? The
+            // How much is the avoidVector longitudinal to the current heading? The
             // greater longitudinalDisplacement, the bigger the difference between
             // avoidVector and currentVelocity.
             float longitudinalDisplacement = 1 -

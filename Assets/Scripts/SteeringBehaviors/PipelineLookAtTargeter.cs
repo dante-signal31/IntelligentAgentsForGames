@@ -8,7 +8,7 @@ namespace SteeringBehaviors
 public class PipelineLookAtTargeter : MonoBehaviour, IPipelineTargeter
 {
     [Header("CONFIGURATION:")]
-    [SerializeField] private GameObject target;
+    [SerializeField] public GameObject target;
     
     [Header("WIRING:")]
     [SerializeField] private LookAtSteeringBehavior lookAtSteeringBehavior;

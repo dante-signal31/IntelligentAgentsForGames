@@ -69,7 +69,7 @@ public class WallAvoiderSteeringBehavior : SteeringBehavior, IGizmos, ITargeter
     }
     
     /// <summary>
-    /// Show closest hit marker and evasion velocity vector.
+    /// Show the closest hit marker and evasion velocity vector.
     /// </summary>
     public bool ShowGizmos
     {
@@ -98,7 +98,7 @@ public class WallAvoiderSteeringBehavior : SteeringBehavior, IGizmos, ITargeter
     
     private void Awake()
     {
-        // AgentMover can be in the same gameobject or in one of its parents, so be must
+        // AgentMover can be in the same game object or in one of its parents, so be must
         // search there.
         _agentMover = GetComponentInParent<AgentMover>();
         seekSteeringBehavior = GetComponent<SeekSteeringBehavior>();
@@ -114,7 +114,7 @@ public class WallAvoiderSteeringBehavior : SteeringBehavior, IGizmos, ITargeter
     }
     
     /// <summary>
-    /// <p> Setup  timer for running away from an obstacle. </p>
+    /// <p> Set up a timer for running away from an obstacle. </p>
     /// <p> While the timer is on, the object will run away from an obstacle, so will
     /// keep its evasion vector. This is useful to avoid jittering when avoiding small
     /// obstacles.</p>
@@ -176,24 +176,24 @@ public class WallAvoiderSteeringBehavior : SteeringBehavior, IGizmos, ITargeter
                 closestHitData.detectionSensorIndex, 
                 closestHitData.distance);
 
-            // Buckland and Millington calculate avoidVector this way but I is 
-            // troublesome when center sensor detect a wall perpendicular to current
-            // heading, because then avoidVector will stop the agent not make it
+            // Buckland and Millington calculate avoidVector this way, but It is 
+            // troublesome when the center sensor detects a wall perpendicular to the
+            // current heading, because then avoidVector will stop the agent not make it
             // evade the wall. So, an additional lateral push must be added to the
-            // avoidVector. That lateral push should be at its maximum when detecting
-            // sensor is in the center and minimum when detecting sensor is in the
+            // avoidVector. That lateral push should be at its maximum when the detecting
+            // sensor is in the center and minimum when the detecting sensor is on the
             // right or left side.
             _avoidVector = _closestHit.normal * (args.MaximumSpeed * overShootFactor);
             
             // Calculate relative side of detecting sensor.
-            // 0 is left side, 1 is right side, 0.5 is center.
+            // 0 is the left side, 1 is the right side, 0.5 is center.
             float indexSide = Mathf.InverseLerp(
                 0, 
                 whiskersSensor.SensorAmount-1,
                 closestHitData.detectionSensorIndex);
             
-            // Positive means the detecting sensor is in the left side of the
-            // agent. Negative means the detecting sensor is in the right side of the
+            // Positive means the detecting sensor is on the left side of the
+            // agent. Negative means the detecting sensor is on the right side of the
             // agent.
             float distanceFromCenterFactor = 0.5f - indexSide;
             
@@ -212,16 +212,16 @@ public class WallAvoiderSteeringBehavior : SteeringBehavior, IGizmos, ITargeter
             } 
             else if (indexSide > 0.5)
             {
-                // Push to the left when sensor detects obstacle in the right side.
+                // Push to the left when sensor detects obstacle on the right side.
                 pushDirection = -1;
             } 
             else
             {
-                // Push to the right when sensor detects obstacle in the left side.
+                // Push to the right when sensor detects obstacle on the left side.
                 pushDirection = 1;
             }
             
-            // Calculate right vector relative to our current Forward vector.
+            // Calculate the right vector relative to our current Forward vector.
             //
             // TIP --------------------------
             // I could have done:
@@ -245,14 +245,17 @@ public class WallAvoiderSteeringBehavior : SteeringBehavior, IGizmos, ITargeter
             // Add the push vector to the avoidVector.
             _avoidVector += pushVector;
             
-            // Start avoid timer to avoid jittering.
+            // Start to avoid timer to avoid jittering.
             StartAvoidanceTimer();
             _waitingForAvoidanceTimeout = true;
         }
 
-        _currentSteering = new SteeringOutput(
-            linear: steeringToTargetVelocity.Linear + _avoidVector,
-            angular: steeringToTargetVelocity.Angular);
+        Vector2 resultVelocity = steeringToTargetVelocity.Linear + _avoidVector;
+        _currentSteering = steeringToTargetVelocity.IsAngularSet? 
+            new SteeringOutput(
+                linear: resultVelocity,
+                angular: steeringToTargetVelocity.Angular):
+            new SteeringOutput(resultVelocity);
         return _currentSteering;
     }
 
@@ -281,9 +284,11 @@ public class WallAvoiderSteeringBehavior : SteeringBehavior, IGizmos, ITargeter
     /// <returns>Hit data.</returns>
     private ClosestHitData GetClosestHit(SteeringBehaviorArgs args)
     {
-        ClosestHitData closestHit = new();
-        closestHit.distance = float.MaxValue;
-        closestHit.detectionSensorIndex = -1;
+        ClosestHitData closestHit = new()
+        {
+            distance = float.MaxValue,
+            detectionSensorIndex = -1
+        };
 
         foreach ((RaycastHit2D hit, int index) in whiskersSensor.DetectedHits)
         {

@@ -111,7 +111,7 @@ public class VelocityMatchingSteeringBehavior : SteeringBehavior
             newVelocity = _currentVelocity + frameAcceleration;
         }
     
-        return new SteeringOutput(newVelocity, 0);
+        return new SteeringOutput(newVelocity);
     }
 }
 }

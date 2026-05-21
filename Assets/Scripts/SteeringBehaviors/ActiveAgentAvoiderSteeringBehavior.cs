@@ -97,21 +97,35 @@ public class ActiveAgentAvoiderSteeringBehavior : SteeringBehavior
         _steeringToTarget = steeringToTarget.GetSteering(args);
         _avoidingSteering = passiveAgentAvoiderSteering.GetSteering(args);
         
-        // Nothing to avoid, but we are waiting for avoidance timeout, so let's
-        // continue our current velocity.
+        // We are waiting for avoidance cooldown, so let's continue our current velocity.
         if (_waitingForAvoidanceTimeout) return _currentSteeringOutput;
         
         // Nothing to avoid and waiting nothing, so let's just go to our target.
-        if (_avoidingSteering.Equals(SteeringOutput.zero)) 
+        if (_avoidingSteering.Equals(SteeringOutput.zero))
+        {
+            _currentSteeringOutput = _steeringToTarget;
             return _steeringToTarget;
+        }
         
         // If we get here, then there's an agent to avoid. Add avoiding vector to our
         // velocity to avoid collision. 
-        Vector2 newVelocity = _steeringToTarget.Linear + 
-                              _avoidingSteering.Linear;
-        _currentSteeringOutput = new SteeringOutput(
-            newVelocity, 
-            _steeringToTarget.Angular);
+        Vector2? newVelocity;
+        if (_steeringToTarget.IsLinearSet || _avoidingSteering.IsLinearSet)
+        {
+            Vector2 steeringVelocity = _steeringToTarget.IsLinearSet ? 
+                _steeringToTarget.Linear: 
+                Vector2.zero;
+            Vector2 avoidingVelocity = _avoidingSteering.IsLinearSet? 
+                _avoidingSteering.Linear: 
+                Vector2.zero;
+            newVelocity = steeringVelocity +
+                          avoidingVelocity;
+        }
+        else newVelocity = SteeringOutput.linearUnset;
+        
+        _currentSteeringOutput = _steeringToTarget.IsAngularSet? 
+            new SteeringOutput(newVelocity, _steeringToTarget.Angular):
+            new SteeringOutput(newVelocity);
         
         // We need a cooldown, or we can get stuck in a cycle where our agent changes 
         // its heading to avoid collision but, in the next frame, as its heading is
@@ -127,20 +141,31 @@ public class ActiveAgentAvoiderSteeringBehavior : SteeringBehavior
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
-        if (!showGizmos) return;
+        if (!showGizmos || !Application.isPlaying) return;
         
         Gizmos.color = gizmosColorAvoidance;
-        Gizmos.DrawLine(
-            transform.position, 
-            transform.position + (Vector3) _avoidingSteering.Linear);
+        if (_avoidingSteering is { IsLinearSet: true })
+        {
+            Gizmos.DrawLine(
+                transform.position, 
+                transform.position + (Vector3) _avoidingSteering.Linear);
+        }
+        
         Gizmos.color = gizmosColorSteering;
-        Gizmos.DrawLine(
-            transform.position, 
-            transform.position + (Vector3) _steeringToTarget.Linear);
+        if (_steeringToTarget is { IsLinearSet: true })
+        {
+            Gizmos.DrawLine(
+                transform.position, 
+                transform.position + (Vector3) _steeringToTarget.Linear);
+        }
+        
         Gizmos.color = gizmosColorResultingVelocity;
-        Gizmos.DrawLine(
-            transform.position, 
-            transform.position + (Vector3)_currentSteeringOutput.Linear);
+        if (_currentSteeringOutput is { IsLinearSet: true })
+        {
+            Gizmos.DrawLine(
+                transform.position, 
+                transform.position + (Vector3)_currentSteeringOutput.Linear);
+        }
     }
 #endif
 }

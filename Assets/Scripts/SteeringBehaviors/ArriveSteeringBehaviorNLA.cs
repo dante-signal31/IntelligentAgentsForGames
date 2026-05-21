@@ -3,14 +3,14 @@
 namespace SteeringBehaviors
 {
 /// <summary>
-/// <p>Monobehaviour to offer an Arrive steering behaviour.</p>
+/// <p>Script to offer an Arrive steering behavior.</p>
 /// 
-/// <p>Arrive behavior is a Seek-like steering behaviour in which agent accelerates at
-/// the startup and brakes gradually when approachs the end.</p>
+/// <p>Arrive behavior is a Seek-like steering behavior in which the agent speeds up at
+/// the startup and brakes gradually when it approaches the end.</p>
 /// <p> NLA behavior implements a Non-Linear-Acceleration approach. So, in this case
-/// acceleration is given by curves instead of a fixed acceleration value.</p>
+/// curves give acceleration instead of a fixed acceleration value.</p>
 /// </summary>
-public class ArriveSteeringBehaviorNLA : SteeringBehavior, ITargeter
+public class ArriveSteeringBehaviorNla : SteeringBehavior, ITargeter
 {
     [Header("CONFIGURATION:")]
     [Tooltip("Point to arrive to.")]
@@ -37,7 +37,7 @@ public class ArriveSteeringBehaviorNLA : SteeringBehavior, ITargeter
     }
 
     /// <summary>
-    /// Radius to start slowing down using deceleration curve.
+    /// Radius to start slowing down using the deceleration curve.
     /// </summary>
     public float BrakingRadius
     {
@@ -46,7 +46,7 @@ public class ArriveSteeringBehaviorNLA : SteeringBehavior, ITargeter
     }
 
     /// <summary>
-    /// At this distance from target, agent will full stop.
+    /// At this distance from the target, the agent will fully stop.
     /// </summary>
     public float ArrivalDistance
     {
@@ -55,7 +55,7 @@ public class ArriveSteeringBehaviorNLA : SteeringBehavior, ITargeter
     }
 
     /// <summary>
-    /// At this distance from start, agent will be at full speed, finishing its
+    /// At this distance from the start, the agent will be at full speed, finishing its
     /// acceleration curve.
     /// </summary>
     public float AccelerationRadius
@@ -70,7 +70,7 @@ public class ArriveSteeringBehaviorNLA : SteeringBehavior, ITargeter
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        if (Target == null) return new SteeringOutput(Vector2.zero, 0);
+        if (Target == null) return SteeringOutput.zero;
     
         Vector2 targetPosition = Target.transform.position;
         Vector2 currentPosition = args.Position;
@@ -82,7 +82,7 @@ public class ArriveSteeringBehaviorNLA : SteeringBehavior, ITargeter
         Vector2 toTarget = targetPosition - currentPosition;
         float distanceToTarget = toTarget.magnitude;
 
-        float newSpeed = 0.0f;
+        float newSpeed;
     
         if (_idle && _distanceFromStart > 0) _distanceFromStart = 0;
     
@@ -119,7 +119,7 @@ public class ArriveSteeringBehaviorNLA : SteeringBehavior, ITargeter
     
         Vector2 newVelocity = toTarget.normalized * newSpeed;
     
-        return new SteeringOutput(newVelocity, 0);
+        return new SteeringOutput(newVelocity);
     }
 }
 }
