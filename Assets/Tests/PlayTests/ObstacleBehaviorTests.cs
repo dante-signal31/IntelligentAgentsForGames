@@ -729,6 +729,9 @@ namespace Tests.PlayTests
         public IEnumerator PipelineBehaviorTest()
         {
             // Setup agents before the tests.
+            _wanderObstacleGameObject.GetComponent<AgentColor>().Color = Color.yellow;
+            _wanderObstacleGameObject.SetActive(true);
+            
             _target.Enabled = true;
             _target.TargetPosition = _position2.position;
             _seekGameObject.transform.position = _position1.position;
@@ -767,7 +770,7 @@ namespace Tests.PlayTests
             
             PipelineManualPositionTargeter positionTargeter = 
                 _pipelineAgent.GetComponentInChildren<PipelineManualPositionTargeter>();
-            positionTargeter.target = _position2.gameObject;
+            positionTargeter.target = _position1.gameObject;
             
             _pipelineGameObject.SetActive(true);
             
@@ -805,7 +808,7 @@ namespace Tests.PlayTests
             
             // Assert we reached our target.
             Assert.True(Vector2.Distance(_pipelineAgent.transform.position, 
-                _position2.position) < 1.5f);
+                _position1.position) < 1.5f);
         }
         
         /// <summary>
