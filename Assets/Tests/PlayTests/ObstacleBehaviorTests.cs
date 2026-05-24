@@ -37,6 +37,7 @@ namespace Tests.PlayTests
         private GameObject _pipelineGameObject;
         private GameObject _wanderObstacleGameObject;
         private GameObject _pipelineTestPath;
+        private GameObject _coneSensorGameObject;
         
         private SeekSteeringBehavior _seekSteeringBehavior;
         private HideSteeringBehavior _hideSteeringBehavior;
@@ -101,6 +102,7 @@ namespace Tests.PlayTests
             _wanderObstacleGameObject = null;
             _wanderObstacleAgent = null;
             _pathFollowingGameObject = null;
+            _coneSensorGameObject = null;
             _target = null;
     
             // Load the test scene
@@ -190,6 +192,12 @@ namespace Tests.PlayTests
             {
                 _pipelineGameObject = GameObject.Find("PipelineMovingAgent");
                 _pipelineGameObject.SetActive(false);
+            }
+
+            if (_coneSensorGameObject == null)
+            {
+                _coneSensorGameObject = GameObject.Find("ConeSensorMovingAgent");
+                _coneSensorGameObject.SetActive(false);
             }
             
             if (_wanderObstacleGameObject == null)
