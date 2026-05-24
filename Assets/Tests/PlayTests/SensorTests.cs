@@ -386,14 +386,14 @@ public class SensorTests
 
         // The coneSensorAgents looks away from the other agents. So, it should detect
         // none.
-        yield return new WaitForSeconds(5.0f);
+        yield return new WaitForSeconds(1.0f);
         Assert.True(coneSensor.DetectedObjects.Count == 0);
         
         // Change to a position where it should see the three of the other agents.
         _coneSensorAgent.transform.position = _position2.transform.position;
         _coneSensorAgent.transform.eulerAngles = new Vector3(0, 0, 40);
         // Give cone sensor time to detect agents.
-        yield return new WaitForSeconds(5.0f);
+        yield return new WaitForSeconds(1.0f);
         Assert.True(coneSensor.DetectedObjects.Count == 3);
         
         // Change to a position where it should only one of the agents because the
