@@ -19,10 +19,15 @@ public class ConeSensor : MonoBehaviour, ISensor
     [SerializeField] private float detectionSemiconeAngle = 45f;
     [Tooltip("Specifies the physics layers that the sensor will monitor for objects")]
     [SerializeField] private LayerMask layersToDetect;
+    [Tooltip("Whether to check line of sight for objects in the detection area. If true," +
+             "and an object in range is behind an obstacle, then it will be marked as " +
+             "not detected.")]
+    [SerializeField] private bool checkLineOfSight = true;
+    [Tooltip("Layers for obstacles that should not be considered for line of sight.")]
+    [SerializeField] private LayerMask visualObstaclesLayersMask;
 
 
     [Header("EVENTS:")]
-    
     [FormerlySerializedAs("objectEnteredCone")]
     [Tooltip("Subscriptions to new detections.")]
     [SerializeField] private UnityEvent<GameObject> objectEnteredSensor;
@@ -43,8 +48,7 @@ public class ConeSensor : MonoBehaviour, ISensor
     [SerializeField] private VolumetricSensor sensor;
     [SerializeField] private BoxRangeManager boxRangeManager;
     [SerializeField] private ConeRange coneRange;
-
-    private bool _parameterSetFromHere;
+    [SerializeField] private RaySensor lineOfSightSensor;
     
     /// <summary>
     /// Range to detect objects.
@@ -97,8 +101,28 @@ public class ConeSensor : MonoBehaviour, ISensor
         set
         {
             layersToDetect = value;
-            if (sensor == null) return;
-            sensor.detectionLayers = value;
+            ConfigureVolumetricSensor(value);
+        }
+    }
+
+    public bool CheckLineOfSight
+    {
+        get => checkLineOfSight;
+        set
+        {
+            checkLineOfSight = value;
+            lineOfSightSensor.enabled = checkLineOfSight;
+        }
+    }
+        
+
+    public LayerMask VisualObstaclesLayersMask
+    {
+        get => visualObstaclesLayersMask;
+        set
+        {
+            visualObstaclesLayersMask = value;
+            ConfigureLineOfSightSensor(value);
         }
     }
     
@@ -127,8 +151,38 @@ public class ConeSensor : MonoBehaviour, ISensor
     /// <p>Only are considered those objects included in the layer mask provided
     /// to ConeSensor.</p> 
     /// </summary>
-    public HashSet<GameObject> DetectedObjects { get; } = new();
+    public HashSet<GameObject> DetectedObjects
+    {
+        get
+        {
+            if (checkLineOfSight) return _objectsInSensorRangeAndVisible;
+            return _objectsInSensorRange;
+        }
+    }
     
+    private bool _parameterSetFromHere;
+    private readonly HashSet<GameObject> _objectsInSensorRange = new();
+    private readonly HashSet<GameObject> _objectsInSensorRangeAndVisible = new();
+
+    private void Start()
+    {
+        ConfigureVolumetricSensor(LayersToDetect);
+        lineOfSightSensor.enabled = checkLineOfSight;
+        ConfigureLineOfSightSensor(VisualObstaclesLayersMask);
+    }
+    
+    private void ConfigureVolumetricSensor(LayerMask value)
+    {
+        if (sensor == null) return;
+        sensor.detectionLayers = value;
+    }
+    
+    private void ConfigureLineOfSightSensor(LayerMask value)
+    {
+        if (lineOfSightSensor == null) return;
+        lineOfSightSensor.detectionLayers = LayersToDetect | value;
+    }
+
     /// <summary>
     /// Whether a global position is inside the cone range of the agent.
     /// </summary>
@@ -166,10 +220,21 @@ public class ConeSensor : MonoBehaviour, ISensor
     /// <param name="otherObject">The object who enters the detection area.</param>
     public void OnObjectEnteredCone(GameObject otherObject)
     {
+        // Remember that the initial detection area is a square, but our final detection
+        // area is a cone whose area is a subset of the square area. So, we need to
+        // check if the object is inside the cone range.
         if (!PositionIsInConeRange(otherObject.transform.position)) 
             return;
         
-        DetectedObjects.Add(otherObject);
+        _objectsInSensorRange.Add(otherObject);
+        
+        if (!CheckLineOfSight) ObjectEnteredSensor?.Invoke(otherObject);
+
+        // Object can be inside the cone range but behind a cover. So, we must check
+        // if there is a line-of-sight with the object.
+        if (!CheckLineOfSight || !ObjectIsVisible(otherObject)) return; 
+            
+        _objectsInSensorRangeAndVisible.Add(otherObject);
         
         objectEnteredSensor?.Invoke(otherObject);
     }
@@ -183,9 +248,9 @@ public class ConeSensor : MonoBehaviour, ISensor
         // Only keep in DetectedObjects those who are in the detection area and in
         // cone range.
         if (!PositionIsInConeRange(otherObject.transform.position) &&
-            DetectedObjects.Contains(otherObject))
+            _objectsInSensorRange.Contains(otherObject))
         {
-            DetectedObjects.Remove(otherObject);
+            _objectsInSensorRange.Remove(otherObject);
             return;
         }
         
@@ -193,8 +258,25 @@ public class ConeSensor : MonoBehaviour, ISensor
         if (!PositionIsInConeRange(otherObject.transform.position)) 
             return;
         
+        // Can an object appear in stay phase without having being detected
+        // in enter phase? Yes, it can. If the game starts with the object already inside
+        // the sensor range, then it won't be detected in the enter phase but in the stay
+        // phase.
+        //
         // If the object is in the cone range, then add it to DetectedObjects.
-        DetectedObjects.Add(otherObject);
+        _objectsInSensorRange.Add(otherObject);
+        
+        if (!CheckLineOfSight || !ObjectIsVisible(otherObject))
+        {
+            if (_objectsInSensorRangeAndVisible.Contains(otherObject)) 
+                _objectsInSensorRangeAndVisible.Remove(otherObject);
+            return;
+        }
+        
+        // This is a HashSet. The type offers a built-in method to avoid duplicated
+        // elements. So, we can simply add the element without checking if it is already
+        // in the collection.
+        _objectsInSensorRangeAndVisible.Add(otherObject);
         
         objectStayedInSensor?.Invoke(otherObject);
     }
@@ -205,12 +287,37 @@ public class ConeSensor : MonoBehaviour, ISensor
     /// <param name="otherObject">The object who exits our detection area.</param>
     public void OnObjectExitedCone(GameObject otherObject)
     {
-        if (!DetectedObjects.Contains(otherObject)) return;
+        // Only remove from detected object if it was already there.
+        if (!_objectsInSensorRange.Contains(otherObject)) return;
+        _objectsInSensorRange.Remove(otherObject);
         
-        DetectedObjects.Remove(otherObject);
-        
-        if (objectLeftSensor != null) 
-            objectLeftSensor.Invoke(otherObject);
+        // If we are not checking line-of-sight, then there is nothing more to do.
+        if (!CheckLineOfSight)
+        {
+            ObjectLeftSensor?.Invoke(otherObject);
+            return;
+        }
+
+        if (!_objectsInSensorRangeAndVisible.Contains(otherObject)) return;
+        _objectsInSensorRangeAndVisible.Remove(otherObject);
+
+        ObjectLeftSensor?.Invoke(otherObject);
+    }
+
+    /// <summary>
+    /// Checks whether the specified object is visible to the sensor, considering
+    /// line-of-sight and visual obstacles.
+    /// </summary>
+    /// <param name="otherObject">The game object to check for visibility.</param>
+    /// <returns>True if the object is visible to the sensor; otherwise, false.</returns>
+    private bool ObjectIsVisible(GameObject otherObject)
+    {
+        lineOfSightSensor.EndPosition = otherObject.transform.position;
+        lineOfSightSensor.UpdateRay();
+        Collider2D detectedCollider = lineOfSightSensor.DetectedCollider;
+        if (detectedCollider == null) return false;
+        GameObject detectedObject = detectedCollider.gameObject;
+        return detectedObject == otherObject;
     }
     
     /// <summary>
