@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Linq;
 using NUnit.Framework;
 using SteeringBehaviors;
 using ninja.dlab.Commontesttools;
@@ -41,6 +42,7 @@ public class SensorTests
     private GameObject _wanderObstacleGameObject;
     private GameObject _pipelineTestPath;
     private GameObject _coneSensorGameObject;
+    private GameObject _touchSensorGameObject;
 
     private SeekSteeringBehavior _seekSteeringBehavior;
     private HideSteeringBehavior _hideSteeringBehavior;
@@ -61,6 +63,7 @@ public class SensorTests
     private AgentMover _wanderObstacleAgent;
     private AgentMover _pathFollowingAgent;
     private AgentMover _coneSensorAgent;
+    private AgentMover _touchSensorAgent;
 
     private AgentColor _seekAgentColor;
     private AgentColor _hideAgentColor;
@@ -74,6 +77,7 @@ public class SensorTests
     private AgentColor _wanderObstacleAgentColor;
     private AgentColor _pathFollowingAgentColor;
     private AgentColor _coneSensorAgentColor;
+    private AgentColor _touchSensorAgentColor;
     
     [UnitySetUp]
     public IEnumerator SetUp()
@@ -107,6 +111,8 @@ public class SensorTests
         _pathFollowingGameObject = null;
         _coneSensorGameObject = null;
         _coneSensorAgent = null;
+        _touchSensorGameObject = null;
+        _touchSensorAgent = null;
         _target = null;
 
         // Load the test scene
@@ -229,6 +235,12 @@ public class SensorTests
             _pipelineTestPath.SetActive(false);
         }
 
+        if (_touchSensorGameObject == null)
+        {
+            _touchSensorGameObject = GameObject.Find("TouchSensorMovingAgent");
+            _touchSensorGameObject.SetActive(false);
+        }
+            
         if (_seekSteeringBehavior == null)
             _seekSteeringBehavior =
                 _seekGameObject.GetComponentInChildren<SeekSteeringBehavior>();
@@ -281,6 +293,8 @@ public class SensorTests
             _pathFollowingAgent = _pathFollowingGameObject.GetComponent<AgentMover>();
         if (_coneSensorAgent == null)
             _coneSensorAgent = _coneSensorGameObject.GetComponent<AgentMover>();
+        if (_touchSensorAgent == null)
+            _touchSensorAgent = _touchSensorGameObject.GetComponent<AgentMover>();
 
         if (_seekAgentColor == null)
             _seekAgentColor = _seekGameObject.GetComponent<AgentColor>();
@@ -315,6 +329,8 @@ public class SensorTests
                 _pathFollowingGameObject.GetComponent<AgentColor>();
         if (_coneSensorAgentColor == null)
             _coneSensorAgentColor = _coneSensorGameObject.GetComponent<AgentColor>();
+        if (_touchSensorAgentColor == null)
+            _touchSensorAgentColor = _touchSensorGameObject.GetComponent<AgentColor>();
     }
 
     [UnityTearDown]
@@ -344,9 +360,11 @@ public class SensorTests
             _pathGameObject.SetActive(false);
         if (_coneSensorGameObject != null)
             _coneSensorGameObject.SetActive(false);
+        if (_touchSensorGameObject != null)
+            _touchSensorGameObject.SetActive(false);
         if (_target != null)
             _target.Enabled = false;
-
+        
         yield return null;
     }
 
@@ -403,6 +421,69 @@ public class SensorTests
         // Give cone sensor time to detect agents.
         yield return new WaitForSeconds(1.0f);
         Assert.True(coneSensor.DetectedObjects.Count == 1);
+    }
+    
+    /// <summary>
+    /// Test that TouchSensor detects other agents it collides with.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator TouchSensorTest()
+    {
+        // Get reference to the TouchSensor.
+        TouchSensor touchSensor = _touchSensorGameObject.GetComponentInChildren<TouchSensor>();
+        SeekSteeringBehavior touchSensorSteeringBehavior = 
+            _touchSensorGameObject.GetComponentInChildren<SeekSteeringBehavior>();
+            
+        // Setup agents before the test.
+        _target.transform.position = _position8.transform.position;
+        
+        _touchSensorAgent.MaximumSpeed = 1.0f;
+        _touchSensorAgent.transform.position = _position1.transform.position;
+        _touchSensorAgent.transform.eulerAngles = Vector3.zero;
+        _touchSensorAgentColor.Color = Color.green;
+        touchSensorSteeringBehavior.Target = _target.gameObject;
+        
+        _hideAgent.transform.position = _position8.transform.position;
+        _hideAgent.MaximumSpeed = 0.0f;
+        _hideAgentColor.Color = Color.red;
+        
+        _seekAgent.transform.position = _position9.transform.position;
+        _seekAgentColor.Color = Color.red;
+        _seekAgent.MaximumSpeed = 0.0f;
+        
+        _pathFollowingAgent.transform.position = _position2.transform.position;
+        _pathFollowingAgent.MaximumSpeed = 0.0f;
+        _pathFollowingAgentColor.Color = Color.red;
+        
+        // Start test.
+        _target.gameObject.SetActive(true);
+        _touchSensorGameObject.SetActive(true);
+        _hideGameObject.SetActive(true);
+        _seekGameObject.SetActive(true);
+        _pathFollowingGameObject.SetActive(true);
+
+        // The touchSensor does not touch any agent. So, it should detect
+        // none.
+        yield return new WaitForSeconds(1.0f);
+        Assert.True(touchSensor.DetectedObjects.Count == 0);
+        
+        // Change to a position where it should touch the first agent.
+        yield return new WaitForSeconds(1.1f);
+        Assert.True(touchSensor.DetectedObjects.Count == 1 &&
+                    touchSensor.DetectedObjects.ToArray()[0].name == _hideGameObject.name);
+        
+        // Change to a position where it should touch the second agent.
+        _target.transform.position = _position2.transform.position;
+        yield return new WaitForSeconds(2.0f);
+        Assert.True(touchSensor.DetectedObjects.Count == 1 &&
+                    touchSensor.DetectedObjects.ToArray()[0].name == _pathFollowingGameObject.name);
+
+        // Change to a position where it should touch the third agent.
+        _target.transform.position = _position9.transform.position;
+        yield return new WaitForSeconds(3.0f);
+        Assert.True(touchSensor.DetectedObjects.Count == 2 &&
+                    touchSensor.DetectedObjects.ToArray()[0].name == _hideGameObject.name &&
+                    touchSensor.DetectedObjects.ToArray()[1].name == _seekGameObject.name);
     }
 }
 }
