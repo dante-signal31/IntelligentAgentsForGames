@@ -153,7 +153,7 @@ public class SmoothedWallAvoiderSteeringBehavior: SteeringBehavior, ITargeter
     {
         _advantageTimer.waitTime = secondsToWaitAfterReachingUsher;
         _advantageTimer.oneShot = true;
-        _advantageTimer.timeoutEvent.AddListener(OnTimerTimeout);
+        _advantageTimer.timeout.AddListener(OnTimerTimeout);
     }
 
     private void OnTimerTimeout()
