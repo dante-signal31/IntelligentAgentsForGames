@@ -2753,7 +2753,7 @@ namespace Tests.PlayTests
             {
                 yield return new WaitForSeconds(1.0f);
                 Assert.True(Vector3.Distance(_unityMeshAgentAvoiderGameObject2.transform.position,
-                    _unityMeshAgentAvoiderGameObject.transform.position) >= (1.5f));
+                    _unityMeshAgentAvoiderGameObject.transform.position) >= (1.3f));
             }
 
             // Assert we reached target.

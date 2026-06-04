@@ -38,6 +38,7 @@ namespace Tests.PlayTests
         private GameObject _wanderObstacleGameObject;
         private GameObject _pipelineTestPath;
         private GameObject _coneSensorGameObject;
+        private GameObject _touchSensorGameObject;
         
         private SeekSteeringBehavior _seekSteeringBehavior;
         private HideSteeringBehavior _hideSteeringBehavior;
@@ -103,6 +104,7 @@ namespace Tests.PlayTests
             _wanderObstacleAgent = null;
             _pathFollowingGameObject = null;
             _coneSensorGameObject = null;
+            _touchSensorGameObject = null;
             _target = null;
     
             // Load the test scene
@@ -204,6 +206,12 @@ namespace Tests.PlayTests
             {
                 _wanderObstacleGameObject = GameObject.Find("WanderMovingAgent_Obstacle");
                 _wanderObstacleGameObject.SetActive(false);
+            }
+
+            if (_touchSensorGameObject == null)
+            {
+                _touchSensorGameObject = GameObject.Find("TouchSensorMovingAgent");
+                _touchSensorGameObject.SetActive(false);
             }
             
             if (_pathGameObject == null)
@@ -316,6 +324,8 @@ namespace Tests.PlayTests
                 _pipelineGameObject.SetActive(false);
             if (_wanderObstacleGameObject != null)
                 _wanderObstacleGameObject.SetActive(false);
+            if (_touchSensorGameObject != null)
+                _touchSensorGameObject.SetActive(false);
             if (_pathGameObject != null)
                 _pathGameObject.SetActive(false);
             if (_target != null)
