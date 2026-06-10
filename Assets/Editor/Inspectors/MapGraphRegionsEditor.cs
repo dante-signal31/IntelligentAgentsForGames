@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using Pathfinding;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace Editor.Inspectors
 {

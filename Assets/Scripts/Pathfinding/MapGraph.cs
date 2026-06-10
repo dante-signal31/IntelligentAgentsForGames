@@ -43,7 +43,8 @@ public class MapGraph : MonoBehaviour, IPositionGraph
     [SerializeField, HideInInspector] private MapGraphResource graphResource = new();
     
     [Header("DEBUG:")]
-    [SerializeField] private bool showGizmos = true;
+    [SerializeField] public bool showGizmos = true;
+    [SerializeField] public bool showCosts;
     [SerializeField] public Color gridColor = Color.yellow;
     [SerializeField] private float nodeRadius = 0.1f;
     [SerializeField] private Color nodeColor = Color.orange;
@@ -122,6 +123,15 @@ public class MapGraph : MonoBehaviour, IPositionGraph
     /// The <see cref="PositionNode"/> associated with the specified ID.
     /// </returns>
     public IPositionNode GetNodeById(uint nodeId) => 
+        graphResource.arrayPositionsToNodes[GetArrayPositionById(nodeId)];
+    
+    /// <summary>
+    /// Retrieves the PositionNode associated with the specified node ID.
+    /// </summary>
+    /// <param name="nodeId">The unique identifier of the node to retrieve.</param>
+    /// <returns>The PositionNode corresponding to the provided node ID. If no node
+    /// exists for the given ID, null is returned.</returns>
+    public PositionNode GetPositionNodeById(uint nodeId) => 
         graphResource.arrayPositionsToNodes[GetArrayPositionById(nodeId)];
     
     /// <summary>

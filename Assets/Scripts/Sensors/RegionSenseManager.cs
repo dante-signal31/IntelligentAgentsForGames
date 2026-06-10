@@ -78,7 +78,7 @@ public class RegionSenseManager: MonoBehaviour
     private readonly SortedSet<SignalNotification> _signalQueue = 
         new(new SignalNotificationComparer());
 
-    private void Start()
+    protected virtual void Start()
     {
         InitializeSenderTimer();
     }
@@ -100,7 +100,7 @@ public class RegionSenseManager: MonoBehaviour
     /// Register a sensor to receive signals from this RegionSenseManager.
     /// </summary>
     /// <param name="sensor">Sensor interested in receiving signals.</param>
-    public void RegisterSensor(IRegionSenseSensor sensor)
+    public virtual void RegisterSensor(IRegionSenseSensor sensor)
     {
         _registeredSensors.Add(sensor);
     }
@@ -109,7 +109,7 @@ public class RegionSenseManager: MonoBehaviour
     /// Unregister a sensor from receiving signals from this RegionSenseManager.
     /// </summary>
     /// <param name="sensor">Sensor no longer interested in receiving signals.</param>
-    public void UnregisterSensor(IRegionSenseSensor sensor)
+    public virtual void UnregisterSensor(IRegionSenseSensor sensor)
     {
         _registeredSensors.Remove(sensor);
     }
@@ -118,7 +118,7 @@ public class RegionSenseManager: MonoBehaviour
     /// Called by signal sources to send a signal to the sensors.
     /// </summary>
     /// <param name="signal">Signal to be sent.</param>
-    public void RegisterSignal(RegionSenseSignal signal)
+    public virtual void RegisterSignal(RegionSenseSignal signal)
     {
         foreach (IRegionSenseSensor sensor in _registeredSensors)
         {

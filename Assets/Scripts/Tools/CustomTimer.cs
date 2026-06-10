@@ -37,7 +37,9 @@ public class CustomTimer : MonoBehaviour
     [SerializeField] public bool oneShot;
     
     [Tooltip("If true, this timer will start automatically when the scene starts. If " +
-             "false, you'll have to call Start() manually.")]
+             "false, you'll have to call StartTimer() manually. If you configure " +
+             "this from code, do it from Awake() because auto start is called " +
+             "from Start().")]
     [SerializeField] public bool autoStart;
     
     [Tooltip("Time scale to use for this timer.")]
@@ -53,7 +55,7 @@ public class CustomTimer : MonoBehaviour
 
     private Coroutine _currentCoroutine;
     
-    private void Awake()
+    private void Start()
     {
         if (autoStart) StartTimer();
     }

@@ -34,6 +34,8 @@ public class MapGraphEditor : UnityEditor.Editor
     private void OnSceneGUI()
     {
         var graph = (MapGraph)target;
+
+        if (!graph.showCosts) return;
         
         var textStyle = new GUIStyle(EditorStyles.label)
         {
