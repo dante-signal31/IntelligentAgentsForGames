@@ -16,36 +16,11 @@ namespace Sensors
 /// T is the type of the modality this sensor is interested in. TU is the type of the
 /// RegionSenseManager this sensor is registered to.
 /// </remarks>
-public class RegionSenseSensor<T, TU>: MonoBehaviour, IRegionSenseSensor, ISensor
+public class RegionSenseSensor<T, TU>: 
+    MonoBehaviour, IRegionSenseSensor, ISensor, ISignalSensor
     where T: RegionSenseModality
     where TU: RegionSenseManager
 {
-    public struct DetectedSignal
-    {
-        public RegionSenseSignal signal;
-        public DateTimeOffset detectionTimeStamp;
-    }
-    
-    private class SignalComparer : IComparer<DetectedSignal>
-    {
-        public int Compare(DetectedSignal x, DetectedSignal y)
-        {
-            int result = x.signal.strength.CompareTo(y.signal.strength);
-            
-            // If times are strength, we must not return 0, otherwise SortedSet 
-            // thinks they are the same element and won't add the new one.
-            
-            if (result == 0 && x.signal.source != y.signal.source)
-                result = x.signal.source.GetEntityId()
-                    .CompareTo(y.signal.source.GetEntityId());
-            
-            if (result == 0 && x.signal.source == y.signal.source)
-                result = x.detectionTimeStamp.CompareTo(y.detectionTimeStamp);
-            
-            return result;
-        }
-    }
-    
     [FormerlySerializedAs("DetectionBufferSize")]
     [Header("CONFIGURATION:")]
     [Tooltip("How many received signal to keep in memory.")]
@@ -110,7 +85,7 @@ public class RegionSenseSensor<T, TU>: MonoBehaviour, IRegionSenseSensor, ISenso
         get
         {
             SortedSet<DetectedSignal> detectedSignals = 
-                new(_detectionBuffer, new SignalComparer());
+                new(_detectionBuffer, new DetectedSignalComparer());
             
             return detectedSignals;
         }

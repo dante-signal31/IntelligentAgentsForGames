@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Tools;
 using UnityEngine;
 
@@ -52,7 +53,7 @@ public class RegionSenseManager: MonoBehaviour
         }
     }
     
-    [Header("CONFIGURATION:")]
+    [Header("REGION SENSE MANAGER CONFIGURATION:")]
     [Tooltip("Time in seconds between signal emissions.")]
     [SerializeField] private float sendingPeriod = 0.1f;
     
@@ -74,7 +75,7 @@ public class RegionSenseManager: MonoBehaviour
         }
     }
     
-    private readonly HashSet<IRegionSenseSensor> _registeredSensors = new();
+    protected readonly HashSet<IRegionSenseSensor> registeredSensors = new();
     private readonly SortedSet<SignalNotification> _signalQueue = 
         new(new SignalNotificationComparer());
 
@@ -102,7 +103,7 @@ public class RegionSenseManager: MonoBehaviour
     /// <param name="sensor">Sensor interested in receiving signals.</param>
     public virtual void RegisterSensor(IRegionSenseSensor sensor)
     {
-        _registeredSensors.Add(sensor);
+        registeredSensors.Add(sensor);
     }
     
     /// <summary>
@@ -111,7 +112,7 @@ public class RegionSenseManager: MonoBehaviour
     /// <param name="sensor">Sensor no longer interested in receiving signals.</param>
     public virtual void UnregisterSensor(IRegionSenseSensor sensor)
     {
-        _registeredSensors.Remove(sensor);
+        registeredSensors.Remove(sensor);
     }
 
     /// <summary>
@@ -120,7 +121,21 @@ public class RegionSenseManager: MonoBehaviour
     /// <param name="signal">Signal to be sent.</param>
     public virtual void RegisterSignal(RegionSenseSignal signal)
     {
-        foreach (IRegionSenseSensor sensor in _registeredSensors)
+        NotifySensors(signal, registeredSensors.ToArray());
+    }
+
+    /// <summary>
+    /// Notifies all registered sensors about a given signal if the signal meets the
+    /// criteria of proximity, strength, and modality requirements for each sensor.
+    /// </summary>
+    /// <param name="signal">The signal to be evaluated and potentially delivered to
+    /// sensors.</param>
+    /// <param name="sensorArray">Array of sensors to be notified.</param>
+    protected virtual void NotifySensors(
+        RegionSenseSignal signal, 
+        IRegionSenseSensor[] sensorArray)
+    {
+        foreach (IRegionSenseSensor sensor in sensorArray)
         {
             // Is this sensor interested in this signal modality?
             if (!sensor.SensesModality(signal.modality)) continue;
@@ -133,9 +148,7 @@ public class RegionSenseManager: MonoBehaviour
             if (distance > signal.modality.MaximumRange) continue;
 
             // Is the signal powerful enough to be perceived by the sensor?
-            float receivedPower = signal.strength *
-                                  MathF.Pow(signal.modality.Attenuation, distance);
-            if (receivedPower < sensor.ModalityThreshold(signal.modality)) continue;
+            if (!SignalPowerfulEnoughForSensor(signal, sensor)) continue;
 
             // Now, let's perform the specific checks for this modality.
             if (!signal.modality.ExtraChecks(signal, sensor)) continue;
@@ -157,6 +170,27 @@ public class RegionSenseManager: MonoBehaviour
             };
             _signalQueue.Add(notification);
         }
+    }
+
+    /// <summary>
+    /// Determines whether a signal is powerful enough to be perceived by a sensor,
+    /// considering the distance, strength, and modality-specific attenuation.
+    /// </summary>
+    /// <param name="signal">The signal being evaluated for perception by the sensor.</param>
+    /// <param name="sensor">The sensor evaluating the signal.</param>
+    /// <returns>True if the signal's power at the sensor's location is above the
+    /// sensor's modality threshold; otherwise, false.</returns>
+    protected virtual bool SignalPowerfulEnoughForSensor(
+        RegionSenseSignal signal,
+        IRegionSenseSensor sensor)
+    {
+        float distance =
+            Vector2.Distance(
+                signal.source.transform.position, 
+                sensor.Position);
+        float receivedPower = signal.strength *
+                              MathF.Pow(signal.modality.Attenuation, distance);
+        return receivedPower >= sensor.ModalityThreshold(signal.modality);
     }
 
     /// <summary>

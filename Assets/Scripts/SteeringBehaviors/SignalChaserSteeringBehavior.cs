@@ -1,39 +1,48 @@
-﻿using Sensors;
+﻿using PropertyAttribute;
+using Sensors;
 using UnityEngine;
 
 namespace SteeringBehaviors
 {
 /// <summary>
 /// Represents a steering behavior responsible for directing an agent toward
-/// the source of the strongest sound signal detected within its sensing range.
-/// The behavior uses a sound sensor to identify signals and dynamically
+/// the source of the strongest signal detected within its sensing range.
+/// The behavior uses a sensor to identify signals and dynamically
 /// updates a pathfinding target for navigation.
 /// </summary>
-public class SoundChaserSteeringBehavior: SteeringBehavior
+/// /// <remarks>
+/// This sensor can be used both for sound modalities, through a RegionSenseManager, and
+/// smell modalities, through a FEMSenseManager.
+/// </remarks>
+public class SignalChaserSteeringBehavior: SteeringBehavior
 {
     [Header("CONFIGURATION:")]
     [Tooltip("Distance at which we give our goal as reached and we stop our agent.")]
-    [SerializeField] public float arrivalDistance = 100f;
+    [SerializeField] public float arrivalDistance = 1f;
     
     [Header("WIRING:")]
-    [SerializeField] private RegionSenseSoundSensor soundSensor;
+    [InterfaceCompliant(typeof(ISensor), typeof(ISignalSensor))]
+    [SerializeField] private MonoBehaviour sensor;
     [SerializeField] private MeshPathFinderSteeringBehavior meshPathFinderSteeringBehavior;
     
+    private ISensor _sensor;
+    private ISignalSensor _signalSensor;
     private GameObject _target;
     private Vector2 _currentTargetPosition;
 
     private void Start()
     {
+        _sensor = (ISensor)sensor;
+        _signalSensor = (ISignalSensor)sensor;
         _target = new GameObject($"{name} - Target");
-        
     }
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        if (!soundSensor.AnyObjectDetected) return SteeringOutput.zero;
+        if (!_sensor.AnyObjectDetected) return SteeringOutput.zero;
         
         // Chase the strongest signal.
-        RegionSenseSignal strongestSignal = soundSensor.DetectedSignals.Max.signal;
+        RegionSenseSignal strongestSignal = _signalSensor.DetectedSignals.Max.signal;
 
         if (Vector2.Distance(
                 _currentTargetPosition, 

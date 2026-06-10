@@ -52,7 +52,8 @@ public class FEMSenseManager: RegionSenseManager
 
     private readonly Dictionary<uint, float> _dissipationIntensities = new();
     private readonly Dictionary<uint, float> _nodeIntensities = new();
-    private readonly Dictionary<uint, List<IRegionSenseSensor>> _registeredSensors = new();
+    private readonly Dictionary<uint, List<IRegionSenseSensor>> _registeredNodeSensors = 
+        new();
     private readonly Queue<PositionNode> _openNodes = new();
     private readonly HashSet<uint> _closedNodes = new();
     private uint _frameCounter;
@@ -88,14 +89,15 @@ public class FEMSenseManager: RegionSenseManager
     public override void RegisterSensor(IRegionSenseSensor sensor)
     {
         PositionNode node = mapGraph.GetNodeAtNearestPosition(sensor.Position);
-        _registeredSensors[node.Id] ??= new List<IRegionSenseSensor>();
-        _registeredSensors[node.Id].Add(sensor);
+        if (!_registeredNodeSensors.ContainsKey(node.Id))
+            _registeredNodeSensors.Add(node.Id, new List<IRegionSenseSensor>());
+        _registeredNodeSensors[node.Id].Add(sensor);
     }
     
     public override void UnregisterSensor(IRegionSenseSensor sensor)
     {
         PositionNode node = mapGraph.GetNodeAtNearestPosition(sensor.Position);
-        _registeredSensors[node.Id].Remove(sensor);
+        _registeredNodeSensors[node.Id].Remove(sensor);
     }
     
     /// <summary>
@@ -107,6 +109,21 @@ public class FEMSenseManager: RegionSenseManager
     /// </remarks>
     /// <param name="signal">Signal to be sent.</param>
     public override void RegisterSignal(RegionSenseSignal signal)
+    {
+        UpdateNodeIntensitiesWithSignal(signal);
+        foreach (KeyValuePair<uint, List<IRegionSenseSensor>> nodeSensors in
+                 _registeredNodeSensors)
+        { 
+            NotifySensors(signal, nodeSensors.Value.ToArray());
+        }
+    }
+
+    /// <summary>
+    /// Disseminate the signal through the graph and add it to the remaining intensities
+    /// of previous signals not yet dissipated.
+    /// </summary>
+    /// <param name="signal">Signal just received.</param>
+    private void UpdateNodeIntensitiesWithSignal(RegionSenseSignal signal)
     {
         Dictionary<uint, float> disseminationIntensities = new();
         
@@ -189,6 +206,16 @@ public class FEMSenseManager: RegionSenseManager
                     disseminationIntensity.Value;
             }
         }
+    }
+    
+    protected override bool SignalPowerfulEnoughForSensor(
+        RegionSenseSignal signal, 
+        IRegionSenseSensor sensor)
+    {
+        uint sensorNodeId = mapGraph.GetNodeAtNearestPosition(sensor.Position).Id;
+        if (!_nodeIntensities.TryGetValue(sensorNodeId, out var receivedPower)) 
+            return false;
+        return receivedPower >= sensor.ModalityThreshold(signal.modality);
     }
 }
 }
