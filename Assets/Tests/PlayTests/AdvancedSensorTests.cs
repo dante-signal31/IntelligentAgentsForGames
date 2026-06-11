@@ -30,16 +30,31 @@ public class AdvancedSensorTests
     private GameObject _soundChaserGameObject;
     private GameObject _soundChaserGameObject2;
     private GameObject _soundChaserGameObject3;
+    
+    private GameObject _smellEmitterGameObject;
+    private GameObject _smellChaserGameObject;
+    private GameObject _smellChaserGameObject2;
+    private GameObject _smellChaserGameObject3;
 
     private AgentMover _soundEmitterAgent;
     private AgentMover _soundChaserAgent;
     private AgentMover _soundChaserAgent2;
     private AgentMover _soundChaserAgent3;
+    
+    private AgentMover _smellEmitterAgent;
+    private AgentMover _smellChaserAgent;
+    private AgentMover _smellChaserAgent2;
+    private AgentMover _smellChaserAgent3;
 
     private AgentColor _soundEmitterAgentColor;
     private AgentColor _soundChaserAgentColor;
     private AgentColor _soundChaserAgentColor2;
     private AgentColor _soundChaserAgentColor3;
+    
+    private AgentColor _smellEmitterAgentColor;
+    private AgentColor _smellChaserAgentColor;
+    private AgentColor _smellChaserAgentColor2;
+    private AgentColor _smellChaserAgentColor3;
 
     [UnitySetUp]
     public IEnumerator SetUp()
@@ -49,11 +64,21 @@ public class AdvancedSensorTests
         _soundChaserGameObject = null;
         _soundChaserGameObject2 = null;
         _soundChaserGameObject3 = null;
+        
+        _smellEmitterGameObject = null;
+        _smellChaserGameObject = null;
+        _smellChaserGameObject2 = null;
+        _smellChaserGameObject3 = null;
 
         _soundEmitterAgent = null;
         _soundChaserAgent = null;
         _soundChaserAgent2 = null;
         _soundChaserAgent3 = null;
+        
+        _smellEmitterAgent = null;
+        _smellChaserAgent = null;
+        _smellChaserAgent2 = null;
+        _smellChaserAgent3 = null;
 
         _target = null;
 
@@ -109,6 +134,30 @@ public class AdvancedSensorTests
             _soundChaserGameObject3.SetActive(false);
         }
 
+        if (_smellEmitterGameObject == null)
+        {
+            _smellEmitterGameObject = GameObject.Find("SmellEmitterMovingAgent");
+            _smellEmitterGameObject.SetActive(false);
+        }
+
+        if (_smellChaserGameObject == null)
+        {
+            _smellChaserGameObject = GameObject.Find("SmellChaserMovingAgent");
+            _smellChaserGameObject.SetActive(false);
+        }
+
+        if (_smellChaserGameObject2 == null)
+        {
+            _smellChaserGameObject2 = GameObject.Find("SmellChaserMovingAgent2");
+            _smellChaserGameObject2.SetActive(false);
+        }
+
+        if (_smellChaserGameObject3 == null)
+        {
+            _smellChaserGameObject3 = GameObject.Find("SmellChaserMovingAgent3");
+            _smellChaserGameObject3.SetActive(false);
+        }
+
         if (_soundEmitterAgent == null)
         {
             _soundEmitterAgent = _soundEmitterGameObject.GetComponent<AgentMover>();
@@ -132,6 +181,30 @@ public class AdvancedSensorTests
             _soundChaserAgent3 = _soundChaserGameObject3.GetComponent<AgentMover>();
             _soundChaserAgentColor3 = _soundChaserGameObject3.GetComponent<AgentColor>();
         }
+        
+        if (_smellEmitterAgent == null)
+        {
+            _smellEmitterAgent = _smellEmitterGameObject.GetComponent<AgentMover>();
+            _smellEmitterAgentColor = _smellEmitterGameObject.GetComponent<AgentColor>();
+        }
+
+        if (_smellChaserAgent == null)
+        {
+            _smellChaserAgent = _smellChaserGameObject.GetComponent<AgentMover>();
+            _smellChaserAgentColor = _smellChaserGameObject.GetComponent<AgentColor>();
+        }
+        
+        if (_smellChaserAgent2 == null)
+        {
+            _smellChaserAgent2 = _smellChaserGameObject2.GetComponent<AgentMover>();
+            _smellChaserAgentColor2 = _smellChaserGameObject2.GetComponent<AgentColor>();
+        }
+        
+        if (_smellChaserAgent3 == null)
+        {
+            _smellChaserAgent3 = _smellChaserGameObject3.GetComponent<AgentMover>();
+            _smellChaserAgentColor3 = _smellChaserGameObject3.GetComponent<AgentColor>();
+        }
     }
 
     [UnityTearDown]
@@ -145,6 +218,15 @@ public class AdvancedSensorTests
             _soundChaserGameObject2.SetActive(false);
         if (_soundChaserGameObject3 != null)
             _soundChaserGameObject3.SetActive(false);
+        
+        if (_smellEmitterGameObject != null)
+            _smellEmitterGameObject.SetActive(false);
+        if (_smellChaserGameObject != null)
+            _smellChaserGameObject.SetActive(false);
+        if (_smellChaserGameObject2 != null)
+            _smellChaserGameObject2.SetActive(false);
+        if (_smellChaserGameObject3 != null)
+            _smellChaserGameObject3.SetActive(false);
         
         if (_target != null)
             _target.Enabled = false;
@@ -246,6 +328,101 @@ public class AdvancedSensorTests
         Assert.True(Vector2.Distance(_soundChaserAgent.transform.position, _position3.transform.position) > 1.0f);
         // The last chased should not have moved.
         Assert.True(Vector2.Distance(_soundChaserAgent2.transform.position, _position4.transform.position) < 0.3f);
+    }
+    
+    /// <summary>
+    /// Test that smell chasers react to an emitting smell.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator SmellEmittingSensorTest()
+    {
+        // Get references.
+        SeekSteeringBehavior emitterSeekSteeringBehavior = 
+            _smellEmitterGameObject.GetComponentInChildren<SeekSteeringBehavior>();
+        RegionSenseSmellSignalEmitter signalEmitter = 
+            _smellEmitterGameObject.GetComponentInChildren<RegionSenseSmellSignalEmitter>();
+        RegionSenseSmellSensor chaserSensor = 
+            _smellChaserGameObject.GetComponentInChildren<RegionSenseSmellSensor>();
+        RegionSenseSmellSensor chaserSensor2 = 
+            _smellChaserGameObject2.GetComponentInChildren<RegionSenseSmellSensor>();
+        RegionSenseSmellSensor chaserSensor3 = 
+            _smellChaserGameObject3.GetComponentInChildren<RegionSenseSmellSensor>();
+        
+        // Setup agents before the test.
+        _target.transform.position = _position1.transform.position;
+        
+        _smellEmitterAgent.MaximumSpeed = 4.0f;
+        _smellEmitterAgent.transform.position = _position1.transform.position;
+        _smellEmitterAgent.transform.eulerAngles = Vector3.zero;
+        _smellEmitterAgentColor.Color = Color.green;
+        _smellEmitterGameObject.SetActive(true);
+        emitterSeekSteeringBehavior.Target = _target.gameObject;
+        signalEmitter.ModalityMaximumRange = 10.0f;
+        signalEmitter.ModalityAttenuation = 0.9f;
+        signalEmitter.ModalityInverseTransmissionSpeed = 2 / 100f;
+        signalEmitter.EmissionPeriod = 0.3f;
+        signalEmitter.autoStartEmission = true;
+        signalEmitter.signalStrength = 100f;
+        
+        _smellChaserAgent.MaximumSpeed = 3.0f;
+        _smellChaserAgent.transform.position = _position3.transform.position;
+        _smellChaserAgentColor.Color = Color.red;
+        _smellChaserGameObject.SetActive(true);
+        chaserSensor.detectionBufferSize = 10;
+        chaserSensor.minimumStrengthDetectionThreshold = 40;
+        chaserSensor.detectionExpirationTime = 1.0f;
+        chaserSensor.cleaningPeriod = 0.3f;
+        
+        _smellChaserAgent2.MaximumSpeed = 3.0f;
+        _smellChaserAgent2.transform.position = _position4.transform.position;
+        _smellChaserAgentColor2.Color = Color.red;
+        _smellChaserGameObject2.SetActive(true);
+        chaserSensor2.detectionBufferSize = 10;
+        chaserSensor2.minimumStrengthDetectionThreshold = 40;
+        chaserSensor2.detectionExpirationTime = 1.0f;
+        chaserSensor2.cleaningPeriod = 0.3f;
+        
+        _smellChaserAgent3.MaximumSpeed = 3.0f;
+        _smellChaserAgent3.transform.position = _position2.transform.position;
+        _smellChaserAgentColor3.Color = Color.red;
+        _smellChaserGameObject3.SetActive(true);
+        chaserSensor3.detectionBufferSize = 10;
+        chaserSensor3.minimumStrengthDetectionThreshold = 40;
+        chaserSensor3.detectionExpirationTime = 1.0f;
+        chaserSensor3.cleaningPeriod = 0.3f;
+
+        // Start test.
+
+        // The smellEmitter has not moved yet, nor any of the chasers.
+        yield return new WaitForSeconds(1.0f);
+        Assert.True(Vector2.Distance(_smellEmitterAgent.transform.position, _position1.transform.position) < 0.3f);
+        Assert.True(Vector2.Distance(_smellChaserAgent.transform.position, _position3.transform.position) < 0.3f);
+        Assert.True(Vector2.Distance(_smellChaserAgent2.transform.position, _position4.transform.position) < 0.3f);
+        Assert.True(Vector2.Distance(_smellChaserAgent3.transform.position, _position2.transform.position) < 0.3f);
+        
+
+        // Change to a position where one of the chasers can smell us.
+        _target.transform.position = _position5.transform.position;
+        yield return new WaitForSeconds(5.0f);
+        _target.transform.position = _position6.transform.position;
+        yield return new WaitForSeconds(4.0f);
+        // Did we make the chaser move?
+        Assert.True(Vector2.Distance(_smellChaserAgent3.transform.position, _position2.transform.position) > 1.0f);
+        // The other two should not have moved.
+        Assert.True(Vector2.Distance(_smellChaserAgent.transform.position, _position3.transform.position) < 0.3f);
+        Assert.True(Vector2.Distance(_smellChaserAgent2.transform.position, _position4.transform.position) < 0.3f);
+        
+        // Change to a position where the second can smell us.
+        _target.transform.position = _position7.transform.position;
+        yield return new WaitForSeconds(1.0f);
+        _target.transform.position = _position8.transform.position;
+        yield return new WaitForSeconds(3.0f);
+        _target.transform.position = _position1.transform.position;
+        yield return new WaitForSeconds(2.0f);
+        // Did we make the chaser move?
+        Assert.True(Vector2.Distance(_smellChaserAgent.transform.position, _position3.transform.position) > 1.0f);
+        // The last chased should not have moved.
+        Assert.True(Vector2.Distance(_smellChaserAgent2.transform.position, _position4.transform.position) < 0.3f);
     }
 }
 }
