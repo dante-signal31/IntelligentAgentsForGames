@@ -151,6 +151,7 @@ public abstract class RegionSenseSignalEmitter<T, TU>: MonoBehaviour
         RegionSenseSignal signal = new()
         {
             modality = _currentModality,
+            emissionPosition = transform.position,
             source = gameObject,
             strength = signalStrength
         };

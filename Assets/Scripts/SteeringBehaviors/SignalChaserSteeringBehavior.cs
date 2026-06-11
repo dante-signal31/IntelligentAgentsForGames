@@ -46,10 +46,10 @@ public class SignalChaserSteeringBehavior: SteeringBehavior
 
         if (Vector2.Distance(
                 _currentTargetPosition, 
-                strongestSignal.source.transform.position) >
+                strongestSignal.emissionPosition) >
             arrivalDistance)
         {
-            _target.transform.position = strongestSignal.source.transform.position;
+            _target.transform.position = strongestSignal.emissionPosition;
             meshPathFinderSteeringBehavior.Target = _target;
             _currentTargetPosition = _target.transform.position;
         }

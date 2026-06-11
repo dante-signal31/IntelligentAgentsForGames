@@ -14,7 +14,12 @@ public struct RegionSenseSignal
     public float strength;
     
     /// <summary>
-    /// Position of the signal source.
+    /// Position of the signal emission.
+    /// </summary>
+    public Vector2 emissionPosition;
+    
+    /// <summary>
+    /// Signal source.
     /// </summary>
     public GameObject source;
     
