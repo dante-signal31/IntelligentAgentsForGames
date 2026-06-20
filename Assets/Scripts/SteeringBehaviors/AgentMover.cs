@@ -315,7 +315,7 @@ public class AgentMover : MonoBehaviour
         }
     }
 
-    protected virtual void UpdateSteeringBehaviorArgs(float deltaTime = 0)
+    protected void UpdateSteeringBehaviorArgs(float deltaTime = 0)
     {
         behaviorArgs.MaximumSpeed = MaximumSpeed;
         behaviorArgs.StopSpeed = StopSpeed;
