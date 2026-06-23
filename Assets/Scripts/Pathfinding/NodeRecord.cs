@@ -1,9 +1,12 @@
-﻿namespace Pathfinding
+﻿using System;
+
+namespace Pathfinding
 {
 /// <summary>
 /// Structure needed for the algorithm to keep track of the calculations
 /// to reach every node.
 /// </summary>
+[Serializable]
 public class NodeRecord
 {
     /// <summary>

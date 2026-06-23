@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Tools
@@ -18,6 +19,7 @@ namespace Tools
 /// </summary>
 /// <typeparam name="TKey">Type for keys</typeparam>
 /// <typeparam name="TValue">Type for values</typeparam>
+[Serializable]
 public abstract class UnitySerializedDictionary<TKey, TValue> : 
     Dictionary<TKey, TValue>, ISerializationCallbackReceiver
 {
