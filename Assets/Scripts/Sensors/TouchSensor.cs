@@ -65,7 +65,6 @@ public class TouchSensor : MonoBehaviour, ISensor
 
     private void Start()
     {
-        _sensorCollider.isTrigger = false;
         // By default, Unity uses the Layer Collision Settings from the Layer Mask. To
         // set collision layers manually, we need to use the includeLayers and
         // excludeLayers. This way we can set a collision matrix only for this object 
