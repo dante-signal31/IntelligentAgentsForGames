@@ -28,7 +28,7 @@ public class InterfaceCompliantAttributeDrawer : PropertyDrawer
 
         AddErrorBoxIfNeeded(interfaceTypes, property, container);
         
-        // Get decorated property.
+        // Gets decorated property.
         PropertyField decoratedProperty = new PropertyField(property);
         
         // Make container check property to refresh inspector if the value given to the
@@ -85,6 +85,34 @@ public class InterfaceCompliantAttributeDrawer : PropertyDrawer
         // Add an error box if needed.
         if (errorBox != null) container.Add(errorBox);
     }
+    
+    /// <summary>
+    /// Identifies the interfaces that are not implemented by a given object.
+    /// </summary>
+    /// <param name="interfaceTypes">An array of interface types to check compliance
+    /// against.</param>
+    /// <param name="checkedObject">The object to be checked for interface
+    /// compliance.</param>
+    /// <returns>A list of interface types that are not implemented by the
+    /// given object. If a provided object complies with every interface, then the
+    /// returned list will have zero elements.</returns>
+    private List<Type> GetNotComplyingInterfaces(
+        Type[] interfaceTypes,
+        Object checkedObject)
+    {
+        List<Type> notFoundTypes = new();
+
+        foreach (Type interfaceType in interfaceTypes)
+        {
+            if (checkedObject != null && 
+                !interfaceType.IsInstanceOfType(checkedObject))
+            {
+                notFoundTypes.Add(interfaceType);
+            }
+        }
+        
+        return notFoundTypes;
+    }
 
     private HelpBox GenerateErrorBox(List<Type> notFoundTypes)
     {
@@ -101,33 +129,6 @@ public class InterfaceCompliantAttributeDrawer : PropertyDrawer
         
         // Build a help box and return it.
         return new HelpBox(alertMessage, HelpBoxMessageType.Error);
-    }
-
-    /// <summary>
-    /// Identifies the interfaces that are not implemented by a given object.
-    /// </summary>
-    /// <param name="interfaceTypes">An array of interface types to check compliance
-    /// against.</param>
-    /// <param name="checkedObject">The object to be checked for interface
-    /// compliance.</param>
-    /// <returns>A list of interface types that are not implemented by the
-    /// given object. If provided object complies with every interface, then returned
-    /// list will have zero elements.</returns>
-    private List<Type> GetNotComplyingInterfaces(Type[] interfaceTypes,
-        Object checkedObject)
-    {
-        List<Type> notFoundTypes = new();
-
-        foreach (Type interfaceType in interfaceTypes)
-        {
-            if (checkedObject != null && 
-                !interfaceType.IsInstanceOfType(checkedObject))
-            {
-                notFoundTypes.Add(interfaceType);
-            }
-        }
-        
-        return notFoundTypes;
     }
     
     // IMGUI fallback for older inspectors or when UI Toolkit is not used.
