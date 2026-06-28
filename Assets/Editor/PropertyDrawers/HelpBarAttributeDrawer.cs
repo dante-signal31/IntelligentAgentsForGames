@@ -1,6 +1,7 @@
 ﻿using System;
 using PropertyAttribute;
 using UnityEditor;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Editor.PropertyDrawers
@@ -33,6 +34,39 @@ public class HelpBarAttributeDrawer : DecoratorDrawer
         
         // Return container.
         return container;
+    }
+    
+    // IMGUI fallback for older Inspectors or when UI Toolkit is not used
+    public override void OnGUI(
+        Rect position)
+    {
+        string message = ((HelpBarAttribute)attribute).Message;
+        MessageType messageType = ((HelpBarAttribute)attribute).MessageType switch
+        {
+            MessageTypes.MessageType.Info => MessageType.Info,
+            MessageTypes.MessageType.Warning => MessageType.Warning,
+            MessageTypes.MessageType.Error => MessageType.Error,
+            _ => MessageType.None
+        };
+
+        // Calculate rects
+        float helpHeight = EditorStyles.helpBox.CalcHeight(
+            new GUIContent(message), 
+            position.width);
+        Rect helpRect = new Rect(position.x, position.y, position.width, helpHeight);
+
+        // Draw help box and property field
+        EditorGUI.HelpBox(helpRect, message, messageType);
+    }
+    
+    public override float GetHeight()
+    {
+        string message = ((HelpBarAttribute)attribute).Message;
+        float helpHeight = EditorStyles.helpBox.CalcHeight(
+            new GUIContent(message), 
+            EditorGUIUtility.currentViewWidth);
+        const float helpBoxPadding = 2f;
+        return helpHeight + helpBoxPadding;
     }
 }
 }
