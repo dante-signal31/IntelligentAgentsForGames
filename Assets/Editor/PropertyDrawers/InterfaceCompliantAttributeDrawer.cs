@@ -14,14 +14,14 @@ namespace Editor.PropertyDrawers
 /// <p>Decorate an inspector field to show an alert message bar if the decorated
 /// property does not comply with any of the given interfaces.</p>
 /// </summary>
-[CustomPropertyDrawer(typeof(InterfaceCompliantAttribute))]
+[CustomPropertyDrawer(typeof(InterfaceCompliant))]
 public class InterfaceCompliantAttributeDrawer : PropertyDrawer
 {
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         // Get the array with the interface types to check.
-        var interfaceCompliantAttribute = (InterfaceCompliantAttribute) attribute;
-        Type[] interfaceTypes = interfaceCompliantAttribute.InterfaceTypes;
+        var interfaceCompliantAttribute = (InterfaceCompliant) attribute;
+        Type[] interfaceTypes = interfaceCompliantAttribute.interfaceTypes;
         
         // Create container element.
         var container = new VisualElement();
@@ -135,8 +135,8 @@ public class InterfaceCompliantAttributeDrawer : PropertyDrawer
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
         // Retrieve attribute and interface list
-        var interfaceCompliantAttribute = (InterfaceCompliantAttribute)attribute;
-        Type[] interfaceTypes = interfaceCompliantAttribute.InterfaceTypes;
+        var interfaceCompliantAttribute = (InterfaceCompliant)attribute;
+        Type[] interfaceTypes = interfaceCompliantAttribute.interfaceTypes;
 
         // Reserve rects
         // First draw the property field
@@ -172,8 +172,8 @@ public class InterfaceCompliantAttributeDrawer : PropertyDrawer
         float height = EditorGUI.GetPropertyHeight(property, label, true);
 
         // Add help box height if there's an error
-        var interfaceCompliantAttribute = (InterfaceCompliantAttribute)attribute;
-        Type[] interfaceTypes = interfaceCompliantAttribute.InterfaceTypes;
+        var interfaceCompliantAttribute = (InterfaceCompliant)attribute;
+        Type[] interfaceTypes = interfaceCompliantAttribute.interfaceTypes;
         List<Type> notFoundTypes = GetNotComplyingInterfaces(interfaceTypes, property.objectReferenceValue);
 
         if (notFoundTypes.Count > 0)
