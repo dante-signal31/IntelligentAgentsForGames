@@ -10,7 +10,7 @@ namespace Editor.PropertyDrawers
 /// Decorate an inspector field with a help bar with a given message as text.
 /// The help bar is preceded by an icon depending on the message type.
 /// </summary>
-[CustomPropertyDrawer(typeof(HelpBarAttribute))]
+[CustomPropertyDrawer(typeof(HelpBar))]
 public class HelpBarAttributeDrawer : DecoratorDrawer
 {
     public override VisualElement CreatePropertyGUI()
@@ -19,8 +19,8 @@ public class HelpBarAttributeDrawer : DecoratorDrawer
         var container = new VisualElement();
         
         // Get message text.
-        string message = ((HelpBarAttribute)attribute).Message;
-        MessageType messageType = ((HelpBarAttribute)attribute).MessageType switch
+        string message = ((HelpBar)attribute).message;
+        MessageType messageType = ((HelpBar)attribute).messageType switch
         {
             MessageTypes.MessageType.Info => MessageType.Info,
             MessageTypes.MessageType.Warning => MessageType.Warning,
@@ -40,8 +40,8 @@ public class HelpBarAttributeDrawer : DecoratorDrawer
     public override void OnGUI(
         Rect position)
     {
-        string message = ((HelpBarAttribute)attribute).Message;
-        MessageType messageType = ((HelpBarAttribute)attribute).MessageType switch
+        string message = ((HelpBar)attribute).message;
+        MessageType messageType = ((HelpBar)attribute).messageType switch
         {
             MessageTypes.MessageType.Info => MessageType.Info,
             MessageTypes.MessageType.Warning => MessageType.Warning,
@@ -61,7 +61,7 @@ public class HelpBarAttributeDrawer : DecoratorDrawer
     
     public override float GetHeight()
     {
-        string message = ((HelpBarAttribute)attribute).Message;
+        string message = ((HelpBar)attribute).message;
         float helpHeight = EditorStyles.helpBox.CalcHeight(
             new GUIContent(message), 
             EditorGUIUtility.currentViewWidth);
