@@ -2626,8 +2626,16 @@ PrefabInstance:
       value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 8146274523747296459, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
+      propertyPath: autoSmooth
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8146274523747296459, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
       propertyPath: maximumSpeed
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8146274523747296459, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
+      propertyPath: smoothingMethod
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8907203368228710122, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
       propertyPath: target
@@ -2712,6 +2720,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4108306927066898285, guid: cda077cf5424eae4785994d1abbea7da, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5869383816838028896, guid: cda077cf5424eae4785994d1abbea7da, type: 3}
+      propertyPath: autoSmooth
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5869383816838028896, guid: cda077cf5424eae4785994d1abbea7da, type: 3}
+      propertyPath: smoothingMethod
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5869383816838028896, guid: cda077cf5424eae4785994d1abbea7da, type: 3}
@@ -3792,6 +3808,10 @@ PrefabInstance:
     - target: {fileID: 3029828113618171140, guid: e3978fb6145077242b822424d1250194, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5563070203757531387, guid: e3978fb6145077242b822424d1250194, type: 3}
+      propertyPath: autoSmooth
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6828551985367113896, guid: e3978fb6145077242b822424d1250194, type: 3}
       propertyPath: threath
