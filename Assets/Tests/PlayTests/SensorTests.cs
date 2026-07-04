@@ -385,6 +385,7 @@ public class SensorTests
         _coneSensorAgent.transform.eulerAngles = Vector3.zero;
         _coneSensorAgentColor.Color = Color.green;
         coneRange.SemiConeDegrees = 53;
+        coneRange.Range = 7;
         _coneSensorGameObject.SetActive(true);
         
         _hideAgent.transform.position = _position1.transform.position;
