@@ -9,7 +9,6 @@ namespace Sensors
 /// This component emits events when objects are detected by the volumetric sensor it is
 /// attached to. 
 /// </summary>
-[ExecuteAlways]
 public class VolumetricSensor : MonoBehaviour, ISensor
 {
     [Header("CONFIGURATION:")]
