@@ -58,6 +58,7 @@ public class ConeRange : MonoBehaviour
             if (updated != null) updated.Invoke();
         }
     }
+    
     /// <summary>
     /// Color to display this cone in the editor.
     /// </summary>
@@ -78,7 +79,6 @@ public class ConeRange : MonoBehaviour
     /// </summary>
     public Vector3 Normal => Vector3.forward;
     
-
 #if UNITY_EDITOR
     protected virtual void OnValidate()
     {
