@@ -22,15 +22,15 @@ public class VolumetricSensor : MonoBehaviour, ISensor
     [Header("EVENTS:")] 
     [FormerlySerializedAs("objectEnteredDetectionArea")]
     [Tooltip("Subscribers for detection events.")] 
-    [SerializeField] private UnityEvent<GameObject> objectEnteredSensor;
+    [SerializeField] private UnityEvent<GameObject> objectEnteredSensor = new();
     
     [FormerlySerializedAs("objectStayDetectionArea")]
     [Tooltip("Subscribers to object staying in volumetric area.")]
-    [SerializeField] private UnityEvent<GameObject> objectStayedInSensor;
+    [SerializeField] private UnityEvent<GameObject> objectStayedInSensor = new();
     
     [FormerlySerializedAs("objectLeftDetectionArea")]
     [Tooltip("Subscribers to object leaving volumetric area.")] 
-    [SerializeField] private UnityEvent<GameObject> objectLeftSensor;
+    [SerializeField] private UnityEvent<GameObject> objectLeftSensor = new();
 
     [Header("WIRING:")] 
     [Tooltip("Volumetric collider trigger.")] 

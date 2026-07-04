@@ -377,12 +377,14 @@ public class SensorTests
     {
         // Get reference to the ConeSensor.
         ConeSensor coneSensor = _coneSensorGameObject.GetComponentInChildren<ConeSensor>();
+        ConeRange coneRange = _coneSensorGameObject.GetComponentInChildren<ConeRange>();
             
         // Setup agents before the test.
         _coneSensorAgent.MaximumSpeed = 0.0f;
         _coneSensorAgent.transform.position = _position4.transform.position;
         _coneSensorAgent.transform.eulerAngles = Vector3.zero;
         _coneSensorAgentColor.Color = Color.green;
+        coneRange.SemiConeDegrees = 53;
         _coneSensorGameObject.SetActive(true);
         
         _hideAgent.transform.position = _position1.transform.position;

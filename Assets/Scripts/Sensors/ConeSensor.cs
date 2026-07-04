@@ -30,19 +30,19 @@ public class ConeSensor : MonoBehaviour, ISensor
     [Header("EVENTS:")]
     [FormerlySerializedAs("objectEnteredCone")]
     [Tooltip("Subscriptions to new detections.")]
-    [SerializeField] private UnityEvent<GameObject> objectEnteredSensor;
+    [SerializeField] private UnityEvent<GameObject> objectEnteredSensor = new();
     
     [FormerlySerializedAs("objectStayCone")]
     [Tooltip("Subscriptions to object staying in volumetric area.")]
-    [SerializeField] private UnityEvent<GameObject> objectStayedInSensor;
+    [SerializeField] private UnityEvent<GameObject> objectStayedInSensor = new();
     
     [FormerlySerializedAs("objectLeftCone")]
     [Tooltip("Subscriptions to object leaving volumetric area.")] 
-    [SerializeField] private UnityEvent<GameObject> objectLeftSensor;
+    [SerializeField] private UnityEvent<GameObject> objectLeftSensor = new();
     
     [Tooltip("Subscriptions to this cone sensor changing its dimensions. It includes " +
              "<newRange, newDegrees>.")]
-    [SerializeField] private UnityEvent<float, float> coneSensorDimensionsChanged;
+    [SerializeField] private UnityEvent<float, float> coneSensorDimensionsChanged = new();
     
     [Header("WIRING:")]
     [SerializeField] private VolumetricSensor sensor;
@@ -105,6 +105,11 @@ public class ConeSensor : MonoBehaviour, ISensor
         }
     }
 
+    /// <summary>
+    /// Whether to check the line of sight for objects in the detection area. If true,
+    /// and an object in range is behind an obstacle, then it will be marked as
+    /// not detected.
+    /// </summary>
     public bool CheckLineOfSight
     {
         get => checkLineOfSight;
@@ -169,6 +174,9 @@ public class ConeSensor : MonoBehaviour, ISensor
         ConfigureVolumetricSensor(LayersToDetect);
         lineOfSightSensor.enabled = checkLineOfSight;
         ConfigureLineOfSightSensor(VisualObstaclesLayersMask);
+        sensor.ObjectEnteredSensor?.AddListener(OnObjectEnteredCone);
+        sensor.ObjectStayedInSensor?.AddListener(OnObjectStayCone);
+        sensor.ObjectLeftSensor?.AddListener(OnObjectExitedCone);
     }
     
     private void ConfigureVolumetricSensor(LayerMask value)
@@ -228,11 +236,13 @@ public class ConeSensor : MonoBehaviour, ISensor
         
         _objectsInSensorRange.Add(otherObject);
         
+        // If we don't want to check line-of-sight, then we can just invoke the event
+        // and call it a day.
         if (!CheckLineOfSight) ObjectEnteredSensor?.Invoke(otherObject);
 
         // Object can be inside the cone range but behind a cover. So, we must check
         // if there is a line-of-sight with the object.
-        if (!CheckLineOfSight || !ObjectIsVisible(otherObject)) return; 
+        if (!ObjectIsVisible(otherObject)) return; 
             
         _objectsInSensorRangeAndVisible.Add(otherObject);
         
@@ -251,6 +261,19 @@ public class ConeSensor : MonoBehaviour, ISensor
             _objectsInSensorRange.Contains(otherObject))
         {
             _objectsInSensorRange.Remove(otherObject);
+            if (!CheckLineOfSight)
+            {
+                objectLeftSensor?.Invoke(otherObject);
+                return;
+            }
+
+            // If check line-of-sight is true, then only announce the object as left if
+            // it was previously seen.
+            if (!_objectsInSensorRangeAndVisible.Contains(otherObject)) return;
+            
+            _objectsInSensorRangeAndVisible.Remove(otherObject);
+            objectLeftSensor?.Invoke(otherObject);
+            
             return;
         }
         
@@ -258,13 +281,54 @@ public class ConeSensor : MonoBehaviour, ISensor
         if (!PositionIsInConeRange(otherObject.transform.position)) 
             return;
         
+        // If the object is already in the cone range, then we can just check if it is
+        // still visible (if we are checking line-of-sight).
+        if (_objectsInSensorRange.Contains(otherObject))
+        {
+            if (!CheckLineOfSight)
+            {
+                objectStayedInSensor?.Invoke(otherObject);
+            }
+            else
+            { // If we are checking line-of-sight, then we must check if the object is
+              // still visible.
+              if (_objectsInSensorRangeAndVisible.Contains(otherObject) &&
+                  ObjectIsVisible(otherObject))
+              {
+                  objectStayedInSensor?.Invoke(otherObject);
+              }
+              else if (_objectsInSensorRangeAndVisible.Contains(otherObject) &&
+                       !ObjectIsVisible(otherObject))
+              {
+                  _objectsInSensorRangeAndVisible.Remove(otherObject);
+                  objectLeftSensor?.Invoke(otherObject);
+              }
+              // If the object is not visible, and it was not contained in the HashSet
+              // _objectsInSensorRangeAndVisible, but we are checking line-of-sight, then
+              // we do nothing because was not announced as detected in the enter phase.
+              return;
+            }
+        }
+       
+        // OK, this is a bit tricky. If we get here is because the stay event has
+        // been raised for an object not detected previously in the enter phase.
+        //
         // Can an object appear in stay phase without having being detected
         // in enter phase? Yes, it can. If the game starts with the object already inside
         // the sensor range, then it won't be detected in the enter phase but in the stay
         // phase.
         //
+        // Besides, an object could have been detected in enter phase because it was
+        // inside the volumetric sensor, but outside the cone range. In that case it was
+        // not added to _objectsInSensorRange. But after that the object could have
+        // entered the cone range, so it must be added to _objectsInSensorRange.
+        //
         // If the object is in the cone range, then add it to DetectedObjects.
         _objectsInSensorRange.Add(otherObject);
+        
+        // If we don't want to check line-of-sight, then we can just invoke the event
+        // and call it a day.
+        if (!CheckLineOfSight) ObjectEnteredSensor?.Invoke(otherObject);
         
         if (!CheckLineOfSight || !ObjectIsVisible(otherObject))
         {
@@ -278,7 +342,7 @@ public class ConeSensor : MonoBehaviour, ISensor
         // in the collection.
         _objectsInSensorRangeAndVisible.Add(otherObject);
         
-        objectStayedInSensor?.Invoke(otherObject);
+        objectEnteredSensor?.Invoke(otherObject);
     }
 
     /// <summary>

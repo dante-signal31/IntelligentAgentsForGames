@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 430166335344507608}
   - component: {fileID: 2850409223302585798}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: ConeSensor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -84,6 +84,10 @@ PrefabInstance:
     - target: {fileID: 329746500251087037, guid: 0678a573e59db3640853e397cb09fdb3, type: 3}
       propertyPath: m_Name
       value: BoxRangeManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 329746500251087037, guid: 0678a573e59db3640853e397cb09fdb3, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 851175381191092502, guid: 0678a573e59db3640853e397cb09fdb3, type: 3}
       propertyPath: m_LocalPosition.x
@@ -177,6 +181,10 @@ PrefabInstance:
     - target: {fileID: 6361976246608292892, guid: 97f92bb48208c7c41836db40fbded15b, type: 3}
       propertyPath: m_Name
       value: ConeRange
+      objectReference: {fileID: 0}
+    - target: {fileID: 6361976246608292892, guid: 97f92bb48208c7c41836db40fbded15b, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 6513150596625146296, guid: 97f92bb48208c7c41836db40fbded15b, type: 3}
       propertyPath: m_LocalPosition.x
@@ -350,6 +358,18 @@ PrefabInstance:
     - target: {fileID: 549089127641453039, guid: 9ae491d825e3b3640ad3ed1224a99004, type: 3}
       propertyPath: m_Name
       value: RaySensor
+      objectReference: {fileID: 0}
+    - target: {fileID: 549089127641453039, guid: 9ae491d825e3b3640ad3ed1224a99004, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1516181276950358065, guid: 9ae491d825e3b3640ad3ed1224a99004, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5516798971329210585, guid: 9ae491d825e3b3640ad3ed1224a99004, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7707730784300397118, guid: 9ae491d825e3b3640ad3ed1224a99004, type: 3}
       propertyPath: m_LocalPosition.x

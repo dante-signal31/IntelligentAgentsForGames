@@ -2637,6 +2637,14 @@ PrefabInstance:
       propertyPath: smoothingMethod
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8146274523747296459, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
+      propertyPath: autoSmoothSamples
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8146274523747296459, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
+      propertyPath: exponentialConvergenceRate
+      value: 0.6
+      objectReference: {fileID: 0}
     - target: {fileID: 8907203368228710122, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
       propertyPath: target
       value: 
