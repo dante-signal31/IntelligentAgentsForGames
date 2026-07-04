@@ -3784,7 +3784,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2385346577831692832, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
       propertyPath: semiConeDegrees
-      value: 52.6
+      value: 62.8
       objectReference: {fileID: 0}
     - target: {fileID: 2571423130398877597, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
       propertyPath: m_Layer
@@ -3796,7 +3796,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2850409223302585798, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
       propertyPath: detectionSemiconeAngle
-      value: 45
+      value: 52.5
       objectReference: {fileID: 0}
     - target: {fileID: 2850409223302585798, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
       propertyPath: visualObstaclesLayersMask.m_Bits
@@ -3812,7 +3812,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7114118836840440797, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
       propertyPath: m_Size.x
-      value: 11.121804
+      value: 11.106947
       objectReference: {fileID: 0}
     - target: {fileID: 7114118836840440797, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
       propertyPath: m_Size.y

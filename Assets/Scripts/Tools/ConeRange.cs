@@ -10,7 +10,6 @@ namespace Tools
 /// The cone range is defined by its length, angular width, and an associated color
 /// for visual representation.
 /// </summary>
-[ExecuteAlways]
 public class ConeRange : MonoBehaviour
 {
     [Header("CONFIGURATION OF CONE RANGE:")]
