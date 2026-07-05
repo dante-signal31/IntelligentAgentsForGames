@@ -18,7 +18,7 @@ public class DrawConeRange : UnityEditor.Editor
         // Draw lines to see visual aids in the scene tab.
         Vector2 handlePosition = Quaternion.AngleAxis(
             newAheadSemiConeDegrees,
-            Vector3.forward) * (Vector3.up * cone.Range);
+            Vector3.forward) * (Vector3.up * newRange);
         Vector2 globalHandlePosition = cone.transform.TransformPoint(handlePosition);
         Handles.color = Color.green;
         Handles.DrawLine(cone.transform.position, globalHandlePosition);

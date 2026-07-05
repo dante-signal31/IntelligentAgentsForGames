@@ -3780,11 +3780,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2385346577831692832, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
       propertyPath: range
-      value: 3
+      value: 2.6091022
+      objectReference: {fileID: 0}
+    - target: {fileID: 2385346577831692832, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
+      propertyPath: color.b
+      value: 0.017928958
+      objectReference: {fileID: 0}
+    - target: {fileID: 2385346577831692832, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
+      propertyPath: color.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2385346577831692832, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
+      propertyPath: color.r
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2385346577831692832, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
       propertyPath: semiConeDegrees
-      value: 53.623074
+      value: 54.927208
       objectReference: {fileID: 0}
     - target: {fileID: 2571423130398877597, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
       propertyPath: m_Layer
@@ -3806,21 +3818,25 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 5216346944936874823, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
+      propertyPath: showGizmos
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7098560492018960932, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
       propertyPath: m_Layer
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7114118836840440797, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
       propertyPath: m_Size.x
-      value: 4.8307962
+      value: 4.270697
       objectReference: {fileID: 0}
     - target: {fileID: 7114118836840440797, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
       propertyPath: m_Size.y
-      value: 3
+      value: 2.6091022
       objectReference: {fileID: 0}
     - target: {fileID: 7114118836840440797, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
       propertyPath: m_Offset.y
-      value: 1.5
+      value: 1.3045511
       objectReference: {fileID: 0}
     - target: {fileID: 8077039191525553146, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
       propertyPath: m_Layer
