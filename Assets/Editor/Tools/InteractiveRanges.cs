@@ -10,25 +10,25 @@ public static class InteractiveRanges
     /// </summary>
     /// <param name="position">Center for the circular handle.</param>
     /// <param name="range">Radius for the circular range handle.</param>
-    /// <returns>New range got from handle.</returns>
+    /// <returns>New range got from the handle.</returns>
     public static float CircularRange(Vector3 position, float range)
     {
         return Handles.RadiusHandle(Quaternion.identity, position, range);
     }
     
     /// <summary>
-    /// Show a range cone with handle to set its angular width and its range.
+    /// Show a range cone with a handle to set its angular width and its range.
     /// </summary>
     /// <param name="parentTransform">Transform of the GameObject this cone is
     /// attached to.</param>
-    /// <param name="semiConeDegrees">Half angular width in degrees for this
+    /// <param name="semiConeDegrees">Half-angular width in degrees for this
     /// cone.</param>
     /// <param name="localConeForward">Forward direction for this cone in local
     /// space.</param>
     /// <param name="coneNormal">Normal vector for this cone plane.</param>
     /// <param name="coneColor">Color for this cone.</param>
     /// <param name="range">Length of this cone.</param>
-    /// <param name="takeRange">Return the updated range after moving handle</param>
+    /// <param name="takeNewRange">Return the updated range after moving the handle</param>
     /// <returns>Tuple of (new semiConeDegrees, new range)</returns>
     public static (float, float) ConeRange(
         Transform parentTransform, 
@@ -45,40 +45,45 @@ public static class InteractiveRanges
         // Rotate in local space.
         Vector3 rotatedVector = (Quaternion.AngleAxis(semiConeDegrees, coneNormal) * 
                                 localConeForward).normalized;
+        
         // Handle is placed in world space, so the rotated vector must be taken back to
         // world space.
         Vector3 newHandlePosition = Handles.PositionHandle(
             parentTransform.TransformPoint(rotatedVector * range), 
             Quaternion.identity);
-        range = takeNewRange ? Vector3.Distance(position, newHandlePosition) : range;
-        Handles.DrawSolidArc(position, coneNormal, 
-            globalForward, semiConeDegrees, range);
-        Handles.DrawSolidArc(position, coneNormal,
-            globalForward, -1 * semiConeDegrees, range);
+        
         // Again, we rotate in local space, so aheadSemiConePosition is taken back
         // to local space.
         float newSemiConeDegrees =  Vector2.Angle(localConeForward, 
             parentTransform.InverseTransformPoint(newHandlePosition));
+        
+        // Draw both halves of the cone.
+        range = takeNewRange ? Vector3.Distance(position, newHandlePosition) : range;
+        Handles.DrawSolidArc(position, coneNormal, 
+            globalForward, newSemiConeDegrees, range);
+        Handles.DrawSolidArc(position, coneNormal,
+            globalForward, -1 * newSemiConeDegrees, range);
+        
         return (newSemiConeDegrees, range);
     }
 
     /// <summary>
-    /// Show a range sector with handle to set its angular width and its range.
+    /// Show a range sector with a handle to set its angular width and its range.
     ///
-    /// Whereas a cone laterals go from center to its range, a range laterals go
+    /// Whereas a cone laterals go from center to its range, a range lateral goes
     /// from a minimum range to its range. 
     /// </summary>
     /// <param name="parentTransform">Transform of the GameObject this cone is
     /// attached to.</param>
-    /// <param name="semiConeDegrees">Half angular width in degrees for this
+    /// <param name="semiConeDegrees">Half-angular width in degrees for this
     /// cone.</param>
-    /// <param name="globalConeForward">Forward direction for this cone.</param>
+    /// <param name="localConeForward">Forward direction for this cone.</param>
     /// <param name="coneNormal">Normal vector for this cone plane.</param>
     /// <param name="coneColor">Color for this cone.</param>
     /// <param name="range">Length of this cone.</param>
     /// <param name="minimumRange">Minimum length of this cone.</param>
     /// <param name="takeNewRange">Return the updated range after moving
-    /// handle</param>
+    /// the handle</param>
     /// <returns>Tuple of (new semiConeDegrees, new range,
     /// new minimumRange)</returns>
     public static (float, float, float) SectorRange(

@@ -44,10 +44,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 274e27867e00464880607cd06309ba34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  range: 6.5726314
+  range: 6.386376
   fixedRange: 0
-  semiConeDegrees: 31.1749
+  semiConeDegrees: 39.95449
   color: {r: 1, g: 0, b: 0, a: 1}
-  Updated:
+  updated:
     m_PersistentCalls:
       m_Calls: []
