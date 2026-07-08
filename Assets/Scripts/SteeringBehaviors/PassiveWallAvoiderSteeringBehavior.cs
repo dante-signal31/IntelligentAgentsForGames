@@ -74,15 +74,15 @@ public class PassiveWallAvoiderSteeringBehavior : SteeringBehavior, IGizmos
     
     private void Start()
     {
-        whiskersSensor.SubscribeToColliderDetected(OnColliderDetected);
-        whiskersSensor.SubscribeToNoColliderDetected(OnNoColliderDetected);
+        whiskersSensor.SubscribeToObjectDetected(OnObjectDetected);
+        whiskersSensor.SubscribeToNoObjectDetected(OnNoObjectDetected);
     }
     
     /// <summary>
     /// Method to bind to whisker's ColliderDetected event.
     /// </summary>
     /// <param name="_"></param>
-    private void OnColliderDetected(Collider2D _)
+    private void OnObjectDetected(GameObject _)
     {
         _obstacleDetected = true;
     }
@@ -90,7 +90,7 @@ public class PassiveWallAvoiderSteeringBehavior : SteeringBehavior, IGizmos
     /// <summary>
     /// Method to bind to whisker's NoColliderDetected event.
     /// </summary>
-    private void OnNoColliderDetected()
+    private void OnNoObjectDetected()
     {
         _obstacleDetected = false;
     }
@@ -269,7 +269,7 @@ public class PassiveWallAvoiderSteeringBehavior : SteeringBehavior, IGizmos
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
-        if (!showGizmos || !whiskersSensor.IsAnyColliderDetected) return;
+        if (!showGizmos || !whiskersSensor.IsAnyObjectDetected) return;
         Gizmos.color = gizmosColor;
         Gizmos.DrawWireSphere(_closestHit.point, 0.2f);
         Gizmos.DrawLine(_closestHit.point, _closestHit.point + _avoidVector);

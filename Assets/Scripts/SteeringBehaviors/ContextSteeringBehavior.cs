@@ -196,7 +196,7 @@ public class ContextSteeringBehavior : SteeringBehavior
         _currentSteeringVector = steering.Linear;
         // If there is no danger, we don't need to do anything. Just go straight to
         // the target.
-        if (!dangerSensor.IsAnyColliderDetected) return steering;
+        if (!dangerSensor.IsAnyObjectDetected) return steering;
         
         // If any obstacle detected, then get fresh interests.
         interestWhisker.CalculateInterests(steering.Linear);
@@ -283,7 +283,7 @@ public class ContextSteeringBehavior : SteeringBehavior
         foreach (Interest interest in _interests)
         {
             if (dangerSensor.DetectionMask[index++] || 
-                !dangerSensor.IsAnyColliderDetected) continue;
+                !dangerSensor.IsAnyObjectDetected) continue;
             Gizmos.color = gizmosColorInterest;
             Gizmos.DrawLine(
                 transform.position,

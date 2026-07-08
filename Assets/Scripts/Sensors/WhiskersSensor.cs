@@ -14,7 +14,7 @@ namespace Sensors
 /// sensor is the local UP direction.</p>
 /// </summary>
 [ExecuteAlways]
-public class WhiskersSensor : MonoBehaviour, IGizmos
+public class WhiskersSensor : MonoBehaviour, IGizmos, ISensor
 {
     /// <summary>
     /// A class wrapping a list of ray sensors to make it easier to search for them.
@@ -131,10 +131,14 @@ public class WhiskersSensor : MonoBehaviour, IGizmos
         1.0f,
         0.2f);
     [Space]
-    [Tooltip("Event to trigger when a collider is detected by this sensor.")]    
-    [SerializeField] private UnityEvent<Collider2D> colliderDetected;
-    [Tooltip("Event to trigger when no collider is detected by this sensor.")]
-    [SerializeField] private UnityEvent noColliderDetected;
+    [Tooltip("Event to trigger when an object is detected by this sensor.")]    
+    [SerializeField] private UnityEvent<GameObject> objectEnteredSensor;
+    [Tooltip("Event to trigger when an object keeps being detected by this sensor.")]
+    [SerializeField] private UnityEvent<GameObject> objectStayedInSensor;
+    [Tooltip("Event to trigger when an object is no longer detected by this sensor.")]
+    [SerializeField] private UnityEvent<GameObject> objectLeftSensor;
+    [Tooltip("Event to trigger when no object is detected by this sensor.")]
+    [SerializeField] private UnityEvent noObjectDetected;
     [Header("WIRING:")] 
     [SerializeField] private SectorRange sectorRange;
     [Header("DEBUG")]
@@ -280,16 +284,16 @@ public class WhiskersSensor : MonoBehaviour, IGizmos
     public int SensorAmount => (sensorResolution * 2) + 3;
 
     /// <summary>
-    /// Whether this sensor detects any collider.
+    /// Whether this sensor detects any object.
     /// </summary>
-    public bool IsAnyColliderDetected
+    public bool IsAnyObjectDetected
     {
         get
         {
             if (_sensors == null) return false;
             foreach (RaySensor currentSensor in _sensors)
             {
-                if (currentSensor.IsColliderDetected) return true;
+                if (currentSensor.AnyObjectDetected) return true;
             }
             return false;
         }
@@ -305,7 +309,7 @@ public class WhiskersSensor : MonoBehaviour, IGizmos
             List<bool> detectionMask = new();
             foreach (RaySensor currentSensor in _sensors)
             {
-                detectionMask.Add(currentSensor.IsColliderDetected); 
+                detectionMask.Add(currentSensor.AnyObjectDetected); 
             }
             return detectionMask;
         }
@@ -313,21 +317,21 @@ public class WhiskersSensor : MonoBehaviour, IGizmos
 
     /// <summary>
     /// <p>Set of detected objects.</p>
-    /// <p>It offers a tuple of (Collider2D, int) where the int is the sensor index.</p>
+    /// <p>It offers a tuple of (GameObject, int) where the int is the sensor index.</p>
     /// </summary>
-    public HashSet<(Collider2D, int)> DetectedColliders
+    public HashSet<(GameObject, int)> DetectingSensors
     {
         get
         {
-            HashSet<(Collider2D, int)> detectedColliders = new();
+            HashSet<(GameObject, int)> detectingSensors = new();
             int sensorIndex = 0;
             foreach (RaySensor currentSensor in _sensors)
             {
-                if (currentSensor.IsColliderDetected) 
-                    detectedColliders.Add((currentSensor.DetectedCollider, sensorIndex));
+                if (currentSensor.AnyObjectDetected) 
+                    detectingSensors.Add((currentSensor.FirstDetectedObject, sensorIndex));
                 sensorIndex++;
             }
-            return detectedColliders;
+            return detectingSensors;
         } 
     }
 
@@ -343,8 +347,10 @@ public class WhiskersSensor : MonoBehaviour, IGizmos
             int sensorIndex = 0;
             foreach (RaySensor currentSensor in _sensors)
             {
-                if (currentSensor.IsColliderDetected) detectedHits.Add(
-                    (currentSensor.DetectedHit, sensorIndex));
+                // I had to use the HasValue-Value syntax because
+                // currentSensor.FirstDetectedHit is nullable.
+                if (currentSensor.FirstDetectedHit.HasValue)
+                    detectedHits.Add((currentSensor.FirstDetectedHit.Value, sensorIndex));
                 sensorIndex++;
             }
             return detectedHits;
@@ -377,6 +383,16 @@ public class WhiskersSensor : MonoBehaviour, IGizmos
     
     public readonly List<RayEnds> rayEnds = new();
 
+    public UnityEvent<GameObject> ObjectEnteredSensor => objectEnteredSensor;
+
+    public UnityEvent<GameObject> ObjectStayedInSensor => objectStayedInSensor;
+
+    public UnityEvent<GameObject> ObjectLeftSensor => objectLeftSensor;
+
+    public HashSet<GameObject> DetectedObjects { get; } = new();
+
+    public bool AnyObjectDetected => DetectedObjects.Count > 0;
+    
     private bool _parameterSetFromHere;
     private RaySensorList _sensors;
 
@@ -428,57 +444,59 @@ public class WhiskersSensor : MonoBehaviour, IGizmos
     }
 
     /// <summary>
-    /// Bind a listener to the colliderDetected event.
+    /// Bind a listener to the objectEnteredSensor event.
     /// </summary>
     /// <param name="action">Method to bind.</param>
-    public void SubscribeToColliderDetected(UnityAction<Collider2D> action)
+    public void SubscribeToObjectDetected(UnityAction<GameObject> action)
     {
-        colliderDetected.AddListener(action);
+        objectEnteredSensor.AddListener(action);
     }
 
     /// <summary>
-    /// Unbind a listener from the colliderDetected event.
+    /// Unbind a listener from the objectEnteredSensor event.
     /// </summary>
     /// <param name="action">Method to unbind.</param>
-    public void UnsubscribeFromColliderDetected(UnityAction<Collider2D> action)
+    public void UnsubscribeFromObjectDetected(UnityAction<GameObject> action)
     {
-        colliderDetected.RemoveListener(action);
+        objectEnteredSensor.RemoveListener(action);
     }
 
     /// <summary>
-    /// Bind a listener to the noColliderDetected event.
+    /// Bind a listener to the noObjectDetected event.
     /// </summary>
     /// <param name="action">Method to bind.</param>
-    public void SubscribeToNoColliderDetected(UnityAction action)
+    public void SubscribeToNoObjectDetected(UnityAction action)
     {
-        noColliderDetected.AddListener(action);
+        noObjectDetected.AddListener(action);
     }
 
     /// <summary>
-    /// Unbind a listener from the noColliderDetected event.
+    /// Unbind a listener from the noObjectDetected event.
     /// </summary>
     /// <param name="action">Method to unbind.</param>
-    public void UnsubscribeFromNoColliderDetected(UnityAction action)
+    public void UnsubscribeFromNoObjectDetected(UnityAction action)
     {
-        noColliderDetected.RemoveListener(action);
+        noObjectDetected.RemoveListener(action);
     }
 
     /// <summary>
     /// Called when a collider is detected.
     /// </summary>
-    /// <param name="detectionSensor">RaySensor that detected collider.</param>
-    public void OnColliderDetected(RaySensor detectionSensor)
+    /// <param name="detectedObject">Object detected by the sensor</param>
+    public void OnObjectDetected(GameObject detectedObject)
     {
-        if (colliderDetected != null) 
-            colliderDetected.Invoke(detectionSensor.DetectedCollider);
+        objectEnteredSensor?.Invoke(detectedObject);
+        DetectedObjects.Add(detectedObject);
     }
 
     /// <summary>
     /// Called when no collider is detected.
     /// </summary>
-    public void OnColliderNoLongerDetected()
+    public void OnObjectNoLongerDetected(GameObject disappearedObject)
     {
-        if (DetectedColliders.Count == 0) noColliderDetected.Invoke();
+        objectLeftSensor?.Invoke(disappearedObject);
+        DetectedObjects.Remove(disappearedObject);
+        if (DetectingSensors.Count == 0) noObjectDetected?.Invoke();
     }
 
     /// <summary>
@@ -530,28 +548,28 @@ public class WhiskersSensor : MonoBehaviour, IGizmos
     }
 
     /// <summary>
-    /// Subscribe to sensors events.
+    /// Subscribe to sensor events.
     /// </summary>
     private void SubscribeToSensorsEvents()
     {
         if (_sensors == null) return;
         foreach (RaySensor raySensor in _sensors)
         {
-            raySensor.colliderDetected.AddListener(OnColliderDetected);
-            raySensor.noColliderDetected.AddListener(OnColliderNoLongerDetected);
+            raySensor.ObjectEnteredSensor.AddListener(OnObjectDetected);
+            raySensor.ObjectLeftSensor.AddListener(OnObjectNoLongerDetected);
         }
     }
 
     /// <summary>
-    /// Unsubscribe from sensors events.
+    /// Unsubscribe from sensor events.
     /// </summary>
     private void UnsubscribeFromSensorsEvents()
     {
         if (_sensors == null) return;
         foreach (RaySensor raySensor in _sensors)
         {
-            raySensor.colliderDetected.RemoveListener(OnColliderDetected);
-            raySensor.noColliderDetected.RemoveListener(OnColliderNoLongerDetected);
+            raySensor.ObjectEnteredSensor.RemoveListener(OnObjectDetected);
+            raySensor.ObjectLeftSensor.RemoveListener(OnObjectNoLongerDetected);
         }
     }
 
@@ -661,6 +679,16 @@ public class WhiskersSensor : MonoBehaviour, IGizmos
             sensorIndex);
         float curvePointRange = rightRangeSemiCone.Evaluate(curvePoint) * range;
         return curvePointRange;
+    }
+
+    private void FixedUpdate()
+    {
+        if (DetectedObjects.Count == 0) return;
+
+        foreach (GameObject detectedObject in DetectedObjects)
+        {
+            ObjectStayedInSensor?.Invoke(detectedObject);    
+        }
     }
 
 #if UNITY_EDITOR
