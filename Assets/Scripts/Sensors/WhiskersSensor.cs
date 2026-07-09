@@ -496,7 +496,7 @@ public class WhiskersSensor : MonoBehaviour, IGizmos, ISensor
     {
         objectLeftSensor?.Invoke(disappearedObject);
         DetectedObjects.Remove(disappearedObject);
-        if (DetectingSensors.Count == 0) noObjectDetected?.Invoke();
+        if (DetectedObjects.Count == 0) noObjectDetected?.Invoke();
     }
 
     /// <summary>
