@@ -86,9 +86,9 @@ public class PipelineHidingConstraint: MonoBehaviour, IPipelineConstraint
         threatVisibilitySensor.transform.position = position;
         threatVisibilitySensor.EndPosition = Threat.transform.position;
         threatVisibilitySensor.UpdateRay();
-        if (threatVisibilitySensor.IsColliderDetected)
+        if (threatVisibilitySensor.AnyObjectDetected)
         {
-            GameObject detectedObject = threatVisibilitySensor.DetectedCollider.gameObject;
+            GameObject detectedObject = threatVisibilitySensor.FirstDetectedObject.gameObject;
             return detectedObject.name == Threat.name;
         }
         

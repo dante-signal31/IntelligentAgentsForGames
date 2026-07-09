@@ -50,8 +50,8 @@ public class WallAvoiderSteeringBehavior : SteeringBehavior, IGizmos, ITargeter
         set
         {
             target = value;
-            if (seekSteeringBehavior == null) return;
-            seekSteeringBehavior.Target = target;
+            if (_seekSteeringBehavior == null) return;
+            _seekSteeringBehavior.Target = target;
         }
     }
     
@@ -94,22 +94,22 @@ public class WallAvoiderSteeringBehavior : SteeringBehavior, IGizmos, ITargeter
     private Timer _avoidanceTimer;
     private bool _waitingForAvoidanceTimeout;
     private SteeringOutput _currentSteering;
-    private SeekSteeringBehavior seekSteeringBehavior;
+    private SeekSteeringBehavior _seekSteeringBehavior;
     
     private void Awake()
     {
         // AgentMover can be in the same game object or in one of its parents, so be must
         // search there.
         _agentMover = GetComponentInParent<AgentMover>();
-        seekSteeringBehavior = GetComponent<SeekSteeringBehavior>();
+        _seekSteeringBehavior = GetComponent<SeekSteeringBehavior>();
     }
 
     private void Start()
     {
         Target = target;
         AvoidLayerMask = layerMask;
-        whiskersSensor.SubscribeToColliderDetected(OnColliderDetected);
-        whiskersSensor.SubscribeToNoColliderDetected(OnNoColliderDetected);
+        whiskersSensor.SubscribeToObjectDetected(OnObjectDetected);
+        whiskersSensor.SubscribeToNoObjectDetected(OnNoObjectDetected);
         SetTimer();
     }
     
@@ -145,18 +145,18 @@ public class WallAvoiderSteeringBehavior : SteeringBehavior, IGizmos, ITargeter
     }
     
     /// <summary>
-    /// Method to bind to whisker's ColliderDetected event.
+    /// Method to bind to whisker's ObjectDetected event.
     /// </summary>
     /// <param name="_"></param>
-    private void OnColliderDetected(Collider2D _)
+    private void OnObjectDetected(GameObject _)
     {
         _obstacleDetected = true;
     }
 
     /// <summary>
-    /// Method to bind to whisker's NoColliderDetected event.
+    /// Method to bind to whisker's NoObjectDetected event.
     /// </summary>
-    private void OnNoColliderDetected()
+    private void OnNoObjectDetected()
     {
         _obstacleDetected = false;
     }
@@ -165,7 +165,7 @@ public class WallAvoiderSteeringBehavior : SteeringBehavior, IGizmos, ITargeter
     {
          if (_waitingForAvoidanceTimeout) return _currentSteering;
         
-        SteeringOutput steeringToTargetVelocity = seekSteeringBehavior.GetSteering(args);
+        SteeringOutput steeringToTargetVelocity = _seekSteeringBehavior.GetSteering(args);
         _avoidVector = Vector2.zero;
         if (_obstacleDetected)
         {
@@ -307,7 +307,7 @@ public class WallAvoiderSteeringBehavior : SteeringBehavior, IGizmos, ITargeter
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
-        if (!showGizmos || !whiskersSensor.IsAnyColliderDetected) return;
+        if (!showGizmos || !whiskersSensor.IsAnyObjectDetected) return;
         Gizmos.color = gizmosColor;
         Gizmos.DrawWireSphere(_closestHit.point, 0.2f);
         Gizmos.DrawLine(_closestHit.point, _closestHit.point + _avoidVector);

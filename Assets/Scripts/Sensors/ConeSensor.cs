@@ -378,9 +378,8 @@ public class ConeSensor : MonoBehaviour, ISensor
     {
         lineOfSightSensor.EndPosition = otherObject.transform.position;
         lineOfSightSensor.UpdateRay();
-        Collider2D detectedCollider = lineOfSightSensor.DetectedCollider;
-        if (detectedCollider == null) return false;
-        GameObject detectedObject = detectedCollider.gameObject;
+        GameObject detectedObject = lineOfSightSensor.FirstDetectedObject;
+        if (detectedObject == null) return false;
         return detectedObject == otherObject;
     }
     

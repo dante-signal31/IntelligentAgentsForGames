@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace Sensors
@@ -10,18 +11,22 @@ namespace Sensors
 /// emit a colliderDetected event whenever a ray hits one and a noColliderDetected
 /// event when the ray is clear. </p>s
 /// </summary>
-public class RaySensor : MonoBehaviour
+public class RaySensor : MonoBehaviour, ISensor
 {
     [Header("CONFIGURATION:")] 
+    [Tooltip("Only return the first object detected by the ray.")]
+    [SerializeField] private bool returnOnlyFirstDetectedObject = true;
     [Tooltip("Layers to be detected by this sensor.")] 
-    public LayerMask detectionLayers;
+    [SerializeField] public LayerMask detectionLayers;
     [Tooltip("Whether to ignore colliders overlapping start point.")]
     [SerializeField] private bool ignoreCollidersOverlappingStartPoint = true;
     [Space]
     [Tooltip("Event to trigger when a collider is detected by this sensor.")]    
-    public UnityEvent<RaySensor> colliderDetected;
-    [Tooltip("Event to trigger when no collider is detected by this sensor.")]
-    public UnityEvent noColliderDetected;
+    [SerializeField] public UnityEvent<GameObject> objectEnteredSensor = new();
+    [Tooltip("Event to trigger when an object keeps being detected by this sensor.")]
+    [SerializeField] public UnityEvent<GameObject> objectStayedInSensor = new();
+    [Tooltip("Event to trigger when an object no longer is detected by this sensor.")]
+    [SerializeField] public UnityEvent<GameObject> objectLeftSensor = new();
 
     [Header("DEBUG:")] 
     [Tooltip("Whether to show gizmos for this sensor.")]
@@ -40,11 +45,20 @@ public class RaySensor : MonoBehaviour
     [Tooltip("Point ray ends to.")]
     public Transform endPoint;
 
+    public UnityEvent<GameObject> ObjectEnteredSensor => objectEnteredSensor;
 
+    public UnityEvent<GameObject> ObjectStayedInSensor => objectStayedInSensor;
+
+    public UnityEvent<GameObject> ObjectLeftSensor => objectLeftSensor;
+
+    private readonly List<GameObject> _detectedObjects = new();
+    
+    public HashSet<GameObject> DetectedObjects => new(_detectedObjects);
+    
     /// <summary>
     /// Whether this sensor has detected any collider.
     /// </summary>
-    public bool IsColliderDetected => DetectedCollider != null;
+    public bool AnyObjectDetected => FirstDetectedObject != null;
 
     /// <summary>
     /// This ray sensor layer mask.
@@ -64,30 +78,27 @@ public class RaySensor : MonoBehaviour
         set => ignoreCollidersOverlappingStartPoint = value;
     }
 
-    private Collider2D _detectedCollider;
+    /// <summary>
+    /// Object currently detected by sensor.
+    /// </summary>
+    public GameObject FirstDetectedObject => DetectedObjects.Count > 0 ? 
+        _detectedObjects[0] : 
+        null;
 
     /// <summary>
-    /// Collider currently detected by sensor.
+    /// Stores information about all detected objects and their corresponding
+    /// raycast hits.
     /// </summary>
-    public Collider2D DetectedCollider
-    {
-        get => _detectedCollider;
-        private set
-        {
-            if (_detectedCollider == value) return;
-            _detectedCollider = value;
-            if (value == null && noColliderDetected != null)
-            {
-                noColliderDetected.Invoke();
-            } 
-            else if (value != null && colliderDetected != null)
-            {
-                colliderDetected.Invoke(this);
-            }
-        }
-    }
+    public Dictionary<GameObject, RaycastHit2D> DetectedHits { get; private set; } =
+        new();
 
-    public RaycastHit2D DetectedHit { get; private set; }
+    /// <summary>
+    /// The first detected raycast hit, if any, from the detected objects.
+    /// Returns null if no objects are detected.
+    /// </summary>
+    public RaycastHit2D? FirstDetectedHit => DetectedObjects.Count > 0 ? 
+        DetectedHits[FirstDetectedObject] : 
+        null;
 
     /// <summary>
     /// Raycast start position.
@@ -132,11 +143,23 @@ public class RaySensor : MonoBehaviour
         PerformRaycast();
     }
 
+    /// <summary>
+    /// Calculates and returns the normalized direction vector of the ray
+    /// based on the positions of the start and end points.
+    /// </summary>
+    /// <returns>
+    /// A normalized <see cref="Vector3"/> representing the direction of the ray
+    /// from the start point to the end point.
+    /// </returns>
     private Vector3 GetRayDirection()
     {
         return (endPoint.position - startPoint.position).normalized;
     }
 
+    /// <summary>
+    /// Calculates the distance between the start and end points of the ray.
+    /// </summary>
+    /// <returns>The distance between the start point and end point of the ray.</returns>
     private float GetRayDistance()
     {
         return Vector2.Distance(endPoint.position, startPoint.position);
@@ -163,32 +186,54 @@ public class RaySensor : MonoBehaviour
         // Nothing detected.
         if (hits.Length == 0)
         {
-            DetectedHit = new RaycastHit2D();
-            DetectedCollider = null;
+            DetectedHits.Clear();
+            
+            // Send an event for every object that is no longer detected.
+            foreach (GameObject detectedObject in _detectedObjects)
+            {
+                ObjectLeftSensor?.Invoke(detectedObject);
+            }
+            _detectedObjects.Clear();
+            
             return;
         }
-    
-        // If we are not ignoring colliders overlapping start point,
-        // then first is good.
-        if (!IgnoreCollidersOverlappingStartPoint)
-        {
-            DetectedHit = hits[0];
-            DetectedCollider = DetectedHit.collider;
-            return;
-        }
-    
-        // If we are ignoring colliders overlapping start point,
-        // then we are searching for the first collider whose distance to start point
-        // is greater than zero.
+        
+        // Get every game object hit by the ray.
+        List<GameObject> currentDetectedObjects = new();
+        DetectedHits.Clear();
         foreach (RaycastHit2D hit in hits)
         {
-            if (hit.distance > 0)
+            if (IgnoreCollidersOverlappingStartPoint && 
+                Mathf.Approximately(hit.distance, 0f)) continue;
+            DetectedHits.Add(hit.collider.gameObject, hit);
+            currentDetectedObjects.Add(hit.collider.gameObject);
+        }
+        
+        // Send events for objects that stay or leave the sensor.
+        foreach (GameObject oldDetectedObject in _detectedObjects)
+        {
+            if (currentDetectedObjects.Contains(oldDetectedObject))
             {
-                DetectedHit = hit;
-                DetectedCollider = hit.collider;
-                return;
+                ObjectStayedInSensor?.Invoke(oldDetectedObject);
+            }
+            else
+            {
+                ObjectLeftSensor?.Invoke(oldDetectedObject);
             }
         }
+
+        // Send an event for every object that is detected for the first time.
+        foreach (GameObject detectedObject in currentDetectedObjects)
+        {
+            if (!_detectedObjects.Contains(detectedObject))
+            {
+                ObjectEnteredSensor?.Invoke(detectedObject);
+            }
+        }
+        
+        // Update the list of detected objects.
+        _detectedObjects.Clear();
+        _detectedObjects.AddRange(currentDetectedObjects);
     }
 
 #if UNITY_EDITOR
@@ -205,9 +250,9 @@ public class RaySensor : MonoBehaviour
         Gizmos.DrawSphere(endPoint.position, gizmoRadius);
         Gizmos.color = Color.red;
         Gizmos.DrawLine(startPoint.position, endPoint.position);
-        if (!IsColliderDetected) return;
+        if (!AnyObjectDetected) return;
         Gizmos.color = gizmoDetectedColor;
-        Gizmos.DrawLine(startPoint.position, DetectedHit.point);
+        Gizmos.DrawLine(startPoint.position, DetectedHits[_detectedObjects[0]].point);
     }
 #endif
 }
