@@ -63,7 +63,7 @@ public class WhiskersSensor : MonoBehaviour, IGizmos, ISensor
         /// <param name="index">0 index is the rightmost sensor</param>
         /// <returns></returns>
         public RaySensor GetSensorFromRight(int index) => _raySensors[Count - 1 - index];
-
+        
         public RaySensorList(List<RaySensor> raySensors)
         {
             _raySensors = raySensors;
@@ -85,11 +85,21 @@ public class WhiskersSensor : MonoBehaviour, IGizmos, ISensor
             Count = 0;
         }
 
+        /// <summary>
+        /// Returns an enumerator that iterates through the collection of RaySensor
+        /// objects.
+        /// </summary>
+        /// <returns>An enumerator for the collection of RaySensor objects.</returns>
         public IEnumerator<RaySensor> GetEnumerator()
         {
             return _raySensors.GetEnumerator();
         }
 
+        /// <summary>
+        /// Returns an enumerator that iterates through the collection of RaySensor
+        /// objects.
+        /// </summary>
+        /// <returns>An enumerator for the collection of RaySensor objects.</returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
@@ -405,9 +415,11 @@ public class WhiskersSensor : MonoBehaviour, IGizmos, ISensor
             _parameterSetFromHere = false;
             return;
         }
+        
         Range = sectorRange.Range;
         MinimumRange = sectorRange.MinimumRange;
         SemiConeDegrees = sectorRange.SemiConeDegrees;
+        
         UpdateRayEnds();
     }
 
