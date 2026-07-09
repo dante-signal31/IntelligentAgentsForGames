@@ -2290,7 +2290,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2747753771222001998, guid: 2d0d219662d67da4fa9019f6cb8a38f1, type: 3}
       propertyPath: maximumSpeed
-      value: 0.5
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2747753771222001998, guid: 2d0d219662d67da4fa9019f6cb8a38f1, type: 3}
       propertyPath: autoSmoothSamples
@@ -2306,7 +2306,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2844971176795166340, guid: 2d0d219662d67da4fa9019f6cb8a38f1, type: 3}
       propertyPath: avoidanceTimeout
-      value: 0.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2844971176795166340, guid: 2d0d219662d67da4fa9019f6cb8a38f1, type: 3}
       propertyPath: steeringBehavior
@@ -2331,6 +2331,10 @@ PrefabInstance:
     - target: {fileID: 5187748683231993232, guid: 2d0d219662d67da4fa9019f6cb8a38f1, type: 3}
       propertyPath: range
       value: 1.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 5187748683231993232, guid: 2d0d219662d67da4fa9019f6cb8a38f1, type: 3}
+      propertyPath: color.a
+      value: 0.44705883
       objectReference: {fileID: 0}
     - target: {fileID: 5187748683231993232, guid: 2d0d219662d67da4fa9019f6cb8a38f1, type: 3}
       propertyPath: minimumRange
