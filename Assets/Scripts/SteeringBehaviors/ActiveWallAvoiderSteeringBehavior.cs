@@ -95,15 +95,13 @@ public class ActiveWallAvoiderSteeringBehavior : SteeringBehavior, ITargeter, IG
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        
+        if (_waitingForAvoidanceTimeout) return _currentSteering;
         
         // Get steering to target.
         toTargetSteering = steeringBehavior.GetSteering(args);
 
         // Get avoid vector.
         avoidingSteering = passiveWallAvoiderSteeringBehavior.GetSteering(args);
-        
-        if (_waitingForAvoidanceTimeout) return _currentSteering;
         
         // No need to avoid anything? Then just go to the target.
         if (avoidingSteering == SteeringOutput.zero)
