@@ -54,7 +54,6 @@ public class RaySensor : MonoBehaviour, ISensor
     private readonly List<GameObject> _detectedObjects = new();
     
     public HashSet<GameObject> DetectedObjects => new(_detectedObjects);
-        
     
     /// <summary>
     /// Whether this sensor has detected any collider.
@@ -86,9 +85,17 @@ public class RaySensor : MonoBehaviour, ISensor
         _detectedObjects[0] : 
         null;
 
+    /// <summary>
+    /// Stores information about all detected objects and their corresponding
+    /// raycast hits.
+    /// </summary>
     public Dictionary<GameObject, RaycastHit2D> DetectedHits { get; private set; } =
         new();
 
+    /// <summary>
+    /// The first detected raycast hit, if any, from the detected objects.
+    /// Returns null if no objects are detected.
+    /// </summary>
     public RaycastHit2D? FirstDetectedHit => DetectedObjects.Count > 0 ? 
         DetectedHits[FirstDetectedObject] : 
         null;
@@ -136,11 +143,23 @@ public class RaySensor : MonoBehaviour, ISensor
         PerformRaycast();
     }
 
+    /// <summary>
+    /// Calculates and returns the normalized direction vector of the ray
+    /// based on the positions of the start and end points.
+    /// </summary>
+    /// <returns>
+    /// A normalized <see cref="Vector3"/> representing the direction of the ray
+    /// from the start point to the end point.
+    /// </returns>
     private Vector3 GetRayDirection()
     {
         return (endPoint.position - startPoint.position).normalized;
     }
 
+    /// <summary>
+    /// Calculates the distance between the start and end points of the ray.
+    /// </summary>
+    /// <returns>The distance between the start point and end point of the ray.</returns>
     private float GetRayDistance()
     {
         return Vector2.Distance(endPoint.position, startPoint.position);
