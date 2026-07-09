@@ -2286,11 +2286,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2747753771222001998, guid: 2d0d219662d67da4fa9019f6cb8a38f1, type: 3}
       propertyPath: autoSmooth
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2747753771222001998, guid: 2d0d219662d67da4fa9019f6cb8a38f1, type: 3}
       propertyPath: maximumSpeed
-      value: 0
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2747753771222001998, guid: 2d0d219662d67da4fa9019f6cb8a38f1, type: 3}
       propertyPath: autoSmoothSamples
@@ -2326,7 +2326,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4692215361483410609, guid: 2d0d219662d67da4fa9019f6cb8a38f1, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5187748683231993232, guid: 2d0d219662d67da4fa9019f6cb8a38f1, type: 3}
       propertyPath: range
@@ -2382,7 +2382,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5862550235621902127, guid: 2d0d219662d67da4fa9019f6cb8a38f1, type: 3}
       propertyPath: showGizmos
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5862550235621902127, guid: 2d0d219662d67da4fa9019f6cb8a38f1, type: 3}
       propertyPath: sensorResolution
@@ -6642,7 +6642,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8870854829495726955, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
