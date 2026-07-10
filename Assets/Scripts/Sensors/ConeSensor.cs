@@ -15,7 +15,7 @@ public class ConeSensor : MonoBehaviour, ISensor
     [Tooltip("Range to detect possible collisions.")]
     [SerializeField] private float detectionRange = 10f;
     [Tooltip("Semicone angle for detection (in degrees).")]
-    [Range(0f, 90f)]
+    [Range(0f, 180f)]
     [SerializeField] private float detectionSemiconeAngle = 45f;
     [Tooltip("Specifies the physics layers that the sensor will monitor for objects")]
     [SerializeField] private LayerMask layersToDetect;
@@ -171,12 +171,13 @@ public class ConeSensor : MonoBehaviour, ISensor
 
     private void Start()
     {
+        coneRange.updated?.AddListener(OnConeRangeUpdated);
         ConfigureVolumetricSensor(LayersToDetect);
         lineOfSightSensor.enabled = checkLineOfSight;
         ConfigureLineOfSightSensor(VisualObstaclesLayersMask);
-        sensor.ObjectEnteredSensor?.AddListener(OnObjectEnteredCone);
-        sensor.ObjectStayedInSensor?.AddListener(OnObjectStayCone);
-        sensor.ObjectLeftSensor?.AddListener(OnObjectExitedCone);
+        sensor.ObjectEnteredSensor?.AddListener(OnObjectEnteredArea);
+        sensor.ObjectStayedInSensor?.AddListener(OnObjectStayedInArea);
+        sensor.ObjectLeftSensor?.AddListener(OnObjectExitedArea);
     }
     
     private void ConfigureVolumetricSensor(LayerMask value)
@@ -226,7 +227,7 @@ public class ConeSensor : MonoBehaviour, ISensor
     /// Event handler to use when another object enters the detection area.
     /// </summary>
     /// <param name="otherObject">The object who enters the detection area.</param>
-    public void OnObjectEnteredCone(GameObject otherObject)
+    public void OnObjectEnteredArea(GameObject otherObject)
     {
         // Remember that the initial detection area is a square, but our final detection
         // area is a cone whose area is a subset of the square area. So, we need to
@@ -253,9 +254,9 @@ public class ConeSensor : MonoBehaviour, ISensor
     /// Event handler to use when another object stays in the detection area.
     /// </summary>
     /// <param name="otherObject">The object who stays in the detection area.</param>
-    public void OnObjectStayCone(GameObject otherObject)
+    public void OnObjectStayedInArea(GameObject otherObject)
     {
-        // Only keep in DetectedObjects those who are in the detection area and in
+        // Only keep in _objectsInSensorRange those who are in the detection area and in
         // cone range.
         if (!PositionIsInConeRange(otherObject.transform.position) &&
             _objectsInSensorRange.Contains(otherObject))
@@ -277,7 +278,7 @@ public class ConeSensor : MonoBehaviour, ISensor
             return;
         }
         
-        // Not in the cone range nor in DetectedObjects, so just ignore it.
+        // Not in the cone range nor in _objectsInSensorRange, so just ignore it.
         if (!PositionIsInConeRange(otherObject.transform.position)) 
             return;
         
@@ -349,7 +350,7 @@ public class ConeSensor : MonoBehaviour, ISensor
     /// Event handler to use when another object exits our detection area.
     /// </summary>
     /// <param name="otherObject">The object who exits our detection area.</param>
-    public void OnObjectExitedCone(GameObject otherObject)
+    public void OnObjectExitedArea(GameObject otherObject)
     {
         // Only remove from detected object if it was already there.
         if (!_objectsInSensorRange.Contains(otherObject)) return;
@@ -376,7 +377,7 @@ public class ConeSensor : MonoBehaviour, ISensor
     /// <returns>True if the object is visible to the sensor; otherwise, false.</returns>
     private bool ObjectIsVisible(GameObject otherObject)
     {
-        lineOfSightSensor.EndPosition = otherObject.transform.position;
+        lineOfSightSensor.GlobalEndPosition = otherObject.transform.position;
         lineOfSightSensor.UpdateRay();
         GameObject detectedObject = lineOfSightSensor.FirstDetectedObject;
         if (detectedObject == null) return false;

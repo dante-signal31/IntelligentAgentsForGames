@@ -47,7 +47,7 @@ public class HidingPointsDetector : MonoBehaviour
         set
         {
             threat = value;
-            raySensor.StartPosition = value.transform.position;
+            raySensor.GlobalStartPosition = value.transform.position;
         }
     }
     
@@ -141,7 +141,7 @@ public class HidingPointsDetector : MonoBehaviour
     {
         ObstaclesLayer = obstaclesLayer;
         if (raySensor == null || Threat == null) return;
-        raySensor.StartPosition = Threat.transform.position;
+        raySensor.GlobalStartPosition = Threat.transform.position;
     }
 
     private void FixedUpdate()
@@ -161,10 +161,10 @@ public class HidingPointsDetector : MonoBehaviour
     private void UpdateRayCollisionPoints()
     {
         _rayCollisionPoints.Clear();
-        raySensor.StartPosition = Threat.transform.position;
+        raySensor.GlobalStartPosition = Threat.transform.position;
         foreach (Vector2 obstaclePosition in ObstaclesPositions)
         {
-            raySensor.EndPosition = obstaclePosition;
+            raySensor.GlobalEndPosition = obstaclePosition;
             if (raySensor.AnyObjectDetected && raySensor.FirstDetectedHit.HasValue)
             {
                 _rayCollisionPoints.Add(raySensor.FirstDetectedHit.Value.point);

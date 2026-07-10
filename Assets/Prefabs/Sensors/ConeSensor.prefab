@@ -69,7 +69,7 @@ MonoBehaviour:
   coneSensorDimensionsChanged:
     m_PersistentCalls:
       m_Calls: []
-  sensor: {fileID: 3755691273847252397, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
+  sensor: {fileID: 4915441943630285652}
   boxRangeManager: {fileID: 1730234677030443106}
   coneRange: {fileID: 2385346577831692832}
   lineOfSightSensor: {fileID: 5216346944936874823}
@@ -248,7 +248,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8898312500515073516, guid: 97f92bb48208c7c41836db40fbded15b, type: 3}
       propertyPath: updated.m_PersistentCalls.m_Calls.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8898312500515073516, guid: 97f92bb48208c7c41836db40fbded15b, type: 3}
       propertyPath: coneUpdated.m_PersistentCalls.m_Calls.Array.size
@@ -412,7 +412,8 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 5516798971329210585, guid: 9ae491d825e3b3640ad3ed1224a99004, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9ae491d825e3b3640ad3ed1224a99004, type: 3}
@@ -458,15 +459,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3755691273847252397, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
       propertyPath: objectLeftSensor.m_PersistentCalls.m_Calls.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3755691273847252397, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
       propertyPath: objectEnteredSensor.m_PersistentCalls.m_Calls.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3755691273847252397, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
       propertyPath: objectStayedInSensor.m_PersistentCalls.m_Calls.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3755691273847252397, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
       propertyPath: objectLeftDetectionArea.m_PersistentCalls.m_Calls.Array.size
@@ -649,6 +650,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
+--- !u!114 &4915441943630285652 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3755691273847252397, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}
+  m_PrefabInstance: {fileID: 8082216643265081081}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 691801b6911a6b34ea3caabde5f8ac86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &5046987781414960193 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3901046994300900024, guid: 01fcd2f61de25584c8898bfd87a4c532, type: 3}

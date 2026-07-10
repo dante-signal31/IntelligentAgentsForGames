@@ -13,7 +13,11 @@ namespace Sensors
 /// </summary>
 public class RaySensor : MonoBehaviour, ISensor
 {
-    [Header("CONFIGURATION:")] 
+    [Header("CONFIGURATION:")]
+    [Tooltip("Point from ray starts. In local coordinates.")]
+    public Vector3 localStartPoint = Vector3.zero;
+    [Tooltip("Point ray ends to. In local coordinates.")]
+    public Vector3 localEndPoint = Vector3.up;
     [Tooltip("Only return the first object detected by the ray.")]
     [SerializeField] private bool returnOnlyFirstDetectedObject = true;
     [Tooltip("Layers to be detected by this sensor.")] 
@@ -32,18 +36,12 @@ public class RaySensor : MonoBehaviour, ISensor
     [Tooltip("Whether to show gizmos for this sensor.")]
     [SerializeField] private bool showGizmos = true;
     [Tooltip("Gizmo color for this sensor.")]
-    [SerializeField] private Color gizmoColor = Color.red;
+    [SerializeField] public Color gizmoColor = Color.red;
     [Tooltip("Color to show when the sensor detects an object.")] 
     [SerializeField] private Color gizmoDetectedColor = Color.green;
     [Tooltip("Radius for the gizmos that mark the ray ends.")]
     [Range(0.01f, 1.0f)]
     [SerializeField] private float gizmoRadius;
-
-    [Header("WIRING:")]
-    [Tooltip("Point from ray starts.")]
-    public Transform startPoint;
-    [Tooltip("Point ray ends to.")]
-    public Transform endPoint;
 
     public UnityEvent<GameObject> ObjectEnteredSensor => objectEnteredSensor;
 
@@ -101,27 +99,27 @@ public class RaySensor : MonoBehaviour, ISensor
         null;
 
     /// <summary>
-    /// Raycast start position.
+    /// Raycast start position. In global coordinates.
     /// </summary>
-    public Vector3 StartPosition
+    public Vector3 GlobalStartPosition
     {
-        get => startPoint.position;
+        get => transform.TransformPoint(localStartPoint);
         set
         {
-            startPoint.position = value;
+            localStartPoint = transform.InverseTransformPoint(value);
             PerformRaycast();
         }
     }
 
     /// <summary>
-    /// Raycast end position.
+    /// Raycast end position. In global coordinates.
     /// </summary>
-    public Vector3 EndPosition
+    public Vector3 GlobalEndPosition
     {
-        get => endPoint.position;
+        get => transform.TransformPoint(localEndPoint);
         set
         {
-            endPoint.position = value;
+            localEndPoint = transform.InverseTransformPoint(value);
             PerformRaycast();
         }
     }
@@ -153,7 +151,7 @@ public class RaySensor : MonoBehaviour, ISensor
     /// </returns>
     private Vector3 GetRayDirection()
     {
-        return (endPoint.position - startPoint.position).normalized;
+        return (GlobalEndPosition - GlobalStartPosition).normalized;
     }
 
     /// <summary>
@@ -162,7 +160,7 @@ public class RaySensor : MonoBehaviour, ISensor
     /// <returns>The distance between the start point and end point of the ray.</returns>
     private float GetRayDistance()
     {
-        return Vector2.Distance(endPoint.position, startPoint.position);
+        return Vector2.Distance(GlobalEndPosition, GlobalStartPosition);
     }
 
     private void FixedUpdate()
@@ -178,7 +176,7 @@ public class RaySensor : MonoBehaviour, ISensor
     {
         // I use RaycastAll to get every collider along the ray, not only the first one.
         RaycastHit2D[] hits = Physics2D.RaycastAll(
-            startPoint.position, 
+            GlobalStartPosition, 
             GetRayDirection(), 
             GetRayDistance(), 
             detectionLayers);
@@ -244,15 +242,14 @@ public class RaySensor : MonoBehaviour, ISensor
 
     private void DrawSensor()
     {
-        Vector3 gizmoSize = new Vector3(gizmoRadius, gizmoRadius, gizmoRadius);
         Gizmos.color = gizmoColor;
-        Gizmos.DrawCube(startPoint.position, gizmoSize);
-        Gizmos.DrawSphere(endPoint.position, gizmoRadius);
+        Gizmos.DrawWireSphere(GlobalStartPosition, gizmoRadius);
+        Gizmos.DrawWireSphere(GlobalEndPosition, gizmoRadius);
         Gizmos.color = Color.red;
-        Gizmos.DrawLine(startPoint.position, endPoint.position);
+        Gizmos.DrawLine(GlobalStartPosition, GlobalEndPosition);
         if (!AnyObjectDetected) return;
         Gizmos.color = gizmoDetectedColor;
-        Gizmos.DrawLine(startPoint.position, DetectedHits[_detectedObjects[0]].point);
+        Gizmos.DrawLine(GlobalStartPosition, DetectedHits[_detectedObjects[0]].point);
     }
 #endif
 }

@@ -84,7 +84,7 @@ public class PipelineHidingConstraint: MonoBehaviour, IPipelineConstraint
     private bool IsPositionVisibleByThreat(Vector2 position)
     {
         threatVisibilitySensor.transform.position = position;
-        threatVisibilitySensor.EndPosition = Threat.transform.position;
+        threatVisibilitySensor.GlobalEndPosition = Threat.transform.position;
         threatVisibilitySensor.UpdateRay();
         if (threatVisibilitySensor.AnyObjectDetected)
         {

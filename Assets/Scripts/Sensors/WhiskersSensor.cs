@@ -597,8 +597,8 @@ public class WhiskersSensor : MonoBehaviour, IGizmos, ISensor
         foreach (RayEnds currentRayEnd in rayEnds)
         {
             RaySensor currentSensor = _sensors.GetSensorFromLeft(i);
-            currentSensor.StartPosition = transform.TransformPoint(currentRayEnd.start);
-            currentSensor.EndPosition = transform.TransformPoint(currentRayEnd.end);
+            currentSensor.GlobalStartPosition = transform.TransformPoint(currentRayEnd.start);
+            currentSensor.GlobalEndPosition = transform.TransformPoint(currentRayEnd.end);
             i++;
         }
     }

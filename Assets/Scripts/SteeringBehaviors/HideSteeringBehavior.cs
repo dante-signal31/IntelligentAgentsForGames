@@ -294,7 +294,7 @@ public class HideSteeringBehavior : SteeringBehavior
 
     private void CheckThreatVisibility()
     {
-        rayCastToThreat.EndPosition = Threat.transform.position;
+        rayCastToThreat.GlobalEndPosition = Threat.transform.position;
         if (rayCastToThreat.AnyObjectDetected)
         {
             _threatCanSeeUs = 

@@ -2750,6 +2750,10 @@ PrefabInstance:
       propertyPath: followPath
       value: 
       objectReference: {fileID: 86846158}
+    - target: {fileID: 6399921883623362871, guid: b9884029951c8e548ba84387e4a48e75, type: 3}
+      propertyPath: maximumSpeed
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3821,6 +3825,30 @@ PrefabInstance:
     - target: {fileID: 2995595104173028114, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
       propertyPath: m_Layer
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4915441943630285652, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
+      propertyPath: objectLeftSensor.m_PersistentCalls.m_Calls.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4915441943630285652, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
+      propertyPath: objectEnteredSensor.m_PersistentCalls.m_Calls.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4915441943630285652, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
+      propertyPath: objectStayedInSensor.m_PersistentCalls.m_Calls.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4915441943630285652, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
+      propertyPath: objectLeftSensor.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4915441943630285652, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
+      propertyPath: objectEnteredSensor.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4915441943630285652, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
+      propertyPath: objectStayedInSensor.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5216346944936874823, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
       propertyPath: showGizmos
@@ -6265,6 +6293,10 @@ PrefabInstance:
       propertyPath: gizmoColor.g
       value: 0.5019608
       objectReference: {fileID: 0}
+    - target: {fileID: 4007519550411357260, guid: f89ebc74ef2390046b2980f2905b4dbc, type: 3}
+      propertyPath: maximumSpeed
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5289814705463455825, guid: f89ebc74ef2390046b2980f2905b4dbc, type: 3}
       propertyPath: threat
       value: 
@@ -6602,11 +6634,11 @@ PrefabInstance:
       objectReference: {fileID: 1165575433}
     - target: {fileID: 8382297402706859929, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -4.05
+      value: 2.27
       objectReference: {fileID: 0}
     - target: {fileID: 8382297402706859929, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -3.22
+      value: 2.65
       objectReference: {fileID: 0}
     - target: {fileID: 8382297402706859929, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
       propertyPath: m_LocalPosition.z
