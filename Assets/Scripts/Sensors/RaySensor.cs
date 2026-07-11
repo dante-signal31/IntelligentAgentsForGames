@@ -18,8 +18,6 @@ public class RaySensor : MonoBehaviour, ISensor
     public Vector3 localStartPoint = Vector3.zero;
     [Tooltip("Point ray ends to. In local coordinates.")]
     public Vector3 localEndPoint = Vector3.up;
-    [Tooltip("Only return the first object detected by the ray.")]
-    [SerializeField] private bool returnOnlyFirstDetectedObject = true;
     [Tooltip("Layers to be detected by this sensor.")] 
     [SerializeField] public LayerMask detectionLayers;
     [Tooltip("Whether to ignore colliders overlapping start point.")]
@@ -54,6 +52,13 @@ public class RaySensor : MonoBehaviour, ISensor
     public HashSet<GameObject> DetectedObjects => new(_detectedObjects);
     
     /// <summary>
+    /// Stores information about all detected objects and their corresponding
+    /// raycast hits.
+    /// </summary>
+    public Dictionary<GameObject, RaycastHit2D> DetectedHits { get; private set; } =
+        new();
+    
+    /// <summary>
     /// Whether this sensor has detected any collider.
     /// </summary>
     public bool AnyObjectDetected => FirstDetectedObject != null;
@@ -77,18 +82,12 @@ public class RaySensor : MonoBehaviour, ISensor
     }
 
     /// <summary>
-    /// Object currently detected by sensor.
+    /// The first detected object, if any, from the detected objects.
+    /// Returns null if no objects are detected.
     /// </summary>
     public GameObject FirstDetectedObject => DetectedObjects.Count > 0 ? 
         _detectedObjects[0] : 
         null;
-
-    /// <summary>
-    /// Stores information about all detected objects and their corresponding
-    /// raycast hits.
-    /// </summary>
-    public Dictionary<GameObject, RaycastHit2D> DetectedHits { get; private set; } =
-        new();
 
     /// <summary>
     /// The first detected raycast hit, if any, from the detected objects.
