@@ -59,6 +59,22 @@ public class RaySensor : MonoBehaviour, ISensor
         new();
     
     /// <summary>
+    /// The first detected object, if any, from the detected objects.
+    /// Returns null if no objects are detected.
+    /// </summary>
+    public GameObject FirstDetectedObject => DetectedObjects.Count > 0 ? 
+        _detectedObjects[0] : 
+        null;
+
+    /// <summary>
+    /// The first detected raycast hit, if any, from the detected objects.
+    /// Returns null if no objects are detected.
+    /// </summary>
+    public RaycastHit2D? FirstDetectedHit => DetectedObjects.Count > 0 ? 
+        DetectedHits[FirstDetectedObject] : 
+        null;
+    
+    /// <summary>
     /// Whether this sensor has detected any collider.
     /// </summary>
     public bool AnyObjectDetected => FirstDetectedObject != null;
@@ -80,23 +96,7 @@ public class RaySensor : MonoBehaviour, ISensor
         get => ignoreCollidersOverlappingStartPoint;
         set => ignoreCollidersOverlappingStartPoint = value;
     }
-
-    /// <summary>
-    /// The first detected object, if any, from the detected objects.
-    /// Returns null if no objects are detected.
-    /// </summary>
-    public GameObject FirstDetectedObject => DetectedObjects.Count > 0 ? 
-        _detectedObjects[0] : 
-        null;
-
-    /// <summary>
-    /// The first detected raycast hit, if any, from the detected objects.
-    /// Returns null if no objects are detected.
-    /// </summary>
-    public RaycastHit2D? FirstDetectedHit => DetectedObjects.Count > 0 ? 
-        DetectedHits[FirstDetectedObject] : 
-        null;
-
+    
     /// <summary>
     /// Raycast start position. In global coordinates.
     /// </summary>
