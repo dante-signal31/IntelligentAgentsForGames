@@ -543,6 +543,22 @@ public class WhiskersSensor : MonoBehaviour, IGizmos, ISensor
         }
         _sensors = new RaySensorList(raySensors);
     }
+    
+    /// <summary>
+    /// Place sensors in the correct positions for current resolution and current range
+    /// sector.
+    /// </summary>
+    private void PlaceSensors()
+    {
+        int i = 0;
+        foreach (RayEnds currentRayEnd in rayEnds)
+        {
+            RaySensor currentSensor = _sensors.GetSensorFromLeft(i);
+            currentSensor.GlobalStartPosition = transform.TransformPoint(currentRayEnd.start);
+            currentSensor.GlobalEndPosition = transform.TransformPoint(currentRayEnd.end);
+            i++;
+        }
+    }
 
     /// <summary>
     /// Clear the current list of sensors.
@@ -582,26 +598,7 @@ public class WhiskersSensor : MonoBehaviour, IGizmos, ISensor
             raySensor.ObjectLeftSensor.RemoveListener(OnObjectNoLongerDetected);
         }
     }
-
-    /// <summary>
-    /// Place sensors in the correct positions for current resolution and current range
-    /// sector.
-    /// </summary>
-    private void PlaceSensors()
-    {
-        // List<RayEnds> rayEnds = this.rayEnds;
-
-        int i = 0;
-        foreach (RayEnds currentRayEnd in rayEnds)
-        {
-            RaySensor currentSensor = _sensors.GetSensorFromLeft(i);
-            currentSensor.GlobalStartPosition = transform.TransformPoint(currentRayEnd.start);
-            currentSensor.GlobalEndPosition = transform.TransformPoint(currentRayEnd.end);
-            i++;
-        }
-    }
-
-
+    
     /// <summary>
     /// <p>Refresh positions for sensor ends.</p>
     /// <p>These positions are local to the current agent</p>
