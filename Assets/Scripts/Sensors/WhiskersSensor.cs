@@ -419,8 +419,6 @@ public class WhiskersSensor : MonoBehaviour, IGizmos, ISensor
         Range = sectorRange.Range;
         MinimumRange = sectorRange.MinimumRange;
         SemiConeDegrees = sectorRange.SemiConeDegrees;
-        
-        UpdateRayEnds();
     }
 
     private void Start()
