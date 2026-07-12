@@ -180,18 +180,18 @@ public class RaySensor : MonoBehaviour, ISensor
             GetRayDistance(), 
             detectionLayers);
     
+        List<GameObject> previouslyDetectedObjects = new(_detectedObjects);
+        
         // Nothing detected.
         if (hits.Length == 0)
         {
             DetectedHits.Clear();
-            
+            _detectedObjects.Clear();
             // Send an event for every object that is no longer detected.
-            foreach (GameObject detectedObject in _detectedObjects)
+            foreach (GameObject detectedObject in previouslyDetectedObjects)
             {
                 ObjectLeftSensor?.Invoke(detectedObject);
             }
-            _detectedObjects.Clear();
-            
             return;
         }
         
@@ -206,8 +206,12 @@ public class RaySensor : MonoBehaviour, ISensor
             currentDetectedObjects.Add(hit.collider.gameObject);
         }
         
+        // Update the list of detected objects.
+        _detectedObjects.Clear();
+        _detectedObjects.AddRange(currentDetectedObjects);
+        
         // Send events for objects that stay or leave the sensor.
-        foreach (GameObject oldDetectedObject in _detectedObjects)
+        foreach (GameObject oldDetectedObject in previouslyDetectedObjects)
         {
             if (currentDetectedObjects.Contains(oldDetectedObject))
             {
@@ -222,15 +226,11 @@ public class RaySensor : MonoBehaviour, ISensor
         // Send an event for every object that is detected for the first time.
         foreach (GameObject detectedObject in currentDetectedObjects)
         {
-            if (!_detectedObjects.Contains(detectedObject))
+            if (!previouslyDetectedObjects.Contains(detectedObject))
             {
                 ObjectEnteredSensor?.Invoke(detectedObject);
             }
         }
-        
-        // Update the list of detected objects.
-        _detectedObjects.Clear();
-        _detectedObjects.AddRange(currentDetectedObjects);
     }
 
 #if UNITY_EDITOR

@@ -500,10 +500,18 @@ public class WhiskersSensor : MonoBehaviour, IGizmos, ISensor
     }
 
     /// <summary>
-    /// Called when no collider is detected.
+    /// Called when an object is no longer detected.
     /// </summary>
     public void OnObjectNoLongerDetected(GameObject disappearedObject)
     {
+        // Does any other ray sensor still detect that game object?
+        foreach (RaySensor raySensor in _sensors)
+        {
+            if (raySensor.FirstDetectedObject == disappearedObject) 
+                return;
+        }
+        
+        // If not, then it's safe to remove it from the detected objects list.
         objectLeftSensor?.Invoke(disappearedObject);
         DetectedObjects.Remove(disappearedObject);
         if (DetectedObjects.Count == 0) noObjectDetected?.Invoke();
