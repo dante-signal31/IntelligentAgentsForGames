@@ -88,11 +88,40 @@ public class BoxRangeManager : MonoBehaviour
     /// Managed box collider.
     /// </summary>
     public BoxCollider2D BoxCollider => boxCollider;
-
-    // private Vector2 _currentSize;
+    
     private GrowDirection _currentGrowDirection;
     private const float OffsetBias = 0.5f;
+    
+    private void Start()
+    {
+        RefreshBoxSize();
+    }
 
+    /// <summary>
+    /// Update the box with its new dimensions.
+    /// </summary>
+    private void RefreshBoxSize()
+    {
+        SetBoxSize(width, range);
+    }
+
+    /// <summary>
+    /// Sets the size of the box collider and adjusts its offset accordingly.
+    /// </summary>
+    /// <param name="newWidth">The new width of the box collider.</param>
+    /// <param name="newRange">The new range (height) of the box collider.</param>
+    private void SetBoxSize(float newWidth, float newRange)
+    {
+        if (boxCollider == null) return;
+        Vector2 newSize = new Vector2(newWidth, newRange);
+        boxCollider.offset = Vector2.zero;
+        boxCollider.size = Vector2.one;
+        Vector2 growOffsetVector = GetGrowOffsetVector();
+        Vector2 growVector = GetGrowVector(boxCollider.size, newSize);
+        boxCollider.size = newSize;
+        boxCollider.offset = initialOffset + growVector * growOffsetVector;
+    }
+    
     /// <summary>
     /// Get offset vector needed to keep the box collider in the same position as before
     /// after changing the size.
@@ -126,36 +155,6 @@ public class BoxRangeManager : MonoBehaviour
     private Vector2 GetGrowVector(Vector2 currentSize, Vector2 newSize)
     {
         return newSize - currentSize;
-    }
-
-    private void Start()
-    {
-        RefreshBoxSize();
-    }
-
-    /// <summary>
-    /// Update the box with its new dimensions.
-    /// </summary>
-    private void RefreshBoxSize()
-    {
-        SetBoxSize(width, range);
-    }
-
-    /// <summary>
-    /// Sets the size of the box collider and adjusts its offset accordingly.
-    /// </summary>
-    /// <param name="newWidth">The new width of the box collider.</param>
-    /// <param name="newRange">The new range (height) of the box collider.</param>
-    private void SetBoxSize(float newWidth, float newRange)
-    {
-        if (boxCollider == null) return;
-        Vector2 newSize = new Vector2(newWidth, newRange);
-        boxCollider.offset = Vector2.zero;
-        boxCollider.size = Vector2.one;
-        Vector2 growOffsetVector = GetGrowOffsetVector();
-        Vector2 growVector = GetGrowVector(boxCollider.size, newSize);
-        boxCollider.size = newSize;
-        boxCollider.offset = initialOffset + growVector * growOffsetVector;
     }
     
     [ContextMenu("Reset Box Manager")]
