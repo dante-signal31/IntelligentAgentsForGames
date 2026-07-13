@@ -5,7 +5,7 @@ namespace Tools
 /// <summary>
 /// <p>This script allows resizing a box collider in realtime.</p>
 ///
-/// <p>WARNING! when using this component, collider offset should be set only by this
+/// <p>WARNING! When using this component, collider offset should be set only by this
 /// script. So let the collider component offset the property alone and do not edit it
 /// through the inspector.</p>
 /// </summary>
@@ -19,19 +19,19 @@ public class BoxRangeManager : MonoBehaviour
     /// DOWN grow. If you change width, then LEFT and RIGHT grow.
     /// </item>
     /// <item>
-    /// <b>Up</b>: grow in the UP direction if you change range. If you change width,
+    /// <b>Up</b>: grow in the UP direction if you change the range. If you change width,
     /// then LEFT and RIGHT grow.
     /// </item>
     /// <item>
-    /// <b>Down</b>: grow in the DOWN direction if you change range. If you change width,
-    /// then LEFT and RIGHT grow.
+    /// <b>Down</b>: grow in the DOWN direction if you change the range. If you change
+    /// width, then LEFT and RIGHT grow.
     /// </item>
     /// <item>
-    /// <b>Left</b>: grow in the LEFT direction if you change width. If you change the
+    /// <b>Left</b>: grow in the LEFT direction if you change the width. If you change the
     /// range, then UP and DOWN grow.
     /// </item>
     /// <item>
-    /// <b>Right</b>: grow in the RIGHT direction if you change width. If you change
+    /// <b>Right</b>: grow in the RIGHT direction if you change the width. If you change
     /// the range, then UP and DOWN grow.
     /// </item>
     /// </list>
