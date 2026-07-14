@@ -60,7 +60,7 @@ public class AgentMoverEditor : UnityEditor.Editor
         container.Add(maximumAccelerationField);
         container.Add(maximumDecelerationField);
         
-        // Auto smooth toggle makes auto smoothing panel appear.  
+        // Auto smooth toggle makes the auto smoothing panel appear.  
         Toggle autoSmoothField = new(_autoSmooth.displayName);
         autoSmoothField.BindProperty(_autoSmooth);
         
