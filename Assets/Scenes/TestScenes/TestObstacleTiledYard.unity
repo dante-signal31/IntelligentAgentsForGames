@@ -3788,7 +3788,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2385346577831692832, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
       propertyPath: range
-      value: 7
+      value: 7.4641314
       objectReference: {fileID: 0}
     - target: {fileID: 2385346577831692832, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
       propertyPath: color.b
@@ -3804,7 +3804,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2385346577831692832, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
       propertyPath: semiConeDegrees
-      value: 52.5
+      value: 51.6
       objectReference: {fileID: 0}
     - target: {fileID: 2571423130398877597, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
       propertyPath: m_Layer
@@ -3812,11 +3812,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2850409223302585798, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
       propertyPath: detectionRange
-      value: 7
+      value: 7.4641314
       objectReference: {fileID: 0}
     - target: {fileID: 2850409223302585798, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
       propertyPath: detectionSemiconeAngle
-      value: 52.5
+      value: 66
       objectReference: {fileID: 0}
     - target: {fileID: 2850409223302585798, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
       propertyPath: visualObstaclesLayersMask.m_Bits
@@ -3860,15 +3860,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7114118836840440797, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
       propertyPath: m_Size.x
-      value: 11.106947
+      value: 11.699182
       objectReference: {fileID: 0}
     - target: {fileID: 7114118836840440797, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
       propertyPath: m_Size.y
-      value: 7
+      value: 7.4641314
       objectReference: {fileID: 0}
     - target: {fileID: 7114118836840440797, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
       propertyPath: m_Offset.y
-      value: 3.5
+      value: 3.7320657
       objectReference: {fileID: 0}
     - target: {fileID: 8077039191525553146, guid: 1284398336a2c5147a9221c232d30cd1, type: 3}
       propertyPath: m_Layer
@@ -6634,11 +6634,11 @@ PrefabInstance:
       objectReference: {fileID: 1165575433}
     - target: {fileID: 8382297402706859929, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2.27
+      value: 2.96
       objectReference: {fileID: 0}
     - target: {fileID: 8382297402706859929, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.65
+      value: 6.99
       objectReference: {fileID: 0}
     - target: {fileID: 8382297402706859929, guid: 62b439c198e11f246b5f778fdb7f37b7, type: 3}
       propertyPath: m_LocalPosition.z
