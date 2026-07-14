@@ -139,18 +139,7 @@ public class ConeSensor : MonoBehaviour, ISensor
         get => transform.up;
         set => transform.up = value;
     }
-
-    public UnityEvent<GameObject> ObjectEnteredSensor => objectEnteredSensor;
-
-    public UnityEvent<GameObject> ObjectStayedInSensor => objectStayedInSensor;
-
-    public UnityEvent<GameObject> ObjectLeftSensor => objectLeftSensor;
     
-    /// <summary>
-    /// Whether the sensor is detecting any object.
-    /// </summary>
-    public bool AnyObjectDetected => DetectedObjects.Count > 0;
-
     /// <summary>
     /// <p>List of objects currently inside this sensor range.</p>
     /// <p>Only are considered those objects included in the layer mask provided
@@ -164,6 +153,17 @@ public class ConeSensor : MonoBehaviour, ISensor
             return _objectsInSensorRange;
         }
     }
+
+    public UnityEvent<GameObject> ObjectEnteredSensor => objectEnteredSensor;
+
+    public UnityEvent<GameObject> ObjectStayedInSensor => objectStayedInSensor;
+
+    public UnityEvent<GameObject> ObjectLeftSensor => objectLeftSensor;
+    
+    /// <summary>
+    /// Whether the sensor is detecting any object.
+    /// </summary>
+    public bool AnyObjectDetected => DetectedObjects.Count > 0;
     
     private bool _parameterSetFromHere;
     private readonly HashSet<GameObject> _objectsInSensorRange = new();
@@ -191,20 +191,6 @@ public class ConeSensor : MonoBehaviour, ISensor
         if (lineOfSightSensor == null) return;
         lineOfSightSensor.detectionLayers = LayersToDetect | value;
     }
-
-    /// <summary>
-    /// Whether a global position is inside the cone range of the agent.
-    /// </summary>
-    /// <param name="position">Global position to check.</param>
-    /// <returns>True if the position is inside the cone.</returns>
-    private bool PositionIsInConeRange(Vector2 position)
-    {
-        float distance = Vector2.Distance(position, transform.position);
-        float heading = Vector2.Angle(
-            Forward,
-            position - (Vector2) transform.position);
-        return distance <= DetectionRange && heading <= DetectionSemiconeAngle;
-    }
     
     /// <summary>
     /// <p>Event handler launched when the cone range gizmo is updated.</p>
@@ -222,7 +208,36 @@ public class ConeSensor : MonoBehaviour, ISensor
         DetectionRange = coneRange.Range;
         DetectionSemiconeAngle = coneRange.SemiConeDegrees;
     }
+    
+    /// <summary>
+    /// Checks whether the specified object is visible to the sensor, considering
+    /// line-of-sight and visual obstacles.
+    /// </summary>
+    /// <param name="otherObject">The game object to check for visibility.</param>
+    /// <returns>True if the object is visible to the sensor; otherwise, false.</returns>
+    private bool ObjectIsVisible(GameObject otherObject)
+    {
+        lineOfSightSensor.GlobalEndPosition = otherObject.transform.position;
+        lineOfSightSensor.UpdateRay();
+        GameObject detectedObject = lineOfSightSensor.FirstDetectedObject;
+        if (detectedObject == null) return false;
+        return detectedObject == otherObject;
+    }
 
+    /// <summary>
+    /// Whether a global position is inside the cone range of the agent.
+    /// </summary>
+    /// <param name="position">Global position to check.</param>
+    /// <returns>True if the position is inside the cone.</returns>
+    private bool PositionIsInConeRange(Vector2 position)
+    {
+        float distance = Vector2.Distance(position, transform.position);
+        float heading = Vector2.Angle(
+            Forward,
+            position - (Vector2) transform.position);
+        return distance <= DetectionRange && heading <= DetectionSemiconeAngle;
+    }
+    
     /// <summary>
     /// Event handler to use when another object enters the detection area.
     /// </summary>
@@ -367,21 +382,6 @@ public class ConeSensor : MonoBehaviour, ISensor
         _objectsInSensorRangeAndVisible.Remove(otherObject);
 
         ObjectLeftSensor?.Invoke(otherObject);
-    }
-
-    /// <summary>
-    /// Checks whether the specified object is visible to the sensor, considering
-    /// line-of-sight and visual obstacles.
-    /// </summary>
-    /// <param name="otherObject">The game object to check for visibility.</param>
-    /// <returns>True if the object is visible to the sensor; otherwise, false.</returns>
-    private bool ObjectIsVisible(GameObject otherObject)
-    {
-        lineOfSightSensor.GlobalEndPosition = otherObject.transform.position;
-        lineOfSightSensor.UpdateRay();
-        GameObject detectedObject = lineOfSightSensor.FirstDetectedObject;
-        if (detectedObject == null) return false;
-        return detectedObject == otherObject;
     }
     
     /// <summary>
