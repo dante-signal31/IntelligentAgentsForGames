@@ -98,6 +98,22 @@ public class RegionSenseManager: MonoBehaviour
     }
     
     /// <summary>
+    /// Send every signal in the signal queue that is due to be sent.
+    /// </summary>
+    private void SendSignals()
+    {
+        double currentTime = 
+            (DateTimeOffset.UtcNow - DateTimeOffset.UnixEpoch).TotalSeconds;
+        
+        while (_signalQueue.Count > 0 && _signalQueue.Min.time <= currentTime)
+        {
+            SignalNotification notification = _signalQueue.Min;
+            _signalQueue.Remove(notification);
+            notification.sensor.NotifySignal(notification.signal);
+        }
+    }
+    
+    /// <summary>
     /// Register a sensor to receive signals from this RegionSenseManager.
     /// </summary>
     /// <param name="sensor">Sensor interested in receiving signals.</param>
@@ -191,22 +207,6 @@ public class RegionSenseManager: MonoBehaviour
         float receivedPower = signal.strength *
                               MathF.Pow(signal.modality.Attenuation, distance);
         return receivedPower >= sensor.ModalityThreshold(signal.modality);
-    }
-
-    /// <summary>
-    /// Send every signal in the signal queue that is due to be sent.
-    /// </summary>
-    private void SendSignals()
-    {
-        double currentTime = 
-            (DateTimeOffset.UtcNow - DateTimeOffset.UnixEpoch).TotalSeconds;
-        
-        while (_signalQueue.Count > 0 && _signalQueue.Min.time <= currentTime)
-        {
-            SignalNotification notification = _signalQueue.Min;
-            _signalQueue.Remove(notification);
-            notification.sensor.NotifySignal(notification.signal);
-        }
     }
 }
 }
