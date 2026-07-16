@@ -22,8 +22,7 @@ public class DetectedSignalComparer : IComparer<DetectedSignal>
     public int Compare(DetectedSignal x, DetectedSignal y)
     {
         int result = x.signal.strength.CompareTo(y.signal.strength);
-        
-        // If times are strength, we must not return 0, otherwise SortedSet 
+        // If strengths are equal, we must not return 0, otherwise SortedSet 
         // thinks they are the same element and won't add the new one.
         
         if (result == 0 && x.signal.source != y.signal.source)
