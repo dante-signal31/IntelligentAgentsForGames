@@ -9,8 +9,9 @@ namespace Sensors
 {
 /// <summary>
 /// Represents a sound-based region sense sensor that detects and processes signals
-/// within a specified region. This class is specialized for detecting sound modality
-/// signals and provides functionality to filter, buffer, and track detected objects.
+/// within a specified region. This class is specialized for detecting sound and
+/// smell modality signals and provides functionality to filter, buffer, and track
+/// detected objects.
 /// </summary>
 /// <remarks>
 /// T is the type of the modality this sensor is interested in. TU is the type of the
