@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Sensors
 {
@@ -33,5 +34,11 @@ public interface IRegionSenseSensor
     /// </summary>
     /// <param name="signal">The signal this sensor has received.</param>
     public void NotifySignal(RegionSenseSignal signal);
+    
+    /// <summary>
+    /// Priority queue of detected signals, sorted by signal strength. The strongest
+    /// signal, the first.
+    /// </summary>
+    public SortedSet<DetectedSignal> DetectedSignals { get; }
 }
 }

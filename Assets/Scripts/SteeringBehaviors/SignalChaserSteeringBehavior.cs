@@ -21,19 +21,19 @@ public class SignalChaserSteeringBehavior: SteeringBehavior
     [SerializeField] public float arrivalDistance = 1f;
     
     [Header("WIRING:")]
-    [InterfaceCompliant(typeof(ISensor), typeof(ISignalSensor))]
+    [InterfaceCompliant(typeof(ISensor), typeof(IRegionSenseSensor))]
     [SerializeField] private MonoBehaviour sensor;
     [SerializeField] private MeshPathFinderSteeringBehavior meshPathFinderSteeringBehavior;
     
     private ISensor _sensor;
-    private ISignalSensor _signalSensor;
+    private IRegionSenseSensor _signalSensor;
     private GameObject _target;
     private Vector2 _currentTargetPosition;
 
     private void Start()
     {
         _sensor = (ISensor)sensor;
-        _signalSensor = (ISignalSensor)sensor;
+        _signalSensor = (IRegionSenseSensor)sensor;
         _target = new GameObject($"{name} - Target");
     }
 

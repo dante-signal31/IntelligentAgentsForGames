@@ -18,7 +18,7 @@ namespace Sensors
 /// RegionSenseManager this sensor is registered to.
 /// </remarks>
 public class RegionSenseSensor<T, TU>: 
-    MonoBehaviour, IRegionSenseSensor, ISensor, ISignalSensor
+    MonoBehaviour, IRegionSenseSensor, ISensor
     where T: RegionSenseModality
     where TU: RegionSenseManager
 {
