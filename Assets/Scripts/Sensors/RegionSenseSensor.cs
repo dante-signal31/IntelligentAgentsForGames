@@ -139,6 +139,28 @@ public class RegionSenseSensor<T, TU>:
         }
     }
     
+    public float ModalityThreshold(RegionSenseModality modality)
+    {
+        if (modality is T)
+        {
+            return minimumStrengthDetectionThreshold;
+        }
+        // I'm only interested in T modality. Any other one is ignored. One way
+        // to do this is through SensesModality(), another one is setting an infinite
+        // strength threshold in those modalities we are not interested in.
+        return float.PositiveInfinity;
+    }
+    
+    public bool SensesModality(RegionSenseModality modality)
+    {
+        return modality is T;
+    }
+
+    public void NotifySignal(RegionSenseSignal signal)
+    {
+        AddDetectedSignal(signal);
+    }
+    
     /// <summary>
     /// Adds a detected signal to the internal detection buffer, ensuring that the buffer
     /// size remains bounded.
@@ -161,28 +183,6 @@ public class RegionSenseSensor<T, TU>:
                 signal = signal, 
                 detectionTimeStamp = DateTimeOffset.Now
             });
-    }
-
-    public float ModalityThreshold(RegionSenseModality modality)
-    {
-        if (modality is T)
-        {
-            return minimumStrengthDetectionThreshold;
-        }
-        // I'm only interested in sound modality. Any other one is ignored. One way
-        // to do this is through SensesModality(), another one is setting an infinite
-        // strength threshold in those modalities we are not interested in.
-        return float.PositiveInfinity;
-    }
-    
-    public bool SensesModality(RegionSenseModality modality)
-    {
-        return modality is T;
-    }
-
-    public void NotifySignal(RegionSenseSignal signal)
-    {
-        AddDetectedSignal(signal);
     }
 
     private void FixedUpdate()
