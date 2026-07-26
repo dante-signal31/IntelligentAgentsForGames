@@ -148,6 +148,15 @@ public abstract class RegionSenseSignalEmitter<T, TU>: MonoBehaviour
 
     private void OnEmissionElapsed()
     {
+        EmitOnce();
+    }
+
+    /// <summary>
+    /// Emits a single signal instance using the current modality and signal parameters.
+    /// This method does not use any timer, it just emits the signal immediately.
+    /// </summary>
+    public void EmitOnce()
+    {
         RegionSenseSignal signal = new()
         {
             modality = _currentModality,
@@ -157,7 +166,7 @@ public abstract class RegionSenseSignalEmitter<T, TU>: MonoBehaviour
         };
         _regionSenseManager.RegisterSignal(signal);
     }
-    
+
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
