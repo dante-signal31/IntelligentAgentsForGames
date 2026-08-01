@@ -34,7 +34,7 @@ public class PositionNodeDrawer : PropertyDrawer
         container.Add(positionField);
         
         // Show the connection list.
-        VisualElement listContainer = new();
+        //
         // Make the list foldable and give it a title.
         Foldout connectionsLabel = new()
         {
@@ -76,9 +76,9 @@ public class PositionNodeDrawer : PropertyDrawer
             objects => 
                 OnSelectionChanged(objects, selectedConnectionIds);
         
-        listContainer.Add(connectionsLabel);
-        listContainer.Add(connectionList);
-        container.Add(listContainer);
+        // Populate container hierarchy.
+        connectionsLabel.Add(connectionList);
+        container.Add(connectionsLabel);
         
         return container;
     }
