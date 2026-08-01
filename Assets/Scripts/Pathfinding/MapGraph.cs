@@ -314,7 +314,7 @@ public class MapGraph : MonoBehaviour, IPositionGraph
                         // The half cost to leave the current node, and the half cost to
                         // enter the neighbor node.
                         connectionCost + neighborConnectionCost,
-                        orientation);
+                        (uint)orientation);
                     // Conversely, as our connections are bidirectional, we must set up
                     // also the reciprocal connection from the neighbor to this node. 
                     Orientation reciprocalOrientation = Orientation.North;
@@ -336,7 +336,7 @@ public class MapGraph : MonoBehaviour, IPositionGraph
                     neighborNode.AddConnection(
                         node.Id, 
                         connectionCost + neighborConnectionCost, 
-                        reciprocalOrientation);
+                        (uint)reciprocalOrientation);
                 }
                 // Once the node is created and configured, we add it to the graph.
                 AddNodeToGraph(nodeArrayPosition, node);

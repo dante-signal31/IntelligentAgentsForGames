@@ -7,7 +7,8 @@ using UnityEngine;
 namespace Editor.Inspectors
 {
 /// <summary>
-/// Custom editor to draw the grid of a map graph and add a button to bake it.
+/// Custom editor to draw the cost of connections in a map graph and add a button
+/// to bake it.
 /// </summary>
 [CustomEditor(typeof(MapGraph))]
 public class MapGraphEditor : UnityEditor.Editor

@@ -389,8 +389,8 @@ public class RegionGraph : MonoBehaviour, IPositionGraph
                 PositionNode node = 
                     (PositionNode) graphRegions.mapGraph.GetNodeById(nodeId);
                 // Check if the node has connections to other regions.
-                foreach (KeyValuePair<Orientation, GraphConnection> graphConnection in 
-                         node.GetConnections())
+                foreach (KeyValuePair<uint, GraphConnection> graphConnection in 
+                         node.Connections)
                 {
                     GraphConnection connection = graphConnection.Value;
                     uint otherNodeRegionId = 

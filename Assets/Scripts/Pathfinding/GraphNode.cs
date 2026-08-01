@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Tools;
 using UnityEngine;
 using Random = System.Random;
@@ -22,7 +23,7 @@ public class GraphNode: IEquatable<GraphNode>
     private static readonly Random RandomGenerator = new();
 
     [SerializeField] private uint id = GenerateUniqueId();
-
+    
     /// <summary>
     /// This node unique identifier.
     /// </summary>
@@ -48,11 +49,13 @@ public class GraphNode: IEquatable<GraphNode>
     public CustomUnityDictionaries.UintGraphConnectionDictionary Connections 
     { 
         get => connections;
-        private set
-        {
-            connections = value;
-        }
+        private set => connections = value;
     }
+
+    /// <summary>
+    /// Connection IDs currently present.
+    /// </summary>
+    public uint[] ConnectionIds => connections.Keys.ToArray();
 
     /// <summary>
     /// Generates a unique identifier for a node by creating a random 32-bit unsigned
@@ -76,6 +79,17 @@ public class GraphNode: IEquatable<GraphNode>
     }
     
     /// <summary>
+    /// Recreate the assigned ID.
+    /// </summary>
+    /// <remarks> Nodes created from the inspector do not run GenerateUniqueId() over
+    /// its id field. So it must be run manually. Monobehaviours that create nodes
+    /// must run this method in everyone.</remarks>
+    public void RegenerateId()
+    {
+        id = GenerateUniqueId();
+    }
+    
+    /// <summary>
     /// Adds a connection between the current node and a specified destination node
     /// with a given cost, orientation, and optionally bidirectional behavior.
     /// </summary>
@@ -91,6 +105,55 @@ public class GraphNode: IEquatable<GraphNode>
     {
         GraphConnection graphConnection = new(Id, endNodeKey, cost);
         Connections[orientation] = graphConnection;
+    }
+    
+    /// <summary>
+    /// Determines whether the node has a connection with the given ID.
+    /// </summary>
+    /// <param name="connectionId">The ID of the connection to check for.</param>
+    /// <returns>True if a connection exists with the given ID; otherwise,
+    /// false.</returns>
+    public bool HasConnection(uint connectionId)
+    {
+        return Connections.ContainsKey(connectionId);
+    }
+
+    /// <summary>
+    /// Retrieves the connection associated with the given ID, if it exists.
+    /// </summary>
+    /// <param name="connectionId">The ID associated with the desired
+    /// connection.</param>
+    /// <returns>The connection object if a connection exists with the specified
+    /// ID; otherwise, null.</returns>
+    public GraphConnection GetConnection(uint connectionId)
+    {
+        return HasConnection(connectionId) ? Connections[connectionId]: null;
+    }
+
+
+    /// <summary>
+    /// Gets the next available unique connection ID that does not conflict with
+    /// any of the existing connection IDs. This method scans the existing
+    /// connection IDs, determines the first missing ID in numerical order, and
+    /// returns it as the next available value.
+    /// </summary>
+    /// <returns>A 32-bit unsigned integer representing the next available connection
+    /// ID that is not already used.</returns>
+    public uint GetNextAvailableConnectionId()
+    {
+        List<uint> connectionIds = ConnectionIds.ToList();
+        connectionIds.Sort();
+
+        uint nextId = 0;
+        foreach (uint usedId in connectionIds)
+        {
+            if (usedId != nextId)
+            {
+                return nextId;
+            }
+            nextId++;
+        }
+        return nextId;
     }
     
     public bool Equals(GraphNode other)
