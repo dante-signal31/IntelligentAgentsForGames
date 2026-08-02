@@ -1,15 +1,24 @@
 ﻿
+using System;
 using System.Collections.Generic;
+using System.Numerics;
+using Sensors;
 using UnityEngine;
+using Quaternion = UnityEngine.Quaternion;
+using Vector2 = UnityEngine.Vector2;
 
 namespace Pathfinding
-{
+{ 
+[ExecuteAlways]
 public class PositionalWebGraph : MonoBehaviour, IPositionGraph
 {
     [Header("CONFIGURATION:")]
     [SerializeField] private PositionNode[] nodes;
     [SerializeField] LayerMask obstaclesLayers;
     [SerializeField] private float lineOfSightRange;
+    
+    [Header("WIRING:")]
+    [SerializeField] private RaySensor raySensor;
     
     [Header("DEBUG:")]
     [SerializeField] public bool showGizmos = true;
@@ -38,11 +47,61 @@ public class PositionalWebGraph : MonoBehaviour, IPositionGraph
         throw new System.NotImplementedException();
     }
 
+    /// <summary>
+    /// Generates connections between nodes using line-of-sight checks.
+    /// This method is used to dynamically rebuild the graph, ensuring nodes are
+    /// connected based on their current positions and environment.
+    /// </summary>
+    /// <remarks>
+    /// <ul>
+    /// <li> Existing connections in all nodes will be cleared before generating new
+    /// ones.</li>
+    /// <li> Nodes too far apart (beyond the configured line-of-sight range) are excluded
+    /// from connection attempts.</li>
+    /// <li> Connections are only established if there are no obstacles blocking the
+    /// direct line-of-sight between two nodes.</li>
+    /// <li> The connections generated are bidirectional, with symmetric costs.</li>
+    /// </ul>
+    /// </remarks>
     public void GenerateConnections()
     {
-        throw new System.NotImplementedException();
+        raySensor.SensorLayerMask = obstaclesLayers;
+        
+        foreach (PositionNode node in nodes)
+        {
+            node.Connections.Clear();
+            
+            uint counter = 0;
+            // Center ray sensor on the current node.
+            raySensor.GlobalStartPosition = node.Position;
+            foreach (PositionNode otherNode in nodes)
+            {
+                // Don't check against yourself.
+                if (node == otherNode) continue;
+                
+                // Don't check nodes that are too far away.
+                float distance = Vector2.Distance(node.Position, otherNode.Position);
+                if (distance > lineOfSightRange) continue;
+                
+                // Point ray sensor to the other node.
+                raySensor.GlobalEndPosition = otherNode.Position;
+                raySensor.UpdateRay();
+                if (!raySensor.AnyObjectDetected)
+                {
+                    // If the ray sensor does not detect any obstacle, then create a
+                    // connection between the two nodes.
+                    node.AddConnection(otherNode.Id, distance, counter);
+                    counter++;
+                }
+            }
+        }
     }
-    
+
+    private void Awake()
+    {
+        raySensor.SensorLayerMask = obstaclesLayers;
+    }
+
 #if UNITY_EDITOR
     private void OnValidate()
     {

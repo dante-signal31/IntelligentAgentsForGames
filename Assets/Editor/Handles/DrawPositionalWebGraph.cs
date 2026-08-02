@@ -83,7 +83,7 @@ public class DrawPositionalWebGraph : UnityEditor.Editor
                 Vector2 textPosition = arrowPosition + graph.gizmoTextOffset;
                 Handles.Label(
                     textPosition, 
-                    connection.cost.ToString("G"),
+                    connection.cost.ToString("F2"),
                     textStyle);
             }
         }

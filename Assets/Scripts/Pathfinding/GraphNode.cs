@@ -166,6 +166,16 @@ public class GraphNode: IEquatable<GraphNode>
     {
         return obj is GraphNode other && Equals(other);
     }
+    
+    public static bool operator ==(GraphNode left, GraphNode right)
+    {
+        return EqualityComparer<GraphNode>.Default.Equals(left, right);
+    }
+
+    public static bool operator !=(GraphNode left, GraphNode right)
+    {
+        return !(left == right);
+    }
 
     public override int GetHashCode()
     {
