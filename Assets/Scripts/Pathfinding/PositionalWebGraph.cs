@@ -1,33 +1,53 @@
-﻿
-using System;
-using System.Collections.Generic;
-using System.Numerics;
+﻿using System.Collections.Generic;
 using Sensors;
 using UnityEngine;
 using Quaternion = UnityEngine.Quaternion;
 using Vector2 = UnityEngine.Vector2;
 
 namespace Pathfinding
-{ 
+{
+/// <summary>
+/// Represents a graph structure designed for pathfinding and navigation,
+/// where each node has an associated position in a 2D space.
+/// </summary>
+/// <remarks>
+/// This class is implemented as a MonoBehaviour, enabling it to be used
+/// within Unity's scene-based environment. The <c>PositionalWebGraph</c> allows
+/// for defining nodes, rendering debug visualizations such as gizmos, and generating
+/// connections between nodes for pathfinding purposes.
+/// </remarks>
 [ExecuteAlways]
 public class PositionalWebGraph : MonoBehaviour, IPositionGraph
 {
     [Header("CONFIGURATION:")]
+    [Tooltip("Nodes modeling the environment.")]
     [SerializeField] private PositionNode[] nodes;
+    [Tooltip("Layers to consider as not walkable.")]
     [SerializeField] LayerMask obstaclesLayers;
+    [Tooltip("Maximum distance between two nodes for line-of-sight checks.")]
     [SerializeField] private float lineOfSightRange;
     
     [Header("WIRING:")]
+    [Tooltip("Ray sensor used for line-of-sight checks.")]
     [SerializeField] private RaySensor raySensor;
     
     [Header("DEBUG:")]
+    [Tooltip("Whether to show gizmos.")]
     [SerializeField] public bool showGizmos = true;
+    [Tooltip("Color to show gizmos.")]
     [SerializeField] public Color gizmosColor = Color.yellow;
+    [Tooltip("Whether to show node IDs.")]
     [SerializeField] public bool showNodesId = true;
+    [Tooltip("Radius for the gizmos that mark the nodes.")]
     [SerializeField] public float gizmoRadius = 0.1f;
+    [Tooltip("Offset por the text to show connection cost.")]
     [SerializeField] public Vector2 gizmoTextOffset = new(0.2f, 0.2f);
+    [Tooltip("Over one position to draw the arrow head for connection direction.")]
     [SerializeField] public float arrowOffset = 0.75f;
+    [Tooltip("Length of the arrow wings.")]
     [SerializeField] public float arrowLength = 0.5f;
+    [Tooltip("Angle in degrees of the arrow wings. [0, 90)")]
+    [Range(0f, 90f)]
     [SerializeField] public float arrowApertureDegrees = 30f;
 
     public IReadOnlyList<PositionNode> Nodes => nodes;
@@ -108,7 +128,7 @@ public class PositionalWebGraph : MonoBehaviour, IPositionGraph
         if (nodes == null) return;
 
         HashSet<uint> ids = new();
-        foreach (GraphNode node in nodes)
+        foreach (PositionNode node in nodes)
         {
             if (ids.Contains(node.Id) || node.Id == 0) 
                 node.RegenerateId();
