@@ -82,23 +82,25 @@ public class PositionalWebGraph : MonoBehaviour, IPositionGraph
                     endPositionNode.Position);
                 
                 // Draw direction arrow.
+                //
+                // Get the arrow point position.
                 Vector2 direction = endPositionNode.Position - startPositionNode.Position;
                 Vector2 arrowPosition = startPositionNode.Position + 
                                          direction.normalized * 
                                          direction.magnitude * arrowOffset;
-                Vector2 inverseDirection = -direction.normalized;
                 
+                // Get the arrow wings.
+                Vector2 inverseDirection = -direction.normalized;
                 Vector2 arrowLine1 =
                     Quaternion.Euler(0f, 0f, arrowApertureDegrees) *
                     inverseDirection *
                     arrowLength;
-
                 Vector2 arrowLine2 =
                     Quaternion.Euler(0f, 0f, -arrowApertureDegrees) *
                     inverseDirection *
                     arrowLength;
 
-                // Draw arrow head
+                // Draw arrow head.
                 Gizmos.DrawLine(arrowPosition, arrowPosition + arrowLine1);
                 Gizmos.DrawLine(arrowPosition, arrowPosition + arrowLine2);
             }
