@@ -22,6 +22,10 @@ public class PathFinderSteeringBehavior: SteeringBehavior, IGizmos
     [Tooltip("Path finder to use. Must comply with IGraphPathFinder interface.")]
     [InterfaceCompliant(typeof(IGraphPathFinder))]
     [SerializeField] private MonoBehaviour pathFinderBehaviour;
+    [Tooltip("Steering behavior to execute when path is finished until reaching the " +
+             "target.")]
+    [InterfaceCompliant(typeof(ITargeter))]
+    [SerializeField] private SteeringBehavior finalSteeringBehaviour;
     
     [Header("DEBUG:")] 
     [SerializeField] private bool showGizmos;
@@ -48,17 +52,26 @@ public class PathFinderSteeringBehavior: SteeringBehavior, IGizmos
         }
     }
     
-    private IGraphPathFinder graphPathFinder;
+    private IGraphPathFinder _graphPathFinder;
+    private ITargeter _finalSteeringTargeter;
     private Path _currentPath;
+    private GameObject _targeterMarker;
     
     private void Awake()
     {
-        graphPathFinder = (IGraphPathFinder) pathFinderBehaviour;
+        _finalSteeringTargeter = (ITargeter) finalSteeringBehaviour;
+        _graphPathFinder = (IGraphPathFinder) pathFinderBehaviour;
+        
         // Create a GameObject at the scene root to include the new path instance in
         // Unity life cycle.
         _currentPath = new GameObject($"{name} - CurrentPath").AddComponent<Path>();
         _currentPath.ShowGizmos = showGizmos;
         _currentPath.GizmosColor = gizmosColor;
+        
+        // Create a GameObject as the final steering targeter target.
+        _targeterMarker = new GameObject($"{name} - TargetMarker");
+        _finalSteeringTargeter.Target = _targeterMarker;
+        _targeterMarker.transform.position = target.transform.position;
     }
 
     private void OnEnable()
@@ -83,15 +96,28 @@ public class PathFinderSteeringBehavior: SteeringBehavior, IGizmos
     /// pathfinding will calculate a path to reach.</param>
     private void OnPathTargetPositionChanged(Vector2 newTargetPosition)
     {
-        PathData newPath = graphPathFinder.FindPath(newTargetPosition);
+        // Update pathfinding.
+        PathData newPath = _graphPathFinder.FindPath(newTargetPosition);
         if (newPath == null) return;
         _currentPath.UpdatePathData(newPath);
         pathFollowingSteeringBehavior.FollowPath = _currentPath;
+        
+        // Update final steering behavior.
+        _targeterMarker.transform.position = target.transform.position;
     }
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
-        return pathFollowingSteeringBehavior.GetSteering(args);
+        SteeringOutput pathFollowingOutput = 
+            pathFollowingSteeringBehavior.GetSteering(args);
+        
+        // If path is not finished, return the steering output from the path-following
+        // behavior.
+        if (pathFollowingOutput != SteeringOutput.zero) 
+            return pathFollowingOutput;
+        
+        // If path is finished, execute final steering behavior to get the target.
+        return finalSteeringBehaviour.GetSteering(args);
     }
 }
 }

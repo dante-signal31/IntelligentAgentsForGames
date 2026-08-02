@@ -20,6 +20,7 @@ public class PathFollowingSteeringBehavior : SteeringBehavior
     [SerializeField] private SteeringBehavior steeringBehavior;
     
     private bool _pathStarted;
+    private bool _pathEnded;
     private ITargeter _targeter;
     private GameObject _target;
     private Vector2 _previousTargetPosition;
@@ -31,11 +32,13 @@ public class PathFollowingSteeringBehavior : SteeringBehavior
         {
             followPath = value;
             _pathStarted = false;
+            _pathEnded = false;
         }
     }
 
     private void OnPathUpdated()
     {
+        _pathEnded = false;
         // If a new path has been generated, we must enter that path in a natural way. We
         // could start the path from the beginning. However, we have no guarantee that we
         // have not actually advanced the new path, and starting from the beginning would
@@ -81,6 +84,7 @@ public class PathFollowingSteeringBehavior : SteeringBehavior
         
         if (!_pathStarted)
         {
+            // Set target position to the first position of the path.
             _target.transform.position = FollowPath.CurrentTargetPosition;
             _pathStarted = true;
         }
@@ -92,10 +96,14 @@ public class PathFollowingSteeringBehavior : SteeringBehavior
             _target.transform.position = FollowPath.GetNextPositionTarget();
             // If path has ended, then GetNextPositionTarget will return the same
             // position as the last one.
-            if ((Vector2) _target.transform.position == _previousTargetPosition) break;
+            if ((Vector2) _target.transform.position == _previousTargetPosition)
+            {
+                _pathEnded = true;
+                break;
+            }
         }
         
-        return steeringBehavior.GetSteering(args);
+        return _pathEnded ? SteeringOutput.zero : steeringBehavior.GetSteering(args);
     }
 }
 }
