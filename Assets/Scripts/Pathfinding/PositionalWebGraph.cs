@@ -51,7 +51,16 @@ public class PositionalWebGraph : MonoBehaviour, IPositionGraph
     [SerializeField] public float arrowApertureDegrees = 30f;
 
     public IReadOnlyList<PositionNode> Nodes => nodes;
-    
+
+
+    /// <summary>
+    /// Retrieves the node corresponding to the specified unique identifier.
+    /// </summary>
+    /// <param name="nodeId">The unique identifier of the node to retrieve.</param>
+    /// <returns>
+    /// The <see cref="IPositionNode"/> that matches the specified identifier,
+    /// or <c>null</c> if no such node exists in the graph.
+    /// </returns>
     public IPositionNode GetNodeById(uint nodeId)
     {
         foreach (PositionNode node in nodes)
@@ -62,9 +71,40 @@ public class PositionalWebGraph : MonoBehaviour, IPositionGraph
         return null;
     }
 
+    /// <summary>
+    /// Retrieves the nearest node to the specified position that has a clear
+    /// line-of-sight.
+    /// </summary>
+    /// <param name="position">The position in the map for which the nearest node is
+    /// being queried.</param>
+    /// <returns>
+    /// The nearest <see cref="IPositionNode"/> to the specified position that satisfies
+    /// the conditions of proximity and unobstructed line-of-sight, or <c>null</c> if
+    /// no such node is found.
+    /// </returns>
     public IPositionNode GetNodeAtPosition(Vector2 position)
     {
-        throw new System.NotImplementedException();
+        PositionNode nearestNode = null;
+        float minDistance = float.MaxValue;
+        
+        foreach (PositionNode node in nodes)
+        {
+            // If farther than the current nearest node, skip it.
+            float currentDistance = Vector2.Distance(node.Position, position);
+            if (currentDistance > minDistance) continue;
+            
+            // If there is an obstacle in the way, skip it.
+            raySensor.GlobalStartPosition = node.Position;
+            raySensor.GlobalEndPosition = position;
+            raySensor.UpdateRay();
+            if (raySensor.AnyObjectDetected) continue;
+            
+            // Otherwise, this is the nearest node so far.
+            minDistance = currentDistance;
+            nearestNode = node;
+        }
+
+        return nearestNode;
     }
 
     /// <summary>

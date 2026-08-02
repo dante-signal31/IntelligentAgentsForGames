@@ -135,7 +135,7 @@ public class MapGraph : MonoBehaviour, IPositionGraph
         graphResource.arrayPositionsToNodes[GetArrayPositionById(nodeId)];
     
     /// <summary>
-    /// Retrieves the GraphNode located at the given global world position.
+    /// Retrieves the node located at the given global world position.
     /// </summary>
     /// <param name="globalPosition">
     /// The global world position represented as a Vector2, specifying where to search
