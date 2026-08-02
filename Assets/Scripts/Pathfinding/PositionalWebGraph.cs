@@ -6,7 +6,10 @@ namespace Pathfinding
 {
 public class PositionalWebGraph : MonoBehaviour, IPositionGraph
 {
+    [Header("CONFIGURATION:")]
     [SerializeField] private PositionNode[] nodes;
+    [SerializeField] LayerMask obstaclesLayers;
+    [SerializeField] private float lineOfSightRange;
     
     [Header("DEBUG:")]
     [SerializeField] public bool showGizmos = true;
@@ -31,6 +34,11 @@ public class PositionalWebGraph : MonoBehaviour, IPositionGraph
     }
 
     public IPositionNode GetNodeAtPosition(Vector2 position)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void GenerateConnections()
     {
         throw new System.NotImplementedException();
     }
@@ -66,6 +74,8 @@ public class PositionalWebGraph : MonoBehaviour, IPositionGraph
                 PositionNode endPositionNode = 
                     (PositionNode) GetNodeById(connection.endNodeId);
                 
+                if (startPositionNode == null || endPositionNode == null) continue;
+                
                 // Draw a line between the two nodes.
                 Gizmos.DrawLine(
                     startPositionNode.Position, 
@@ -77,20 +87,17 @@ public class PositionalWebGraph : MonoBehaviour, IPositionGraph
                                          direction.normalized * 
                                          direction.magnitude * arrowOffset;
                 Vector2 inverseDirection = -direction.normalized;
-                // Rotate inverseDirection to create arrow head
-                float angleRad = arrowApertureDegrees * Mathf.Deg2Rad;
-                float cos = Mathf.Cos(angleRad);
-                float sin = Mathf.Sin(angleRad);
-                // Rotate counterclockwise
-                Vector2 arrowLine1 = new Vector2(
-                    inverseDirection.x * cos - inverseDirection.y * sin,
-                    inverseDirection.x * sin + inverseDirection.y * cos
-                ) * arrowLength;
-                // Rotate clockwise
-                Vector2 arrowLine2 = new Vector2(
-                    inverseDirection.x * cos + inverseDirection.y * sin,
-                    -inverseDirection.x * sin + inverseDirection.y * cos
-                ) * arrowLength;
+                
+                Vector2 arrowLine1 =
+                    Quaternion.Euler(0f, 0f, arrowApertureDegrees) *
+                    inverseDirection *
+                    arrowLength;
+
+                Vector2 arrowLine2 =
+                    Quaternion.Euler(0f, 0f, -arrowApertureDegrees) *
+                    inverseDirection *
+                    arrowLength;
+
                 // Draw arrow head
                 Gizmos.DrawLine(arrowPosition, arrowPosition + arrowLine1);
                 Gizmos.DrawLine(arrowPosition, arrowPosition + arrowLine2);

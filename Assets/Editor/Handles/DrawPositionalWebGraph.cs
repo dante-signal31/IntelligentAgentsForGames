@@ -72,6 +72,10 @@ public class DrawPositionalWebGraph : UnityEditor.Editor
                     (PositionNode) graph.GetNodeById(connection.startNodeId);
                 PositionNode endPositionNode = 
                     (PositionNode) graph.GetNodeById(connection.endNodeId);
+                
+                if (startPositionNode == null || endPositionNode == null) continue;
+                
+                // Show a label with the connection cost.
                 Vector2 direction = endPositionNode.Position - startPositionNode.Position;
                 Vector2 arrowPosition = startPositionNode.Position + 
                                         direction.normalized * 
@@ -93,7 +97,24 @@ public class DrawPositionalWebGraph : UnityEditor.Editor
         VisualElement root = new();
 
         InspectorElement.FillDefaultInspector(root, serializedObject, this);
+        
+        // Show a warning box to not push the auto-generate button if you want to
+        // keep any hand-made connection.
+        HelpBox warningBox = new(
+            "Be aware that the button below will regenerate every connection in " +
+            "the graph using a line-of-sight check. So, any previous connection will " +
+            "be lost.", 
+            HelpBoxMessageType.Warning);
+        root.Add(warningBox);
 
+        Button bakeButton = new(() =>
+        {
+            var graph = (PositionalWebGraph)target;
+            graph.GenerateConnections();
+        });
+        bakeButton.text = "Bake Connections";
+        root.Add(bakeButton);
+        
         return root;
     }
 }
