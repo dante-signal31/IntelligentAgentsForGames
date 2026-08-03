@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using SteeringBehaviors;
 using ninja.dlab.Commontesttools;
+using Pathfinding;
 using UnityEngine;
 using UnityEngine.TestTools;
 
@@ -22,7 +23,6 @@ public class NotInformedPathFindingTests
     private GameObject _depthFirstPathFindingGameObject;
     private GameObject _meshPathFindingGameObject;
     private GameObject _unityNavMeshMovingAgentGameObject;
-    // private GameObject _smoothPathFinderCurrentPathGameObject;
     private GameObject _regionPathFindingGameObject;
     private GameObject _target;
     private PathFinderSteeringBehavior _breathFirstPathFinderSteeringBehavior;
@@ -33,6 +33,10 @@ public class NotInformedPathFindingTests
     private AgentColor _depthFirstPathFinderAgentColor;
     private GameObject _pathGameObject;
     private GameObject _path2GameObject;
+    private GameObject _positionalWebGraphGameObject;
+    private GameObject _mapGraphGameObject;
+    private PositionalWebGraph _positionalWebGraph;
+    private MapGraph _mapGraph;
     
     
     [UnitySetUp]
@@ -135,6 +139,18 @@ public class NotInformedPathFindingTests
             _path2GameObject = GameObject.Find("Path_2");
             _path2GameObject.SetActive(false);
         }
+
+        if (_positionalWebGraphGameObject == null)
+        {
+            _positionalWebGraphGameObject = GameObject.Find("PositionalWebGraph");
+            _positionalWebGraphGameObject.SetActive(false);
+        }
+
+        if (_mapGraphGameObject == null)
+        {
+            _mapGraphGameObject = GameObject.Find("MapGraph");
+            _mapGraphGameObject.SetActive(false);
+        }
         
         if (_breathFirstPathFinderAgent == null)
             _breathFirstPathFinderAgent = _breathFirstPathFindingGameObject.GetComponent<AgentMover>();
@@ -153,6 +169,12 @@ public class NotInformedPathFindingTests
         
         if (_depthFirstPathFinderAgentColor == null)
             _depthFirstPathFinderAgentColor = _depthFirstPathFindingGameObject.GetComponent<AgentColor>();
+        
+        if (_positionalWebGraph == null)
+            _positionalWebGraph = _positionalWebGraphGameObject.GetComponent<PositionalWebGraph>();
+        
+        if (_mapGraph == null)
+            _mapGraph = _mapGraphGameObject.GetComponent<MapGraph>();
     }
     
     
@@ -227,6 +249,80 @@ public class NotInformedPathFindingTests
         _target.transform.position = _position3.position;
         yield return new WaitForSeconds(9);
         Assert.True(Vector2.Distance(_depthFirstPathFindingGameObject.transform.position, _position3.position) < 0.3f);
+    }
+    
+    /// <summary>
+    /// Test the Breath First pathfinder behavior using a positional web graph.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator PositionalWebGraphBreathFirstPathFindingBehaviorTest()
+    {
+        BreathFirstGraphPathFinder pathFinder = 
+            _breathFirstPathFindingGameObject.GetComponentInChildren<BreathFirstGraphPathFinder>();
+        pathFinder.Graph = _positionalWebGraph;
+        
+        // Set up agents before the tests.
+        _breathFirstPathFindingGameObject.transform.position = _position1.position;
+        _breathFirstPathFinderAgent.MaximumSpeed = 6.0f;
+        _breathFirstPathFinderAgent.StopSpeed = 0.01f;
+        _breathFirstPathFinderAgent.MaximumRotationalSpeed = 1080f;
+        _breathFirstPathFinderAgent.StopRotationThreshold = 1f;
+        _breathFirstPathFinderAgentColor.Color = Color.green;
+        _breathFirstPathFinderSteeringBehavior.ShowGizmos = true;
+        _breathFirstPathFindingGameObject.SetActive(true);
+        _target.SetActive(true);
+        
+    
+        // Start test.
+        // Assert that the pathfinder agent can reach the first target.
+        _target.transform.position = _position2.position;
+        yield return new WaitForSeconds(5);
+        Assert.True(Vector2.Distance(_breathFirstPathFindingGameObject.transform.position, _position2.position) < 0.3f);
+        
+        // Assert that the pathfinder agent can reach the second target.
+        _target.transform.position = _position3.position;
+        yield return new WaitForSeconds(5);
+        Assert.True(Vector2.Distance(_breathFirstPathFindingGameObject.transform.position, _position3.position) < 0.3f);
+        
+        // Clean up.
+        pathFinder.Graph = _mapGraph;
+    }
+    
+    /// <summary>
+    /// Test the Depth First pathfinder behavior using a positional web graph.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator PositionalWebGraphDepthFirstPathFindingBehaviorTest()
+    {
+        DepthFirstGraphPathFinder pathFinder = 
+            _depthFirstPathFindingGameObject.GetComponentInChildren<DepthFirstGraphPathFinder>();
+        pathFinder.Graph = _positionalWebGraph;
+        
+        // Set up agents before the tests.
+        _depthFirstPathFindingGameObject.transform.position = _position1.position;
+        _depthFirstPathFinderAgent.MaximumSpeed = 6.0f;
+        _depthFirstPathFinderAgent.StopSpeed = 0.01f;
+        _depthFirstPathFinderAgent.MaximumRotationalSpeed = 1080f;
+        _depthFirstPathFinderAgent.StopRotationThreshold = 1f;
+        _depthFirstPathFinderAgentColor.Color = Color.green;
+        _depthFirstPathFinderSteeringBehavior.ShowGizmos = true;
+        _depthFirstPathFindingGameObject.SetActive(true);
+        _target.SetActive(true);
+        
+    
+        // Start test.
+        // Assert that the pathfinder agent can reach the first target.
+        _target.transform.position = _position2.position;
+        yield return new WaitForSeconds(7);
+        Assert.True(Vector2.Distance(_depthFirstPathFindingGameObject.transform.position, _position2.position) < 0.3f);
+        
+        // Assert that the pathfinder agent can reach the second target.
+        _target.transform.position = _position3.position;
+        yield return new WaitForSeconds(9);
+        Assert.True(Vector2.Distance(_depthFirstPathFindingGameObject.transform.position, _position3.position) < 0.3f);
+        
+        // Clean up.
+        pathFinder.Graph = _mapGraph;
     }
 }
 }

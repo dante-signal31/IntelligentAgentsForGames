@@ -26,6 +26,10 @@ public class InformedPathFindingTests
     private GameObject _unityNavMeshMovingAgentGameObject;
     private GameObject _regionPathFindingGameObject;
     private GameObject _target;
+    private GameObject _positionalWebGraphGameObject;
+    private GameObject _mapGraphGameObject;
+    private PositionalWebGraph _positionalWebGraph;
+    private MapGraph _mapGraph;
     private PathFollowingSteeringBehavior _pathFollowingSteeringBehavior;
     private PathFinderSteeringBehavior _dijkstraPathFinderSteeringBehavior;
     private PathFinderSteeringBehavior _aStarPathFinderSteeringBehavior;
@@ -146,6 +150,18 @@ public class InformedPathFindingTests
             _regionPathFindingGameObject = GameObject.Find("RegionPathFinderMovingAgent");
             _regionPathFindingGameObject.SetActive(false);
         }
+        
+        if (_positionalWebGraphGameObject == null)
+        {
+            _positionalWebGraphGameObject = GameObject.Find("PositionalWebGraph");
+            _positionalWebGraphGameObject.SetActive(false);
+        }
+
+        if (_mapGraphGameObject == null)
+        {
+            _mapGraphGameObject = GameObject.Find("MapGraph");
+            _mapGraphGameObject.SetActive(false);
+        }
 
         if (_target == null)
         {
@@ -252,6 +268,12 @@ public class InformedPathFindingTests
         
         if (_path2 == null)
             _path2 = _path2GameObject.GetComponent<Path>();
+        
+        if (_positionalWebGraph == null)
+            _positionalWebGraph = _positionalWebGraphGameObject.GetComponent<PositionalWebGraph>();
+        
+        if (_mapGraph == null)
+            _mapGraph = _mapGraphGameObject.GetComponent<MapGraph>();
     }
     
     
@@ -441,6 +463,42 @@ public class InformedPathFindingTests
     }
     
     /// <summary>
+    /// Test the Dijkstra pathfinder behavior using a positional web graph.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator PositionalWebGraphDijkstraPathFindingBehaviorTest()
+    {
+        DijkstraGraphPathFinder pathFinder = 
+            _dijkstraPathFindingGameObject.GetComponentInChildren<DijkstraGraphPathFinder>();
+        pathFinder.Graph = _positionalWebGraph;
+        
+        // Set up agents before the tests.
+        _dijkstraPathFindingGameObject.transform.position = _position1.position;
+        _dijkstraPathFinderAgent.MaximumSpeed = 6.0f;
+        _dijkstraPathFinderAgent.StopSpeed = 0.01f;
+        _dijkstraPathFinderAgent.MaximumRotationalSpeed = 1080f;
+        _dijkstraPathFinderAgent.StopRotationThreshold = 1f;
+        _dijkstraPathFinderAgentColor.Color = Color.green;
+        _dijkstraPathFinderSteeringBehavior.ShowGizmos = true;
+        _dijkstraPathFindingGameObject.SetActive(true);
+        _target.SetActive(true);
+
+        // Start test.
+        // Assert that the pathfinder agent can reach the first target.
+        _target.transform.position = _position2.position;
+        yield return new WaitForSeconds(5);
+        Assert.True(Vector2.Distance(_dijkstraPathFindingGameObject.transform.position, _position2.position) < 0.3f);
+        
+        // Assert that the pathfinder agent can reach the second target.
+        _target.transform.position = _position3.position;
+        yield return new WaitForSeconds(5);
+        Assert.True(Vector2.Distance(_dijkstraPathFindingGameObject.transform.position, _position3.position) < 0.3f);
+        
+        // Clean up.
+        pathFinder.Graph = _mapGraph;
+    }
+    
+    /// <summary>
     /// Test the AStar pathfinder behavior.
     /// </summary>
     [UnityTest]
@@ -467,6 +525,42 @@ public class InformedPathFindingTests
         _target.transform.position = _position3.position;
         yield return new WaitForSeconds(5);
         Assert.True(Vector2.Distance(_aStarPathFindingGameObject.transform.position, _position3.position) < 0.3f);
+    }
+    
+    /// <summary>
+    /// Test the AStar pathfinder behavior using a positional web graph.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator PositionalWebGraphAStarPathFindingBehaviorTest()
+    {
+        AStarGraphPathFinder pathFinder = 
+            _aStarPathFindingGameObject.GetComponentInChildren<AStarGraphPathFinder>();
+        pathFinder.Graph = _positionalWebGraph;
+        
+        // Set up agents before the tests.
+        _aStarPathFindingGameObject.transform.position = _position1.position;
+        _aStarPathFinderAgent.MaximumSpeed = 6.0f;
+        _aStarPathFinderAgent.StopSpeed = 0.01f;
+        _aStarPathFinderAgent.MaximumRotationalSpeed = 1080f;
+        _aStarPathFinderAgent.StopRotationThreshold = 1f;
+        _aStarPathFinderAgentColor.Color = Color.green;
+        _aStarPathFinderSteeringBehavior.ShowGizmos = true;
+        _aStarPathFindingGameObject.SetActive(true);
+        _target.SetActive(true);
+
+        // Start test.
+        // Assert that the pathfinder agent can reach the first target.
+        _target.transform.position = _position2.position;
+        yield return new WaitForSeconds(5);
+        Assert.True(Vector2.Distance(_aStarPathFindingGameObject.transform.position, _position2.position) < 0.3f);
+        
+        // Assert that the pathfinder agent can reach the second target.
+        _target.transform.position = _position3.position;
+        yield return new WaitForSeconds(5);
+        Assert.True(Vector2.Distance(_aStarPathFindingGameObject.transform.position, _position3.position) < 0.3f);
+        
+        // Clean up.
+        pathFinder.Graph = _mapGraph;
     }
     
     /// <summary>
