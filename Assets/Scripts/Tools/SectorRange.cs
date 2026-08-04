@@ -21,8 +21,10 @@ public class SectorRange : ConeRange
         get => minimumRange;
         set
         {
+            if (Mathf.Approximately(minimumRange, value)) return;
+            
             minimumRange = value;
-            if (updated != null) updated.Invoke();
+            updated?.Invoke();
         }   
     }
 

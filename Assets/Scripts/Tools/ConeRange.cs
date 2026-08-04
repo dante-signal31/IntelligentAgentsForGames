@@ -36,6 +36,8 @@ public class ConeRange : MonoBehaviour
         get => range;
         set
         {
+            if (Mathf.Approximately(range, value)) return;
+            
             range = value;
             updated?.Invoke();
         }
@@ -54,8 +56,10 @@ public class ConeRange : MonoBehaviour
         get => semiConeDegrees;
         set
         {
+            if (Mathf.Approximately(semiConeDegrees, value)) return;
+            
             semiConeDegrees = value;
-            if (updated != null) updated.Invoke();
+            updated?.Invoke();
         }
     }
     

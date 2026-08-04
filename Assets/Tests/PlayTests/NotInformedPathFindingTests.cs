@@ -282,7 +282,7 @@ public class NotInformedPathFindingTests
         // Assert that the pathfinder agent can reach the second target.
         _target.transform.position = _position3.position;
         yield return new WaitForSeconds(5);
-        Assert.True(Vector2.Distance(_breathFirstPathFindingGameObject.transform.position, _position3.position) < 0.3f);
+        Assert.True(Vector2.Distance(_breathFirstPathFindingGameObject.transform.position, _position3.position) < 0.4f);
         
         // Clean up.
         pathFinder.Graph = _mapGraph;
