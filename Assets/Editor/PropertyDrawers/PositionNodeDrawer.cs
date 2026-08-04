@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Pathfinding;
-using Tools;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
@@ -45,7 +44,7 @@ public class PositionNodeDrawer : PropertyDrawer
         ListView connectionList = new()
         {
             itemsSource = connectionIds,
-            // Show the add and remove buttons under the list.
+            // Show add and remove buttons under the list.
             showAddRemoveFooter = true,
             // Make the list resize automatically to the height of its content.
             virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
@@ -200,7 +199,7 @@ public class PositionNodeDrawer : PropertyDrawer
     }
 
     /// <summary>
-    /// Handles the addition of new items to the connections list in the property drawer.
+    /// Handles the addition of new items to the connection list in the property drawer.
     /// </summary>
     /// <param name="addedIndices">
     /// The indices of the newly added items in the list.

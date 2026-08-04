@@ -79,7 +79,7 @@ public class DrawPositionalWebGraph : UnityEditor.Editor
                 Vector2 direction = endPositionNode.Position - startPositionNode.Position;
                 Vector2 arrowPosition = startPositionNode.Position + 
                                         direction.normalized * 
-                                        direction.magnitude * graph.arrowOffset;
+                                        (direction.magnitude * graph.arrowOffset);
                 Vector2 textPosition = arrowPosition + graph.gizmoTextOffset;
                 Handles.Label(
                     textPosition, 

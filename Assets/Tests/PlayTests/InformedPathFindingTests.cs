@@ -280,7 +280,7 @@ public class InformedPathFindingTests
     [UnityTearDown]
     public IEnumerator TearDown()
     {
-        if (_pathFollowingGameObject != null){}
+        if (_pathFollowingGameObject != null)
             _pathFollowingGameObject.SetActive(false);
         if (_pathGameObject != null)
             _pathGameObject.SetActive(false);
@@ -335,7 +335,7 @@ public class InformedPathFindingTests
 
 
     /// <summary>
-    /// Test the path following behavior.
+    /// Test the path-following behavior.
     /// </summary>
     [UnityTest]
     public IEnumerator PathFollowingBehaviorTest()
@@ -355,7 +355,7 @@ public class InformedPathFindingTests
         _pathFollowingGameObject.SetActive(true);
         
         // Start test.
-        // Assert that the path following agent can reach every target position in the
+        // Assert that the path-following agent can reach every target position in the
         // path.
         float maximumWaitTime = 10;
         float waitStep = 0.001f;

@@ -101,8 +101,8 @@ public class RegionGraph : MonoBehaviour, IPositionGraph
     /// one does not exist at the exact position. Null if nothing is found.</returns>
     public IPositionNode GetNodeAtPosition(Vector2 position)
     {
-        RegionNode regionNode;
-        regionNode = regionGraphResource.positionToRegionNode.ContainsKey(position) ? 
+        RegionNode regionNode = 
+            regionGraphResource.positionToRegionNode.ContainsKey(position) ? 
             regionGraphResource.positionToRegionNode[position]: 
             GetNodeAtNearestPosition(position);
         return regionNode;

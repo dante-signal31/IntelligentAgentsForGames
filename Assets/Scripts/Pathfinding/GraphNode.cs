@@ -82,7 +82,7 @@ public class GraphNode: IEquatable<GraphNode>
     /// Recreate the assigned ID.
     /// </summary>
     /// <remarks> Nodes created from the inspector do not run GenerateUniqueId() over
-    /// its id field. So it must be run manually. Monobehaviours that create nodes
+    /// its id field. So it must be run manually. MonoBehaviours that create nodes
     /// must run this method in everyone.</remarks>
     public void RegenerateId()
     {
