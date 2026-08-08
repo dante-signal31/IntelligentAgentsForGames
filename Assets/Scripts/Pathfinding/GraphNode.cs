@@ -129,8 +129,7 @@ public class GraphNode: IEquatable<GraphNode>
     {
         return HasConnection(connectionId) ? Connections[connectionId]: null;
     }
-
-
+    
     /// <summary>
     /// Gets the next available unique connection ID that does not conflict with
     /// any of the existing connection IDs. This method scans the existing
