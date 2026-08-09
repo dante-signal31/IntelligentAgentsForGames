@@ -11,6 +11,8 @@ namespace Editor
 public class DrawPositionalWebGraph : UnityEditor.Editor
 {
     private readonly List<Vector2> _nodeHandles = new();
+    private SerializedProperty _nodesProperty;
+    private ListView _nodesListView;
         
     private void OnSceneGUI()
     {
@@ -89,6 +91,11 @@ public class DrawPositionalWebGraph : UnityEditor.Editor
         }
     }
     
+    private void OnEnable()
+    {
+        _nodesProperty = serializedObject.FindProperty("nodes");
+    }
+    
     public override VisualElement CreateInspectorGUI()
     {
         // Do not use base.CreateInspectorGUI() to draw the default inspector. It can use
@@ -98,6 +105,18 @@ public class DrawPositionalWebGraph : UnityEditor.Editor
 
         InspectorElement.FillDefaultInspector(root, serializedObject, this);
         
+        // Create new ListView and bind it to the nodes field.
+        _nodesListView = new ListView();
+        _nodesListView.bindingPath = _nodesProperty.propertyPath;
+        _nodesListView.showBorder = true;
+        _nodesListView.showFoldoutHeader = true;
+        _nodesListView.headerTitle = "NODES:";
+        _nodesListView.showAddRemoveFooter = true;
+        _nodesListView.reorderable = false;
+        _nodesListView.virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight;
+        _nodesListView.itemsRemoved += OnNodeRemoved;
+        root.Add(_nodesListView);
+
         // Show a warning box to not push the auto-generate button if you want to
         // keep any hand-made connection.
         HelpBox warningBox = new(
@@ -109,13 +128,68 @@ public class DrawPositionalWebGraph : UnityEditor.Editor
 
         Button bakeButton = new(() =>
         {
-            var graph = (PositionalWebGraph)target;
+            // Update graph.
+            var graph = (PositionalWebGraph) target;
+            Undo.RecordObject(graph, "Bake graph connections");
             graph.GenerateConnections();
+            
+            // Force inspector update.
+            serializedObject.Update();
+            _nodesListView.Rebuild();
+            EditorUtility.SetDirty(graph);
         });
         bakeButton.text = "Bake Connections";
         root.Add(bakeButton);
         
         return root;
+    }
+
+    private void OnNodeRemoved(IEnumerable<int> removedIndices)
+    {
+        // Read-only access to original object.
+        var graph = (PositionalWebGraph)target;
+        
+        // Look for any connection pointing to the removed node.
+        //
+        // int = node Index, List<uint> = connection IDs to remove in that node.
+        Dictionary <int, List<uint>> connectionIndicesToRemove = new();
+        foreach (int removedIndex in removedIndices)
+        {
+            if (removedIndex >= 0 && removedIndex < graph.Nodes.Count)
+            {
+                uint removedID = graph.Nodes[removedIndex].Id;
+                // Do not remove any connection while searching, or you will get alerts
+                // of being traversing modified collections.
+                for (int nodeIndex = 0; nodeIndex < graph.Nodes.Count; nodeIndex++)
+                {
+                    foreach (uint connectionKey in 
+                             graph.Nodes[nodeIndex].Connections.Keys)
+                    {
+                        if (graph.Nodes[nodeIndex].Connections[connectionKey]
+                                .endNodeId != removedID) continue;
+                        if (!connectionIndicesToRemove.ContainsKey(nodeIndex))
+                            connectionIndicesToRemove[nodeIndex] = new();
+                        connectionIndicesToRemove[nodeIndex].Add(connectionKey);
+                    }
+                }
+            }
+        }
+        
+        // Remove any connection pointing to removed node.
+        foreach (KeyValuePair<int, List<uint>> indexToIDsToRemove in connectionIndicesToRemove)
+        {
+            int nodeIndex = indexToIDsToRemove.Key;
+            List<uint> idsToRemove = indexToIDsToRemove.Value;
+            PositionNode node = graph.Nodes[nodeIndex];
+            foreach (uint id in idsToRemove)
+            {
+                node.Connections.Remove(id);
+            }
+            _nodesProperty.GetArrayElementAtIndex(nodeIndex).boxedValue = node;
+        }
+        
+        // Apply changes to the original object.
+        serializedObject.ApplyModifiedProperties();
     }
 }
 }

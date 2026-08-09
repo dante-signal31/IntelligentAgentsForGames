@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Pathfinding;
+using Tools;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 namespace Editor.PropertyDrawers
-{
+{ 
 [CustomPropertyDrawer(typeof(PositionNode))]
 public class PositionNodeDrawer : PropertyDrawer
 {
@@ -15,7 +16,6 @@ public class PositionNodeDrawer : PropertyDrawer
         SerializedProperty currentProperty = property;
         List<uint> connectionIds = 
             ((PositionNode) property.boxedValue).ConnectionIds.ToList();
-        HashSet<uint> selectedConnectionIds = new();
         
         VisualElement container = new VisualElement();
         
@@ -63,17 +63,12 @@ public class PositionNodeDrawer : PropertyDrawer
                 OnListItemsAdded(
                     addedIndices, 
                     currentProperty, 
-                    connectionList, 
                     connectionIds);
         connectionList.itemsRemoved += 
-            _ => OnListItemsRemoved(
+            removedIndices => OnListItemsRemoved(
                 currentProperty, 
-                selectedConnectionIds, 
-                connectionList, 
+                removedIndices, 
                 connectionIds);
-        connectionList.selectionChanged += 
-            objects => 
-                OnSelectionChanged(objects, selectedConnectionIds);
         
         // Populate container hierarchy.
         connectionsLabel.Add(connectionList);
@@ -168,10 +163,11 @@ public class PositionNodeDrawer : PropertyDrawer
                 connectionId
             );
             if (serializedIndex == -1) return;
-            // Get the connection to change and load its new data. 
+            // Get the connection to change. 
             GraphConnection connectionToChange = 
                 (GraphConnection) valueDataProperty
                     .GetArrayElementAtIndex(serializedIndex).boxedValue;
+            // Modify connection.
             connectionToChange.endNodeId = (uint)evt.newValue;
             // Apply the changes to the original object.
             valueDataProperty
@@ -186,10 +182,11 @@ public class PositionNodeDrawer : PropertyDrawer
                 connectionId
             );
             if (serializedIndex == -1) return;
-            // Get the connection to change and load its new data. 
+            // Get the connection to change. 
             GraphConnection connectionToChange = 
                 (GraphConnection) valueDataProperty
                     .GetArrayElementAtIndex(serializedIndex).boxedValue;
+            // Modify connection.
             connectionToChange.cost = evt.newValue;
             // Apply the changes to the original object.
             valueDataProperty
@@ -207,27 +204,14 @@ public class PositionNodeDrawer : PropertyDrawer
     /// <param name="currentProperty">
     /// The serialized property representing the object associated with the list.
     /// </param>
-    /// <param name="currentListView">
-    /// The list view element displaying the connections in the property drawer.
-    /// </param>
     /// <param name="connectionsIds">
     /// The list of connection IDs corresponding to the existing connections.
     /// </param>
     private void OnListItemsAdded(
         IEnumerable<int> addedIndices, 
         SerializedProperty currentProperty,
-        ListView currentListView,
         List<uint> connectionsIds)
     {
-        // Original object connections write access. Remember you have to access to its
-        // serialized version to be able to modify it.
-        SerializedProperty connectionsProperty =
-            currentProperty.FindPropertyRelative("connections");
-        SerializedProperty keyDataProperty =
-            connectionsProperty.FindPropertyRelative("keyData");
-        SerializedProperty valueDataProperty =
-            connectionsProperty.FindPropertyRelative("valueData");
-        
         // Add new connection entries to the list. Usually, if you use the inspector list
         // "+" button, the indices will have only one element. You'll only have more than
         // that if you add elements to the list using some sort of drag-and-drop.
@@ -245,70 +229,59 @@ public class PositionNodeDrawer : PropertyDrawer
                 cost: 1f
             );
             
-            // Append the new connection to the original list. First, the connection
-            // ID key...
-            int lastIndex = keyDataProperty.arraySize;
-            keyDataProperty.InsertArrayElementAtIndex(lastIndex); // Create new slot.
-            keyDataProperty.GetArrayElementAtIndex(lastIndex).uintValue = newConnectionId;
-            // ... and now the connection value.
-            valueDataProperty.InsertArrayElementAtIndex(lastIndex); // Create new slot.
-            valueDataProperty.GetArrayElementAtIndex(lastIndex).boxedValue = 
-                newConnection;
+            // Append the new connection to the original list.
+            positionNode.Connections.Add(newConnectionId, newConnection);
+            
+            // Overwrite original object with the one with the updated list.
+            currentProperty.boxedValue = positionNode;
             
             // Apply the changes to the original object.
             currentProperty.serializedObject.ApplyModifiedProperties();
         }
-        
-        // Update the inspector list.
-        currentListView.RefreshItems();
     }
 
+    /// <summary>
+    /// Handles the removal of items from the connection list and updates
+    /// the associated serialized property and underlying data structure.
+    /// </summary>
+    /// <param name="currentProperty">
+    /// The serialized property representing the PositionNode object being modified.
+    /// </param>
+    /// <param name="removedIndices">
+    /// A collection of indices corresponding to the items removed from the connection
+    /// list.
+    /// </param>
+    /// <param name="connectionsIds">
+    /// The list of connection IDs currently associated with the PositionNode object.
+    /// </param>
     private void OnListItemsRemoved(
         SerializedProperty currentProperty,
-        HashSet<uint> selectedConnectionIds,
-        ListView currentListView,
+        IEnumerable<int> removedIndices,
         List<uint> connectionsIds)
     {
         // Make sure we are working with the most updated version of the original object.
         currentProperty.serializedObject.Update();
         
-        // Original object connections write access. Remember you have to access to its
-        // serialized version to be able to modify it.
+        // Original object connections write access. 
         SerializedProperty connectionsProperty =
             currentProperty.FindPropertyRelative("connections");
-        SerializedProperty keyDataProperty =
-            connectionsProperty.FindPropertyRelative("keyData");
-        SerializedProperty valueDataProperty =
-            connectionsProperty.FindPropertyRelative("valueData");
         
-        // Remove selected connection from the original object.
-        foreach (uint removedId in selectedConnectionIds)
+        // Get original connection list.
+        CustomUnityDictionaries.UintGraphConnectionDictionary connections =
+            (CustomUnityDictionaries.UintGraphConnectionDictionary) 
+            connectionsProperty.boxedValue;
+        
+        // Remove connection.
+        foreach (var removedIndex in removedIndices)
         {
-            // Get the index of the connection to remove.
-            int serializedIndex = FindConnectionSerializedIndex(
-                keyDataProperty,
-                removedId
-            );
-            
-            // If the connection ID is not found, search for the next one.
-            if (serializedIndex == -1) continue;
-            
-            // Otherwise, remove the connection from the original object at the found
-            // index.
-            keyDataProperty.DeleteArrayElementAtIndex(serializedIndex);
-            valueDataProperty.DeleteArrayElementAtIndex(serializedIndex);
-            
-            connectionsIds.Remove(removedId);
+            connections.Remove(connectionsIds[removedIndex]);
         }
+        
+        // Overwrite connection list.
+        connectionsProperty.boxedValue = connections;
         
         // Apply changes to the original object.
         currentProperty.serializedObject.ApplyModifiedProperties();
-        
-        // Selected entries are now removed.
-        selectedConnectionIds.Clear();
-        
-        // Update the inspector list.
-        currentListView.RefreshItems();
     }
 
 
@@ -338,28 +311,6 @@ public class PositionNodeDrawer : PropertyDrawer
         }
 
         return -1;
-    }
-
-    /// <summary>
-    /// Handles changes in the user's selection within the connection list.
-    /// </summary>
-    /// <param name="selectedItems">
-    /// The collection of items currently selected in the connection list.
-    /// </param>
-    /// <param name="selectedConnectionIds">
-    /// A set to store the IDs of the selected connections after the selection changes.
-    /// </param>
-    private void OnSelectionChanged(
-        IEnumerable<object> selectedItems, 
-        HashSet<uint> selectedConnectionIds)
-    {
-        selectedConnectionIds.Clear();
-
-        foreach (object selectedItem in selectedItems)
-        {
-            if (!(selectedItem is uint connectionId)) return;
-            selectedConnectionIds.Add(connectionId);
-        }
     }
 }
 }

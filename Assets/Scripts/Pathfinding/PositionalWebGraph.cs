@@ -16,12 +16,9 @@ namespace Pathfinding
 /// for defining nodes, rendering debug visualizations such as gizmos, and generating
 /// connections between nodes for pathfinding purposes.
 /// </remarks>
-[ExecuteAlways]
 public class PositionalWebGraph : MonoBehaviour, IPositionGraph
 {
     [Header("CONFIGURATION:")]
-    [Tooltip("Nodes modeling the environment.")]
-    [SerializeField] private PositionNode[] nodes;
     [Tooltip("Layers to consider as not walkable.")]
     [SerializeField] LayerMask obstaclesLayers;
     [Tooltip("Maximum distance between two nodes for line-of-sight checks.")]
@@ -49,6 +46,10 @@ public class PositionalWebGraph : MonoBehaviour, IPositionGraph
     [Tooltip("Angle in degrees of the arrow wings. [0, 90)")]
     [Range(0f, 90f)]
     [SerializeField] public float arrowApertureDegrees = 30f;
+    
+    [Space]
+    // Do not show. We will use our custom drawer instead.
+    [SerializeField, HideInInspector] private PositionNode[] nodes;
 
     public IReadOnlyList<PositionNode> Nodes => nodes;
 
