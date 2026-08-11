@@ -37,7 +37,7 @@ public class PositionNodeDrawer : PropertyDrawer
         // Make the list foldable and give it a title.
         Foldout connectionsLabel = new()
         {
-            text = "Connections",
+            text = "Connections:",
             value = true
         };
         // Now create the list.

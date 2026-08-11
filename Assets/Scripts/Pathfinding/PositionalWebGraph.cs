@@ -52,8 +52,7 @@ public class PositionalWebGraph : MonoBehaviour, IPositionGraph
     [SerializeField, HideInInspector] private PositionNode[] nodes;
 
     public IReadOnlyList<PositionNode> Nodes => nodes;
-
-
+    
     /// <summary>
     /// Retrieves the node corresponding to the specified unique identifier.
     /// </summary>
@@ -185,6 +184,8 @@ public class PositionalWebGraph : MonoBehaviour, IPositionGraph
 
         foreach (PositionNode node in nodes)
         {
+            Gizmos.DrawWireSphere(node.Position, gizmoRadius);
+            
             foreach (KeyValuePair<uint, GraphConnection> uintToGraphConnection in 
                      node.Connections)
             {
