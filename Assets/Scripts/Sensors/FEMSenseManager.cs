@@ -152,7 +152,7 @@ public class FEMSenseManager: RegionSenseManager
             {
                 // Where does that connection lead us?
                 PositionNode endNode = 
-                    mapGraph.GetPositionNodeById(graphConnection.endNodeId);
+                    (PositionNode) mapGraph.GetNodeById(graphConnection.endNodeId);
                 // If that connection leads to an already explored node, skip it.
                 if (_closedNodes.Contains(endNode.Id)) continue;
                 
