@@ -53,6 +53,49 @@ public class MapGraph : MonoBehaviour, IPositionGraph
     public Color GridColor => gridColor;
     
     /// <summary>
+    /// Retrieves the array position of a node based on its unique identifier.
+    /// </summary>
+    /// <param name="nodeId">
+    /// The unique identifier of the node, represented as an unsigned integer.
+    /// This ID is used to map the node to its corresponding array position.
+    /// </param>
+    /// <returns>
+    /// A Vector2Int representing the position of the node within the grid's array
+    /// structure.
+    /// </returns>
+    private Vector2Int GetArrayPositionById(uint nodeId) => 
+        graphResource.nodeIdsToArrayPositions[nodeId];
+
+    /// <summary>
+    /// Retrieves a node from the graph using its unique identifier.
+    /// </summary>
+    /// <param name="nodeId">
+    /// The unique identifier of the node to retrieve.
+    /// </param>
+    /// <returns>
+    /// The <see cref="PositionNode"/> associated with the specified ID.
+    /// </returns>
+    public IPositionNode GetNodeById(uint nodeId) => 
+        graphResource.arrayPositionsToNodes[GetArrayPositionById(nodeId)];
+    
+    /// <summary>
+    /// Retrieves the node at the given array position within the grid.
+    /// </summary>
+    /// <param name="arrayPosition">
+    /// The position of the node in the grid as a Vector2Int, representing its
+    /// indices within the grid structure.
+    /// </param>
+    /// <returns>
+    /// The PositionNode corresponding to the specified array position. Returns null if
+    /// no node exists at the given position.
+    /// </returns>
+    public PositionNode GetNodeAtArrayPosition(Vector2Int arrayPosition)
+    {
+        if (!graphResource.arrayPositionsToNodes.ContainsKey(arrayPosition)) return null;
+        return graphResource.arrayPositionsToNodes[arrayPosition];
+    }
+    
+    /// <summary>
     /// Represents the physical size of each cell in the grid based on the map dimensions
     /// and the resolution of the grid.
     /// </summary>
@@ -98,41 +141,6 @@ public class MapGraph : MonoBehaviour, IPositionGraph
         );
         return groundRoundedArrayPosition;
     }
-
-    /// <summary>
-    /// Retrieves the array position of a node based on its unique identifier.
-    /// </summary>
-    /// <param name="nodeId">
-    /// The unique identifier of the node, represented as an unsigned integer.
-    /// This ID is used to map the node to its corresponding array position.
-    /// </param>
-    /// <returns>
-    /// A Vector2Int representing the position of the node within the grid's array
-    /// structure.
-    /// </returns>
-    private Vector2Int GetArrayPositionById(uint nodeId) => 
-        graphResource.nodeIdsToArrayPositions[nodeId];
-
-    /// <summary>
-    /// Retrieves a node from the graph using its unique identifier.
-    /// </summary>
-    /// <param name="nodeId">
-    /// The unique identifier of the node to retrieve.
-    /// </param>
-    /// <returns>
-    /// The <see cref="PositionNode"/> associated with the specified ID.
-    /// </returns>
-    public IPositionNode GetNodeById(uint nodeId) => 
-        graphResource.arrayPositionsToNodes[GetArrayPositionById(nodeId)];
-    
-    /// <summary>
-    /// Retrieves the PositionNode associated with the specified node ID.
-    /// </summary>
-    /// <param name="nodeId">The unique identifier of the node to retrieve.</param>
-    /// <returns>The PositionNode corresponding to the provided node ID. If no node
-    /// exists for the given ID, null is returned.</returns>
-    public PositionNode GetPositionNodeById(uint nodeId) => 
-        graphResource.arrayPositionsToNodes[GetArrayPositionById(nodeId)];
     
     /// <summary>
     /// Retrieves the node located at the given global world position.
@@ -203,24 +211,7 @@ public class MapGraph : MonoBehaviour, IPositionGraph
         }
         return nearestPosition;
     }
-
-    /// <summary>
-    /// Retrieves the node at the given array position within the grid.
-    /// </summary>
-    /// <param name="arrayPosition">
-    /// The position of the node in the grid as a Vector2Int, representing its
-    /// indices within the grid structure.
-    /// </param>
-    /// <returns>
-    /// The PositionNode corresponding to the specified array position. Returns null if
-    /// no node exists at the given position.
-    /// </returns>
-    public PositionNode GetNodeAtArrayPosition(Vector2Int arrayPosition)
-    {
-        if (!graphResource.arrayPositionsToNodes.ContainsKey(arrayPosition)) return null;
-        return graphResource.arrayPositionsToNodes[arrayPosition];
-    }
-
+    
     /// <summary>
     /// Just a shortcut to the graph nodes dictionary inside GraphResource.
     /// </summary>
