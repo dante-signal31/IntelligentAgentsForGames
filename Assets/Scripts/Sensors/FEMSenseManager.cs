@@ -56,7 +56,6 @@ public class FEMSenseManager: RegionSenseManager
         new();
     private readonly Queue<PositionNode> _openNodes = new();
     private readonly HashSet<uint> _closedNodes = new();
-    private uint _frameCounter;
     
     protected void Awake()
     {
@@ -143,7 +142,7 @@ public class FEMSenseManager: RegionSenseManager
         // open list. This way you can avoid exploring the same node multiple times. 
         _closedNodes.Add(sourceNode.Id);
         
-        // Breath-first exploration of the graph.
+        // Breadth-first exploration of the graph.
         while (_openNodes.Count > 0)
         {
             PositionNode current = _openNodes.Dequeue();
