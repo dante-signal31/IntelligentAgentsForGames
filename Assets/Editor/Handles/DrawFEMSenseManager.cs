@@ -46,7 +46,7 @@ public class DrawFEMSenseManager : UnityEditor.Editor
             Color.RGBToHSV(
                 femSenseManager.dissipationColor, 
                 out float hue, 
-                out _, 
+                out float _, 
                 out float _);
             float saturation = normalizedIntensity;
             float value = 1.0f;
