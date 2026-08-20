@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace Sensors
+﻿namespace Sensors
 {
 /// <summary>
 /// Represents a signal emitter that uses the smell sense modality.
