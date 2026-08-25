@@ -52,7 +52,8 @@ public class DrawPath : UnityEditor.Editor
                 path.positions[i] =
                     path.transform.InverseTransformPoint(_positionHandles[i]);
             }
-
+            path.UpdatePathData();
+            
             // Force inspector update.
             EditorUtility.SetDirty(path);
         }

@@ -38,9 +38,10 @@ public class Path : MonoBehaviour, IGizmos
     }
     
     /// <summary>
-    /// How many positions this path has.
+    /// Where to place strings with the number of positions.
     /// </summary>
-    public int PathPositionsCount => _data.PathPositionsLength;
+    public Vector2 GizmoTextPosition => 
+        new Vector2(positionGizmoRadius, positionGizmoRadius) + gizmoTextOffset;
     
     /// <summary>
     /// Length of the path.
@@ -59,6 +60,11 @@ public class Path : MonoBehaviour, IGizmos
             return length;
         }
     }
+    
+    /// <summary>
+    /// How many positions this path has.
+    /// </summary>
+    public int PathPositionsCount => _data.PathPositionsLength;
 
     /// <summary>
     /// Current index of the position we are going to.
@@ -73,12 +79,6 @@ public class Path : MonoBehaviour, IGizmos
     /// Position at the current position index.
     /// </summary>
     public Vector2 CurrentTargetPosition => _data.CurrentTargetPosition;
-    
-    /// <summary>
-    /// Where to place strings with the number of positions.
-    /// </summary>
-    public Vector2 GizmoTextPosition => 
-        new Vector2(positionGizmoRadius, positionGizmoRadius) + gizmoTextOffset;
     
     /// <summary>
     /// <p>Get the next position target in Path.</p>
@@ -100,8 +100,22 @@ public class Path : MonoBehaviour, IGizmos
     {
         // Leave any internal initialization here to let external path users make their
         // initial path configuration at the Start phase.
+        UpdatePathData();
+    }
+    
+    /// <summary>
+    /// Updates the internal path data representation with the current
+    /// configuration of the path, including the loop setting and positions.
+    /// </summary>
+    /// <remarks>
+    /// Use this method if you have updated the path configuration, changing the
+    /// positions field directly.
+    /// </remarks>
+    public void UpdatePathData()
+    {
         _data.loop = loop;
         _data.LoadPathData(positions);
+        pathUpdated?.Invoke();
     }
 
     /// <summary>
@@ -187,8 +201,7 @@ public class Path : MonoBehaviour, IGizmos
 #if UNITY_EDITOR
     private void OnValidate()
     {
-        _data.loop = loop;
-        _data.LoadPathData(positions);
+        UpdatePathData();
     }
 
     private void OnDrawGizmos()
