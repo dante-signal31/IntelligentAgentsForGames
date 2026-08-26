@@ -48,10 +48,10 @@ public class PathFollowingSteeringBehavior : SteeringBehavior
         // current position. However, that could make us going backwards (for instance)
         // if we have just abandoned a path position and the path change is only some
         // new positions at the path end. I think it's better to enter the new path by
-        // the path position nearest to our current target (the target position of our
-        // current path). This way you can avoid going backwards.
+        // the path position nearest to our current target. This way you can avoid
+        // going backwards.
         (Vector2 newTargetPosition, uint pathIndex) = 
-            FollowPath.GetNearestPosition(FollowPath.CurrentTargetPosition);
+            FollowPath.GetNearestPosition(_target.transform.position);
         _target.transform.position = newTargetPosition;
         FollowPath.CurrentTargetPositionIndex = (int) pathIndex;
     }
