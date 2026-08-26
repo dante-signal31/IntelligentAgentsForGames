@@ -10,7 +10,7 @@ namespace SteeringBehaviors
 /// <p> NLA behavior implements a Non-Linear-Acceleration approach. So, in this case
 /// curves give acceleration instead of a fixed acceleration value.</p>
 /// </summary>
-public class ArriveSteeringBehaviorNla : SteeringBehavior, ITargeter
+public class ArriveSteeringBehaviorNLA : SteeringBehavior, ITargeter
 {
     [Header("CONFIGURATION:")]
     [Tooltip("Point to arrive to.")]

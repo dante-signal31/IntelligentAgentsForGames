@@ -150,8 +150,8 @@ public class EmergentFormationTests
         _wingman5GameObject.transform.position = _position5.position;
         
         // Set leader target.
-        ArriveSteeringBehaviorNla arriveSteeringBehavior = 
-            _leaderGameObject.GetComponentInChildren<ArriveSteeringBehaviorNla>();
+        ArriveSteeringBehaviorNLA arriveSteeringBehavior = 
+            _leaderGameObject.GetComponentInChildren<ArriveSteeringBehaviorNLA>();
         arriveSteeringBehavior.Target = _target.gameObject;
         
         // Enable everything to start the test.

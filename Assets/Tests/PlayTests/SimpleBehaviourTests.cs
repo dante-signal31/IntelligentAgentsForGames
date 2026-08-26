@@ -315,7 +315,7 @@ namespace Tests.PlayTests
             // Test setup.
             _arriveNLAGameObject.transform.position = _position5.position;
             var arriveSteeringBehavior =
-                _arriveNLAGameObject.GetComponentInChildren<ArriveSteeringBehaviorNla>();
+                _arriveNLAGameObject.GetComponentInChildren<ArriveSteeringBehaviorNLA>();
             var arriveMover = _arriveNLAGameObject.GetComponent<AgentMover>();
             var arriveMoverRigidBody = _arriveNLAGameObject.GetComponent<Rigidbody2D>();
             arriveMoverRigidBody.linearVelocity = Vector2.zero;
