@@ -62,7 +62,7 @@ where T: NodeRecord, new()
     /// The currently found path across the graph to the target node.
     /// </summary>
     private PathData foundPath;
-
+    
     /// <summary>
     /// Finds a path from the current position to the specified target position
     /// within the provided graph using Dijkstra's algorithm.
@@ -80,7 +80,7 @@ where T: NodeRecord, new()
     public abstract PathData FindPath(
         Vector2 targetPosition, 
         Vector2 fromPosition=default);
-
+    
     /// <summary>
     /// Constructs a path from the start node to the target node by traversing
     /// the closed dictionary in reverse and building a sequence of connections.
