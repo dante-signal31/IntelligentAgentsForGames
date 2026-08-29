@@ -4,11 +4,12 @@
     /// Implements the Breadth-First Search (BFS) algorithm for pathfinding.
     /// </summary>
     /// <remarks>
-    /// Actually, a Breath-First pathfinder only guarantees to find the shortest path
+    /// Actually, a Breadth-First pathfinder only guarantees to find the shortest path
     /// if every connection has the same cost. With scenes with variable costs, the
     /// algorithm will ignore that some connections are cheaper than others. I.e., a 
-    /// Breath-First pathfinder will always find the path with fewer nodes, not the
+    /// Breadth-First pathfinder will always find the path with fewer nodes, not the
     /// cost-cheaper one.
     /// </remarks>
-    public class BreathFirstGraphPathFinder : NotInformedGraphPathFinder<NodeRecordQueue> { }
+    public class BreadthFirstGraphPathFinder : NotInformedGraphPathFinder<NodeRecordQueue> 
+    { }
 }

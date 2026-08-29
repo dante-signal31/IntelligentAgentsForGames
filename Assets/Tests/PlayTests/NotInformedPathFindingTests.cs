@@ -257,8 +257,8 @@ public class NotInformedPathFindingTests
     [UnityTest]
     public IEnumerator PositionalWebGraphBreathFirstPathFindingBehaviorTest()
     {
-        BreathFirstGraphPathFinder pathFinder = 
-            _breathFirstPathFindingGameObject.GetComponentInChildren<BreathFirstGraphPathFinder>();
+        BreadthFirstGraphPathFinder pathFinder = 
+            _breathFirstPathFindingGameObject.GetComponentInChildren<BreadthFirstGraphPathFinder>();
         pathFinder.Graph = _positionalWebGraph;
         
         // Set up agents before the tests.
