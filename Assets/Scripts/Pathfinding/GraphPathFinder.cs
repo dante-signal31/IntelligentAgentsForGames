@@ -45,7 +45,7 @@ where T: NodeRecord, new()
     /// Dictionary containing nodes and their corresponding recorded data after the
     /// exploration process.
     /// </summary>
-    public readonly Dictionary<IPositionNode, T> closedDict = new();
+    protected readonly Dictionary<IPositionNode, T> closedDict = new();
     
     /// <summary>
     /// Exposes the explored nodes for debugging purposes (e.g., Editor handles) but
@@ -100,7 +100,7 @@ where T: NodeRecord, new()
     /// from the start node to the target node.
     /// </returns>
     public PathData BuildPath(
-        Dictionary<IPositionNode, T> currentClosedDict,
+        IReadOnlyDictionary<IPositionNode, T> currentClosedDict,
         IPositionNode startNode, 
         IPositionNode targetNode)
     {

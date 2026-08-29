@@ -301,16 +301,16 @@ public class RegionGraph : MonoBehaviour, IPositionGraph
                                 if (!regionGraphResource.fromNodeToRegionPaths.ContainsKey(
                                         nodeToRegionKey) ||
                                     regionGraphResource.fromNodeToRegionPaths[nodeToRegionKey]
-                                        .cost > dijkstraPathFinder.closedDict[targetNode]
+                                        .cost > dijkstraPathFinder.ExploredNodes[targetNode]
                                         .costSoFar)
                                 {
                                     regionGraphResource.fromNodeToRegionPaths[nodeToRegionKey] =
                                         new InterRegionPath()
                                         {
-                                            cost = dijkstraPathFinder.closedDict[targetNode]
+                                            cost = dijkstraPathFinder.ExploredNodes[targetNode]
                                                 .costSoFar,
                                             pathPositions = dijkstraPathFinder
-                                                .BuildPath(dijkstraPathFinder.closedDict,
+                                                .BuildPath(dijkstraPathFinder.ExploredNodes,
                                                     boundaryNode, targetNode).positions
                                         };
                                 }

@@ -141,7 +141,7 @@ public class RegionPathFinder : MonoBehaviour, IGraphPathFinder
                 (PositionNode) MapGraph.GetNodeById(nextRegionBoundaryNode);
             // There should be only une candidate node at the closed list, the nearest
             // one.
-            if (firstMilePathFinder.closedDict.ContainsKey(
+            if (firstMilePathFinder.ExploredNodes.ContainsKey(
                     candidateNextRegionBoundaryNode))
             {
                 nearestNextRegionBoundaryNode = candidateNextRegionBoundaryNode;
@@ -149,7 +149,7 @@ public class RegionPathFinder : MonoBehaviour, IGraphPathFinder
             }
         }
         PathData pathDataToNextRegion = firstMilePathFinder.BuildPath(
-            firstMilePathFinder.closedDict, 
+            firstMilePathFinder.ExploredNodes, 
             initialNode, 
             nearestNextRegionBoundaryNode);
         totalPathData.AddPositionsToPath(pathDataToNextRegion.positions);
