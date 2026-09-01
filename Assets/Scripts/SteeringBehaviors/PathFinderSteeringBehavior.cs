@@ -1,27 +1,30 @@
 ﻿using Pathfinding;
 using PropertyAttribute;
-using Tools;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace SteeringBehaviors
 {
 /// <summary>
 /// <p>Steering behavior to find, and follow, a path to a given target.</p>
 /// <p>The pathfinder algorithm used depends on the IGraphPathFinder instance referenced
-/// from the pathFinderBehaviour field.</p> 
+/// from the pathFinder field.</p> 
 /// </summary>
 public class PathFinderSteeringBehavior: SteeringBehavior, IGizmos
 {
     [Header("CONFIGURATION:")]
     [Tooltip("Target to go to using found path.")]
-    [SerializeField] public Target target;
+    [SerializeField] public GameObject target;
+    [Tooltip("Minimum changed distance to consider the target position updated.")]
+    [SerializeField] public float minDistanceToUpdate = 0.1f;
     
     [Header("WIRING:")]
     [Tooltip("Steering Behavior to move using found path.")]
     [SerializeField] private PathFollowingSteeringBehavior pathFollowingSteeringBehavior;
+    [FormerlySerializedAs("pathFinderBehaviour")]
     [Tooltip("Path finder to use. Must comply with IGraphPathFinder interface.")]
     [InterfaceCompliant(typeof(IGraphPathFinder))]
-    [SerializeField] private MonoBehaviour pathFinderBehaviour;
+    [SerializeField] private MonoBehaviour pathFinder;
     [Tooltip("Steering behavior to execute when path is finished until reaching the " +
              "target.")]
     [InterfaceCompliant(typeof(ITargeter))]
@@ -56,11 +59,12 @@ public class PathFinderSteeringBehavior: SteeringBehavior, IGizmos
     private ITargeter _finalSteeringTargeter;
     private Path _currentPath;
     private GameObject _targeterMarker;
+    private bool _calculatingPath;
     
     private void Awake()
     {
         _finalSteeringTargeter = (ITargeter) finalSteeringBehaviour;
-        _graphPathFinder = (IGraphPathFinder) pathFinderBehaviour;
+        _graphPathFinder = (IGraphPathFinder) pathFinder;
         
         // Create a GameObject at the scene root to include the new path instance in
         // Unity life cycle.
@@ -74,17 +78,14 @@ public class PathFinderSteeringBehavior: SteeringBehavior, IGizmos
         _targeterMarker.transform.position = target.transform.position;
     }
 
-    private void OnEnable()
+    private void FixedUpdate()
     {
-        if (target == null) return;
-        target.positionChanged.AddListener(OnPathTargetPositionChanged);
-    }
-
-    private void OnDisable()
-    {
-        if (target == null) return;
-        // We don't want to calculate paths while the game object is not active.
-        target.positionChanged.RemoveListener(OnPathTargetPositionChanged);
+        if (Vector2.Distance(
+                target.transform.position,
+                _targeterMarker.transform.position) > minDistanceToUpdate)
+        {
+            OnPathTargetPositionChanged(target.transform.position);
+        }
     }
 
     /// <summary>
@@ -96,6 +97,10 @@ public class PathFinderSteeringBehavior: SteeringBehavior, IGizmos
     /// pathfinding will calculate a path to reach.</param>
     private void OnPathTargetPositionChanged(Vector2 newTargetPosition)
     {
+        // Lock to avoid multiple pathfinding calculations at the same time.
+        if (_calculatingPath) return;
+        _calculatingPath = true;
+        
         // Update pathfinding.
         PathData newPath = _graphPathFinder.FindPath(newTargetPosition);
         if (newPath == null) return;
@@ -104,6 +109,9 @@ public class PathFinderSteeringBehavior: SteeringBehavior, IGizmos
         
         // Update final steering behavior.
         _targeterMarker.transform.position = target.transform.position;
+        
+        // Release lock.
+        _calculatingPath = false;
     }
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
