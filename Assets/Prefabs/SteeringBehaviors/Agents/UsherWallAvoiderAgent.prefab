@@ -569,6 +569,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4796784b2ba24286b89ad16a1bbea619, type: 3}
   m_Name: 
   m_EditorClassIdentifier: ScriptsAssembly::SteeringBehaviors.UsherWaiterAgent
+  steeringBehavior: {fileID: 269389913369550841}
+  rigidBody: {fileID: 6013682417659336252}
   maximumSpeed: 2
   stopSpeed: 0.1
   maximumRotationalSpeed: 1080
@@ -585,8 +587,6 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   exponentialConvergenceRate: 0.6
-  steeringBehavior: {fileID: 269389913369550841}
-  rigidBody: {fileID: 6013682417659336252}
   maximumLaggingBehindDistance: 5
   targeter: {fileID: 269389913369550841}
 --- !u!4 &4611234838970947425 stripped

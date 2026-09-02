@@ -1749,7 +1749,7 @@ MonoBehaviour:
   m_OverrideArea: 0
   m_Area: 0
   m_IgnoreFromBuild: 0
-  m_AffectedAgents: ffffffff
+  m_AffectedAgents: ffffffffi
 --- !u!114 &14759281
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1762,7 +1762,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 709c8d6349be44c68dff3d220992400c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: NavMeshPlus::NavMeshPlus.Components.NavMeshModifierTilemap
-  m_AffectedAgents: ffffffff
+  m_AffectedAgents: ffffffffi
   m_TileModifiers:
   - tile: {fileID: 11400000, guid: d1f41ce37573419439ee46ccd4b04a4b, type: 2}
     overrideArea: 1
@@ -130363,7 +130363,7 @@ MonoBehaviour:
   m_OverrideArea: 1
   m_Area: 1
   m_IgnoreFromBuild: 0
-  m_AffectedAgents: ffffffff
+  m_AffectedAgents: ffffffffi
 --- !u!1001 &1330411884
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -130623,8 +130623,16 @@ PrefabInstance:
       value: 0.01
       objectReference: {fileID: 0}
     - target: {fileID: 6258067890701291013, guid: fd4ecbe6bebab824fa0121887aa63773, type: 3}
+      propertyPath: autoSmooth
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6258067890701291013, guid: fd4ecbe6bebab824fa0121887aa63773, type: 3}
       propertyPath: maximumSpeed
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 6258067890701291013, guid: fd4ecbe6bebab824fa0121887aa63773, type: 3}
+      propertyPath: smoothingMethod
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -131374,7 +131382,7 @@ MonoBehaviour:
   m_OverrideArea: 1
   m_Area: 1
   m_IgnoreFromBuild: 0
-  m_AffectedAgents: ffffffff
+  m_AffectedAgents: ffffffffi
 --- !u!1001 &1740883047
 PrefabInstance:
   m_ObjectHideFlags: 0

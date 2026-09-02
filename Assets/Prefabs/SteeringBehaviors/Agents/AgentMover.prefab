@@ -247,6 +247,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3d83550b99ef26438b9b356965efa6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  steeringBehavior: {fileID: 0}
+  rigidBody: {fileID: 1790575542233831108}
   maximumSpeed: 2
   stopSpeed: 0.1
   maximumRotationalSpeed: 1080
@@ -263,8 +265,6 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   exponentialConvergenceRate: 0.6
-  steeringBehavior: {fileID: 0}
-  rigidBody: {fileID: 1790575542233831108}
 --- !u!50 &1790575542233831108
 Rigidbody2D:
   serializedVersion: 5

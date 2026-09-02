@@ -1,4 +1,5 @@
-﻿using Pathfinding;
+﻿using System;
+using Pathfinding;
 using PropertyAttribute;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -76,6 +77,11 @@ public class PathFinderSteeringBehavior: SteeringBehavior, IGizmos
         _targeterMarker = new GameObject($"{name} - TargetMarker");
         _finalSteeringTargeter.Target = _targeterMarker;
         _targeterMarker.transform.position = target.transform.position;
+    }
+
+    private void Start()
+    {
+        OnPathTargetPositionChanged(target.transform.position);
     }
 
     private void FixedUpdate()

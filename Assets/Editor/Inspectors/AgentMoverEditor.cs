@@ -20,6 +20,8 @@ public class AgentMoverEditor : UnityEditor.Editor
     private SerializedProperty _autoSmoothSamples;
     private SerializedProperty _smoothingCurve;
     private SerializedProperty _exponentialConvergenceRate;
+    private SerializedProperty _steeringBehavior;
+    private SerializedProperty _rigidBody;
 
     private void OnEnable()
     {
@@ -36,6 +38,8 @@ public class AgentMoverEditor : UnityEditor.Editor
         _smoothingCurve = serializedObject.FindProperty("smoothingCurve");
         _exponentialConvergenceRate = 
             serializedObject.FindProperty("exponentialConvergenceRate");
+        _steeringBehavior = serializedObject.FindProperty("steeringBehavior");
+        _rigidBody = serializedObject.FindProperty("rigidBody");
     }
 
     public override VisualElement CreateInspectorGUI()
@@ -51,6 +55,8 @@ public class AgentMoverEditor : UnityEditor.Editor
             new PropertyField(_stopRotationalThreshold);
         PropertyField maximumAccelerationField = new PropertyField(_maximumAcceleration);
         PropertyField maximumDecelerationField = new PropertyField(_maximumDeceleration);
+        PropertyField steeringBehaviorField = new PropertyField(_steeringBehavior);
+        PropertyField rigidBodyField = new PropertyField(_rigidBody);
         
         // Add fields to main container.
         container.Add(maximumSpeedField);
@@ -150,6 +156,10 @@ public class AgentMoverEditor : UnityEditor.Editor
         {
             RefreshAutoSmoothOptions((SmoothingMethods) evt.newValue);
         });
+        
+        // Now add wiring fields to the container.
+        container.Add(steeringBehaviorField);
+        container.Add(rigidBodyField);
         
         return container;
     }

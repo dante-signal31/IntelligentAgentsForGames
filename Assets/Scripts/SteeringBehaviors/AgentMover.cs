@@ -12,6 +12,12 @@ namespace SteeringBehaviors
 /// </summary>
 public class AgentMover : MonoBehaviour
 {
+    [Header("WIRING:")]
+    [Tooltip("Steering behaviour component that will return movement vectors.")]
+    [SerializeField] protected SteeringBehavior steeringBehavior;
+    [Tooltip("This prefab's RigidBody to apply movement vectors over it.")]
+    [SerializeField] protected Rigidbody2D rigidBody;
+    
     [Header("CONFIGURATION:")]
     [Tooltip("Movement will now surpass this maximum speed.")]
     [SerializeField] private float maximumSpeed;
@@ -37,12 +43,6 @@ public class AgentMover : MonoBehaviour
     [SerializeField] private AnimationCurve smoothingCurve = new();
     [Tooltip("Convergence rate for exponential smoothing.")]
     [SerializeField] public float exponentialConvergenceRate = 0.6f;
-    
-    [Header("WIRING:")]
-    [Tooltip("Steering behaviour component that will return movement vectors.")]
-    [SerializeField] protected SteeringBehavior steeringBehavior;
-    [Tooltip("This prefab's RigidBody to apply movement vectors over it.")]
-    [SerializeField] protected Rigidbody2D rigidBody;
 
     /// <summary>
     /// This agent current speed
