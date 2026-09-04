@@ -82,6 +82,10 @@ PrefabInstance:
       value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 3224491061626100660, guid: 1bb25c451c70f3d4cbc7462f1f2db011, type: 3}
+      propertyPath: pathFinder
+      value: 
+      objectReference: {fileID: 1093672356253222293}
+    - target: {fileID: 3224491061626100660, guid: 1bb25c451c70f3d4cbc7462f1f2db011, type: 3}
       propertyPath: pathFinderBehaviour
       value: 
       objectReference: {fileID: 1093672356253222293}

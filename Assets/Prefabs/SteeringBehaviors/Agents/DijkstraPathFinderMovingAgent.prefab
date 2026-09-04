@@ -151,6 +151,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 6910170702238282384}
     m_Modifications:
     - target: {fileID: 3224491061626100660, guid: 1bb25c451c70f3d4cbc7462f1f2db011, type: 3}
+      propertyPath: pathFinder
+      value: 
+      objectReference: {fileID: 8219087972932942475}
+    - target: {fileID: 3224491061626100660, guid: 1bb25c451c70f3d4cbc7462f1f2db011, type: 3}
       propertyPath: pathFinderBehaviour
       value: 
       objectReference: {fileID: 8219087972932942475}
