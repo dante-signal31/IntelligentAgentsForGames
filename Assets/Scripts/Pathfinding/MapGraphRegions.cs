@@ -15,8 +15,7 @@ public class MapGraphRegions: MonoBehaviour
     /// based on their accumulated path cost, ensuring that the lowest-cost nodes
     /// are processed first.
     /// </summary>
-    private class NodeRegionsRecordSet :
-        HeuristicGraphPathFinder<RegionNodeRecord>.PrioritizedNodeRecordSet
+    private class NodeRegionsRecordSet : PrioritizedNodeRecordSet<RegionNodeRecord>
     {
         // Comparer to keep the SortedSet ordered by TotalEstimatedCostToTarget
         private class NodeRecordComparer : IComparer<RegionNodeRecord>

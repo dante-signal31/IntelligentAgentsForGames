@@ -40,7 +40,7 @@ public class GraphPathSmoother : MonoBehaviour, IGraphPathFinder
     private PathData _smoothedPathData = new();
     private PathData _rawPathData = new();
 
-    private void Start()
+    private void Awake()
     {
         smoothedGraphPathFinder = (IGraphPathFinder) smoothedPathFinder;
         smoothedGraphPathFinder.Graph = graph;

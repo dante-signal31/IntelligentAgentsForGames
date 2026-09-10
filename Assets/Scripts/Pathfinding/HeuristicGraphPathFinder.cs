@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Android;
 
 namespace Pathfinding
 {
@@ -11,98 +13,44 @@ namespace Pathfinding
 /// explored first.
 /// </remarks> 
 /// </summary>
-public abstract class HeuristicGraphPathFinder<T>: GraphPathFinder<T>
+public abstract class HeuristicGraphPathFinder<T, TU>: GraphPathFinder<T>
     where T: NodeRecord, new()
+    where TU: PrioritizedNodeRecordSet<T>, new()
 {
-    /// <summary>
-    /// A collection of nodes with priority-based access for use in pathfinding
-    /// algorithms like Dijkstra.
-    /// </summary>
-    /// <remarks>
-    /// This class maintains a set of node along with their associated costs for
-    /// traversing a graph. It provides functionality to add and remove nodes, check for
-    /// node existence, and retrieve the node with the lowest cost value.
-    /// </remarks>
-    public abstract class PrioritizedNodeRecordSet: INodeRecordCollection<T>
-    {
-        // Needed to keep ordered by cost the NodeRecords of the node pending to be
-        // explored.
-        // Initially, I planned to use a PriorityQueue<GraphNode, float>, but I found that
-        // the Unity .NET API doesn't support it, because that collection was added in
-        // .NET 6, while my Unity version is .NET Framework 4.7.1.
-        private readonly SortedSet<T> prioritySet;
-        
-        // Needed to keep track of the nodes still pending to be explored and to quickly
-        // get their respective records.
-        private readonly Dictionary<IPositionNode, T> nodeRecordDict = new ();
+    public T currentNodeRecord;
+    protected readonly TU _openRecordSet = new();
     
-        public int Count => nodeRecordDict.Count;
+    public delegate bool EndCondition();
+
+    public override PathData FindPath(
+        Vector2 targetPosition,
+        Vector2 fromPosition = default)
+    {
+        // Get graph nodes associated with the start and target positions. 
+        CurrentStartNode = fromPosition==default? 
+            Graph.GetNodeAtPosition(transform.position): 
+            Graph.GetNodeAtPosition(fromPosition);
+        CurrentTargetNode = Graph.GetNodeAtPosition(targetPosition);
+
+        CalculateCosts(CurrentStartNode, 
+            () => currentNodeRecord.node.Id == CurrentTargetNode.Id);
         
-        public void Clear()
-        {
-            prioritySet.Clear();
-            nodeRecordDict.Clear();
-        }
-        
-        public bool Contains(IPositionNode node) => nodeRecordDict.ContainsKey(node);
-
-        protected PrioritizedNodeRecordSet(IComparer<T> comparer)
-        {
-            prioritySet = new SortedSet<T>(comparer);
-        }
-
-        public void Add(T record)
-        {
-            // If the node already exists, we must remove it first because SortedSet
-            // doesn't update positions automatically if an existing node costSoFar
-            // value changes.
-            if (nodeRecordDict.TryGetValue(record.node, out var value))
-            {
-                prioritySet.Remove(value);
-            }
-            
-            prioritySet.Add(record);
-            nodeRecordDict[record.node] = record;
-        }
-        
-        public void Remove(T record)
-        {
-            if (nodeRecordDict.ContainsKey(record.node))
-            {
-                prioritySet.Remove(nodeRecordDict[record.node]);
-                nodeRecordDict.Remove(record.node);
-            }
-        }
-
-        /// <summary>
-        /// Provides indexed access to the node records using a GraphNode as the key.
-        /// </summary>
-        public T this[IPositionNode node]
-        {
-            get => nodeRecordDict[node];
-            set => nodeRecordDict[node] = value;
-        }
-
-        /// <summary>
-        /// Extracts and removes the node record with the lowest cost-so-far value
-        /// from the prioritized set. 
-        /// </summary>
-        /// <returns>
-        /// The node record with the lowest cost-so-far value or a null if there are no
-        /// valid records available in the set.
-        /// </returns>
-        public T Get()
-        {
-            if (prioritySet.Count == 0) return null;
-
-            // In SortedSet, Min is the element with the lowest priority/cost.
-            T lowest = prioritySet.Min;
-            
-            prioritySet.Remove(lowest);
-            nodeRecordDict.Remove(lowest.node);
-        
-            return lowest;
-        }
+        // If we get here and the current record does not point to the targetNode, then
+        // we've fully explored the graph without finding a valid path to get the target.
+        if (currentNodeRecord?.node == null || 
+            currentNodeRecord.node.Id != CurrentTargetNode.Id) return null;
+    
+        // As we've got the target node, analyze the closedDict to follow back
+        // connections from the target node to start node to build the path.
+        PathData calculatedPath = BuildPath(
+            closedDict, 
+            CurrentStartNode, 
+            CurrentTargetNode);
+        return calculatedPath;
     }
+    
+    public abstract void CalculateCosts(
+        IPositionNode startNode, 
+        EndCondition endCondition);
 }
 }

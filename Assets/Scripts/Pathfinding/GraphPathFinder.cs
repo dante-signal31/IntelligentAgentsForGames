@@ -59,6 +59,11 @@ where T: NodeRecord, new()
     public IPositionNode CurrentStartNode { get; protected set; }
     
     /// <summary>
+    /// Agent current destination node.
+    /// </summary>
+    public IPositionNode CurrentTargetNode { get; protected set; }
+    
+    /// <summary>
     /// The currently found path across the graph to the target node.
     /// </summary>
     private PathData foundPath;

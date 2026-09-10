@@ -36,7 +36,7 @@ public class RegionPathFinder : MonoBehaviour, IGraphPathFinder
         set => regionGraph = (RegionGraph) value;
     }
 
-    public void Start()
+    public void Awake()
     {
         // At "first mile" we use Dijkstra to get to the nearest boundary node of the
         // next region.

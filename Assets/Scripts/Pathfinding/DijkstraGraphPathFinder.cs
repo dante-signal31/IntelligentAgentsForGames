@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 
 namespace Pathfinding
@@ -9,72 +9,15 @@ namespace Pathfinding
 /// position to a target position by exploring nodes systematically based on their cost
 /// to be reached from the starting position.
 /// </summary>
-public class DijkstraGraphPathFinder : HeuristicGraphPathFinder<NodeRecord>
+public class DijkstraGraphPathFinder : 
+    HeuristicGraphPathFinder<NodeRecord, DijkstraPrioritizedNodeRecordSet>
 {
-    /// <summary>
-    /// A specialized collection of node records used in the Dijkstra pathfinding
-    /// algorithm. This collection manages nodes to be explored in priority order
-    /// based on their accumulated path cost, ensuring that the lowest-cost nodes
-    /// are processed first.
-    /// </summary>
-    protected class DijkstraPrioritizedNodeRecordSet: PrioritizedNodeRecordSet
+    private void Awake()
     {
-        // Comparer to keep the SortedSet ordered by CostSoFar
-        private class NodeRecordComparer : IComparer<NodeRecord>
-        {
-            public int Compare(NodeRecord x, NodeRecord y)
-            {
-                int result = x.costSoFar.CompareTo(y.costSoFar);
-                // If costs are equal, we must not return 0, otherwise SortedSet 
-                // thinks they are the same element and won't add the new one.
-                if (result == 0 && x.node != y.node)
-                    return x.node.Id.CompareTo(y.node.Id);
-                return result;
-            }
-        }
-        
-        public DijkstraPrioritizedNodeRecordSet() : base(new NodeRecordComparer()) {}
+        currentNodeRecord = NodeRecord.nodeRecordNull;
     }
 
-    private readonly DijkstraPrioritizedNodeRecordSet _openRecordSet = new ();
-    public NodeRecord currentNodeRecord = NodeRecord.nodeRecordNull;
-
-    public delegate bool EndCondition();
-    
-    public override PathData FindPath(
-        Vector2 targetPosition, 
-        Vector2 fromPosition=default)
-    {
-        // Nodes not fully explored yet, ordered by the cost to get them from the
-        // start node.
-        _openRecordSet.Clear();
-        
-        // Nodes already fully explored. We use a dictionary to keep track of the
-        // information gathered from each node, including the connection to get there,
-        // while exploring the graph.
-        closedDict.Clear();
-    
-        // Get graph nodes associated with the start and target positions. 
-        CurrentStartNode = fromPosition==default? 
-            Graph.GetNodeAtPosition(transform.position): 
-            Graph.GetNodeAtPosition(fromPosition);
-        IPositionNode targetNode = Graph.GetNodeAtPosition(targetPosition);
-        
-        CalculateCosts(CurrentStartNode, 
-            () => currentNodeRecord.node.Id == targetNode.Id);
-        
-        // If we get here and the current record does not point to the targetNode, then
-        // we've fully explored the graph without finding a valid path to get the target.
-        if (currentNodeRecord?.node == null || 
-            currentNodeRecord.node.Id != targetNode.Id) return null;
-    
-        // As we've got the target node, analyze the closedDict to follow back
-        // connections from the target node to start node to build the path.
-        PathData calculatedPath = BuildPath(closedDict, CurrentStartNode, targetNode);
-        return calculatedPath;
-    }
-
-    public void CalculateCosts(IPositionNode startNode, EndCondition endCondition)
+    public override void CalculateCosts(IPositionNode startNode, EndCondition endCondition)
     {
         // Nodes not fully explored yet, ordered by the cost to get them from the
         // start node.
@@ -101,14 +44,6 @@ public class DijkstraGraphPathFinder : HeuristicGraphPathFinder<NodeRecord>
             currentNodeRecord = _openRecordSet.Get();
             if (currentNodeRecord == null) break;
 
-            // If the current record is already in the ClosedDict, but in the ClosedDict
-            // it is with a lower cost, it means that the recovered current record it's a
-            // duplicated record left behind by the "lazy removal" node record set. So we
-            // discard it and recover the next record from _openRecordSet.
-            if (closedDict.ContainsKey(currentNodeRecord.node) &&
-                currentNodeRecord.costSoFar >=
-                closedDict[currentNodeRecord.node].costSoFar) continue;
-
             // If we comply with end condition, then our exploration is complete.
             if (endCondition())
             {
@@ -124,8 +59,10 @@ public class DijkstraGraphPathFinder : HeuristicGraphPathFinder<NodeRecord>
             {
                 // Where does that connection lead us?
                 IPositionNode endNode = Graph.GetNodeById(graphConnection.endNodeId);
+                
                 // If that connection leads to a node fully explored, skip it.
                 if (closedDict.ContainsKey(endNode)) continue;
+                
                 // Calculate the cost to reach the end node from the current node.
                 float endNodeCost = currentNodeRecord.costSoFar + graphConnection.cost;
 
