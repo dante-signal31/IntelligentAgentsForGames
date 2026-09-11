@@ -21,7 +21,7 @@ public class DijkstraGraphPathFinder :
     {
         // Nodes not fully explored yet, ordered by the cost to get them from the
         // start node.
-        _openRecordSet.Clear();
+        openRecordSet.Clear();
         
         // Nodes already fully explored. We use a dictionary to keep track of the
         // information gathered from each node, including the connection to get there,
@@ -35,13 +35,13 @@ public class DijkstraGraphPathFinder :
             connection = null,
             costSoFar = 0,
         };
-        _openRecordSet.Add(startNodeRecord);
+        openRecordSet.Add(startNodeRecord);
 
         // Loop until we reach the target node or no more nodes are available to explore.
-        while (_openRecordSet.Count > 0)
+        while (openRecordSet.Count > 0)
         {
             // Explore prioritizing the node with the lowest cost to be reached.
-            currentNodeRecord = _openRecordSet.Get();
+            currentNodeRecord = openRecordSet.Get();
             if (currentNodeRecord == null) break;
 
             // If we comply with end condition, then our exploration is complete.
@@ -52,7 +52,7 @@ public class DijkstraGraphPathFinder :
             }
 
             // Get all the connections of the current node and take note of the nodes
-            // those connections lead to into the _openRecordSet to explore those nodes
+            // those connections lead to into the openRecordSet to explore those nodes
             // later.
             foreach (GraphConnection graphConnection in 
                      currentNodeRecord.node.Connections.Values)
@@ -67,9 +67,9 @@ public class DijkstraGraphPathFinder :
                 float endNodeCost = currentNodeRecord.costSoFar + graphConnection.cost;
 
                 NodeRecord endNodeRecord;
-                if (_openRecordSet.Contains(endNode))
+                if (openRecordSet.Contains(endNode))
                 {
-                    endNodeRecord = _openRecordSet[endNode];
+                    endNodeRecord = openRecordSet[endNode];
                     // If the end node is already in the open set, but with a lower cost,
                     // it means that we are NOT found a better path to get to it. So skip
                     // it.
@@ -79,7 +79,7 @@ public class DijkstraGraphPathFinder :
                     //
                     // First, remove the record from the existing set to avoid
                     // corrupting it by editing its values.
-                    _openRecordSet.Remove(endNodeRecord);
+                    openRecordSet.Remove(endNodeRecord);
                     // Now, you can safely edit the record values.
                     endNodeRecord.costSoFar = endNodeCost;
                     endNodeRecord.connection = graphConnection;
@@ -98,7 +98,7 @@ public class DijkstraGraphPathFinder :
                 }
 
                 // Add the node to the openSet to assess it fully again.
-                _openRecordSet.Add(endNodeRecord);
+                openRecordSet.Add(endNodeRecord);
             }
 
             // As we've finished looking at the connections of the current node, mark it

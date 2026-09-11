@@ -31,7 +31,7 @@ public class AStarGraphPathFinder:
     {
         // Nodes not fully explored yet, ordered by the estimated cost to get the target
         // through them.
-        _openRecordSet.Clear();
+        openRecordSet.Clear();
         
         // Nodes already fully explored. We use a dictionary to keep track of the
         // information gathered from each node, including the connection to get there,
@@ -61,14 +61,14 @@ public class AStarGraphPathFinder:
                 CurrentStartNode.Position,
                 CurrentTargetNode.Position)
         };
-        _openRecordSet.Add(startNodeRecord);
+        openRecordSet.Add(startNodeRecord);
 
         // Loop until we reach the target node or no more nodes are available to explore.
-        while (_openRecordSet.Count > 0)
+        while (openRecordSet.Count > 0)
         {
             // Explore prioritizing the node with the lowest total estimated cost to get
             // the target.
-            currentNodeRecord = _openRecordSet.Get();
+            currentNodeRecord = openRecordSet.Get();
             if (currentNodeRecord == null) break;
 
             // If we reached the end node, then our exploration is complete.
@@ -79,7 +79,7 @@ public class AStarGraphPathFinder:
             }
 
             // Get all the connections of the current node and take note of the nodes
-            // those connections lead to into the _openRecordSet to explore those nodes later.
+            // those connections lead to into the openRecordSet to explore those nodes later.
             foreach (GraphConnection graphConnection in 
                      currentNodeRecord.node.Connections.Values)
             {
@@ -117,9 +117,9 @@ public class AStarGraphPathFinder:
                 }
                 // OK, we've just found a node that is still being assessed in the open
                 // list.
-                else if (_openRecordSet.Contains(endNode))
+                else if (openRecordSet.Contains(endNode))
                 {
-                    endNodeRecord = _openRecordSet[endNode];
+                    endNodeRecord = openRecordSet[endNode];
                     // If the end node is already in the open set, but with a lower cost,
                     // it means that we have NOT found a better path to get to it. So skip
                     // it.
@@ -130,7 +130,7 @@ public class AStarGraphPathFinder:
                     //
                     // First, remove the record from the existing set to avoid
                     // corrupting it by editing its values.
-                    _openRecordSet.Remove(endNodeRecord);
+                    openRecordSet.Remove(endNodeRecord);
                     // Now, you can safely edit the record values.
                     // We could call the heuristic again, but it will return the same
                     // value as the last time. What has changed is the CostSoFar part,
@@ -159,8 +159,8 @@ public class AStarGraphPathFinder:
                                 CurrentTargetNode.Position)
                     };
                 }
-                // Add the node to the _openRecordSet to assess it fully again.
-                _openRecordSet.Add(endNodeRecord);
+                // Add the node to the openRecordSet to assess it fully again.
+                openRecordSet.Add(endNodeRecord);
             }
             // As we've finished looking at the connections of the current node, mark it
             // as fully explored, including it in the closed list.

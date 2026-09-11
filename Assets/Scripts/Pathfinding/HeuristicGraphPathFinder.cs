@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Android;
+﻿using UnityEngine;
 
 namespace Pathfinding
 {
@@ -18,7 +16,7 @@ public abstract class HeuristicGraphPathFinder<T, TU>: GraphPathFinder<T>
     where TU: PrioritizedNodeRecordSet<T>, new()
 {
     public T currentNodeRecord;
-    protected readonly TU _openRecordSet = new();
+    protected readonly TU openRecordSet = new();
     
     public delegate bool EndCondition();
 
