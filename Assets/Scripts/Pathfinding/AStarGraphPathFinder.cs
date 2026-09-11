@@ -25,7 +25,7 @@ public class AStarGraphPathFinder:
         currentNodeRecord = AStarNodeRecord.aStarNodeRecordNull;
     }
     
-    public override void CalculateCosts(
+    protected override void ExploreGraph(
         IPositionNode startNode,
         EndCondition endCondition)
     {

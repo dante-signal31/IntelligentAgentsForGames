@@ -1,7 +1,4 @@
-﻿using System;
-using UnityEngine;
-
-namespace Pathfinding
+﻿namespace Pathfinding
 {
 /// <summary>
 /// Implements a pathfinding algorithm based on Dijkstra's algorithm to find the shortest
@@ -17,7 +14,12 @@ public class DijkstraGraphPathFinder :
         currentNodeRecord = NodeRecord.nodeRecordNull;
     }
 
-    public override void CalculateCosts(IPositionNode startNode, EndCondition endCondition)
+    protected override void ExploreGraph(IPositionNode startNode, EndCondition endCondition)
+    {
+        CalculateCosts(startNode, endCondition);
+    }
+
+    public void CalculateCosts(IPositionNode startNode, EndCondition endCondition)
     {
         // Nodes not fully explored yet, ordered by the cost to get them from the
         // start node.

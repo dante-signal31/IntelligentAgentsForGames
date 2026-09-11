@@ -30,7 +30,7 @@ public abstract class HeuristicGraphPathFinder<T, TU>: GraphPathFinder<T>
             Graph.GetNodeAtPosition(fromPosition);
         CurrentTargetNode = Graph.GetNodeAtPosition(targetPosition);
 
-        CalculateCosts(CurrentStartNode, 
+        ExploreGraph(CurrentStartNode, 
             () => currentNodeRecord.node.Id == CurrentTargetNode.Id);
         
         // If we get here and the current record does not point to the targetNode, then
@@ -47,7 +47,7 @@ public abstract class HeuristicGraphPathFinder<T, TU>: GraphPathFinder<T>
         return calculatedPath;
     }
     
-    public abstract void CalculateCosts(
+    protected abstract void ExploreGraph(
         IPositionNode startNode, 
         EndCondition endCondition);
 }
