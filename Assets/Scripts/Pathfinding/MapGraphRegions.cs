@@ -10,32 +10,6 @@ namespace Pathfinding
 public class MapGraphRegions: MonoBehaviour
 
 {
-    /// <summary>
-    /// This collection manages nodes to be explored in priority order
-    /// based on their accumulated path cost, ensuring that the lowest-cost nodes
-    /// are processed first.
-    /// </summary>
-    private class NodeRegionsRecordSet : PrioritizedNodeRecordSet<RegionNodeRecord>
-    {
-        // Comparer to keep the SortedSet ordered by TotalEstimatedCostToTarget
-        private class NodeRecordComparer : IComparer<RegionNodeRecord>
-        {
-            public int Compare(RegionNodeRecord x, RegionNodeRecord y)
-            {
-                int result = x.costSoFar.CompareTo(y.costSoFar);
-                // If costs are equal, we must not return 0, otherwise SortedSet 
-                // thinks they are the same element and won't add the new one.
-                if (result == 0 && x.node != y.node)
-                    return x.node.Id.CompareTo(y.node.Id);
-                return result;
-            }
-        }
-
-        public NodeRegionsRecordSet() : base(new NodeRecordComparer())
-        {
-        }
-    }
-
     [Header("CONFIGURATION:")]
     [Tooltip("Take connection cost into account when calculating the regions.")]
     [SerializeField] public bool costAware = true;
@@ -124,13 +98,84 @@ public class MapGraphRegions: MonoBehaviour
     {
         return seeds[(int)regionId].position;
     }
-
     
     public void Start()
     {
         UpdateRegionsColors();
         UpdateRegionsArray();
         UpdateNodesByRegion();
+    }
+    
+    /// <summary>
+    /// Updates the colors of the defined regions in the map based on the
+    /// <see cref="RegionSeed.gizmoColor"/> property of each seed.
+    /// </summary>
+    public void UpdateRegionsColors()
+    {
+        regionColors.Clear();
+        for (uint i = 0; i < seeds.Count; i++)
+        {
+            RegionSeed regionSeed = seeds[(int)i];
+            regionColors[i] = regionSeed.gizmoColor;
+        }
+    }
+    
+    /// <summary>
+    /// Updates the set of region IDs by synchronizing the current collection of regions
+    /// with the mappings stored in the associated MapGraphRegionsResource object.
+    /// This ensures that the Regions property reflects the latest region assignments.
+    /// </summary>
+    private void UpdateRegionsArray()
+    {
+        Regions.Clear();
+        Regions.UnionWith(graphRegionsResource.nodesIdToRegionsId.Values);
+    }
+    
+    /// <summary>
+    /// Updates the mapping between region IDs and the sets of node IDs that belong to
+    /// those regions.
+    /// </summary>
+    private void UpdateNodesByRegion()
+    {
+        foreach (uint regionId in Regions)
+        {
+            HashSet<uint> nodesInRegion = new();
+            foreach (KeyValuePair<uint, uint> nodeIdTopRegionId in 
+                     graphRegionsResource.nodesIdToRegionsId)
+            {
+                if (nodeIdTopRegionId.Value == regionId) 
+                    nodesInRegion.Add(nodeIdTopRegionId.Key);
+            }
+            nodesByRegion[regionId] = nodesInRegion;
+        }
+    }
+    
+    /// <summary>
+    /// Initializes and clears the collections used for region generation in the map
+    /// graph.
+    /// </summary>
+    private void InitCollections()
+    {
+        _nodeRegionsOpenSet.Clear();
+        _regionsInfluence.Clear();
+        _exploredNodes.Clear();
+        for (uint i = 0; i < seeds.Count; i++)
+        {
+            RegionSeed regionSeed = seeds[(int)i];
+            _regionsInfluence[i] = regionSeed.influence;
+            PositionNode seedNode = 
+                (PositionNode) mapGraph.GetNodeAtPosition(regionSeed.position);
+            RegionNodeRecord nodeRecord = new RegionNodeRecord()
+            {
+                node = seedNode,
+                connection = null,
+                costSoFar = 0,
+                regionId = i
+            };
+            _nodeRegionsOpenSet.Add(nodeRecord);
+            // Take seed nodes as already explored.
+            _exploredNodes[seedNode] = nodeRecord;
+        }
     }
     
     /// <summary>
@@ -205,78 +250,6 @@ public class MapGraphRegions: MonoBehaviour
         {
             graphRegionsResource.nodesIdToRegionsId[exploredNode.Key.Id] =
                 exploredNode.Value.regionId;
-        }
-    }
-    
-    /// <summary>
-    /// Updates the set of region IDs by synchronizing the current collection of regions
-    /// with the mappings stored in the associated MapGraphRegionsResource object.
-    /// This ensures that the Regions property reflects the latest region assignments.
-    /// </summary>
-    private void UpdateRegionsArray()
-    {
-        Regions.Clear();
-        Regions.UnionWith(graphRegionsResource.nodesIdToRegionsId.Values);
-    }
-    
-    /// <summary>
-    /// Updates the mapping between region IDs and the sets of node IDs that belong to
-    /// those regions.
-    /// </summary>
-    private void UpdateNodesByRegion()
-    {
-        foreach (uint regionId in Regions)
-        {
-            HashSet<uint> nodesInRegion = new();
-            foreach (KeyValuePair<uint, uint> nodeIdTopRegionId in 
-                     graphRegionsResource.nodesIdToRegionsId)
-            {
-                if (nodeIdTopRegionId.Value == regionId) 
-                    nodesInRegion.Add(nodeIdTopRegionId.Key);
-            }
-            nodesByRegion[regionId] = nodesInRegion;
-        }
-    }
-    
-    /// <summary>
-    /// Initializes and clears the collections used for region generation in the map
-    /// graph.
-    /// </summary>
-    private void InitCollections()
-    {
-        _nodeRegionsOpenSet.Clear();
-        _regionsInfluence.Clear();
-        _exploredNodes.Clear();
-        for (uint i = 0; i < seeds.Count; i++)
-        {
-            RegionSeed regionSeed = seeds[(int)i];
-            _regionsInfluence[i] = regionSeed.influence;
-            PositionNode seedNode = 
-                (PositionNode) mapGraph.GetNodeAtPosition(regionSeed.position);
-            RegionNodeRecord nodeRecord = new RegionNodeRecord()
-            {
-                node = seedNode,
-                connection = null,
-                costSoFar = 0,
-                regionId = i
-            };
-            _nodeRegionsOpenSet.Add(nodeRecord);
-            // Take seed nodes as already explored.
-            _exploredNodes[seedNode] = nodeRecord;
-        }
-    }
-    
-    /// <summary>
-    /// Updates the colors of the defined regions in the map based on the
-    /// <see cref="RegionSeed.gizmoColor"/> property of each seed.
-    /// </summary>
-    public void UpdateRegionsColors()
-    {
-        regionColors.Clear();
-        for (uint i = 0; i < seeds.Count; i++)
-        {
-            RegionSeed regionSeed = seeds[(int)i];
-            regionColors[i] = regionSeed.gizmoColor;
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -59,6 +58,66 @@ public class MapGraphRegionsSmoother : MonoBehaviour
     }
     
     /// <summary>
+    /// Generates a collection of randomized region seeds to initialize the map graph
+    /// regions. Each seed is assigned a unique spatial position and color, ensuring no
+    /// duplicates.
+    /// </summary>
+    /// <returns>
+    /// An array of generated RegionSeed objects, each carrying a position, an influence
+    /// value, and a randomly assigned color.
+    /// </returns>
+    private List<RegionSeed> GenerateRandomSeeds()
+    {
+        List<RegionSeed> generatedSeeds = new();
+        Color mapGraphRegionsGizmoColor = mapGraphRegions.gizmosColor;
+        HashSet<Color> selectedColors = new() { mapGraphRegionsGizmoColor };
+
+        // Get all valid array positions from the graph nodes
+        List<Vector2Int> allNodesArrayPositions = 
+            mapGraphRegions.mapGraph.ArrayPositionsToNodes.Keys.ToList();
+
+        HashSet<int> alreadySelectedIndices = new();
+        // Generate random seeds
+        for (int i = 0; i < randomSeedsAmount && i < allNodesArrayPositions.Count; i++)
+        {
+            // Select a random node from the graph.
+            int randomIndex;
+            do
+            {
+                randomIndex = Random.Range(0, allNodesArrayPositions.Count);
+                // I've had problems with seed collision, so I made sure to avoid selecting
+                // the same position.
+            } while (alreadySelectedIndices.Contains(randomIndex));
+            alreadySelectedIndices.Add(randomIndex);
+            Vector2Int selectedArrayPosition = allNodesArrayPositions[randomIndex];
+            PositionNode selectedNode = 
+                mapGraphRegions.mapGraph.GetNodeAtArrayPosition(selectedArrayPosition);
+
+            // Generate a random color that doesn't exist
+            Color randomColor;
+            do
+            {
+                randomColor = new Color(
+                    Random.Range(0.0f, 1.0f),
+                    Random.Range(0.0f, 1.0f),
+                    Random.Range(0.0f, 1.0f)
+                );
+            } while (selectedColors.Contains(randomColor));
+            selectedColors.Add(randomColor);
+
+            // Create the region seed
+            RegionSeed seed = new()
+            {
+                position = selectedNode.Position,
+                influence = 1,
+                gizmoColor = randomColor
+            };
+            generatedSeeds.Add(seed);
+        }
+        return generatedSeeds;
+    }
+    
+    /// <summary>
     /// Relocates region seeds to the nearest valid positions within their respective
     /// regions by calculating the average position of nodes in each region and snapping
     /// the seed to the nearest node to that position.
@@ -109,67 +168,6 @@ public class MapGraphRegionsSmoother : MonoBehaviour
             positionsCount++;
         }
         return positionsSum / positionsCount;
-    }
-    
-    /// <summary>
-    /// Generates a collection of randomized region seeds to initialize the map graph
-    /// regions. Each seed is assigned a unique spatial position and color, ensuring no
-    /// duplicates.
-    /// </summary>
-    /// <returns>
-    /// An array of generated RegionSeed objects, each carrying a position, an influence
-    /// value, and a randomly assigned color.
-    /// </returns>
-    private List<RegionSeed> GenerateRandomSeeds()
-    {
-        List<RegionSeed> generatedSeeds = new();
-        Color mapGraphRegionsGizmoColor = mapGraphRegions.gizmosColor;
-        HashSet<Color> selectedColors = new() { mapGraphRegionsGizmoColor };
-
-        // Get all valid array positions from the graph nodes
-        List<Vector2Int> allNodesArrayPositions = 
-            mapGraphRegions.mapGraph.ArrayPositionsToNodes.Keys.ToList();
-
-        HashSet<int> alreadySelectedIndices = new();
-        // Generate random seeds
-        for (int i = 0; i < randomSeedsAmount && i < allNodesArrayPositions.Count; i++)
-        {
-            // Select a random node from the graph.
-            int randomIndex;
-            do
-            {
-                randomIndex = Random.Range(0, allNodesArrayPositions.Count);
-                // I've had problems with seed collision, so I made sure to avoid selecting
-                // the same position.
-            } while (alreadySelectedIndices.Contains(randomIndex));
-            alreadySelectedIndices.Add(randomIndex);
-            Vector2Int selectedArrayPosition = allNodesArrayPositions[randomIndex];
-            PositionNode selectedNode = 
-                mapGraphRegions.mapGraph.GetNodeAtArrayPosition(selectedArrayPosition);
-            allNodesArrayPositions.RemoveAt(randomIndex);
-
-            // Generate a random color that doesn't exist
-            Color randomColor;
-            do
-            {
-                randomColor = new Color(
-                    Random.Range(0.0f, 1.0f),
-                    Random.Range(0.0f, 1.0f),
-                    Random.Range(0.0f, 1.0f)
-                );
-            } while (selectedColors.Contains(randomColor));
-            selectedColors.Add(randomColor);
-
-            // Create the region seed
-            RegionSeed seed = new()
-            {
-                position = selectedNode.Position,
-                influence = 1,
-                gizmoColor = randomColor
-            };
-            generatedSeeds.Add(seed);
-        }
-        return generatedSeeds;
     }
 }
 }

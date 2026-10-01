@@ -148,75 +148,63 @@ public class RegionGraph : MonoBehaviour, IPositionGraph
     
     public void GenerateRegionGraph()
     {
-        if (dijkstraPathFinder.Graph == null) 
-            dijkstraPathFinder.Graph = graphRegions.mapGraph;
+        dijkstraPathFinder.Graph ??= graphRegions.mapGraph;
         GenerateRegionNodes();
         CalculateRegionTraversalPaths();
         CalculateRegionTraversalCosts();
         EstablishRegionConnections();
     }
-
+    
     /// <summary>
-    /// Computes the traversal costs for each region based on inter-region paths.
+    /// Generates and initializes region nodes that represent individual regions
+    /// within the region graph. Each region node is created based on the regions
+    /// defined in the MapGraphRegions and is associated with attributes such as
+    /// position and connectivity.
     /// </summary>
-    /// <remarks>
-    /// This method calculates the average traversal cost for every region by aggregating
-    /// the costs of paths crossing each region and determining the average cost per path.
-    /// The result is stored in a dictionary where each region ID is associated with its
-    /// average traversal cost.
-    /// </remarks>
-    private void CalculateRegionTraversalCosts()
+    private void GenerateRegionNodes()
     {
-        // <CrossedRegion, (TotalCost, PathsCrossingAmount)>
-        Dictionary<uint, (float, uint)> regionIdToGlobalCostAndPathCount = new();
+        regionGraphResource.regionIdToRegionNode.Clear();
+        regionGraphResource.positionToRegionNode.Clear();
         
-        // Sum cost of every path crossing a region.
-        foreach (KeyValuePair<
-                     long, 
-                     InterRegionPath> fromNodeToRegionPath 
-                 in regionGraphResource.fromNodeToRegionPaths)
+        // Traverse every region to generate their region nodes.
+        foreach (KeyValuePair<uint, HashSet<uint>> regionIdToNodesIdsByRegion in 
+                 graphRegions.nodesByRegion)
         {
-            long nodeToRegionKey = fromNodeToRegionPath.Key;
-            RegionGraphResource.SplitKey(
-                nodeToRegionKey, 
-                out uint fromNodeId, 
-                out uint _);
-            InterRegionPath interRegionPath = fromNodeToRegionPath.Value;
-            uint crossedRegionId =
-                graphRegions.GetRegionByNodeId(fromNodeId);
-            if (!regionIdToGlobalCostAndPathCount.ContainsKey(crossedRegionId))
-                regionIdToGlobalCostAndPathCount[crossedRegionId] = (0, 0);
-            (float totalCost, uint pathCrossingAmount) =
-                regionIdToGlobalCostAndPathCount[crossedRegionId];
-            totalCost += interRegionPath.cost;
-            pathCrossingAmount++;
-            regionIdToGlobalCostAndPathCount[crossedRegionId] = 
-                (totalCost, pathCrossingAmount);
-        }
-
-        // Calculate the average cost of every region.
-        foreach (KeyValuePair<uint, (float, uint)> regionToCostAndCount in 
-                 regionIdToGlobalCostAndPathCount)
-        {
-            uint regionId = regionToCostAndCount.Key;
-            (float totalCost, uint pathCrossingAmount) = regionToCostAndCount.Value;
-            _regionTraversalCosts[regionId] = totalCost / pathCrossingAmount;
+            uint regionId = regionIdToNodesIdsByRegion.Key;
+            // Create a new region node to represent that region in the graph.
+            RegionNode regionNode = new()
+            {
+                Id = regionId,
+                Position = graphRegions.GetRegionCenter(regionId),
+            };
+            // Traverse every node in the region to identify boundary nodes.
+            HashSet<uint> nodeIdsInRegion = regionIdToNodesIdsByRegion.Value;
+            foreach (uint nodeId in nodeIdsInRegion)
+            {
+                PositionNode node = 
+                    (PositionNode) graphRegions.mapGraph.GetNodeById(nodeId);
+                // Check if the node has connections to other regions.
+                foreach (KeyValuePair<uint, GraphConnection> graphConnection in 
+                         node.Connections)
+                {
+                    GraphConnection connection = graphConnection.Value;
+                    uint otherNodeRegionId = 
+                        graphRegions.GetRegionByNodeId(connection.endNodeId);
+                    // If the node is connected to another region, add it to the region's
+                    // boundary nodes.
+                    if (otherNodeRegionId != regionId)
+                    {
+                        if (!regionNode.boundaryNodes.ContainsKey(otherNodeRegionId))
+                            regionNode.boundaryNodes[otherNodeRegionId] = new();
+                        regionNode.boundaryNodes[otherNodeRegionId].items.Add(nodeId);
+                    }
+                }
+            }
+            regionGraphResource.regionIdToRegionNode[regionId] = regionNode;
+            regionGraphResource.positionToRegionNode[regionNode.Position] = regionNode;
         }
     }
     
-    /// <summary>
-    /// Ends Dijkstra calculation when every target node is reached.
-    /// </summary>
-    /// <returns>Returns true only when every target node has been reached;
-    /// otherwise returns false.</returns>
-    private bool EndCondition()
-    {
-        if (!_targetNodes.Contains(dijkstraPathFinder.currentNodeRecord.node)) 
-            return false;
-        _targetNodes.Remove(dijkstraPathFinder.currentNodeRecord.node);
-        return _targetNodes.Count == 0;
-    }
-
     /// <summary>
     /// Calculates the traversal paths between regions in the region graph.
     /// For each region, determines the shortest paths from its boundary nodes
@@ -327,7 +315,68 @@ public class RegionGraph : MonoBehaviour, IPositionGraph
             }
         }
     }
+    
+    /// <summary>
+    /// Ends Dijkstra calculation when every target node is reached.
+    /// </summary>
+    /// <returns>Returns true only when every target node has been reached;
+    /// otherwise returns false.</returns>
+    private bool EndCondition()
+    {
+        if (!_targetNodes.Contains(dijkstraPathFinder.currentNodeRecord.node)) 
+            return false;
+        _targetNodes.Remove(dijkstraPathFinder.currentNodeRecord.node);
+        return _targetNodes.Count == 0;
+    }
 
+    /// <summary>
+    /// Computes the traversal costs for each region based on inter-region paths.
+    /// </summary>
+    /// <remarks>
+    /// This method calculates the average traversal cost for every region by aggregating
+    /// the costs of paths crossing each region and determining the average cost per path.
+    /// The result is stored in a dictionary where each region ID is associated with its
+    /// average traversal cost.
+    /// </remarks>
+    private void CalculateRegionTraversalCosts()
+    {
+        // <CrossedRegion, (TotalCost, PathsCrossingAmount)>
+        Dictionary<uint, (float, uint)> regionIdToGlobalCostAndPathCount = new();
+        
+        // Sum cost of every path crossing a region.
+        foreach (KeyValuePair<
+                     long, 
+                     InterRegionPath> fromNodeToRegionPath 
+                 in regionGraphResource.fromNodeToRegionPaths)
+        {
+            long nodeToRegionKey = fromNodeToRegionPath.Key;
+            RegionGraphResource.SplitKey(
+                nodeToRegionKey, 
+                out uint fromNodeId, 
+                out uint _);
+            InterRegionPath interRegionPath = fromNodeToRegionPath.Value;
+            uint crossedRegionId =
+                graphRegions.GetRegionByNodeId(fromNodeId);
+            if (!regionIdToGlobalCostAndPathCount.ContainsKey(crossedRegionId))
+                regionIdToGlobalCostAndPathCount[crossedRegionId] = (0, 0);
+            (float totalCost, uint pathCrossingAmount) =
+                regionIdToGlobalCostAndPathCount[crossedRegionId];
+            totalCost += interRegionPath.cost;
+            pathCrossingAmount++;
+            regionIdToGlobalCostAndPathCount[crossedRegionId] = 
+                (totalCost, pathCrossingAmount);
+        }
+
+        // Calculate the average cost of every region.
+        foreach (KeyValuePair<uint, (float, uint)> regionToCostAndCount in 
+                 regionIdToGlobalCostAndPathCount)
+        {
+            uint regionId = regionToCostAndCount.Key;
+            (float totalCost, uint pathCrossingAmount) = regionToCostAndCount.Value;
+            _regionTraversalCosts[regionId] = totalCost / pathCrossingAmount;
+        }
+    }
+    
     /// <summary>
     /// Establishes connections between region nodes in the region graph by analyzing
     /// shared boundary nodes and calculating traversal costs. This ensures that each
@@ -359,57 +408,6 @@ public class RegionGraph : MonoBehaviour, IPositionGraph
             }
         }
     }
-
-    /// <summary>
-    /// Generates and initializes region nodes that represent individual regions
-    /// within the region graph. Each region node is created based on the regions
-    /// defined in the MapGraphRegions and is associated with attributes such as
-    /// position and connectivity.
-    /// </summary>
-    private void GenerateRegionNodes()
-    {
-        regionGraphResource.regionIdToRegionNode.Clear();
-        regionGraphResource.positionToRegionNode.Clear();
-        
-        // Traverse every region to generate their region nodes.
-        foreach (KeyValuePair<uint, HashSet<uint>> regionIdToNodesIdsByRegion in 
-                 graphRegions.nodesByRegion)
-        {
-            uint regionId = regionIdToNodesIdsByRegion.Key;
-            // Create a new region node to represent that region in the graph.
-            RegionNode regionNode = new()
-            {
-                Id = regionId,
-                Position = graphRegions.GetRegionCenter(regionId),
-            };
-            // Traverse every node in the region.
-            HashSet<uint> nodeIdsInRegion = regionIdToNodesIdsByRegion.Value;
-            foreach (uint nodeId in nodeIdsInRegion)
-            {
-                PositionNode node = 
-                    (PositionNode) graphRegions.mapGraph.GetNodeById(nodeId);
-                // Check if the node has connections to other regions.
-                foreach (KeyValuePair<uint, GraphConnection> graphConnection in 
-                         node.Connections)
-                {
-                    GraphConnection connection = graphConnection.Value;
-                    uint otherNodeRegionId = 
-                        graphRegions.GetRegionByNodeId(connection.endNodeId);
-                    // If the node is connected to another region, add it to the region's
-                    // boundary nodes.
-                    if (otherNodeRegionId != regionId)
-                    {
-                        if (!regionNode.boundaryNodes.ContainsKey(otherNodeRegionId))
-                            regionNode.boundaryNodes[otherNodeRegionId] = new();
-                        regionNode.boundaryNodes[otherNodeRegionId].items.Add(nodeId);
-                    }
-                }
-            }
-            regionGraphResource.regionIdToRegionNode[regionId] = regionNode;
-            regionGraphResource.positionToRegionNode[regionNode.Position] = regionNode;
-        }
-    }
-
 }
 }
 

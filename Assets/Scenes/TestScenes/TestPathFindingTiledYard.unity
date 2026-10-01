@@ -129,11 +129,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3374666069497621577, guid: 7039a0f10eac5e4449a3edf7e5f9edc7, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 14.81
+      value: 17.06
       objectReference: {fileID: 0}
     - target: {fileID: 3374666069497621577, guid: 7039a0f10eac5e4449a3edf7e5f9edc7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 8.22
+      value: 6.06
       objectReference: {fileID: 0}
     - target: {fileID: 3374666069497621577, guid: 7039a0f10eac5e4449a3edf7e5f9edc7, type: 3}
       propertyPath: m_LocalPosition.z
@@ -8585,11 +8585,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6910170702238282384, guid: 6f02a1abe57c277478b2211a4a723f76, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2.39
+      value: 3.5
       objectReference: {fileID: 0}
     - target: {fileID: 6910170702238282384, guid: 6f02a1abe57c277478b2211a4a723f76, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 7.89
+      value: 8.48
       objectReference: {fileID: 0}
     - target: {fileID: 6910170702238282384, guid: 6f02a1abe57c277478b2211a4a723f76, type: 3}
       propertyPath: m_LocalPosition.z
@@ -8635,6 +8635,18 @@ PrefabInstance:
       propertyPath: mapGraph
       value: 
       objectReference: {fileID: 949245251}
+    - target: {fileID: 8219087972932942475, guid: 6f02a1abe57c277478b2211a4a723f76, type: 3}
+      propertyPath: pathNodeColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8219087972932942475, guid: 6f02a1abe57c277478b2211a4a723f76, type: 3}
+      propertyPath: pathNodeColor.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8219087972932942475, guid: 6f02a1abe57c277478b2211a4a723f76, type: 3}
+      propertyPath: pathNodeColor.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8219087972932942475, guid: 6f02a1abe57c277478b2211a4a723f76, type: 3}
       propertyPath: gizmoTextOffset.x
       value: 0.2
@@ -127378,7 +127390,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9182251609453333426, guid: a9efdc6d0db432948a6ddb28fe754150, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -131403,6 +131415,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1917747424}
     m_Modifications:
+    - target: {fileID: 1927024324596710731, guid: 2f7afe22a2233c54695497172220de41, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3770792591158853933, guid: 2f7afe22a2233c54695497172220de41, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4077566847266941947, guid: 2f7afe22a2233c54695497172220de41, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4315344173704937994, guid: 2f7afe22a2233c54695497172220de41, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5813487139095729762, guid: 2f7afe22a2233c54695497172220de41, type: 3}
       propertyPath: m_Name
       value: AStarPathFinderMovingAgent
@@ -131411,13 +131439,17 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6656120888109948305, guid: 2f7afe22a2233c54695497172220de41, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6910170702238282384, guid: 2f7afe22a2233c54695497172220de41, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2.17
+      value: 3.53
       objectReference: {fileID: 0}
     - target: {fileID: 6910170702238282384, guid: 2f7afe22a2233c54695497172220de41, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 7.99
+      value: 8.52
       objectReference: {fileID: 0}
     - target: {fileID: 6910170702238282384, guid: 2f7afe22a2233c54695497172220de41, type: 3}
       propertyPath: m_LocalPosition.z
@@ -131459,10 +131491,26 @@ PrefabInstance:
       propertyPath: target
       value: 
       objectReference: {fileID: 2297234}
+    - target: {fileID: 8549450034307804089, guid: 2f7afe22a2233c54695497172220de41, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8904734150828308510, guid: 2f7afe22a2233c54695497172220de41, type: 3}
       propertyPath: mapGraph
       value: 
       objectReference: {fileID: 949245251}
+    - target: {fileID: 8904734150828308510, guid: 2f7afe22a2233c54695497172220de41, type: 3}
+      propertyPath: pathNodeColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8904734150828308510, guid: 2f7afe22a2233c54695497172220de41, type: 3}
+      propertyPath: pathNodeColor.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8904734150828308510, guid: 2f7afe22a2233c54695497172220de41, type: 3}
+      propertyPath: pathNodeColor.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8904734150828308510, guid: 2f7afe22a2233c54695497172220de41, type: 3}
       propertyPath: gizmoTextOffset.x
       value: 0.2
@@ -131786,11 +131834,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6910170702238282384, guid: 76d76767d37dffe439e2c1be4b7d1c50, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3.4
+      value: 3.5
       objectReference: {fileID: 0}
     - target: {fileID: 6910170702238282384, guid: 76d76767d37dffe439e2c1be4b7d1c50, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 7.04
+      value: 8.5
       objectReference: {fileID: 0}
     - target: {fileID: 6910170702238282384, guid: 76d76767d37dffe439e2c1be4b7d1c50, type: 3}
       propertyPath: m_LocalPosition.z
@@ -131835,6 +131883,18 @@ PrefabInstance:
     - target: {fileID: 8549450034307804089, guid: 76d76767d37dffe439e2c1be4b7d1c50, type: 3}
       propertyPath: m_Layer
       value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 8904734150828308510, guid: 76d76767d37dffe439e2c1be4b7d1c50, type: 3}
+      propertyPath: pathNodeColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8904734150828308510, guid: 76d76767d37dffe439e2c1be4b7d1c50, type: 3}
+      propertyPath: pathNodeColor.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8904734150828308510, guid: 76d76767d37dffe439e2c1be4b7d1c50, type: 3}
+      propertyPath: pathNodeColor.r
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8904734150828308510, guid: 76d76767d37dffe439e2c1be4b7d1c50, type: 3}
       propertyPath: gizmoTextOffset.x

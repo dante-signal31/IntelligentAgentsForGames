@@ -59,7 +59,8 @@ public class MeshPathFinder: MonoBehaviour, IPathFinder
         Vector2 sourcePosition = fromPosition == default ? 
             transform.position : 
             fromPosition;
-        NavMesh.CalculatePath(sourcePosition, 
+        NavMesh.CalculatePath(
+            sourcePosition, 
             _targetPosition, 
             NavMesh.AllAreas, 
             _navMeshPath);

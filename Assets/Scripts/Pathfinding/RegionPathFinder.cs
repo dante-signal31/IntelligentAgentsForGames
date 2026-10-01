@@ -23,7 +23,7 @@ public class RegionPathFinder : MonoBehaviour, IGraphPathFinder
     [InterfaceCompliant(typeof(IGraphPathFinder))]
     [SerializeField] private MonoBehaviour regionLevelPathFinder;
     [Tooltip("Path finder used for last mile. It can be either Dijkstra or A*.")]
-    [InterfaceCompliant(typeof(IPathFinder))]
+    [InterfaceCompliant(typeof(IGraphPathFinder))]
     [SerializeField] private MonoBehaviour lastMilePathFinder;
 
     private MapGraph MapGraph => regionGraph.graphRegions.mapGraph;
@@ -139,7 +139,7 @@ public class RegionPathFinder : MonoBehaviour, IGraphPathFinder
         {
             PositionNode candidateNextRegionBoundaryNode = 
                 (PositionNode) MapGraph.GetNodeById(nextRegionBoundaryNode);
-            // There should be only une candidate node at the closed list, the nearest
+            // There should be only one candidate node at the closed list, the nearest
             // one.
             if (firstMilePathFinder.ExploredNodes.ContainsKey(
                     candidateNextRegionBoundaryNode))
@@ -154,7 +154,7 @@ public class RegionPathFinder : MonoBehaviour, IGraphPathFinder
             nearestNextRegionBoundaryNode);
         totalPathData.AddPositionsToPath(pathDataToNextRegion.positions);
     
-        // Once you are in intermediate regions, you can use static routing embed in 
+        // Once you are in intermediate regions, you can use static routing embedded in 
         // regionGraph to get to the final region.
         uint currentRegionId = nextRegionId;
         uint currentRegionIndex = 1;

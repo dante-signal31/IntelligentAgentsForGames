@@ -54,7 +54,7 @@ public class MapGraphRegionsEditor : UnityEditor.Editor
                     mapGraphRegions.mapGraph.GridColor);
             }
             else
-            {   // In some editor context changes, region colors are missed and I need to
+            {   // In some editor context changes, region colors are missed, and I need to
                 // update them manually.
                 mapGraphRegions.UpdateRegionsColors();
             }

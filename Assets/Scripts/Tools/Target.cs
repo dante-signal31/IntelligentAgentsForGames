@@ -19,7 +19,7 @@ public class Target : MonoBehaviour
     private Vector3 _currentPosition;
 
     /// <summary>
-    /// This target current position.
+    /// This target the current position.
     /// </summary>
     public Vector3 TargetPosition
     {

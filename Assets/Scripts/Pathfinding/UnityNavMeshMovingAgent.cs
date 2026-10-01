@@ -58,9 +58,9 @@ public class UnityNavMeshMovingAgent : MonoBehaviour
             target.positionChanged.RemoveListener(OnTargetPositionChanged);
     }
 
-    private void OnTargetPositionChanged(Vector2 arg0)
+    private void OnTargetPositionChanged(Vector2 newPosition)
     {
-        navMeshAgent.SetDestination(arg0);
+        navMeshAgent.SetDestination(newPosition);
     }
     
     private void Update()

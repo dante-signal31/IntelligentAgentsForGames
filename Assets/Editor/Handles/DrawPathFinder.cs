@@ -52,7 +52,7 @@ public class DrawPathFinder<T> : UnityEditor.Editor where T: NodeRecord, new()
                 {
                     connectionOrientation = relativePosition.x > 0f ? "W" : "E";
                 }
-
+                
                 string nodeInfoText =
                     $"{connectionOrientation}" +
                     $"{pathFinder.ExploredNodes[exploredNode].costSoFar}";
