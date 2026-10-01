@@ -226714,7 +226714,7 @@ MonoBehaviour:
   m_OverrideArea: 1
   m_Area: 1
   m_IgnoreFromBuild: 0
-  m_AffectedAgents: ffffffff
+  m_AffectedAgents: ffffffffi
 --- !u!66 &1567049281
 CompositeCollider2D:
   m_ObjectHideFlags: 0
@@ -231838,7 +231838,7 @@ MonoBehaviour:
   m_OverrideArea: 1
   m_Area: 0
   m_IgnoreFromBuild: 0
-  m_AffectedAgents: ffffffff
+  m_AffectedAgents: ffffffffi
 --- !u!483693784 &1598029648
 TilemapRenderer:
   serializedVersion: 2
@@ -258644,7 +258644,7 @@ MonoBehaviour:
   m_OverrideArea: 1
   m_Area: 1
   m_IgnoreFromBuild: 0
-  m_AffectedAgents: ffffffff
+  m_AffectedAgents: ffffffffi
 --- !u!66 &1723647826
 CompositeCollider2D:
   m_ObjectHideFlags: 0
@@ -265298,7 +265298,7 @@ MonoBehaviour:
   m_BuildHeightMesh: 0
   m_MinRegionArea: 0
   m_HideEditorLogs: 0
-  m_NavMeshData: {fileID: 23800000, guid: 4b5a3c8fb5bace2438c887a404fc2b3f, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: 6a8ae5cb303787c4bb36d7e9233d47b1, type: 2}
 --- !u!114 &2066378641
 MonoBehaviour:
   m_ObjectHideFlags: 0
