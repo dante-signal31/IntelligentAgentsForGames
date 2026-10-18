@@ -420,6 +420,8 @@ namespace Tests.PlayTests
             yield return null;
             yield return null;
             yield return null;
+            yield return null;
+            yield return null;
             Assert.True(agentMover.CurrentSpeed > 0.0f &&
                         agentMover.CurrentSpeed < agentMover.MaximumSpeed);
 

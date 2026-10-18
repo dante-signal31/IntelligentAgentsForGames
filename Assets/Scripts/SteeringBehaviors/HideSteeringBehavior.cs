@@ -167,8 +167,6 @@ public class HideSteeringBehavior : SteeringBehavior
 
     private bool ThreatHasJustMoved => 
         (Vector2)Threat.transform.position != _previousThreatPosition;
-
-    // private bool HidingPointReached => meshPathFinderSteeringBehavior.IsPathEnded;
     
     private bool _threatCanSeeUs;
     private bool _hidingPointRecheckNeeded;
@@ -186,6 +184,20 @@ public class HideSteeringBehavior : SteeringBehavior
         _pathRecalculationTimer.AutoReset = false;
     }
 
+    /// <summary>
+    /// Handles the timeout event for the path recalculation timer.
+    /// Resets the cooldown flag that prevents frequent recalculations
+    /// of the hiding path to ensure smoother performance when determining
+    /// new hiding positions.
+    /// </summary>
+    /// <param name="sender">The source of the elapsed event, typically the timer
+    /// object.</param>
+    /// <param name="e">Event data containing information about the elapsed time.</param>
+    private void OnRecalculationPathTimerTimeout(object sender, ElapsedEventArgs e)
+    {
+        _pathRecalculationCooldownActive = false;
+    }
+
     private void Start()
     {
         _currentLevel = FindAnyObjectByType<Courtyard>();
@@ -195,18 +207,11 @@ public class HideSteeringBehavior : SteeringBehavior
         InitNavigationAgent();
     }
 
-    private void OnRecalculationPathTimerTimeout(object sender, ElapsedEventArgs e)
-    {
-        _pathRecalculationCooldownActive = false;
-    }
-
-    private void StartPathRecalculationTimer()
-    {
-        _pathRecalculationTimer.Stop();
-        _pathRecalculationTimer.Start();
-        _pathRecalculationCooldownActive = true;
-    }
-
+    /// <summary>
+    /// Configures and initializes the RaySensor component for detecting threats and
+    /// obstacles by setting up the appropriate layer masks and parameters. Ensures that
+    /// colliders overlapping the start point of the raycast are ignored.
+    /// </summary>
     private void InitRayCast()
     {
         if (rayCastToThreat == null) return;
@@ -215,6 +220,10 @@ public class HideSteeringBehavior : SteeringBehavior
         rayCastToThreat.IgnoreCollidersOverlappingStartPoint = true;
     }
 
+    /// <summary>
+    /// Initializes and configures the hiding point detector component essential for
+    /// identifying optimal hiding positions in the environment. 
+    /// </summary>
     private void InitHidingPointDetector()
     {
         if (Threat != null) hidingPointsDetector.Threat = Threat.gameObject;
@@ -227,6 +236,13 @@ public class HideSteeringBehavior : SteeringBehavior
         hidingPointsDetector.InnerRayStep = innerRayStep;
     }
 
+    /// <summary>
+    /// Initializes and configures the navigation agent used for pathfinding behaviors.
+    /// Assigns the hiding point marker as the target for the navigation component and
+    /// sets the agent's movement radius based on its defined parameters. This method
+    /// prepares the pathfinding system for use in guiding the agent towards an optimal
+    /// hiding position relative to a threat.
+    /// </summary>
     private void InitNavigationAgent()
     {
         meshPathFinderSteeringBehavior.Target = _hidingPointMarker;
@@ -249,8 +265,7 @@ public class HideSteeringBehavior : SteeringBehavior
         }
         _previousThreatPosition = Threat.transform.position;
         
-        // Look for a new hiding point if the threat can see us and has just moved, or
-        // if it is threat-first position (only once).
+        // Look for a new hiding point if the threat can see us and has just moved.
         if (_threatCanSeeUs && _hidingPointRecheckNeeded && 
             !_pathRecalculationCooldownActive) 
         {   // Search for the nearest hiding point.
@@ -289,9 +304,16 @@ public class HideSteeringBehavior : SteeringBehavior
             // If we don't need to hide, then return zero.
             return SteeringOutput.zero;
         }
+
         return meshPathFinderSteeringBehavior.GetSteering(args);
     }
 
+    /// <summary>
+    /// Determines whether the threat can see the agent by utilizing a RaySensor to detect
+    /// potential line of sight between the agent and the threat. Updates the internal
+    /// state to reflect whether the threat has a direct visual on the agent based on
+    /// the detection results.
+    /// </summary>
     private void CheckThreatVisibility()
     {
         rayCastToThreat.GlobalEndPosition = Threat.transform.position;
@@ -304,6 +326,18 @@ public class HideSteeringBehavior : SteeringBehavior
         {
             _threatCanSeeUs = false;
         }
+    }
+
+    /// <summary>
+    /// Activates and resets the timer used to manage the cooldown period for path
+    /// recalculation. Marks the path recalculation as temporarily inactive during the
+    /// cooldown to prevent repeated recalculations until the timer completes.
+    /// </summary>
+    private void StartPathRecalculationTimer()
+    {
+        _pathRecalculationTimer.Stop();
+        _pathRecalculationTimer.Start();
+        _pathRecalculationCooldownActive = true;
     }
 }
 }

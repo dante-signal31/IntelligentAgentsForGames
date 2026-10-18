@@ -56,17 +56,16 @@ public class FleeSteeringBehavior : SteeringBehavior
                 Threat.transform.position) > PanicDistance)
         { // Out of panic distance, so we stop fleeing.
             return new SteeringOutput(Vector2.zero);
-        }
-        else
-        {   // Threat inside panic distance, so run in the opposite direction seek
-            // would advise. 
-            SteeringOutput approachSteeringOutput = 
-                seekSteeringBehaviour.GetSteering(args);
-            SteeringOutput fleeSteeringOutput = new SteeringOutput(
-                -approachSteeringOutput.Linear
-            );
-            return fleeSteeringOutput;
-        }
+        } 
+        
+        // Threat inside panic distance, so run in the opposite direction seek
+        // advice. 
+        SteeringOutput approachSteeringOutput = 
+            seekSteeringBehaviour.GetSteering(args);
+        SteeringOutput fleeSteeringOutput = new SteeringOutput(
+            -approachSteeringOutput.Linear
+        );
+        return fleeSteeringOutput;
     }
 }
 }

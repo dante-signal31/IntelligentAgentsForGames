@@ -1,15 +1,13 @@
-﻿using UnityEngine;
+﻿using PropertyAttribute;
+using UnityEngine;
 
 namespace SteeringBehaviors
 {
 /// <summary>
-/// <p>Component to offer an offset Follow steering behavior.</p>
-/// <p>Represents a steering behavior where an agent follows a target with an offset.
-/// The agent expects the target's position based on its current position,
-/// velocity, and a look-ahead time.</p>
+/// Represents a steering behavior where an entity follows a target at a specified
+/// offset position.
 /// </summary>
 public class OffsetFollowSteeringBehavior : SteeringBehavior, ITargeter, IGizmos
-
 {
 [Header("CONFIGURATION:")] 
 [Tooltip("Target to follow")] 
@@ -20,6 +18,7 @@ public class OffsetFollowSteeringBehavior : SteeringBehavior, ITargeter, IGizmos
 [Header("WIRING:")]
 [Tooltip("Steering behavior to actually move this agent. Must comply with " +
          "ITargeter interface.")]
+[InterfaceCompliant(typeof(ITargeter))]
 [SerializeField] private SteeringBehavior followSteeringBehavior;
 
 [Header("DEBUG:")] 

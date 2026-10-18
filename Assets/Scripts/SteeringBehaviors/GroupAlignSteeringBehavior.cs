@@ -52,7 +52,7 @@ public class GroupAlignSteeringBehavior: SteeringBehavior
         {
             decelerationRadius = value;
             if (alignSteeringBehavior != null)
-                alignSteeringBehavior.DecelerationRadius = value;
+                alignSteeringBehavior.DecelerationThreshold = value;
         }
     }
 
@@ -80,7 +80,7 @@ public class GroupAlignSteeringBehavior: SteeringBehavior
         {
             accelerationRadius = value;
             if (alignSteeringBehavior != null)
-                alignSteeringBehavior.AccelerationRadius = value;
+                alignSteeringBehavior.AccelerationThreshold = value;
         }
     }
 
@@ -109,8 +109,8 @@ public class GroupAlignSteeringBehavior: SteeringBehavior
     {
         _orientationMarker = new GameObject("OrientationMarker");
         alignSteeringBehavior.Target = _orientationMarker;
-        alignSteeringBehavior.AccelerationRadius = AccelerationRadius;
-        alignSteeringBehavior.DecelerationRadius = DecelerationRadius;
+        alignSteeringBehavior.AccelerationThreshold = AccelerationRadius;
+        alignSteeringBehavior.DecelerationThreshold = DecelerationRadius;
         alignSteeringBehavior.AccelerationCurve = AccelerationCurve;
         alignSteeringBehavior.DecelerationCurve = DecelerationCurve;
     }

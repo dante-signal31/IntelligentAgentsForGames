@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace SteeringBehaviors
 {
@@ -13,12 +14,14 @@ public class AlignSteeringBehavior : SteeringBehavior, ITargeter
     [Header("CONFIGURATION:")]
     [Tooltip("Target to align with.")]
     [SerializeField] private GameObject target;
+    [FormerlySerializedAs("decelerationRadius")]
     [Tooltip("Rotation to start to slow down (degrees).")]
-    [SerializeField] private float decelerationRadius;
+    [SerializeField] private float decelerationThreshold;
     [Tooltip("Deceleration curve.")] 
     [SerializeField] private AnimationCurve decelerationCurve;
+    [FormerlySerializedAs("accelerationRadius")]
     [Tooltip("At this rotation start angle will be at full speed (degrees).")]
-    [SerializeField] private float accelerationRadius;
+    [SerializeField] private float accelerationThreshold;
     [Tooltip("Acceleration curve.")] 
     [SerializeField] private AnimationCurve accelerationCurve;
 
@@ -34,10 +37,10 @@ public class AlignSteeringBehavior : SteeringBehavior, ITargeter
     /// <summary>
     /// Rotation to start to slow down (degrees).
     /// </summary>
-    public float DecelerationRadius
+    public float DecelerationThreshold
     {
-        get => decelerationRadius;
-        set => decelerationRadius = value;
+        get => decelerationThreshold;
+        set => decelerationThreshold = value;
     }
 
     /// <summary>
@@ -52,10 +55,10 @@ public class AlignSteeringBehavior : SteeringBehavior, ITargeter
     /// <summary>
     /// At this rotation the start angle will be at full speed (degrees).
     /// </summary>
-    public float AccelerationRadius
+    public float AccelerationThreshold
     {
-        get => accelerationRadius;
-        set => accelerationRadius = value;
+        get => accelerationThreshold;
+        set => accelerationThreshold = value;
     }
 
     /// <summary>
@@ -100,7 +103,7 @@ public class AlignSteeringBehavior : SteeringBehavior, ITargeter
         }
     
         if (toTargetRotationAbs >= arrivingMargin && 
-            _rotationFromStartAbs < AccelerationRadius)
+            _rotationFromStartAbs < AccelerationThreshold)
         {   // Acceleration phase.
             if (_idle)
             {
@@ -113,17 +116,17 @@ public class AlignSteeringBehavior : SteeringBehavior, ITargeter
             // start to move.
             float accelerationProgress = Mathf.InverseLerp(
                 0, 
-                AccelerationRadius, 
+                AccelerationThreshold, 
                 _rotationFromStartAbs);
             newRotationalSpeed = maximumRotationalSpeed * 
                                  accelerationCurve.Evaluate(accelerationProgress) * 
                                  rotationSide;
         }
-        else if (toTargetRotationAbs < DecelerationRadius && 
+        else if (toTargetRotationAbs < DecelerationThreshold && 
                  toTargetRotationAbs >= arrivingMargin)
         { // Deceleration phase.
             float decelerationProgress = Mathf.InverseLerp(
-                DecelerationRadius, 
+                DecelerationThreshold, 
                 0, 
                 toTargetRotationAbs);
             newRotationalSpeed = maximumRotationalSpeed * 

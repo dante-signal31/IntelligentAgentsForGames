@@ -15,10 +15,10 @@ public class ArriveSteeringBehaviorNLA : SteeringBehavior, ITargeter
     [Header("CONFIGURATION:")]
     [Tooltip("Point to arrive to.")]
     [SerializeField] private GameObject target;
-    [Tooltip("Radius to start slowing down using deceleration curve.")]
-    [SerializeField] private float brakingRadius;
     [Tooltip("At this distance from target, agent will full stop.")]
     [SerializeField] private float arrivalDistance;
+    [Tooltip("Radius to start slowing down using deceleration curve.")]
+    [SerializeField] private float brakingRadius;
     [Tooltip("Deceleration curve.")] 
     [SerializeField] private AnimationCurve decelerationCurve;
     [Tooltip("At this distance from start, agent will be at full speed, finishing its " +

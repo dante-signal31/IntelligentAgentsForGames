@@ -49,18 +49,18 @@ public class EvadeSteeringBehavior : SteeringBehavior
                 fleeSteeringBehaviour.PanicDistance = panicDistance;
         }
     }
-
+    
+    private void Start()
+    {
+        if (Threat != null) _targetColor = Threat.GetComponent<AgentColor>().Color;
+    }
+    
     private void Awake()
     {
         _predictedPositionMarker = new GameObject();
         fleeSteeringBehaviour.PanicDistance = PanicDistance;
         fleeSteeringBehaviour.Threat = _predictedPositionMarker;
         _agentColor = GetComponentInParent<AgentColor>().Color;
-    }
-
-    private void Start()
-    {
-        if (Threat != null) _targetColor = Threat.GetComponent<AgentColor>().Color;
     }
 
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)

@@ -156,31 +156,30 @@ public class PursuitSteeringBehavior : SteeringBehavior
             _predictedPositionMarker.transform.position = targetPosition;
             return seekSteeringBehaviour.GetSteering(args);
         }
-        else
-        {   // Target is not coming to us, so we must predict where it will be.
-            // The look-ahead time is proportional to the distance between the chased
-            // and the pursuer and is inversely proportional to the sum of the
-            // agent's velocities.
-            Vector2 currentPosition = args.Position;
-            float currentSpeed = args.CurrentVelocity.magnitude;
-            float targetSpeed = Target.Velocity.magnitude;
-            Vector3 targetVelocity = Target.Velocity;
-            float distanceToTarget = (targetPosition - currentPosition).magnitude;
-            float lookAheadTime = distanceToTarget / (currentSpeed + targetSpeed);
-
-            // Avoid divide-by-zero error when both agents are stationary.
-            if (float.IsInfinity(lookAheadTime)) return SteeringOutput.zero;
         
-            // Place the marker where we think the target will be at the look-ahead
-            // time.
-            _predictedPositionMarker.transform.position = (Vector3) targetPosition + 
-                (targetVelocity * lookAheadTime);
+        // Target is not coming to us, so we must predict where it will be.
+        // The look-ahead time is proportional to the distance between the chased
+        // and the pursuer and is inversely proportional to the sum of the
+        // agent's velocities.
+        Vector2 currentPosition = args.Position;
+        float currentSpeed = args.CurrentVelocity.magnitude;
+        float targetSpeed = Target.Velocity.magnitude;
+        Vector3 targetVelocity = Target.Velocity;
+        float distanceToTarget = (targetPosition - currentPosition).magnitude;
+        // Avoid divide-by-zero error when both agents are stationary.
+        if (Mathf.Approximately(currentSpeed + targetSpeed, 0)) 
+            return SteeringOutput.zero;
+        float lookAheadTime = distanceToTarget / (currentSpeed + targetSpeed);
         
-            // Let the seek steering behavior get to the new marker position.
-            seekSteeringBehaviour.Target = _predictedPositionMarker;
-        
-            return seekSteeringBehaviour.GetSteering(args);
-        }
+        // Place the marker where we think the target will be at the look-ahead
+        // time.
+        _predictedPositionMarker.transform.position = (Vector3) targetPosition + 
+            (targetVelocity * lookAheadTime);
+    
+        // Let the seek steering behavior get to the new marker position.
+        seekSteeringBehaviour.Target = _predictedPositionMarker;
+    
+        return seekSteeringBehaviour.GetSteering(args);
     }
 
 #if UNITY_EDITOR

@@ -5,6 +5,10 @@ using UnityEngine.Serialization;
 
 namespace Tools
 {
+/// <summary>
+/// Detects valid hiding points in the scene based on obstacles, ground features,
+/// and contextual parameters such as agent radius and separation requirements.
+/// </summary>
 public class HidingPointsDetector : MonoBehaviour
 {
     [Header("CONFIGURATION:")]
@@ -52,7 +56,7 @@ public class HidingPointsDetector : MonoBehaviour
     }
     
     /// <summary>
-    /// Obstacles positions in the level.
+    /// Obstacle positions in the level.
     /// </summary>
     public List<Vector2> ObstaclesPositions { get; set; }
     
@@ -194,7 +198,7 @@ public class HidingPointsDetector : MonoBehaviour
                                                rayDirection * innerAdvance;
                 if (IsCleanHidingPoint(candidateHidingPoint))
                 {
-                    // Candidate point zone is clean. We can place and agent there.
+                    // Candidate point zone is clean. We can place an agent there.
                     _afterCollisionRayEnds.Add((rayCollisionPoint, candidateHidingPoint));
                     HidingPoints.Add(candidateHidingPoint);
                     break;

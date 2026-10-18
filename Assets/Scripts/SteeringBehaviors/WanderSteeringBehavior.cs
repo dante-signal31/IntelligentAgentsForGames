@@ -103,8 +103,7 @@ public class WanderSteeringBehavior : SteeringBehavior
     
         // Place WanderPosition in a point constrained to the edge of a circle of
         // radius wanderRadius.
-        _wanderLocalPosition = GetRandomCircumferencePoint(Vector2.zero, 
-            wanderRadius);
+        _wanderLocalPosition = GetRandomCircumferencePoint(Vector2.zero, wanderRadius);
     }
 
     private void Start()
