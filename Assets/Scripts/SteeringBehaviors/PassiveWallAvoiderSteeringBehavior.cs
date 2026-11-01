@@ -95,25 +95,6 @@ public class PassiveWallAvoiderSteeringBehavior : SteeringBehavior, IGizmos
         _obstacleDetected = false;
     }
     
-    /// <summary>
-    /// Determines the relative orientation of a given position with respect to the
-    /// current agent.
-    /// </summary>
-    /// <param name="position">The position to evaluate relative to the agent.</param>
-    /// <returns>A value of <see cref="RelativeOrientation"/> indicating whether the
-    /// position is to the left, right, or in front of the agent.</returns>
-    private RelativeOrientation GetRelativeOrientation(Vector2 position)
-    {
-        Vector2 relativePosition = position - (Vector2) _agentMover.transform.position;
-        float crossProduct = Vector3.Cross(
-            _agentMover.Forward, 
-            relativePosition.normalized).z;
-        if (Mathf.Abs(crossProduct) < longitudinalTolerance)
-            return RelativeOrientation.Front;
-        if (crossProduct < 0) return RelativeOrientation.Right;
-        return RelativeOrientation.Left;
-    }
-    
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
         // If no obstacle detected, then this behavior has nothing to say.
@@ -123,7 +104,7 @@ public class PassiveWallAvoiderSteeringBehavior : SteeringBehavior, IGizmos
             return _currentSteering;
         }
         
-        // Millington algorithm: head to a point way from the obstacle. This point is
+        // Millington algorithm: head to a point away from the obstacle. This point is
         // defined by _avoidVector, using as the base the closest point detected by the
         // sensor.
         _avoidVector = GetAvoidVector(args);
@@ -141,103 +122,88 @@ public class PassiveWallAvoiderSteeringBehavior : SteeringBehavior, IGizmos
     {
         Vector2 avoidVector = Vector2.zero;
         
-        if (_obstacleDetected)
+        if (!_obstacleDetected) return avoidVector;
+        
+        ClosestHitData closestHitData = GetClosestHit(args);
+        _closestHit = closestHitData.hit;
+        
+        // Calculated how much the detecting sensor penetrated into the detected
+        // obstacle.
+        float overShootFactor = GetOverShootFactor(
+            closestHitData.detectionSensorIndex, 
+            closestHitData.distance);
+
+        // Millington calculates avoidVector this way, but It is 
+        // troublesome when the avoid-vector is longitudinal to the
+        // current heading, because then avoidVector will stop the agent not make it
+        // evade the wall. So, an additional lateral push must be added to the
+        // avoidVector. That lateral push is added later in this method.
+        avoidVector = _closestHit.normal * 
+                      (args.MaximumSpeed * overShootFactor + avoidDistance);
+        
+        Vector2 normalizedInverseAvoidVector = -avoidVector.normalized;
+        Vector2 normalizedHeading = args.CurrentVelocity == Vector2.zero? 
+            _agentMover.Forward: 
+            args.CurrentVelocity.normalized;
+        // How much is the avoidVector longitudinal to the current heading? The
+        // greater longitudinalDisplacement, the bigger the difference between
+        // avoidVector and currentVelocity.
+        float longitudinalDisplacement = 1 -
+                                         Vector2.Dot(
+                                             normalizedInverseAvoidVector,
+                                             normalizedHeading);
+
+        // If avoidVector and CurrentVelocity are too aligned (avoidVector is
+        // longitudinal to current heading), then we must add
+        // a lateral push to avoid the obstacle.
+        // avoidVector and currentVelocity are too aligned in two edge cases:
+        // - When the agent approaches to a wall perpendicular to its heading.
+        // - When one of the lateral sensors touches the end of a wall that is 
+        // perpendicular to the agent heading.
+        if (longitudinalDisplacement < longitudinalTolerance)
         {
-            ClosestHitData closestHitData = GetClosestHit(args);
-            _closestHit = closestHitData.hit;
-            
-            // Calculated how much the detecting sensor penetrated into the detected
-            // obstacle.
-            float overShootFactor = GetOverShootFactor(
-                closestHitData.detectionSensorIndex, 
-                closestHitData.distance);
+            // Calculate the right vector relative to our current Forward vector.
+            //
+            // TIP --------------------------
+            // I could have done:
+            // Vector2 rightVector = Quaternion.Euler(0, 0, 90f) *
+            //      _agentMover.Forward;
+            // 
+            // But when you are rotating exactly 90 degrees is more performant just
+            // inverting the components.
+            // To rotate counterclockwise:
+            // Vector2 leftVector = new Vector2(-_currentAgent.Forward.y,
+            //       _currentAgent.Forward.x);
+            // To rotate clockwise:
+            // Vector2 rightVector = new Vector2(_currentAgent.Forward.y,
+            //       -_currentAgent.Forward.x);
+            Vector2 rightVector = new Vector2(
+                _agentMover.Forward.y,
+                -_agentMover.Forward.x);
 
-            // Millington calculates avoidVector this way, but It is 
-            // troublesome when the avoid-vector is longitudinal to the
-            // current heading, because then avoidVector will stop the agent not make it
-            // evade the wall. So, an additional lateral push must be added to the
-            // avoidVector. That lateral push is added later in this method.
-            avoidVector = _closestHit.normal * 
-                          (args.MaximumSpeed * overShootFactor + avoidDistance);
-            
-            Vector2 normalizedInverseAvoidVector = -avoidVector.normalized;
-            Vector2 normalizedHeading = args.CurrentVelocity == Vector2.zero? 
-                _agentMover.Forward: 
-                args.CurrentVelocity.normalized;
-            // How much is the avoidVector longitudinal to the current heading? The
-            // greater longitudinalDisplacement, the bigger the difference between
-            // avoidVector and currentVelocity.
-            float longitudinalDisplacement = 1 -
-                                             Vector2.Dot(
-                                                 normalizedInverseAvoidVector,
-                                                 normalizedHeading);
-
-            // If avoidVector and CurrentVelocity are too aligned (avoidVector is
-            // longitudinal to current heading), then we must add
-            // a lateral push to avoid the obstacle.
-            // avoidVector and currentVelocity are too aligned in two edge cases:
-            // - When the agent approaches to a wall perpendicular to its heading.
-            // - When one of the lateral sensors touches the end of a wall that is 
-            // perpendicular to the agent heading.
-            if (longitudinalDisplacement < longitudinalTolerance)
+            // The detected obstacle is on the left or right side of the agent?
+            switch (GetRelativeOrientation(_closestHit.point))
             {
-                // Calculate the right vector relative to our current Forward vector.
-                //
-                // TIP --------------------------
-                // I could have done:
-                // Vector2 rightVector = Quaternion.Euler(0, 0, 90f) * _agentMover.Forward;
-                // 
-                // But when you are rotating exactly 90 degrees is more performant just
-                // inverting the components.
-                // To rotate counterclockwise:
-                // Vector2 leftVector = new Vector2(-_currentAgent.Forward.y, _currentAgent.Forward.x);
-                // To rotate clockwise:
-                // Vector2 rightVector = new Vector2(_currentAgent.Forward.y, -_currentAgent.Forward.x);
-                Vector2 rightVector = new Vector2(
-                    _agentMover.Forward.y,
-                    -_agentMover.Forward.x);
-                
-                // The detected obstacle is on the left or right side of the agent?
-                switch (GetRelativeOrientation(_closestHit.point))
-                {
-                    // If obstacle on the left, evade to the right.
-                    case RelativeOrientation.Left: 
-                        avoidVector = avoidVector.magnitude * rightVector;
-                        break;
-                    // If obstacle on the right, evade to the left.
-                    case RelativeOrientation.Right: 
-                        avoidVector = rightVector * (avoidVector.magnitude * -1);
-                        break;
-                    // If obstacle on the front, evade to the right or left.
-                    case RelativeOrientation.Front: 
-                        float pushDirection = Random.value < 0.5f ? 1 : -1;
-                        avoidVector = rightVector * 
-                                      (avoidVector.magnitude * pushDirection);
-                        break;
-                }
+                // If obstacle on the left, evade to the right.
+                case RelativeOrientation.Left:
+                    avoidVector = avoidVector.magnitude * rightVector;
+                    break;
+                // If obstacle on the right, evade to the left.
+                case RelativeOrientation.Right:
+                    avoidVector = rightVector * (avoidVector.magnitude * -1);
+                    break;
+                // If obstacle on the front, evade to the right or left.
+                case RelativeOrientation.Front:
+                    float pushDirection = Random.value < 0.5f ? 1 : -1;
+                    avoidVector = rightVector *
+                                  (avoidVector.magnitude * pushDirection);
+                    break;
             }
         }
+        
         return avoidVector;
     }
     
-    /// <summary>
-    /// Calculates the overshoot factor based on the sensor index and the
-    /// closest distance.
-    /// </summary>
-    /// <param name="sensorIndex">The index of the sensor used in the calculation.
-    /// </param>
-    /// <param name="closestDistance">The distance to the closest object detected
-    /// by the sensor.</param>
-    /// <returns> A normalized value representing the overshoot factor, ranging
-    /// from 0 to 1.</returns>
-    private float GetOverShootFactor(int sensorIndex, float closestDistance)
-    {
-        float sensorLength = whiskersSensor.GetSensorLength(sensorIndex);
-        float overShoot = sensorLength - closestDistance;
-        float overShootFactor = Mathf.InverseLerp(0, sensorLength, overShoot);
-        return overShootFactor;
-    }
-
     /// <summary>
     /// Get the closest hit data.
     /// </summary>
@@ -264,6 +230,43 @@ public class PassiveWallAvoiderSteeringBehavior : SteeringBehavior, IGizmos
         }
 
         return closestHit;
+    }
+    
+    /// <summary>
+    /// Calculates the overshoot factor based on the sensor index and the
+    /// closest distance.
+    /// </summary>
+    /// <param name="sensorIndex">The index of the sensor used in the calculation.
+    /// </param>
+    /// <param name="closestDistance">The distance to the closest object detected
+    /// by the sensor.</param>
+    /// <returns> A normalized value representing the overshoot factor, ranging
+    /// from 0 to 1.</returns>
+    private float GetOverShootFactor(int sensorIndex, float closestDistance)
+    {
+        float sensorLength = whiskersSensor.GetSensorLength(sensorIndex);
+        float overShoot = sensorLength - closestDistance;
+        float overShootFactor = Mathf.InverseLerp(0, sensorLength, overShoot);
+        return overShootFactor;
+    }
+    
+    /// <summary>
+    /// Determines the relative orientation of a given position with respect to the
+    /// current agent.
+    /// </summary>
+    /// <param name="position">The position to evaluate relative to the agent.</param>
+    /// <returns>A value of <see cref="RelativeOrientation"/> indicating whether the
+    /// position is to the left, right, or in front of the agent.</returns>
+    private RelativeOrientation GetRelativeOrientation(Vector2 position)
+    {
+        Vector2 relativePosition = position - (Vector2) _agentMover.transform.position;
+        float crossProduct = Vector3.Cross(
+            _agentMover.Forward, 
+            relativePosition.normalized).z;
+        if (Mathf.Abs(crossProduct) < longitudinalTolerance)
+            return RelativeOrientation.Front;
+        if (crossProduct < 0) return RelativeOrientation.Right;
+        return RelativeOrientation.Left;
     }
     
 #if UNITY_EDITOR

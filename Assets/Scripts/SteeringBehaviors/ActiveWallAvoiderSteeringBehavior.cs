@@ -1,5 +1,4 @@
-﻿
-using System.Timers;
+﻿using System.Timers;
 using PropertyAttribute;
 using UnityEngine;
 
@@ -58,8 +57,8 @@ public class ActiveWallAvoiderSteeringBehavior : SteeringBehavior, ITargeter, IG
     private Timer _avoidanceTimer;
     private bool _waitingForAvoidanceTimeout;
     private SteeringOutput _currentSteering;
-    private SteeringOutput toTargetSteering;
-    private SteeringOutput avoidingSteering;
+    private SteeringOutput _toTargetSteering;
+    private SteeringOutput _avoidingSteering;
     
     private void Start()
     {
@@ -98,22 +97,22 @@ public class ActiveWallAvoiderSteeringBehavior : SteeringBehavior, ITargeter, IG
         if (_waitingForAvoidanceTimeout) return _currentSteering;
         
         // Get steering to target.
-        toTargetSteering = steeringBehavior.GetSteering(args);
+        _toTargetSteering = steeringBehavior.GetSteering(args);
 
         // Get avoid vector.
-        avoidingSteering = passiveWallAvoiderSteeringBehavior.GetSteering(args);
+        _avoidingSteering = passiveWallAvoiderSteeringBehavior.GetSteering(args);
         
         // No need to avoid anything? Then just go to the target.
-        if (avoidingSteering == SteeringOutput.zero)
+        if (_avoidingSteering == SteeringOutput.zero)
         {
-            _currentSteering = toTargetSteering;
+            _currentSteering = _toTargetSteering;
         }
         // If we need to avoid an obstacle, then return the avoiding steering.
         else
         {
             // Start timer to give time to the agent to avoid the obstacle.
             StartAvoidanceTimer();
-            _currentSteering = avoidingSteering;
+            _currentSteering = _avoidingSteering;
         }
         
         return _currentSteering;
@@ -125,20 +124,20 @@ public class ActiveWallAvoiderSteeringBehavior : SteeringBehavior, ITargeter, IG
         if (!showGizmos) return;
         if (_currentSteering == null) return;
         
-        if (avoidingSteering.IsLinearSet)
+        if (_avoidingSteering.IsLinearSet)
         {
             Gizmos.color = gizmosColor;
             Gizmos.DrawLine(
                 transform.position, 
-                (Vector2) transform.position + avoidingSteering.Linear);
+                (Vector2) transform.position + _avoidingSteering.Linear);
         }
 
-        if (toTargetSteering.IsLinearSet)
+        if (_toTargetSteering.IsLinearSet)
         {
             Gizmos.color = Color.beige;
             Gizmos.DrawLine(
                 transform.position, 
-                (Vector2) transform.position + toTargetSteering.Linear);
+                (Vector2) transform.position + _toTargetSteering.Linear);
         }
 
         if (_currentSteering.IsLinearSet)

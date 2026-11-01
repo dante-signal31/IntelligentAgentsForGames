@@ -1,5 +1,4 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Tools;
 using UnityEngine;
 
@@ -50,8 +49,8 @@ public class InterestWhiskers : MonoBehaviour
                 .normalized;
             _interests[index] = 
                 Mathf.Max(0, Vector2.Dot(
-                    normalizedInterestWhisker,
-                    idealVelocity));
+                    idealVelocity,
+                    normalizedInterestWhisker));
             index++;
         }
     }
