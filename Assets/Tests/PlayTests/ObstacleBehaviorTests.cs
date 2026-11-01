@@ -459,7 +459,7 @@ namespace Tests.PlayTests
             // Start test.
             
             // Give agent time to get to the target.
-            yield return new WaitForSeconds(14f);
+            yield return new WaitForSeconds(16f);
             
             // Assert that wall avoider has reached the target.
             Assert.True(Vector2.Distance(

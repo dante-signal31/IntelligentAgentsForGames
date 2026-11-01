@@ -85,15 +85,13 @@ public class MeshPathFinderSteeringBehavior : SteeringBehavior, IGizmos, ITarget
     /// </summary>
     public Path CurrentPath { get; private set; }
     
-    private void UpdatePath(Vector2 newTargetPosition)
+    public void UpdatePath(Vector2 newTargetPosition)
     {
         PathData newPath = meshPathFinder.FindPath(newTargetPosition);
         if (newPath == null) return;
         CurrentPath.UpdatePathData(newPath);
     }
     
-    
-
     private void Awake()
     {
         // Create a GameObject at the scene root to include the new path instance in

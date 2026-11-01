@@ -287,6 +287,7 @@ public class HideSteeringBehavior : SteeringBehavior
                     }
                 }
                 HidingPoint = nearestHidingPoint;
+                meshPathFinderSteeringBehavior.UpdatePath(nearestHidingPoint);
                 _hidingPointReached = false;
                 _hidingPointRecheckNeeded = false;
             }
