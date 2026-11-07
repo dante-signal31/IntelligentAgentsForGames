@@ -1772,7 +1772,7 @@ namespace Tests.PlayTests
             var agentAvoiderBehavior = _annAgentAvoiderGameObject
                 .GetComponentInChildren<ActiveAgentAvoiderSteeringBehavior>();
             var annAgentAvoiderSteeringBehavior = _annAgentAvoiderGameObject
-                .GetComponentInChildren<AnnPassiveAgentAvoiderBehavior>();
+                .GetComponentInChildren<ANNPassiveAgentAvoiderBehavior>();
             var circleSensor =
                 _annAgentAvoiderGameObject.GetComponentInChildren<CircleSensor>();
 
@@ -1843,7 +1843,7 @@ namespace Tests.PlayTests
             var agentAvoiderBehavior = _annAgentAvoiderGameObject
                 .GetComponentInChildren<ActiveAgentAvoiderSteeringBehavior>();
             var annAgentAvoiderSteeringBehavior = _annAgentAvoiderGameObject
-                .GetComponentInChildren<AnnPassiveAgentAvoiderBehavior>();
+                .GetComponentInChildren<ANNPassiveAgentAvoiderBehavior>();
             var circleSensor =
                 _annAgentAvoiderGameObject.GetComponentInChildren<CircleSensor>();
 
@@ -1914,7 +1914,7 @@ namespace Tests.PlayTests
             var agentAvoiderBehavior = _annAgentAvoiderGameObject
                 .GetComponentInChildren<ActiveAgentAvoiderSteeringBehavior>();
             var annAgentAvoiderSteeringBehavior = _annAgentAvoiderGameObject
-                .GetComponentInChildren<AnnPassiveAgentAvoiderBehavior>();
+                .GetComponentInChildren<ANNPassiveAgentAvoiderBehavior>();
             var circleSensor =
                 _annAgentAvoiderGameObject.GetComponentInChildren<CircleSensor>();
 
@@ -1985,7 +1985,7 @@ namespace Tests.PlayTests
             var agentAvoiderBehavior = _annAgentAvoiderGameObject
                 .GetComponentInChildren<ActiveAgentAvoiderSteeringBehavior>();
             var annAgentAvoiderSteeringBehavior = _annAgentAvoiderGameObject
-                .GetComponentInChildren<AnnPassiveAgentAvoiderBehavior>();
+                .GetComponentInChildren<ANNPassiveAgentAvoiderBehavior>();
             var circleSensor =
                 _annAgentAvoiderGameObject.GetComponentInChildren<CircleSensor>();
 
@@ -2057,7 +2057,7 @@ namespace Tests.PlayTests
             var agentAvoiderBehavior = _annAgentAvoiderGameObject
                 .GetComponentInChildren<ActiveAgentAvoiderSteeringBehavior>();
             var annAgentAvoiderSteeringBehavior = _annAgentAvoiderGameObject
-                .GetComponentInChildren<AnnPassiveAgentAvoiderBehavior>();
+                .GetComponentInChildren<ANNPassiveAgentAvoiderBehavior>();
             var circleSensor =
                 _annAgentAvoiderGameObject.GetComponentInChildren<CircleSensor>();
 
@@ -2140,7 +2140,7 @@ namespace Tests.PlayTests
             var agentAvoiderSeekSteeringBehavior = _annAgentAvoiderGameObject
                 .GetComponentInChildren<SeekSteeringBehavior>();
             var annAgentAvoiderSteeringBehavior = _annAgentAvoiderGameObject
-                .GetComponentInChildren<AnnPassiveAgentAvoiderBehavior>();
+                .GetComponentInChildren<ANNPassiveAgentAvoiderBehavior>();
             var circleSensor =
                 _annAgentAvoiderGameObject.GetComponentInChildren<CircleSensor>();
 

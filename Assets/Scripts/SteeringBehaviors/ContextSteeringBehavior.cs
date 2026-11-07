@@ -184,7 +184,7 @@ public class ContextSteeringBehavior : SteeringBehavior
             _filteredDetectionMask, 
             centerBitIndex, 
             _filteredDetectionMask.Count);
-
+        
         if (leftTrues > rightTrues)
         {
             SetRangeToTrue(_filteredDetectionMask, 0, centerBitIndex);

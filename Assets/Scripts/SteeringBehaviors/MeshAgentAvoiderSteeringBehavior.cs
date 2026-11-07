@@ -110,8 +110,9 @@ public class MeshAgentAvoiderSteeringBehavior: SteeringBehavior
             // Here I use NavMesh.Raycast to get one projection point in the navMesh
             // boundary. Another option could be to use navMesh.SamplePosition to get the
             // point in the navMesh nearest to the far away point. I tried it, but I
-            // wasn't to make it work. I don't know why, but the projection point always
-            // ended in a corner of the navMesh. The Raycast approach worked through.
+            // wasn't able to make it work. I don't know why, but the projection point
+            // always ended in a corner of the navMesh. Instead, the Raycast approach
+            // worked well.
             if (NavMesh.Raycast(
                     transform.position, 
                     farPoint, 
@@ -127,7 +128,23 @@ public class MeshAgentAvoiderSteeringBehavior: SteeringBehavior
             _lastRequestedDirection = _velocityToTarget;
         }
     }
+    
+    public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
+    {
+        SteeringOutput steeringOutputToTarget = steeringToTarget.GetSteering(args);
+        // Ideal velocity to get the target. It would be the one to use if there was no
+        // risk of collision.
+        _velocityToTarget = steeringOutputToTarget.Linear;
+        // Current velocity of the agent. Previous to decide the next velocity.
+        _currentVelocity = args.CurrentVelocity;
 
+        CalculateAvoidanceVector();
+
+        _newVelocity = steeringOutputToTarget.Linear + _avoidVector;
+        
+        return new SteeringOutput(_newVelocity, steeringOutputToTarget.Angular);
+    }
+    
     /// <summary>
     /// Calculates the avoidance vector for a NavMeshAgent. This vector is used to adjust
     /// the agent's movement to avoid potential collisions with other agents or obstacles
@@ -155,22 +172,6 @@ public class MeshAgentAvoiderSteeringBehavior: SteeringBehavior
             // that difference is negligible.
             (Vector2)navMeshAgent.desiredVelocity - _lastRequestedDirection:
             Vector2.zero;
-    }
-
-    public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
-    {
-        SteeringOutput steeringOutputToTarget = steeringToTarget.GetSteering(args);
-        // Ideal velocity to get the target. It would be the one to use if there was no
-        // risk of collision.
-        _velocityToTarget = steeringOutputToTarget.Linear;
-        // Current velocity of the agent. Previous to decide the next velocity.
-        _currentVelocity = args.CurrentVelocity;
-
-        CalculateAvoidanceVector();
-
-        _newVelocity = steeringOutputToTarget.Linear + _avoidVector;
-        
-        return new SteeringOutput(_newVelocity, steeringOutputToTarget.Angular);
     }
 
 #if UNITY_EDITOR

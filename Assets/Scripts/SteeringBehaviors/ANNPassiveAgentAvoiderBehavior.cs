@@ -15,7 +15,7 @@ namespace SteeringBehaviors
 /// <p>The difference with an obstacle avoidance algorithm is that obstacles don't move
 /// while agents do.</p>
 /// </summary>
-public class AnnPassiveAgentAvoiderBehavior : SteeringBehavior
+public class ANNPassiveAgentAvoiderBehavior : SteeringBehavior
 {
     [Header("CONFIGURATION:")] 
     [Tooltip("Maximum approach allowable between agents.")]
@@ -98,7 +98,7 @@ public class AnnPassiveAgentAvoiderBehavior : SteeringBehavior
         // two agents are approaching in opposite directions.
         float alignmentFactor = Mathf.Abs(
             Vector2.Dot(evasionVector,currentAgent.Velocity.normalized)); 
-        if (Mathf.Abs(alignmentFactor) >= tooAlignedFactor)
+        if (alignmentFactor >= tooAlignedFactor)
         {
             // If relative velocity is too aligned with evasionVector, then it means
             // we can end in a direct hit, so we try an evasion vector that is

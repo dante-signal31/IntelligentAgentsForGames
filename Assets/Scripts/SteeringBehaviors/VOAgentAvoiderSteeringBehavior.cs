@@ -223,6 +223,7 @@ public class VOAgentAvoiderSteeringBehavior: SteeringBehavior
         return penalty;
     }
 
+#if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         if (!showGizmos) return;
@@ -254,5 +255,6 @@ public class VOAgentAvoiderSteeringBehavior: SteeringBehavior
             transform.position, 
             transform.position + (Vector3) coneSide2 * _currentMaximumSpeed);
     }
+#endif
 }
 }

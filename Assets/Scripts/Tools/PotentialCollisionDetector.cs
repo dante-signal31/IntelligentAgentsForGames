@@ -90,7 +90,7 @@ public class PotentialCollisionDetector : MonoBehaviour
     
     private AgentMover _currentAgent;
     private readonly HashSet<AgentMover> _detectedAgents = new();
-    private ISensor sensor;
+    private ISensor _sensor;
 
     /// <summary>
     /// Event handler to use when another agent enters our detection area.
@@ -181,15 +181,76 @@ public class PotentialCollisionDetector : MonoBehaviour
     private List<AgentMover> GetDetectedAgents()
     {
         return new List<AgentMover>(
-            sensor.DetectedObjects.Where(x => 
+            _sensor.DetectedObjects.Where(x => 
                     x.GetComponent<AgentMover>() != null && 
                     // Don't take in count our own agent.
                     (x.GetComponent<AgentMover>()).name != _currentAgent.name)
                 .Select(x => x.GetComponent<AgentMover>())
                 .ToArray());
     }
+    
+    private void Awake()
+    {
+        _currentAgent = GetComponentInParent<AgentMover>();
+        CollisionDistance = 2 * agentRadius;
+    }
 
+    private void Start()
+    {
+        _sensor = (ISensor) iSensor;
+    }
 
+    private void FixedUpdate()
+    {
+        PotentialCollisionDetected = false;
+        if (_detectedAgents.Count == 0) return;
+
+        
+        float shortestTimeToCollision = float.MaxValue;
+        Vector2 relativePositionAtPotentialCollision = Vector2.zero;
+        float minSeparationAtClosestCollisionCandidate = float.MaxValue;
+        AgentMover closestCollidingAgentCandidate = null;
+        Vector2 currentRelativePositionToPotentialCollisionAgent = Vector2.zero;
+        Vector2 currentRelativeVelocityToPotentialCollisionAgent = Vector2.zero;
+
+        foreach (AgentMover target in _detectedAgents)
+        {
+            // If it isn't going to happen with that target, then continue to the next
+            // target.
+            if (!IsGoingToHappenACollision(
+                    target, 
+                    _currentAgent.Velocity,
+                    CollisionDistance,
+                    out var relativePosition, 
+                    out var relativeVelocity, 
+                    out var timeToClosestPosition, 
+                    out var minRelativePosition, 
+                    out var minSeparation)) continue;
+            
+            // OK, we have a candidate potential collision, but is it the nearest?
+            if (timeToClosestPosition < shortestTimeToCollision)
+            {
+                shortestTimeToCollision = timeToClosestPosition;
+                closestCollidingAgentCandidate = target;
+                relativePositionAtPotentialCollision = minRelativePosition;
+                minSeparationAtClosestCollisionCandidate = minSeparation;
+                currentRelativePositionToPotentialCollisionAgent = relativePosition;
+                currentRelativeVelocityToPotentialCollisionAgent = relativeVelocity;
+            }
+        }
+        
+        // Offer data of the current nearest agent collision candidate.
+        TimeToPotentialCollision = shortestTimeToCollision;
+        RelativePositionAtPotentialCollision = relativePositionAtPotentialCollision;
+        SeparationAtPotentialCollision = minSeparationAtClosestCollisionCandidate;
+        PotentialCollisionAgent = closestCollidingAgentCandidate;
+        CurrentRelativePositionToPotentialCollisionAgent = 
+            currentRelativePositionToPotentialCollisionAgent;
+        CurrentRelativeVelocityToPotentialCollisionAgent = 
+            currentRelativeVelocityToPotentialCollisionAgent;
+        PotentialCollisionDetected = PotentialCollisionAgent != null;
+    }
+    
     /// <summary>
     /// Determines whether a collision is likely to occur between the current agent and
     /// a target agent based on their velocities and positions.
@@ -259,73 +320,10 @@ public class PotentialCollisionDetector : MonoBehaviour
             return false;
         }
         
-        // If timeToClosestPosition is 0, then the two agents
         // If minSeparation is greater than _collisionDistance, then we have no
         // collision at all, so we assess the next target.
         if (minSeparation > collisionDistance) return false;
         return true;
-    }
-
-    private void Awake()
-    {
-        _currentAgent = GetComponentInParent<AgentMover>();
-        CollisionDistance = 2 * agentRadius;
-    }
-
-    private void Start()
-    {
-        sensor = (ISensor) iSensor;
-    }
-
-    private void FixedUpdate()
-    {
-        PotentialCollisionDetected = false;
-        if (_detectedAgents.Count == 0) return;
-
-        
-        float shortestTimeToCollision = float.MaxValue;
-        Vector2 relativePositionAtPotentialCollision = Vector2.zero;
-        float minSeparationAtClosestCollisionCandidate = float.MaxValue;
-        AgentMover closestCollidingAgentCandidate = null;
-        Vector2 currentRelativePositionToPotentialCollisionAgent = Vector2.zero;
-        Vector2 currentRelativeVelocityToPotentialCollisionAgent = Vector2.zero;
-
-        foreach (AgentMover target in _detectedAgents)
-        {
-            // If it isn't going to happen with that target, then continue to the next
-            // target.
-            if (!IsGoingToHappenACollision(
-                    target, 
-                    _currentAgent.Velocity,
-                    CollisionDistance,
-                    out var relativePosition, 
-                    out var relativeVelocity, 
-                    out var timeToClosestPosition, 
-                    out var minRelativePosition, 
-                    out var minSeparation)) continue;
-            
-            // OK, we have a candidate potential collision, but is it the nearest?
-            if (timeToClosestPosition < shortestTimeToCollision)
-            {
-                shortestTimeToCollision = timeToClosestPosition;
-                closestCollidingAgentCandidate = target;
-                relativePositionAtPotentialCollision = minRelativePosition;
-                minSeparationAtClosestCollisionCandidate = minSeparation;
-                currentRelativePositionToPotentialCollisionAgent = relativePosition;
-                currentRelativeVelocityToPotentialCollisionAgent = relativeVelocity;
-            }
-        }
-        
-        // Offer data of the current nearest agent collision candidate.
-        TimeToPotentialCollision = shortestTimeToCollision;
-        RelativePositionAtPotentialCollision = relativePositionAtPotentialCollision;
-        SeparationAtPotentialCollision = minSeparationAtClosestCollisionCandidate;
-        PotentialCollisionAgent = closestCollidingAgentCandidate;
-        CurrentRelativePositionToPotentialCollisionAgent = 
-            currentRelativePositionToPotentialCollisionAgent;
-        CurrentRelativeVelocityToPotentialCollisionAgent = 
-            currentRelativeVelocityToPotentialCollisionAgent;
-        PotentialCollisionDetected = PotentialCollisionAgent != null;
     }
 }
 }
