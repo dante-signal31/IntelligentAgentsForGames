@@ -1570,7 +1570,7 @@ MonoBehaviour:
   m_OverrideArea: 1
   m_Area: 0
   m_IgnoreFromBuild: 0
-  m_AffectedAgents: ffffffff
+  m_AffectedAgents: ffffffffi
 --- !u!1001 &77024405
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2627,7 +2627,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8146274523747296459, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
       propertyPath: autoSmooth
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8146274523747296459, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
       propertyPath: maximumSpeed
@@ -2635,7 +2635,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8146274523747296459, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
       propertyPath: smoothingMethod
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8146274523747296459, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
       propertyPath: autoSmoothSamples
@@ -2644,6 +2644,78 @@ PrefabInstance:
     - target: {fileID: 8146274523747296459, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
       propertyPath: exponentialConvergenceRate
       value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8146274523747296459, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
+      propertyPath: smoothingCurve.m_Curve.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8146274523747296459, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
+      propertyPath: smoothingCurve.m_Curve.Array.data[1].time
+      value: 0.49787837
+      objectReference: {fileID: 0}
+    - target: {fileID: 8146274523747296459, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
+      propertyPath: smoothingCurve.m_Curve.Array.data[2].time
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8146274523747296459, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
+      propertyPath: smoothingCurve.m_Curve.Array.data[0].value
+      value: 0.004760742
+      objectReference: {fileID: 0}
+    - target: {fileID: 8146274523747296459, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
+      propertyPath: smoothingCurve.m_Curve.Array.data[1].value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8146274523747296459, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
+      propertyPath: smoothingCurve.m_Curve.Array.data[0].inSlope
+      value: 1.9989606
+      objectReference: {fileID: 0}
+    - target: {fileID: 8146274523747296459, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
+      propertyPath: smoothingCurve.m_Curve.Array.data[1].inSlope
+      value: 0.0037056208
+      objectReference: {fileID: 0}
+    - target: {fileID: 8146274523747296459, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
+      propertyPath: smoothingCurve.m_Curve.Array.data[2].inSlope
+      value: -1.9915494
+      objectReference: {fileID: 0}
+    - target: {fileID: 8146274523747296459, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
+      propertyPath: smoothingCurve.m_Curve.Array.data[0].outSlope
+      value: 1.9989606
+      objectReference: {fileID: 0}
+    - target: {fileID: 8146274523747296459, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
+      propertyPath: smoothingCurve.m_Curve.Array.data[1].inWeight
+      value: 0.33333334
+      objectReference: {fileID: 0}
+    - target: {fileID: 8146274523747296459, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
+      propertyPath: smoothingCurve.m_Curve.Array.data[1].outSlope
+      value: 0.0037056208
+      objectReference: {fileID: 0}
+    - target: {fileID: 8146274523747296459, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
+      propertyPath: smoothingCurve.m_Curve.Array.data[2].inWeight
+      value: 0.33333334
+      objectReference: {fileID: 0}
+    - target: {fileID: 8146274523747296459, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
+      propertyPath: smoothingCurve.m_Curve.Array.data[2].outSlope
+      value: -1.9915494
+      objectReference: {fileID: 0}
+    - target: {fileID: 8146274523747296459, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
+      propertyPath: smoothingCurve.m_Curve.Array.data[0].outWeight
+      value: 0.33333334
+      objectReference: {fileID: 0}
+    - target: {fileID: 8146274523747296459, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
+      propertyPath: smoothingCurve.m_Curve.Array.data[1].outWeight
+      value: 0.33333334
+      objectReference: {fileID: 0}
+    - target: {fileID: 8146274523747296459, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
+      propertyPath: smoothingCurve.m_Curve.Array.data[0].tangentMode
+      value: 34
+      objectReference: {fileID: 0}
+    - target: {fileID: 8146274523747296459, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
+      propertyPath: smoothingCurve.m_Curve.Array.data[1].tangentMode
+      value: 34
+      objectReference: {fileID: 0}
+    - target: {fileID: 8146274523747296459, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
+      propertyPath: smoothingCurve.m_Curve.Array.data[2].tangentMode
+      value: 34
       objectReference: {fileID: 0}
     - target: {fileID: 8907203368228710122, guid: c5846b60617435043bb5a8cb2cf68999, type: 3}
       propertyPath: target
@@ -5062,7 +5134,7 @@ MonoBehaviour:
   m_OverrideArea: 1
   m_Area: 1
   m_IgnoreFromBuild: 0
-  m_AffectedAgents: ffffffff
+  m_AffectedAgents: ffffffffi
 --- !u!1 &1301527234
 GameObject:
   m_ObjectHideFlags: 0
@@ -5663,6 +5735,14 @@ PrefabInstance:
     - target: {fileID: 4200184753836605426, guid: 314166ff7f239114ea80a4a26b4b6346, type: 3}
       propertyPath: gizmoRadius
       value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4200184753836605426, guid: 314166ff7f239114ea80a4a26b4b6346, type: 3}
+      propertyPath: noCollisionVelocitiesColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4200184753836605426, guid: 314166ff7f239114ea80a4a26b4b6346, type: 3}
+      propertyPath: noCollisionVelocitiesColor.r
+      value: 0.34369373
       objectReference: {fileID: 0}
     - target: {fileID: 6112199516070744878, guid: 314166ff7f239114ea80a4a26b4b6346, type: 3}
       propertyPath: iSensor

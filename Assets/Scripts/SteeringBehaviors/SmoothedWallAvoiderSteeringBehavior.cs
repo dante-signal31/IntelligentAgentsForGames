@@ -17,9 +17,9 @@ public class SmoothedWallAvoiderSteeringBehavior: SteeringBehavior, ITargeter
     [Tooltip("Usher scene to spawn.")]
     [SerializeField] private GameObject usherPrefab;
     [Tooltip("How far should usher start ahead of current agent.")]
-    [SerializeField] private float usherAdvantage;
+    [SerializeField] private float usherAdvantage = 2.0f;
     [Tooltip("Distance to usher to consider it reached.")]
-    [SerializeField] private float reachingDistanceToUsher = 20.0f;
+    [SerializeField] private float reachingDistanceToUsher = 0.1f;
     [Tooltip("Time to wait after reaching usher to start chasing it again.")]
     [SerializeField] private float secondsToWaitAfterReachingUsher = 1.0f;
     
@@ -71,7 +71,6 @@ public class SmoothedWallAvoiderSteeringBehavior: SteeringBehavior, ITargeter
         set => gizmosColor = value;
     }
     
-    
     private ITargeter _chaseToUsherTargeter;
     private AgentMover _currentAgent;
     private UsherWaiterAgent _usherAgent;
@@ -89,6 +88,18 @@ public class SmoothedWallAvoiderSteeringBehavior: SteeringBehavior, ITargeter
         _chaseToUsherTargeter = (ITargeter)chaseToUsherSteeringBehavior;
         CreateUsher();
     }
+    
+    private void CreateUsher()
+    {
+        // Create usher to follow.
+        _usherAgent = Instantiate(
+            usherPrefab, 
+            transform.position, 
+            Quaternion.identity, 
+            null).GetComponent<UsherWaiterAgent>();
+        _usherAgentSteeringBehaviorGizmos = (IGizmos) _usherAgent.SteeringBehavior;
+        _usherTargeter = (ITargeter)_usherAgent.SteeringBehavior;
+    }
 
     private void Start()
     {
@@ -101,16 +112,22 @@ public class SmoothedWallAvoiderSteeringBehavior: SteeringBehavior, ITargeter
         _chaseToUsherTargeter.Target = _usherAgent.gameObject;
     }
     
-    private void CreateUsher()
+    private void ConfigureUsher()
     {
-        // Create usher to follow.
-        _usherAgent = Instantiate(
-            usherPrefab, 
-            transform.position, 
-            Quaternion.identity, 
-            null).GetComponent<UsherWaiterAgent>();
-        _usherAgentSteeringBehaviorGizmos = (IGizmos) _usherAgent.SteeringBehavior;
-        _usherTargeter = (ITargeter)_usherAgent.SteeringBehavior;
+        // Place the usher ahead of our agent.
+        _usherAgent.transform.position = _currentAgent.transform.position + 
+                                         usherAdvantage * (Vector3)_currentAgent.Forward;
+        
+        // Configure usher.
+        _usherAgent.FollowingAgent = _currentAgent;
+        _usherAgent.MaximumSpeed = _currentAgent.MaximumSpeed;
+        _usherAgent.StopSpeed = _currentAgent.StopSpeed;
+        _usherAgent.MaximumAcceleration = _currentAgent.MaximumAcceleration;
+        _usherAgent.MaximumDeceleration = _currentAgent.MaximumDeceleration;
+        _usherAgent.MaximumRotationalSpeed = _currentAgent.MaximumRotationalSpeed;
+        
+        // Give usher a place to go to.
+        _usherTargeter.Target = target;
     }
 
     private void OnEnable()
@@ -130,24 +147,6 @@ public class SmoothedWallAvoiderSteeringBehavior: SteeringBehavior, ITargeter
         if (_usherAgent == null) return;
         Destroy(_usherAgent.gameObject);
     }
-
-    private void ConfigureUsher()
-    {
-        // Place the usher ahead of our agent.
-        _usherAgent.transform.position = _currentAgent.transform.position + 
-                               usherAdvantage * (Vector3)_currentAgent.Forward;
-        
-        // Configure usher.
-        _usherAgent.FollowingAgent = _currentAgent;
-        _usherAgent.MaximumSpeed = _currentAgent.MaximumSpeed;
-        _usherAgent.StopSpeed = _currentAgent.StopSpeed;
-        _usherAgent.MaximumAcceleration = _currentAgent.MaximumAcceleration;
-        _usherAgent.MaximumDeceleration = _currentAgent.MaximumDeceleration;
-        _usherAgent.MaximumRotationalSpeed = _currentAgent.MaximumRotationalSpeed;
-        
-        // Give usher a place to go to.
-        _usherTargeter.Target = target;
-    }
     
     private void SetTimer()
     {
@@ -166,8 +165,7 @@ public class SmoothedWallAvoiderSteeringBehavior: SteeringBehavior, ITargeter
         _givingAdvantageToUsher = true;
         _advantageTimer.StartTimer();
     }
-
-
+    
     public override SteeringOutput GetSteering(SteeringBehaviorArgs args)
     {
         if (chaseToUsherSteeringBehavior == null || _usherAgent == null) 

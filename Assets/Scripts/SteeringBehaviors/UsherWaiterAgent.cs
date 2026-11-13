@@ -1,29 +1,23 @@
-﻿using PropertyAttribute;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SteeringBehaviors
 {
 public class UsherWaiterAgent: AgentMover
 {
     [Header("USHER WAITER CONFIGURATION:")]
-    [Tooltip(" Maximum distance that the following agent can lag behind usher.")]
+    [Tooltip("Maximum distance that the following agent can lag behind usher.")]
     [SerializeField] public float maximumLaggingBehindDistance  = 0.5f;
-
-    [Header("WIRING:")]
-    [Tooltip("Steering behavior to move the formation. It must be ITargeter compliant")]
-    [InterfaceCompliant(typeof(ITargeter))]
-    [SerializeField] private SteeringBehavior targeter;
     
     // Following agent.
     public AgentMover FollowingAgent {get; set;}
     
-    // Steering behavior to move the formation.
+    // Steering behavior to move the usher.
     private ITargeter _targeter;
     
     private float _originalMaximumSpeed;
     
     /// <summary>
-    /// Distance between the members' average positions and formation usher.
+    /// Distance between the members' average positions and usher.
     /// </summary>
     private float LaggingBehindDistance => Vector2.Distance(
         transform.position,
@@ -41,7 +35,7 @@ public class UsherWaiterAgent: AgentMover
     protected override void Start()
     {
         base.Start();
-        _targeter = (ITargeter) targeter;
+        _targeter = (ITargeter) steeringBehavior;
         _originalMaximumSpeed = MaximumSpeed;
     }
 
@@ -52,10 +46,9 @@ public class UsherWaiterAgent: AgentMover
             // If we are leaving behind the following agent. We want to slow down so that
             // the following agent has time to catch the usher.
             MaximumSpeed = _originalMaximumSpeed * 
-                           (1 - Mathf.Min(
-                               LaggingBehindDistance, 
-                               maximumLaggingBehindDistance) / 
-                               maximumLaggingBehindDistance);
+                           (1 - 
+                            Mathf.Min(LaggingBehindDistance, maximumLaggingBehindDistance) 
+                            / maximumLaggingBehindDistance);
         }
         else
         {

@@ -123,7 +123,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3427322213753861587, guid: bbc64906f3bb67d47aa32f3f9b3362bc, type: 3}
       propertyPath: showGizmos
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3427322213753861587, guid: bbc64906f3bb67d47aa32f3f9b3362bc, type: 3}
       propertyPath: sectorRange
@@ -588,7 +588,6 @@ MonoBehaviour:
     m_RotationOrder: 4
   exponentialConvergenceRate: 0.6
   maximumLaggingBehindDistance: 5
-  targeter: {fileID: 269389913369550841}
 --- !u!4 &4611234838970947425 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5062723459673179850, guid: d0ed024f3daa0dc4f830e2f4cd6eebc1, type: 3}

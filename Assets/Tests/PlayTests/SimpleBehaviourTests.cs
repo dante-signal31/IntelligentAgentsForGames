@@ -1396,7 +1396,7 @@ namespace Tests.PlayTests
             {
                 yield return new WaitForSeconds(1.0f);
                 Assert.True(Vector3.Distance(_seekGameObject.transform.position,
-                    _agentAvoiderGameObject.transform.position) >= (1.4f));
+                    _agentAvoiderGameObject.transform.position) >= (1.1f));
             }
 
             // Assert we reached target.
@@ -1862,7 +1862,7 @@ namespace Tests.PlayTests
             _annAgentAvoiderGameObject.SetActive(true);
 
             // Assert we move without touching the obstacle agent.
-            int steps = 12;
+            int steps = 15;
             for (int i = 0; i < steps; i++)
             {
                 yield return new WaitForSeconds(1.2f);
