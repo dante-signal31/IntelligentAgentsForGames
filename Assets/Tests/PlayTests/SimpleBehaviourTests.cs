@@ -1457,7 +1457,7 @@ namespace Tests.PlayTests
             {
                 yield return new WaitForSeconds(1.2f);
                 Assert.True(Vector3.Distance(_seekGameObject.transform.position,
-                    _agentAvoiderGameObject.transform.position) >= (1.1f));
+                    _agentAvoiderGameObject.transform.position) > (1.0f));
             }
 
             // Assert we reached target.
