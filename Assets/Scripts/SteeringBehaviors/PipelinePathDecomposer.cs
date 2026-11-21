@@ -17,11 +17,11 @@ public class PipelinePathDecomposer: MonoBehaviour, IPipelineDecomposer
     
     private Vector2 _currentGoalPosition;
     private Path _currentPath;
-    private Path partialPath;
+    private Path _partialPath;
 
     private void Start()
     {
-        partialPath = new GameObject($"{name} - Partial Path").AddComponent<Path>();
+        _partialPath = new GameObject($"{name} - Partial Path").AddComponent<Path>();
     }
 
 
@@ -34,17 +34,17 @@ public class PipelinePathDecomposer: MonoBehaviour, IPipelineDecomposer
         if (_currentPath == null) return goal;
         
         // If the path is too short, then we don't need to decompose it.
-        partialPath.ClearPath();
+        _partialPath.ClearPath();
         foreach (Vector2 pathTargetPosition in _currentPath.positions)
         {
-            partialPath.AppendPosition(pathTargetPosition);
-            if (partialPath.PathLength >= minimumChunkLength) break;
+            _partialPath.AppendPosition(pathTargetPosition);
+            if (_partialPath.PathLength >= minimumChunkLength) break;
         }
-        if (partialPath.positions.Count <= 1) return goal;
+        if (_partialPath.positions.Count <= 1) return goal;
         
         // Goal is passed by reference, so we are updating directly the passed in
         // parameter. It doesn't matter because decomposers are run sequentially.
-        goal.Position = partialPath.positions[^1];
+        goal.Position = _partialPath.positions[^1];
         
         return goal;
     }

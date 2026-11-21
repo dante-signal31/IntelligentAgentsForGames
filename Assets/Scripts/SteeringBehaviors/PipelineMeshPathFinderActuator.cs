@@ -12,14 +12,14 @@ public class PipelineMeshPathFinderActuator: MonoBehaviour, IPipelineActuator
     [Header("WIRING:")]
     [SerializeField] private MeshPathFinderSteeringBehavior meshPathFinderSteeringBehavior;
     
-    private Vector2 currentGoalPosition;
+    private Vector2 _currentGoalPosition;
 
     public Path GetPath(PipelineGoal goal, SteeringBehaviorArgs args)
     {
-        if (currentGoalPosition != goal.Position)
+        if (_currentGoalPosition != goal.Position)
         {
             meshPathFinderSteeringBehavior.TargetPosition = goal.Position;
-            currentGoalPosition = goal.Position;
+            _currentGoalPosition = goal.Position;
         }
         
         return meshPathFinderSteeringBehavior.CurrentPath;

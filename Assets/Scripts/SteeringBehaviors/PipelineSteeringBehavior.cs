@@ -12,9 +12,10 @@ namespace SteeringBehaviors
 /// </summary>
 public class PipelineSteeringBehavior : SteeringBehavior
 {
+    [FormerlySerializedAs("avoidanceTimeout")]
     [FormerlySerializedAs("AvoidanceTimeout")]
     [Header("CONFIGURATION:")] 
-    [SerializeField] public float avoidanceTimeout = 0.5f;
+    [SerializeField] public float cooldownTimeout = 0.5f;
 
     [Header("WIRING:")]
     [SerializeField] private PipelineTargeterAggregator targeterAggregator;
@@ -24,16 +25,16 @@ public class PipelineSteeringBehavior : SteeringBehavior
     [SerializeField] private MonoBehaviour actuatorBehavior;
     [SerializeField] private SteeringBehavior deadlockSteeringBehavior;
 
-    private IPipelineActuator actuator;
+    private IPipelineActuator _actuator;
     private Timer _cooldownTimer;
     private bool _waitingForCooldownTimeout;
     private SteeringOutput _currentSteering;
 
     private void Start()
     {
-        actuator = (IPipelineActuator) actuatorBehavior;
+        _actuator = (IPipelineActuator) actuatorBehavior;
         
-        _cooldownTimer = new Timer(avoidanceTimeout * 1000);
+        _cooldownTimer = new Timer(cooldownTimeout * 1000);
         _cooldownTimer.AutoReset = false;
         _cooldownTimer.Elapsed += OnCooldownTimeout;
     }
@@ -71,7 +72,7 @@ public class PipelineSteeringBehavior : SteeringBehavior
         PipelineGoal constrainedGoal = constraintsAggregator.ApplyConstraints(
             partialGoal,
             args,
-            actuator);
+            _actuator);
     
         if (constrainedGoal == null)
             // If we get here, then it means no meaningful goal was found.
@@ -80,7 +81,7 @@ public class PipelineSteeringBehavior : SteeringBehavior
     
         // If a subgoal could be calculated, then we ask the actuator to get the best
         // steering output to achieve the goal.
-        _currentSteering = actuator.GetOutput(constrainedGoal, args);
+        _currentSteering = _actuator.GetOutput(constrainedGoal, args);
         StartCooldownTimer();
         return _currentSteering;
     }
